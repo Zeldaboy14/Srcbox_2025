@@ -1,0 +1,10 @@
+UnlitGeneric
+{
+
+
+$translucent 1
+$basetexture "VGUI\s_panel_gambler_incap"
+$vertexcolor 1
+$no_fullbright 1
+$ignorez 1
+}

@@ -1,0 +1,14 @@
+UnlitGeneric
+{
+
+
+$translucent 1
+$basetexture "VGUI\LoadingScreen_background"
+$vertexcolor 1
+$vertexalpha 1
+$no_fullbright 1
+$ignorez 1
+$additive 0
+$color2 "[ 0.333 0.333 0.333 ]"
+$SHADERSRGBREAD360 1
+}

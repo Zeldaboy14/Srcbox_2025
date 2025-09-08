@@ -1,0 +1,10 @@
+UnlitGeneric
+{
+$baseTexture "vgui/terror/l4d360ui/hud/inventory_pipebomb"
+$translucent 1
+$vertexcolor 1
+$vertexalpha 1
+$ignorez 1
+$additive 0
+$no_fullbright 1
+}

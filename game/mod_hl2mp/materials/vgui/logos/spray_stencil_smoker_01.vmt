@@ -1,0 +1,7 @@
+LightmappedGeneric
+{
+$basetexture "vgui\logos\spray_stencil_smoker_01"
+$translucent 1
+$decal 1
+$decalscale "0.250"
+}

@@ -1,0 +1,7 @@
+UnlitGeneric
+{
+$basetexture "vgui\icon_l4d"
+$translucent 1
+$ignorez 1
+$vertexcolor 1
+}

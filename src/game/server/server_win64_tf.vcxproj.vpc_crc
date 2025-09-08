@@ -1,0 +1,28 @@
+[vpc crc file version 3]
+_.HOST_WIN64.HOST_WINDOWS.SOURCESDK.VS2022.WINDOWS_/vpcgame:valve_
+PROJECT.server.GAME.tf.PLATFORM.win64
+106a480f server_tf.vpc
+0cb9fb49 ..\..\game\server\server_base.vpc
+2093e423 ..\..\vpc_scripts\source_dll_base.vpc
+8ef6e028 ..\..\vpc_scripts\platform_dirs.vpc
+a75746b9 ..\..\vpc_scripts\source_base.vpc
+ef326a62 ..\..\vpc_scripts\definitions\win32_2010.def
+0e70677c ..\..\vpc_scripts\source_dll_win32_base.vpc
+0218a46e ..\..\vpc_scripts\version.vpc
+eab33351 ..\..\vpc_scripts\loadaddress.vpc
+0c8d4e68 ..\..\vpc_scripts\source_dll_win32_debug.vpc
+079c5af9 ..\..\vpc_scripts\source_dll_win32_release.vpc
+0cebedfb ..\..\vpc_scripts\source_win32_base.vpc
+10b424ea ..\..\vpc_scripts\source_video_base.vpc
+b7a46bf5 ..\..\vpc_scripts\protobuf_builder.vpc
+4ba2d0f0 ..\..\vpc_scripts\source_replay.vpc
+a70e0403 ..\..\vpc_scripts\source_replay_private.vpc
+74cdfe10 ..\..\game\protobuf_include.vpc
+e9a33f4b ..\..\game\server\server_econ_base.vpc
+186ee7ef ..\..\gcsdk\gcsdk_game_include.vpc
+fe83cad1 ..\..\gcsdk\steammessages_include.vpc
+d301b74b ..\..\game\shared\base_gcmessages_include.vpc
+389ecfc7 ..\..\game\shared\econ_gcmessages_include.vpc
+0e36526c ..\..\game\shared\tf\tf_gcmessages_include.vpc
+09adcae2 ..\..\game\shared\tf\tf_proto_def_messages_include.vpc
+1a15c62b ..\..\game\server\nav_mesh.vpc

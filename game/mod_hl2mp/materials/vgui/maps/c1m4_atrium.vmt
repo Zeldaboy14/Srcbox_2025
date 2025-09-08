@@ -1,0 +1,8 @@
+UnlitGeneric
+{
+$basetexture "vgui\maps\c1m4_atrium"
+$translucent 1
+$ignorez 1
+$vertexcolor 1
+$vertexalpha 1
+}

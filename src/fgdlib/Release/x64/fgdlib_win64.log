@@ -1,0 +1,17 @@
+﻿  A subdirectory or file ..\lib\public\x64 already exists.
+  gamedata.cpp
+  gdclass.cpp
+  gdvar.cpp
+  inputoutput.cpp
+  wckeyvalues.cpp
+U:\GitHub\source-sdk-2013_2025\src\public\fgdlib\HelperInfo.h(83,12): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+  (compiling source file 'gdvar.cpp')
+  
+U:\GitHub\source-sdk-2013_2025\src\public\fgdlib\HelperInfo.h(83,12): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+  (compiling source file 'gdclass.cpp')
+  
+U:\GitHub\source-sdk-2013_2025\src\fgdlib\wckeyvalues.cpp(194,11): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+U:\GitHub\source-sdk-2013_2025\src\public\fgdlib\HelperInfo.h(83,12): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+  (compiling source file 'gamedata.cpp')
+  
+  fgdlib_win64.vcxproj -> U:\GitHub\source-sdk-2013_2025\src\lib\public\x64\fgdlib.lib

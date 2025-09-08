@@ -1,0 +1,10 @@
+UnlitGeneric
+{
+$baseTexture "vgui/s_panel_healthcross"
+$translucent 1
+$vertexcolor 1
+$vertexalpha 1
+$ignorez 1
+$additive 0
+$no_fullbright 1
+}

@@ -1,0 +1,10 @@
+UnlitGeneric
+{
+
+$translucent 1
+$vertexcolor 1
+$no_fullbright 1
+$ignorez 1
+$no_draw 1
+$basetexture "vgui\gfx\vgui\defaultweapon"
+}

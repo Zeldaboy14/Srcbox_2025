@@ -1,0 +1,97 @@
+//-----------------------------------------------------------------------------
+//	STUDIOMDL.VPC
+//
+//	Project Script
+//-----------------------------------------------------------------------------
+
+$Macro SRCDIR		"..\.."
+$Macro OUTBINDIR	"$SRCDIR\..\game\bin"
+$Macro OUTBINNAME	"studiomdl"
+
+$Include "$SRCDIR\vpc_scripts\source_exe_con_base.vpc"
+
+$Configuration
+{
+	$Compiler
+	{
+		$AdditionalIncludeDirectories	"$BASE;../nvtristriplib;../xwad;../../public/mathlib;../common;../../public/"
+		$TreatWarningsAsErrors			"No (/WX-)"
+	}
+
+	$Linker [$WIN32]
+	{
+		$EnableLargeAddresses				"Support Addresses Larger Than 2 Gigabytes (/LARGEADDRESSAWARE)"	
+		$SubSystem							"Windows (/SUBSYSTEM:WINDOWS)"
+		$AdditionalDependencies				"$BASE;comctl32.lib"
+		$EntryPoint						"mainCRTStartup"
+	}
+}
+
+$Project "Studio MDL"
+{
+
+	$Folder	"Source Files"
+	{
+		//$Folder "External"
+		//{
+			//$File "..\..\public\bone_setup.cpp"
+			//$File "..\..\Public\CollisionUtils.cpp"
+			//$File "..\..\public\filesystem_helpers.cpp"
+			//$File "..\..\public\filesystem_init.cpp"
+			//$File "..\..\public\studio.cpp"
+			//$File "..\..\public\tier0\memoverride.cpp"
+			//$File "..\common\cmdlib.cpp"
+			//$File "..\common\FileSystem_Tools.cpp"
+			//$File "..\common\mstristrip.cpp"
+			//$File "..\common\physdll.cpp"
+			//$File "..\common\scriplib.cpp"
+		//}
+		$File "..\..\public\bone_setup.cpp"
+		$File "collisionmodel.cpp"
+		$File "..\..\Public\CollisionUtils.cpp"
+		$File "..\..\public\filesystem_helpers.cpp"
+		$File "..\..\public\filesystem_init.cpp"
+		$File "..\..\public\studio.cpp"
+		$File "..\..\public\tier0\memoverride.cpp"
+		$File "..\common\cmdlib.cpp"
+		$File "..\common\FileSystem_Tools.cpp"
+		$File "..\common\mstristrip.cpp"
+		$File "..\common\physdll.cpp"
+		$File "..\common\scriplib.cpp"
+		//$File "bmpread.cpp"
+		$File "hardwarematrixstate.cpp"
+		$File "hardwarevertexcache.cpp"
+		$File "matsys.cpp"
+		$File "mrmsupport.cpp"
+		$File "objsupport.cpp"
+		$File "optimize.cpp"
+		$File "perfstats.cpp"
+		$File "simplify.cpp"
+		$File "studiomdl.cpp"
+		//$File "tristrip.cpp"
+		$File "unifylods.cpp"
+		$File "v1support.cpp"
+		$File "write.cpp"
+	}
+
+	$Folder	"Header Files"
+	{
+			$File "collisionmodel.h"
+			$File "filebuffer.h"
+			$File "hardwarematrixstate.h"
+			$File "hardwarevertexcache.h"
+			$File "matsys.h"
+			$File "perfstats.h"
+			$File "studiomdl.h"
+	}
+	
+	$Folder	"Libraries"
+	{
+		$Lib "mathlib"
+		$Lib "nvtristrip"
+		$Lib "tier0"
+		$Lib "tier1"
+		$Lib "tier2"
+		$Lib "vstdlib"
+	}
+}

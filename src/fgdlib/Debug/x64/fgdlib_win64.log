@@ -1,0 +1,16 @@
+﻿  gamedata.cpp
+  gdclass.cpp
+  gdvar.cpp
+  inputoutput.cpp
+  wckeyvalues.cpp
+C:\Users\zelda\Documents\GitHub\Srcbox\src\public\fgdlib\HelperInfo.h(83,12): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+  (compiling source file '../../fgdlib/gdvar.cpp')
+  
+C:\Users\zelda\Documents\GitHub\Srcbox\src\fgdlib\wckeyvalues.cpp(194,11): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\zelda\Documents\GitHub\Srcbox\src\public\fgdlib\HelperInfo.h(83,12): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+  (compiling source file '../../fgdlib/gdclass.cpp')
+  
+C:\Users\zelda\Documents\GitHub\Srcbox\src\public\fgdlib\HelperInfo.h(83,12): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+  (compiling source file '../../fgdlib/gamedata.cpp')
+  
+  fgdlib_win64.vcxproj -> C:\Users\zelda\Documents\GitHub\Srcbox\src\lib\public\x64\fgdlib.lib

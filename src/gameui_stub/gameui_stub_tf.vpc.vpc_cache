@@ -1,0 +1,13 @@
+"vpc_cache"
+{
+	"CacheVersion"		"1"
+	"win64"
+	{
+		"CRCFile"		"gameui_stub_win64_tf.vcxproj.vpc_crc"
+		"OutputFiles"
+		{
+			"0"		"gameui_stub_win64_tf.vcxproj"
+			"1"		"gameui_stub_win64_tf.vcxproj.filters"
+		}
+	}
+}

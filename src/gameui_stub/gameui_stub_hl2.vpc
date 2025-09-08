@@ -1,0 +1,36 @@
+//-----------------------------------------------------------------------------
+//	GAMEUI_STUB.VPC
+//
+//	Project Script
+//-----------------------------------------------------------------------------
+$Macro SRCDIR		".."
+$Macro GAMENAME 	"hl2mp" [!$SOURCESDK]
+$Macro GAMENAME 	"mod_hl2mp" [$SOURCESDK]
+
+$Macro OUTBINNAME	"GameUI"
+$Macro OUTBINDIR	"$SRCDIR\..\game\$GAMENAME\bin"
+
+$Include "$SRCDIR\vpc_scripts\source_dll_base.vpc"
+
+
+$Configuration
+{
+
+	$Compiler
+	{
+		$AdditionalIncludeDirectories	"$BASE;.\;$SRCDIR\common\GameUI;$SRCDIR\public"
+		$PreprocessorDefinitions		"$BASE;"
+	}
+
+}
+
+$Project "GameUI Stub [HL2MP]"
+{
+	
+	$File "gameui_stub.cpp"
+
+
+	$Folder	"Link Libraries"
+	{
+ 	}
+}

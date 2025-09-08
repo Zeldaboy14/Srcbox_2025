@@ -1,0 +1,8 @@
+UnlitGeneric
+{
+$baseTexture "vgui\maps/c4m3_sugarmill_b"
+$translucent 1
+$ignorez 1
+$vertexcolor 1
+$vertexalpha 1
+}

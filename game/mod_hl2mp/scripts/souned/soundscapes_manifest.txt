@@ -1,0 +1,38 @@
+soundscaples_manifest
+{
+	"file"		"scripts/soundscapes.txt"
+
+	// List additional soundscape files here
+
+	"file"		"scripts/soundscapes_canals.txt"
+	"file"		"scripts/soundscapes_klab.txt"
+	"file"		"scripts/soundscapes_elab.txt"
+	"file"		"scripts/soundscapes_streetwar.txt"
+	"file"		"scripts/soundscapes_citadel.txt"
+	"file"		"scripts/soundscapes_town.txt"
+	"file"		"scripts/soundscapes_coast.txt"
+	"file"		"scripts/soundscapes_prison.txt"
+	"file"		"scripts/soundscapes_trainyard.txt"
+	"file"		"scripts/soundscapes_hospital.txt"
+	"file"		"scripts/soundscapes_rural2.txt"
+	"file"		"scripts/soundscapes_urban2.txt"
+	"file"		"scripts/soundscapes_rural.txt"
+	"file"		"scripts/soundscapes_urban.txt"
+	"file"		"scripts/soundscapes_smalltown.txt"
+	"file"		"scripts/soundscapes_farm.txt"
+	"file"		"scripts/soundscapes_airport.txt"
+	"file"		"scripts/soundscapes_lighthouse.txt"
+	"file"		"scripts/soundscapes_campaign6.txt"
+	"file"		"scripts/soundscapes_campaign5.txt"
+	"file"		"scripts/soundscapes_campaign4.txt"
+	"file"		"scripts/soundscapes_campaign3.txt"
+	"file"		"scripts/soundscapes_campaign2.txt"
+	"file"		"scripts/soundscapes_campaign1.txt"
+	"file"		"scripts/soundscapes_swamps.txt"
+	
+	// River campaign - Campaign 7
+	"file"		"scripts/soundscapes_river.txt"
+	
+	// List additional soundscape files here
+	"file"		"scripts/soundscapes_garage.txt"
+}

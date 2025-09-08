@@ -1,0 +1,18 @@
+Refract
+{
+$MIRRORABOUTVIEWPORTEDGES 1
+"!360?$NOVIEWPORTFIXUP" 1
+$model 1
+$refractamount ".1"
+$bluramount 1
+$scale "[1 1]"
+$dudvmap "vgui\HUD\scope_dudv_ul"
+$normalmap "vgui\HUD\scope_normal_ul"
+$bumpframe 0
+$translucent 1
+$ignorez 1
+$forcerefract 1
+$nofog 1
+$refracttinttexture "vgui\HUD\scope_sniper_ul"
+
+}

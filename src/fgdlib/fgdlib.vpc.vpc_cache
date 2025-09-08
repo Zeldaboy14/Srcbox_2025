@@ -1,0 +1,13 @@
+"vpc_cache"
+{
+	"CacheVersion"		"1"
+	"win64"
+	{
+		"CRCFile"		"fgdlib_win64.vcxproj.vpc_crc"
+		"OutputFiles"
+		{
+			"0"		"fgdlib_win64.vcxproj"
+			"1"		"fgdlib_win64.vcxproj.filters"
+		}
+	}
+}

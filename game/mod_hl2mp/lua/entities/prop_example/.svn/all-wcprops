@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/svn/!svn/ver/61/trunk/lua/entities/prop_example
+END
+cl_init.lua
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/svn/!svn/ver/61/trunk/lua/entities/prop_example/cl_init.lua
+END
+init.lua
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/svn/!svn/ver/61/trunk/lua/entities/prop_example/init.lua
+END
+shared.lua
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/!svn/ver/61/trunk/lua/entities/prop_example/shared.lua
+END

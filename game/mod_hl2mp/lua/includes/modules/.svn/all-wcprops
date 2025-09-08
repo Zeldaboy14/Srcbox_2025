@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 44
+/svn/!svn/ver/286/trunk/lua/includes/modules
+END
+bit.dll
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/!svn/ver/253/trunk/lua/includes/modules/bit.dll
+END
+weapon.lua
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/svn/!svn/ver/256/trunk/lua/includes/modules/weapon.lua
+END
+cvar.lua
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/svn/!svn/ver/286/trunk/lua/includes/modules/cvar.lua
+END
+entity.lua
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/svn/!svn/ver/256/trunk/lua/includes/modules/entity.lua
+END
+save.lua
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/svn/!svn/ver/286/trunk/lua/includes/modules/save.lua
+END
+concommand.lua
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/!svn/ver/286/trunk/lua/includes/modules/concommand.lua
+END
+gamemode.lua
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/svn/!svn/ver/286/trunk/lua/includes/modules/gamemode.lua
+END
+hook.lua
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/svn/!svn/ver/286/trunk/lua/includes/modules/hook.lua
+END

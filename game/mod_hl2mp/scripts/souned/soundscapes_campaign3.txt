@@ -1,0 +1,864 @@
+//
+// Campaign 3 Soundscapes
+//
+// These are Derived from the urban soundscapes.
+//
+// Please keep all generic and global updates within swamps, 
+// while any map specific replacements or changes go here.
+
+
+//=======================
+//=======================
+//   C3M1 Plankcountry
+//=======================
+//=======================
+
+
+
+"c3m1.gasstationspawn"
+{
+	"dsp" "1"
+
+	"playsoundscape" 
+ 	{
+		"name"		"swamps.gasstation"
+		"volume" 	"1"
+	}
+	"playsoundscape" 
+ 	{
+		"name"		"urban2.util_cicadas"
+		"volume" 	"1"
+	}
+
+	//light insects
+	"playlooping"
+	{
+		"volume"	"0.27"
+		"pitch"		"125"
+		"wave"		"ambient/ambience/Cicada_Loop.wav"
+		"origin"	"-10767.832031, 9164.086914, 160.031250;"
+		"soundlevel" 	"SNDLVL_85dB"
+	}
+
+	"playlooping"
+	{
+		"volume"	"0.3"
+		"pitch"		"103"
+		"wave"		"ambient/ambience/Cicada_Loop.wav"
+		"origin"	"-7571.685059, 8929.197266, 32.031250;"
+		"soundlevel" 	"SNDLVL_85dB"
+	}
+	
+}
+
+"c3m1.gasstaionspawn"
+{
+	"dsp" "1"
+
+	"playsoundscape" 
+ 	{
+		"name"		"swamps.gasstation"
+		"volume" 	"1"
+	}
+	"playsoundscape" 
+ 	{
+		"name"		"urban2.util_cicadas"
+		"volume" 	"1"
+	}
+
+	//light insects
+	"playlooping"
+	{
+		"volume"	"0.27"
+		"pitch"		"125"
+		"wave"		"ambient/ambience/Cicada_Loop.wav"
+		"origin"	"-10767.832031, 9164.086914, 160.031250;"
+		"soundlevel" 	"SNDLVL_85dB"
+	}
+
+	"playlooping"
+	{
+		"volume"	"0.3"
+		"pitch"		"103"
+		"wave"		"ambient/ambience/Cicada_Loop.wav"
+		"origin"	"-7571.685059, 8929.197266, 32.031250;"
+		"soundlevel" 	"SNDLVL_85dB"
+	}
+	
+}
+
+"c3m1.houseinteriors"
+{
+	"dsp" "1"
+
+	"playsoundscape" 
+ 	{
+		"name"	"c3m1.gasstationspawn"
+		"volume" ".3"
+	}
+
+}
+
+"c3m1.dock"
+{
+	"dsp" "1"
+
+	"playsoundscape"
+	{
+		"name"	"swamps.dock"
+		"volume" ".5"
+	}
+	"playlooping"
+	{
+		"volume"	"0.88"
+		"pitch"		"103"
+		"wave"		"ambient/ambience/mosquito_loop_st.wav"
+
+	}
+	
+}
+
+
+"c3m1.openinterior"
+{
+	"dsp" "1"
+
+	"playsoundscape"
+	{
+		"name"	"urban2.street"
+		"volume" "1"
+	}
+
+	//street manhole vent
+	"playlooping"
+	{
+		"volume"	".8"
+		"pitch"		"100"
+		"wave"		"ambient/Spacial_Loops/ManHoleSteam_loop.wav"
+		"origin"	"-989.178345, -2073.994873, -375.647522;"
+		"soundlevel" 	"SNDLVL_65dB"
+	}
+	//street manhole vent
+	"playlooping"
+	{
+		"volume"	".8"
+		"pitch"		"100"
+		"wave"		"ambient/Spacial_Loops/ManHoleSteam_loop.wav"
+		"origin"	"-3393.560791, -1247.106567, -379.968750;"
+		"soundlevel" 	"SNDLVL_65dB"
+	}
+	//Fire 
+	"playlooping"
+	{
+		"volume"	".6"
+		"pitch"		"110"
+		"wave"		"ambient/Spacial_Loops/MediumFire_Loop.wav"
+		"origin"	"-9823.568359, -3305.402588, -201.920990;"
+		"soundlevel" 	"SNDLVL_70dB"
+	}
+
+	// sea birds
+	"playrandom"
+	{
+		"time"		"7,25"
+		"volume"	"0.14,0.15"
+		"pitch"		"90,110"
+		"position"	"random"
+
+		"rndwave"
+		{
+			"wave"	"ambient/Random_Amb_SFX/RUR5b_Seagull01.wav"
+			"wave"	"ambient/Random_Amb_SFX/RUR5b_Seagull02.wav"
+			"wave"	"ambient/Random_Amb_SFX/RUR5b_Seagull03.wav"
+			"wave"	"ambient/Random_Amb_SFX/RUR5b_Seagull04.wav"
+			"wave"	"ambient/Random_Amb_SFX/RUR5b_Seagull05.wav"
+			"wave"	"ambient/Random_Amb_SFX/RUR5b_Seagull06.wav"
+		}
+	}
+	
+	
+}
+
+
+"c3m1.plankswamp"
+{
+
+	"dsp"	"1"
+
+	"playsoundscape"
+	{
+		"name"	"swamps.plankswamp_01"
+		"volume" "1"
+	}
+
+	//localized frogs
+	"playlooping"
+	{
+		"volume"	".5"
+		"pitch"		"100"
+		"wave"		"ambient/Spacial_Loops/frogs_spatial_loop01.wav"
+		"origin"	"-806.563660, 3715.172363, -20.861238;"
+		"soundlevel" 	"SNDLVL_90dB"
+	}
+
+	"playlooping"
+	{
+		"volume"	"0.29"
+		"pitch"		"93"
+		"wave"		"ambient/ambience/Cicada_Loop.wav"
+		"origin"	"-1754.348755, 1217.362061, 27.712482;"
+		"soundlevel" 	"SNDLVL_85dB"
+	}
+}
+
+
+"c3m1.saferoom"
+{
+	"dsp" "1"
+
+	"playlooping"
+	{
+		"volume"	"0.38"
+		"pitch"		"100"
+		"wave"		"ambient/atmosphere/crucial_ambience5.wav"
+	}
+		
+	
+}
+
+
+
+
+
+
+//=======================
+//=======================
+//   C3M2 Swamp
+//=======================
+//=======================
+
+
+
+"c3m2.tunnelspawn"
+{
+	"dsp" "1"
+
+	"playlooping"
+	{
+		"volume"	"0.2"
+		"pitch"		"100"
+		"wave"		"ambient/atmosphere/crucial_ambience5.wav"
+	}
+	
+}
+
+
+"c3m2.swamp"
+{
+	"dsp" "1"
+
+	"playsoundscape"
+	{
+		"name"	"swamps.swamp_01"
+		"volume" "1"
+	}
+
+
+
+	//localized frogs
+	"playlooping"
+	{
+		"volume"	"0.68"
+		"pitch"		"100"
+		"wave"		"ambient/swamps/pond_frogs_loop.wav"
+		"origin"	"-5636.955566, 4966.139648, -11.592878;"
+		"soundlevel" 	"SNDLVL_90dB"
+	}
+
+
+	//localized bugs
+	"playlooping"
+	{
+		"volume"	"0.4"
+		"pitch"		"130"
+		"wave"		"ambient/ambience/Cicada_Loop.wav"
+		"origin"	"574.869141, 2989.117676, 5.737450;"
+		"soundlevel" 	"SNDLVL_90dB"
+	}
+}
+
+"c3m2.swamp02"
+{
+	"dsp" "1"
+
+	"playsoundscape"
+	{
+		"name"	"swamps.swamp_02"
+		"volume" "1"
+	}
+
+}
+
+"c3m2.swamp03"
+{
+	"dsp" "1"
+
+	"playsoundscape"
+	{
+		"name"	"swamps.swamp_03"
+		"volume" "1"
+	}
+
+}
+
+
+"c3m2.houseinterior"
+{
+	"dsp" "1"
+
+	"playsoundscape"
+	{
+		"name"	"urban2.apartment"
+		"volume" ".1"
+	}
+	
+	"playsoundscape"
+	{
+		"name"	"swamps.swamp_03"
+		"volume" ".4"
+	}
+}
+
+"c3m2.elevatedground"
+{
+	"dsp" "1"
+
+	"playsoundscape"
+	{
+		"name"	"urban2.apartment"
+		"volume" "1"
+	}
+	
+}
+
+
+"c3m2.safehouse"
+{
+	"dsp" "1"
+
+	"playsoundscape"
+	{
+		"name"	"urban2.apartment"
+		"volume" ".23"
+	}
+	
+	"playsoundscape"
+	{
+		"name"	"swamps.swamp_03"
+		"volume" ".16"
+	}
+}
+
+
+
+
+
+//=======================
+//=======================
+//   C3M3 Shantytown
+//=======================
+//=======================
+
+
+
+"c3m3.housespawn"
+{
+	"dsp" "1"
+
+	"playsoundscape"
+	{
+		"name"	"urban2.apartment"
+		"volume" ".23"
+	}
+	
+	// underlying area "tone"
+	"playsoundscape" 
+ 	{
+		"name"		"swamps.gasstation"
+		"volume" 	".1"
+	}
+
+	// added "tone"
+	"playlooping"
+	{
+		"volume"	".35"
+		"pitch"		"100"
+		"wave"		"ambient/ambience/mosquito_loop_st.wav"
+	}
+}
+
+
+"c3m3.townoutside_01"
+{
+	"dsp" "1"
+
+	"playsoundscape" 
+ 	{
+		"name"		"swamps.gasstation"
+		"volume" 	"1"
+	}
+	
+	// added "insects"
+	"playlooping"
+	{
+		"volume"	".45"
+		"pitch"		"107"
+		"wave"		"ambient/ambience/mosquito_loop_st.wav"
+	}
+
+	"playlooping"
+	{
+		"wave"		"ambient/Spacial_Loops/bugzapper_loop.wav"
+		"soundlevel"	"SNDLVL_65dB"
+		"volume" 	".9"
+		"pitch"		"95"
+		"origin"	"-5029.438477, 542.807861, 178.345505;"
+	}
+	
+
+
+	//fires
+	"playlooping"
+	{
+		"wave"		"ambient/Spacial_Loops/MediumFire_Loop.wav"
+		"soundlevel"	"SNDLVL_65dB"
+		"volume" 	".70"
+		"pitch"		"95"
+		"origin"	"-5668.713379, 971.034912, 137.732498;"
+	}
+	
+
+
+		"playsoundscape" 
+ 	{
+		"name"		"urban2.utilbirdsgroup1"
+		"volume" 	".33"
+	}
+
+	// crows
+	"playrandom"
+	{
+		"position"	"random"
+		"time"			"20,40"
+		"pitch"			"95,102"
+		"volume"		"0.45"
+		"soundlevel"  	"SNDLVL_NORM"
+
+		"rndwave"
+		{
+			"wave"	"ambient/animal/crow_1.wav"
+			"wave"	"ambient/animal/crow_2.wav"
+		}
+	}
+
+	//Metal
+	"playrandom"
+	{
+		"volume"	"1"
+		"time"		"5,14"
+		"pitch"		"45,110"
+		"position"	"random"
+		"soundlevel" 	"SNDLVL_100dB"
+		"rndwave"
+		{	
+			"wave"	"ambient\Random_Amb_SFX\Metal_Rattle_Scaffold01.wav"
+			"wave"	"ambient\Random_Amb_SFX\Metal_Rattle_Scaffold02.wav"
+		}
+	}
+}
+
+
+"c3m3.houseinterior"
+{
+
+	"dsp"	"1"
+
+		"playsoundscape" 
+ 	{
+		"name"		"swamps.gasstation"
+		"volume" 	".16"
+	}
+
+	"playsoundscape"
+	{
+		"name"	"urban2.util_woodqueaks_new"
+		"volume" ".5"
+	}
+	
+	
+}
+
+"c3m3.houseinterior_02"
+{
+
+	"dsp"	"1"
+
+	"playsoundscape"
+	{
+		"name"	"swamps.shantyoutside"
+		"volume" ".17"
+	}
+
+	"playsoundscape"
+	{
+		"name"	"urban2.util_woodqueaks_new"
+		"volume" ".86"
+	}
+
+	"playlooping"
+	{
+		"volume"	".35"
+		"pitch"		"100"
+		"wave"		"ambient/ambience/mosquito_loop_st.wav"
+	}
+}
+
+"c3m3.townoutside_02"
+{
+
+	"dsp"	"1"
+
+	"playsoundscape"
+	{
+		"name"	"swamps.shantyoutside"
+		"volume" "1"
+	}
+
+	"playlooping"
+	{
+		"wave"		"ambient/Spacial_Loops/bugzapper_loop.wav"
+		"soundlevel"	"SNDLVL_65dB"
+		"volume" 	".9"
+		"pitch"		"95"
+		"origin"	"-5328.367188, -1422.985107, 113.060989;"
+	}
+
+	"playlooping"
+	{
+		"wave"		"ambient/Spacial_Loops/bugzapper_loop.wav"
+		"soundlevel"	"SNDLVL_70dB"
+		"volume" 	".9"
+		"pitch"		"100"
+		"origin"	"-4019.633545, -2950.698486, 89.975403;"
+	}
+
+	//fires
+	"playlooping"
+	{
+		"wave"		"ambient/Spacial_Loops/MediumFire_Loop.wav"
+		"soundlevel"	"SNDLVL_65dB"
+		"volume" 	".70"
+		"pitch"		"95"
+		"origin"	"-2903.106689, -35.277184, 82.268875;"
+	}
+
+	"playlooping"
+	{
+		"wave"		"ambient/Spacial_Loops/MediumFire_Loop.wav"
+		"soundlevel"	"SNDLVL_65dB"
+		"volume" 	".70"
+		"pitch"		"95"
+		"origin"	"-3826.648193, -1654.746704, 35.873302;"
+	}
+
+}
+
+"c3m3.swamp"
+{
+	"dsp" "1"
+
+	
+	"playsoundscape"
+	{
+		"name"	"swamps.swamp_03"
+		"volume" "1"
+	}
+
+	//frogs
+	"playlooping"
+	{
+		"wave"		"ambient/swamps/pond_frogs_loop.wav"
+		"soundlevel"	"SNDLVL_90dB"
+		"volume" 	"1"
+		"pitch"		"100"
+		"origin"	"-34.700363, -3587.545898, -13.320953;"
+	}
+
+	//fires
+	"playlooping"
+	{
+		"wave"		"ambient/Spacial_Loops/MediumFire_Loop.wav"
+		"soundlevel"	"SNDLVL_65dB"
+		"volume" 	".70"
+		"pitch"		"95"
+		"origin"	"1119.705078, -3388.526855, 105.873306;"
+	}
+
+	"playlooping"
+	{
+		"wave"		"ambient/Spacial_Loops/MediumFire_Loop.wav"
+		"soundlevel"	"SNDLVL_65dB"
+		"volume" 	".70"
+		"pitch"		"115"
+		"origin"	"1627.567383, -4775.482422, 54.801010;"
+	}
+
+
+	// cicadas
+	"playsoundscape"
+	{
+		"name"	"urban2.util_cicadas"
+		"volume" "1"
+	}
+	//light insect cover
+	"playlooping"
+	{
+		"volume"	"0.27"
+		"pitch"		"125"
+		"wave"		"ambient/ambience/Cicada_Loop.wav"
+		"origin"	"3369.727539, -3796.364502, 16.295113;"
+		"soundlevel" 	"SNDLVL_85dB"
+	}	
+	
+	
+}
+
+"c3m3.outside_dry"
+{
+
+	"dsp"	"1"
+
+	"playsoundscape"
+	{
+		"name"	"swamps.gasstation"
+		"volume" "1"
+	}
+
+	//light insect cover
+	"playlooping"
+	{
+		"volume"	"0.27"
+		"pitch"		"125"
+		"wave"		"ambient/ambience/Cicada_Loop.wav"
+		"origin"	"3369.727539, -3796.364502, 16.295113;"
+		"soundlevel" 	"SNDLVL_85dB"
+	}
+
+	"playlooping"
+	{
+		"wave"		"ambient/Spacial_Loops/bugzapper_loop.wav"
+		"soundlevel"	"SNDLVL_70dB"
+		"volume" 	".9"
+		"pitch"		"100"
+		"origin"	"4937.596680, -3905.736084, 367.797333;"
+	}
+}
+
+
+"c3m3.safehouse"
+{
+	"dsp" "1"
+
+	"playsoundscape"
+	{
+		"name"	"urban2.apartment"
+		"volume" ".23"
+	}
+	
+	// underlying area "tone"
+	"playsoundscape" 
+ 	{
+		"name"		"swamps.gasstation"
+		"volume" 	".1"
+	}
+
+}
+
+
+
+
+
+//=======================
+//=======================
+//   C3M4 Plantation
+//=======================
+//=======================
+
+
+
+"c3m4.housespawn"
+{
+	"dsp" "1"
+
+	"playsoundscape"
+	{
+		"name"	"urban2.respawn"
+		"volume" ".25"
+	} 
+
+	// underlying area "tone"
+	"playsoundscape" 
+ 	{
+		"name"		"swamps.gasstation"
+		"volume" 	".15"
+	}
+	
+	
+}
+
+
+"c3m4.plantationoutside"
+{
+	"dsp" "1"
+
+	"playsoundscape"
+	{
+		"name"	"swamps.plantation_outside"
+		"volume" "1"
+	}
+	
+	//pond frogs
+	"playlooping"
+	{
+		"volume"	"1"
+		"pitch"		"110"
+		"wave"		"ambient/swamps/pond_frogs_loop.wav"
+		"origin"	"-3505.380615, -1188.117188, -123.161423;"
+		"soundlevel" 	"SNDLVL_85dB"
+	}
+
+	"playsoundscape" 
+ 	{
+		"name"		"urban2.utilbirdsgroup1"
+		"volume" 	".22"
+	}
+}
+
+
+"c3m4.houseinterior"
+{
+	"dsp" "1"
+
+	"playsoundscape"
+	{
+		"name"	"swamps.plantation_outside"
+		"volume" ".3"
+	}
+
+	"playsoundscape"
+	{
+		"name"	"urban2.util_woodqueaks_new"
+		"volume" ".8"
+	}
+}
+
+"c3m4.orchard_entrance"
+{
+	"dsp" "1"
+
+	"playsoundscape"
+	{
+		"name"	"swamps.orchard"
+		"volume" "1"
+	}
+
+	"playsoundscape" 
+ 	{
+		"name"		"urban2.utilbirdsgroup1"
+		"volume" 	".22"
+	}
+
+	//cicada loop 
+	"playlooping"
+	{
+		"volume"		".3"
+		"pitch"			"100"
+		"wave"			"ambient/ambience/Cicada_loop.wav"
+		"origin"		"1235.347046, -1513.003540, 132.906052;"
+		"soundlevel" 		"SNDLVL_85dB"
+	}
+}
+
+
+"c3m4.plantation.int"
+{
+	"dsp" "1"
+
+	"playsoundscape"
+	{
+		"name"	"urban2.apartment"
+		"volume" ".3"
+	}
+
+	"playsoundscape"
+	{
+		"name"	"urban2.util_woodqueaks_new"
+		"volume" ".8"
+	}
+}
+
+"c3m4.plantation_backyard"
+{
+	"dsp" "1"
+
+	"playsoundscape"
+	{
+		"name"	"swamps.orchard"
+		"volume" "1"
+	}
+}
+
+
+"c3m4.plantation_dock"
+{
+	"dsp" "1"
+
+	// underlying area "tone"
+	"playlooping"
+	{
+		"volume"	".4"
+		"pitch"		"100"
+		"wave"		"(ambient/ambience/crucial_orchard_bird_cricket_01.wav"
+		"position"	"random"
+	}
+	// underlying area "tone"
+	"playlooping"
+	{
+		"volume"	".43"
+		"pitch"		"100"
+		"wave"		"(ambient/swamps/crucial_frog_cricket_01_loop.wav"
+		"position"	"random"
+	}
+	// position specific water sounds
+	"playlooping"
+	{
+		"volume"	".65"
+		"pitch"		"100"
+		"wave"		"ambient/spacial_loops/Dock_close_loop.wav"
+		"origin"	"1645.586182, 4319.571289, -17.855263;"
+		"soundlevel"	"SNDLVL_85dB"
+	
+	}
+
+	
+	//waterlaps 
+	"playlooping"
+	{
+		"volume"		"1"
+		"pitch"			"95"
+		"wave"			"ambient/swamps/water_Lap_loop_st.wav"
+		"origin"		"1835.509399, 3768.697754, -43.433662;"
+		"soundlevel" 		"SNDLVL_85dB"
+	}
+}
+

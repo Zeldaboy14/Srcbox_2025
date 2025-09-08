@@ -1,0 +1,18 @@
+UnlitGeneric
+{
+$baseTexture "vgui\hud\ZombieTeamImage_Jockey"
+$translucent 1
+$vertexcolor 1
+$vertexalpha 1
+$ignorez 1
+Proxies
+{
+Sine
+{
+resultVar $alpha
+sineperiod 1
+sinemin 0.02
+sinemax 0.3
+}
+}
+}

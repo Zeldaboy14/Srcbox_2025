@@ -1,0 +1,65 @@
+// Physics Gun
+
+WeaponData
+{
+	// Weapon data is loaded by both the Game and Client DLLs.
+	//"printname"	"#HL2_Physgun"
+	"printname"	"Physics Gun"
+	//"viewmodel"				"models/weapons/v_Physics.mdl"
+	"viewmodel"		"models/weapons/v_superphyscannon.mdl"
+	"playermodel"			"models/weapons/w_Physics.mdl"
+	//"anim_prefix"			"physgun"
+	"anim_prefix"			"pistol"
+	"bucket"				"0"
+	"bucket_position"		"2"
+
+	"clip_size"				"-1" // initially 1
+	//"clip2_size"			"8" // not required as per gmod 10
+	"primary_ammo"			"None"
+	//"secondary_ammo"		"Gravity"
+	"secondary_ammo"		"None"
+	//"default_clip2"			"8" //not required as per gmod 10
+
+	"weight"				"2" // initially 0
+	"item_flags"			"0" // initially 2
+
+	SoundData
+	{
+		"single_shot"		"Weapon_Physgun.On"
+		"reload"			"Weapon_Physgun.Off"
+		"special1"			"Weapon_Physgun.Special1"
+	}
+
+	// Weapon Sprite data is loaded by the Client DLL.
+	TextureData
+	{
+		"weapon"
+		{
+				"font"		"WeaponIcons"
+				"character"	"h"
+		}
+		"weapon_s"
+		{	
+				"font"		"WeaponIconsSelected"
+				"character"	"h"
+		}
+		"ammo"
+		{
+				"font"		"WeaponIcons"
+				"character"	"p"
+		}
+		"crosshair"
+		{
+				"font"		"Crosshairs"
+				"character"	"Q"
+		}
+		"autoaim"
+		{
+				"file"		"sprites/crosshairs"
+				"x"			"0"
+				"y"			"48"
+				"width"		"24"
+				"height"	"24"
+		}
+	}
+}

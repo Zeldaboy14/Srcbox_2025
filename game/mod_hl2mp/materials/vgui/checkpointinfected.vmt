@@ -1,0 +1,5 @@
+UnlitGeneric
+{
+$basetexture "vgui/checkpointInfected"
+$surfaceprop default
+}

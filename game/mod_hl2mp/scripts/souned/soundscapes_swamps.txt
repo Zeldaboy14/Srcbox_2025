@@ -1,0 +1,788 @@
+// swamps soundscapes
+// Author: Tim Larkin
+
+
+// utility soundscapes
+
+
+"swamps.frogs_01"
+{
+
+	"dsp"	"1"
+	
+	"playrandom"
+	{
+		"time"		"2,6"
+		"volume"	".3,.9"
+		"pitch"		"97,105"
+		"position"	"random"
+
+		"rndwave"
+		{
+			"wave"	"ambient/random_animals/frog_groups/by_frog_01.wav"
+			"wave"	"ambient/random_animals/frog_groups/by_frog_02.wav"
+			"wave"	"ambient/random_animals/frog_groups/by_frog_03.wav"
+			"wave"	"ambient/random_animals/frog_groups/by_frog_04.wav"
+			"wave"	"ambient/random_animals/frog_groups/by_frog_05.wav"
+			"wave"	"ambient/random_animals/frog_groups/by_frog_06.wav"
+			"wave"	"ambient/random_animals/frog_groups/by_frog_07.wav"
+			"wave"	"ambient/random_animals/frog_groups/by_frog_08.wav"
+			"wave"	"ambient/random_animals/frog_groups/by_frog_long_01.wav"
+			"wave"	"ambient/random_animals/frog_groups/by_frog_long_02.wav"
+			"wave"	"ambient/random_animals/frog_groups/by_frog_long_03.wav"
+		}
+	}
+
+}
+
+"swamps.frogs_02"
+{
+
+	"dsp"	"1"
+	
+	"playrandom"
+	{
+		"time"		"2,6"
+		"volume"	".7,1"
+		"pitch"		"97,105"
+		"position"	"random"
+
+		"rndwave"
+		{
+			"wave"	"ambient/random_animals/frog_groups/small_frog_01a.wav"
+			"wave"	"ambient/random_animals/frog_groups/small_frog_01b.wav"
+			"wave"	"ambient/random_animals/frog_groups/small_frog_01c.wav"
+		}
+	}
+
+}
+
+"swamps.frogs_03"
+{
+
+	"dsp"	"1"
+	
+	"playrandom"
+	{
+		"time"		"2,21"
+		"volume"	".4,1"
+		"pitch"		"97,105"
+		"position"	"random"
+
+		"rndwave"
+		{
+			"wave"	"ambient/random_animals/frog_groups/small_frog_03a.wav"
+			"wave"	"ambient/random_animals/frog_groups/small_frog_03b.wav"
+		}
+	}
+
+}
+
+"swamps.frogs_04"
+{
+
+	"dsp"	"1"
+	
+	"playrandom"
+	{
+		"time"		"2,6"
+		"volume"	".7,1"
+		"pitch"		"97,105"
+		"position"	"random"
+
+		"rndwave"
+		{
+			"wave"	"ambient/random_animals/frog_groups/small_frog_04a.wav"
+			"wave"	"ambient/random_animals/frog_groups/small_frog_04b.wav"							"wave"	"ambient/random_animals/frog_groups/small_frog_04c.wav"
+			"wave"	"ambient/random_animals/frog_groups/small_frog_04d.wav"	
+		}
+	}
+
+}
+
+"swamps.frogs_05"
+{
+
+	"dsp"	"1"
+	
+	"playrandom"
+	{
+		"time"		"2,6"
+		"volume"	".7,1"
+		"pitch"		"97,103"
+		"position"	"random"
+
+		"rndwave"
+		{
+			"wave"	"ambient/random_animals/frog_groups/small_frog_05a.wav"
+			"wave"	"ambient/random_animals/frog_groups/small_frog_05b.wav"	
+			"wave"	"ambient/random_animals/frog_groups/small_frog_05c.wav"							"wave"	"ambient/random_animals/frog_groups/small_frog_05c.wav"
+			
+		}
+	}
+
+}
+
+"swamps.frogs_06"
+{
+
+	"dsp"	"1"
+	
+	"playrandom"
+	{
+		"time"		"2,6"
+		"volume"	".7,1"
+		"pitch"		"97,102"
+		"position"	"random"
+
+		"rndwave"
+		{
+			"wave"	"ambient/random_animals/frog_groups/frog_long_01.wav"
+			"wave"	"ambient/random_animals/frog_groups/frog_long_02.wav"							"wave"	"ambient/random_animals/frog_groups/frog_long_03.wav"	
+		}
+	}
+
+}
+
+"swamps.bullfrogs_01"
+{
+
+	"dsp"	"1"
+	
+	"playrandom"
+	{
+		"time"		"2,6"
+		"volume"	".7,1"
+		"pitch"		"94,101"
+		"position"	"random"
+
+		"rndwave"
+		{
+			"wave"	"ambient/random_animals/frog_groups/bullfrog_01.wav"
+			"wave"	"ambient/random_animals/frog_groups/bullfrog_02.wav"		
+		}
+	}
+
+}
+
+"swamps.flies"
+{
+
+	"dsp"	"1"
+	
+	"playrandom"
+	{
+		"time"		"4,22"
+		"volume"	".7,.9"
+		"pitch"		"150"
+		"position"	"random"
+
+		"rndwave"
+		{
+			"wave"	"ambient/random_animals/fly_buzz_01.wav"
+			"wave"	"ambient/random_animals/fly_buzz_02.wav"
+			"wave"	"ambient/random_animals/fly_buzz_03.wav"
+			"wave"	"ambient/random_animals/fly_buzz_04.wav"		
+		}
+	}
+
+}
+
+"swamps.gators"
+{
+
+	"dsp"	"1"
+	
+	"playrandom"
+	{
+		"time"		"30,90"
+		"volume"	".9,1"
+		"pitch"		"100"
+		"position"	"random"
+
+		"rndwave"
+		{
+			"wave"	"ambient/random_animals/gator_01.wav"
+			"wave"	"ambient/random_animals/gator_02.wav"
+			"wave"	"ambient/random_animals/gator_03.wav"
+			"wave"	"ambient/random_animals/gator_04.wav"		
+		}
+	}
+
+}
+
+
+
+"swamps.gasstation"
+{
+	"dsp" "1"
+
+	// underlying area "tone"
+	"playlooping"
+	{
+		"volume"	"0.3"
+		"pitch"		"100"
+		"wave"		"(ambient/swamps/crucial_cricket_amb_01.wav"
+		"position"	"random"
+	}
+
+	
+}
+
+"swamps.dock"
+{
+	"dsp" "1"
+
+	// underlying area "tone"
+	
+	"playlooping"
+	{
+		"volume"	"0.3"
+		"pitch"		"100"
+		"wave"		"(ambient/swamps/crucial_cricket_amb_01.wav"
+		"position"	"random"
+	}
+	// underlying area "tone"
+	"playlooping"
+	{
+		"volume"	".45"
+		"pitch"		"100"
+		"wave"		"(ambient/swamps/crucial_frog_cricket_01_loop.wav"
+		"position"	"random"
+	}
+
+	"playsoundscape"
+	{
+		"name"	"swamps.flies"
+		"volume" "1"
+	}
+
+
+	//waterlaps 
+	"playlooping"
+	{
+		"volume"		".98"
+		"pitch"			"110"
+		"wave"			"ambient/swamps/water_Lap_loop_st.wav"
+		"position"		"0"
+		"soundlevel" 		"SNDLVL_85dB"
+	}
+	//insects 1
+	"playrandom"
+	{
+		"time"		"12,29"
+		"volume"	".7"
+		"pitch"		"90,110"
+		"position"	"random"
+
+		"rndwave"
+		{
+			"wave"	"ambient/Random_Amb_SFX/RUR_Random_Insect01.wav"
+			"wave"	"ambient/Random_Amb_SFX/RUR_Random_Insect02.wav"
+			
+		}
+	
+	
+	}
+
+
+}
+
+
+
+"swamps.plankswamp_01"
+{
+	"dsp" "1"
+
+	// underlying area "tone"
+	"playlooping"
+	{
+		"volume"	".55"
+		"pitch"		"100"
+		"wave"		"(ambient/swamps/crucial_frog_cricket_01_loop.wav"
+		"position"	"random"
+	}
+
+	"playlooping"
+	{
+		"volume"	"0.33"
+		"pitch"		"103"
+		"wave"		"(ambient/ambience/mosquito_loop_st.wav"
+		"position"	"random"
+
+	}
+
+	//waterlaps 
+	"playlooping"
+	{
+		"volume"	".85"
+		"pitch"		"110"
+		"wave"		"ambient/swamps/water_Lap_loop_st.wav"
+		"position"	"0"
+		"soundlevel" 	"SNDLVL_85dB"
+	}
+
+
+
+	//frogs 
+	"playsoundscape"
+	{
+		"name"		"swamps.frogs_01"
+		"volume" 	".65"
+		"position"	"1"
+		"soundlevel" 	"SNDLVL_80dB"
+	}
+
+	//cicada loop 
+	"playlooping"
+	{
+		"volume"		".25"
+		"pitch"			"100"
+		"wave"			"ambient/ambience/Cicada_loop.wav"
+		"position"		"2"
+		"soundlevel" 		"SNDLVL_85dB"
+	}
+
+	//cicada loop 
+	"playlooping"
+	{
+		"volume"		".22"
+		"pitch"			"119"
+		"wave"			"ambient/ambience/Cicada_loop.wav"
+		"position"		"3"
+		"soundlevel" 		"SNDLVL_85dB"
+	}
+
+
+	//frogs 
+	"playsoundscape"
+	{
+		"name"			"swamps.frogs_03"
+		"volume" 		".7"
+	}
+
+	"playsoundscape"
+	{
+		"name"			"swamps.flies"
+		"volume" 		".75"
+	}
+
+	"playsoundscape"
+	{
+		"name"			"swamps.gators"
+		"volume" 		"1"
+	}
+
+
+	
+	
+	//insects 1
+	"playrandom"
+	{
+		"time"			"9,25"
+		"volume"		".88"	
+		"pitch"			"90,110"
+		"position"		"random"
+
+		"rndwave"
+		{
+					"wave"	"ambient/Random_Amb_SFX/RUR_Random_Insect01.wav"
+					"wave"	"ambient/Random_Amb_SFX/RUR_Random_Insect02.wav"
+			
+		}
+	}
+
+}
+
+
+"swamps.swamp_01"
+{
+	"dsp" "1"
+
+	// underlying area "tone"
+	"playlooping"
+	{
+		"volume"	".3"
+		"pitch"		"100"
+		"wave"		"(ambient/swamps/crucial_frog_cricket_01_loop.wav"
+		"position"	"random"
+	}
+	
+
+
+	//frogs 
+	"playsoundscape"
+	{
+		"name"			"swamps.frogs_04"
+		"volume" 		".7"
+	}
+
+	//frogs 
+	"playsoundscape"
+	{
+		"name"			"swamps.frogs_05"
+		"volume" 		".7"
+	}
+
+	"playsoundscape"
+	{
+		"name"			"swamps.flies"
+		"volume" 		".3"
+	}
+
+	"playsoundscape"
+	{
+		"name"			"swamps.gators"
+		"volume" 		".86"
+	}
+
+
+	
+	
+	//insects 1
+	"playrandom"
+	{
+		"time"			"9,25"
+		"volume"		".5"	
+		"pitch"			"90,110"
+		"position"		"random"
+
+		"rndwave"
+		{
+					"wave"	"ambient/Random_Amb_SFX/RUR_Random_Insect01.wav"
+					"wave"	"ambient/Random_Amb_SFX/RUR_Random_Insect02.wav"
+			
+		}
+	}
+
+}
+
+"swamps.swamp_02"
+{
+	"dsp" "1"
+
+	// underlying area "tone"
+	"playlooping"
+	{
+		"volume"	".3"
+		"pitch"		"100"
+		"wave"		"(ambient/swamps/crucial_frog_cricket_01_loop.wav"
+		"position"	"random"
+	}
+	
+
+
+	//frogs 
+	"playsoundscape"
+	{
+		"name"			"swamps.bullfrogs_01"
+		"volume" 		".9"
+	}
+
+	//frogs 
+	"playsoundscape"
+	{
+		"name"			"swamps.frogs_06"
+		"volume" 		".3"
+	}
+
+	"playsoundscape"
+	{
+		"name"			"swamps.flies"
+		"volume" 		".3"
+	}
+
+	"playsoundscape"
+	{
+		"name"			"swamps.gators"
+		"volume" 		".86"
+	}
+
+
+}
+
+"swamps.swamp_03"
+{
+	"dsp" "1"
+
+	// underlying area "tone"
+	"playlooping"
+	{
+		"volume"	".1"
+		"pitch"		"100"
+		"wave"		"(ambient/swamps/crucial_frog_cricket_01_loop.wav"
+		"position"	"random"
+	}
+	
+	"playlooping"
+	{
+		"volume"	".2"
+		"pitch"		"100"
+		"wave"		"(ambient/swamps/crucial_frog_cricket_02_loop.wav"
+		"position"	"random"
+	}
+
+
+	//frogs 
+	"playsoundscape"
+	{
+		"name"			"swamps.frogs_01"
+		"volume" 		".66"
+	}
+
+	//frogs 
+	"playsoundscape"
+	{
+		"name"			"swamps.frogs_02"
+		"volume" 		".6"
+	}
+
+	"playsoundscape"
+	{
+		"name"			"swamps.flies"
+		"volume" 		".3"
+	}
+
+
+}
+
+"swamps.shantyoutside"
+{
+	"dsp" "1"
+
+	// underlying area "tone"
+	"playlooping"
+	{
+		"volume"	".27"
+		"pitch"		"100"
+		"wave"		"(ambient/swamps/crucial_frog_cricket_01_loop.wav"
+		"position"	"random"
+	}
+	
+	"playlooping"
+	{
+		"volume"	".2"
+		"pitch"		"100"
+		"wave"		"(ambient/swamps/crucial_cricket_amb_01.wav"
+		"position"	"random"
+	}
+
+
+
+	//frogs 
+	"playsoundscape"
+	{
+		"name"			"swamps.frogs_02"
+		"volume" 		".6"
+	}
+
+	"playsoundscape"
+	{
+		"name"			"swamps.flies"
+		"volume" 		".3"
+	}
+
+
+}
+
+
+"swamps.plantation_outside"
+{
+	"dsp" "1"
+
+	// underlying area "tone"
+	"playlooping"
+	{
+		"volume"	".52"
+		"pitch"		"100"
+		"wave"		"(ambient/swamps/crucial_cricket_amb_02.wav"
+		"position"	"random"
+	}
+
+	"playlooping"
+	{
+		"volume"	".65"
+		"pitch"		"100"
+		"wave"		"(ambient/ambience/Bug_loop.wav"
+		"position"	"random"
+	}
+
+	//insects 1
+	"playrandom"
+	{
+		"time"			"9,25"
+		"volume"		"1"	
+		"pitch"			"90,110"
+		"position"		"random"
+
+		"rndwave"
+		{
+					"wave"	"ambient/Random_Amb_SFX/RUR_Random_Insect01.wav"
+					"wave"	"ambient/Random_Amb_SFX/RUR_Random_Insect02.wav"
+			
+		}
+	}
+
+}
+
+"swamps.orchard"
+{
+	"dsp" "1"
+
+	// underlying area "tone"
+	"playlooping"
+	{
+		"volume"	".6"
+		"pitch"		"100"
+		"wave"		"(ambient/ambience/crucial_orchard_bird_cricket_01.wav"
+		"position"	"random"
+	}
+
+	"playlooping"
+	{
+		"volume"	".55"
+		"pitch"		"100"
+		"wave"		"(ambient/swamps/crucial_cricket_amb_02.wav"
+		"position"	"random"
+	}
+
+	//insects 1
+	"playrandom"
+	{
+		"time"			"6,14"
+		"volume"		"1"	
+		"pitch"			"90,110"
+		"position"		"random"
+
+		"rndwave"
+		{
+					"wave"	"ambient/Random_Amb_SFX/RUR_Random_Insect01.wav"
+					"wave"	"ambient/Random_Amb_SFX/RUR_Random_Insect02.wav"
+			
+		}
+	}
+
+}
+
+
+
+// battle sounds heard throughout the small town campaign
+"rural2.combat_far_heavy"
+{
+
+	"playrandom"
+	{
+		"time"		"1,4"
+		"volume"	"0.1,0.25"
+		"pitch"		"90,105"	
+		"soundlevel"	"SNDLVL_140dB"	
+		"position" "0"
+		"rndwave"
+		{
+			"wave"	"ambient/levels/streetwar/city_battle2.wav"
+			"wave"	"ambient/levels/streetwar/city_battle3.wav"
+			"wave"	"ambient/levels/streetwar/city_battle4.wav"
+			"wave"	"ambient/levels/streetwar/city_battle5.wav"
+			"wave"	"ambient/levels/streetwar/city_battle8.wav"
+			"wave"	"ambient/levels/streetwar/city_battle9.wav"
+			"wave"	"ambient/levels/streetwar/city_battle12.wav"
+		}
+		
+	}
+
+	"playrandom"
+	{
+		"time"		"6,15"
+		"volume"	"0.1,0.2"
+		"pitch"		"90,105"
+		"soundlevel"	"SNDLVL_140dB"	
+		"position" "0"
+		"rndwave"
+		{
+			"wave"	"ambient/levels/streetwar/city_battle15.wav"
+			"wave"	"ambient/levels/streetwar/city_battle17.wav"
+			"wave"	"ambient/levels/streetwar/city_battle19.wav"
+		}
+		
+	}
+}
+
+"rural2.combat_far_medium"
+{
+
+	"playrandom"
+	{
+		"time"		"2,6"
+		"volume"	"0.2,0.3"
+		"pitch"		"90,105"	
+		"soundlevel"	"SNDLVL_140dB"	
+		"position" "0"
+		"rndwave"
+		{
+			"wave"	"ambient/levels/streetwar/city_battle2.wav"
+			"wave"	"ambient/levels/streetwar/city_battle3.wav"
+			"wave"	"ambient/levels/streetwar/city_battle4.wav"
+			"wave"	"ambient/levels/streetwar/city_battle5.wav"
+			"wave"	"ambient/levels/streetwar/city_battle8.wav"
+			"wave"	"ambient/levels/streetwar/city_battle9.wav"
+			"wave"	"ambient/levels/streetwar/city_battle12.wav"
+		}
+		
+	}
+
+	"playrandom"
+	{
+		"time"		"5,18"
+		"volume"	"0.2,0.4"
+		"pitch"		"90,105"
+		"soundlevel"	"SNDLVL_140dB"	
+		"position" "0"
+		"rndwave"
+		{
+			"wave"	"ambient/levels/streetwar/city_battle15.wav"
+			"wave"	"ambient/levels/streetwar/city_battle17.wav"
+			"wave"	"ambient/levels/streetwar/city_battle19.wav"
+		}
+		
+	}
+}
+
+"rural2.combat_close_light"
+{
+
+	"playrandom"
+	{
+		"time"		"4,12"
+		"volume"	"0.2,0.3"
+		"pitch"		"90,105"
+		"soundlevel"	"SNDLVL_140dB"	
+		"position" "0"
+		"rndwave"
+		{
+			"wave"	"ambient/levels/streetwar/city_battle2.wav"
+			"wave"	"ambient/levels/streetwar/city_battle3.wav"
+			"wave"	"ambient/levels/streetwar/city_battle4.wav"
+			"wave"	"ambient/levels/streetwar/city_battle5.wav"
+			"wave"	"ambient/levels/streetwar/city_battle8.wav"
+			"wave"	"ambient/levels/streetwar/city_battle9.wav"
+			"wave"	"ambient/levels/streetwar/city_battle12.wav"
+		}
+		
+	}
+
+	"playrandom"
+	{
+		"time"		"10,25"
+		"volume"	"0.2,0.4"
+		"pitch"		"90,105"
+		"soundlevel"	"SNDLVL_140dB"	
+		"position" "0"
+		"rndwave"
+		{
+			"wave"	"ambient/levels/streetwar/city_battle15.wav"
+			"wave"	"ambient/levels/streetwar/city_battle17.wav"
+			"wave"	"ambient/levels/streetwar/city_battle19.wav"
+		}
+		
+	}
+}

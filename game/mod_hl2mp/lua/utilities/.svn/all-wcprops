@@ -1,0 +1,71 @@
+K 25
+svn:wc:ra_dav:version-url
+V 37
+/svn/!svn/ver/296/trunk/lua/utilities
+END
+getwpndata.lua
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/svn/!svn/ver/23/trunk/lua/utilities/getwpndata.lua
+END
+eyeset.lua
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/svn/!svn/ver/83/trunk/lua/utilities/eyeset.lua
+END
+networkstringtabledump.lua
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/!svn/ver/1/trunk/lua/utilities/networkstringtabledump.lua
+END
+tablediff.lua
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/svn/!svn/ver/2/trunk/lua/utilities/tablediff.lua
+END
+downloadablesstringtabledump.lua
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/!svn/ver/152/trunk/lua/utilities/downloadablesstringtabledump.lua
+END
+metatabledump.lua
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/svn/!svn/ver/1/trunk/lua/utilities/metatabledump.lua
+END
+checktriggers.lua
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/svn/!svn/ver/261/trunk/lua/utilities/checktriggers.lua
+END
+forcecolorcorrection.lua
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/!svn/ver/51/trunk/lua/utilities/forcecolorcorrection.lua
+END
+eyedump.lua
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/svn/!svn/ver/3/trunk/lua/utilities/eyedump.lua
+END
+globallookup.lua
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/svn/!svn/ver/22/trunk/lua/utilities/globallookup.lua
+END
+enumdump.lua
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/svn/!svn/ver/214/trunk/lua/utilities/enumdump.lua
+END

@@ -1,0 +1,41 @@
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/svn/!svn/ver/304/trunk/lua/includes/extensions
+END
+entity.lua
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/svn/!svn/ver/294/trunk/lua/includes/extensions/entity.lua
+END
+panel.lua
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/svn/!svn/ver/294/trunk/lua/includes/extensions/panel.lua
+END
+table.lua
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/svn/!svn/ver/289/trunk/lua/includes/extensions/table.lua
+END
+keyvalues.lua
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/!svn/ver/285/trunk/lua/includes/extensions/keyvalues.lua
+END
+weapon.lua
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/svn/!svn/ver/304/trunk/lua/includes/extensions/weapon.lua
+END
+vgui.lua
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/svn/!svn/ver/294/trunk/lua/includes/extensions/vgui.lua
+END

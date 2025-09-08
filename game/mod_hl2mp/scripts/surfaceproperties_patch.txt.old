@@ -1,0 +1,152 @@
+// --- This stuff was purpose-built for dropped melee weapons
+
+// borrowed from HL2
+"crowbar"
+{
+	"base"		"metal"
+	"impactsoft"	"Canister.ImpactSoft"	//"Crowbar.ImpactHard"
+	"impacthard"	"Crowbar.ImpactHard"
+}
+
+// currently just crowbar, but high-pitched
+"sword"
+{
+	"base"		"metal"
+	"impactsoft"	"Blade.ImpactSoft"
+	"impacthard"	"Sword.ImpactHard"
+}
+
+"blade"
+{
+	"base"		"metal"
+	"impactsoft"	"Blade.ImpactSoft"
+	"impacthard"	"Blade.ImpactHard"
+}
+
+"fireaxe"
+{
+	"base"		"metal"
+	"impactsoft"	"Blade.ImpactSoft"
+	"impacthard"	"Fireaxe.ImpactHard"
+}
+
+"bat"
+{
+	"base"		"wood_box"
+	"impactsoft"	"Wood_Panel.ImpactSoft"
+	"impacthard"	"Bat.ImpactHard"
+}
+
+"cricketbat"
+{
+	"base"		"wood_box"
+	"impactsoft"	"Wood_Panel.ImpactSoft"
+	"impacthard"	"CricketBat.ImpactHard"
+}
+
+"chainsaw"
+{
+	"base"		"metal"
+	"impactsoft"	"Canister.ImpactSoft"
+	"impacthard"	"Chainsaw.ImpactHard"
+}
+
+"shovel"
+{
+	"base"		"wood_box"
+	"impactsoft"	"Wood_Panel.ImpactSoft"
+	"impacthard"	"Shovel.ImpactHard"
+}
+
+"pitchfork"
+{
+	"base"		"wood_box"
+	"impactsoft"	"Wood_Panel.ImpactSoft"
+	"impacthard"	"Pitchfork.ImpactHard"
+}
+
+"fryingpan"
+{
+	"base"		"metal"
+	"impactsoft"	"Canister.ImpactSoft"
+	"impacthard"	"Pan.ImpactHard"
+}
+
+"golfclub"
+{
+	"base"		"wood_box"
+	"impactsoft"	"Wood_Panel.ImpactSoft"
+	"impacthard"	"GolfClub.ImpactHard"
+}
+
+// reusing guitar attack sound for physics comedy
+"guitar"
+{
+	"base"		"wood_box"
+	"impactsoft"	"Wood_Panel.ImpactSoft"
+	"impacthard"	"Guitar.ImpactWorld"
+}
+
+
+// --- overriding originals
+
+// had to change the footsteps
+"snow"
+{
+	"base"		"dirt"
+	"density"	"800"
+	"friction"	"0.35"
+
+	"audiohardnessfactor"	"0.25"
+	"friction"		"0.8"
+
+	"runleft"	"snow.RunLeft"
+	"runright"	"snow.RunRight"
+	"walkleft"	"snow.WalkLeft"
+	"walkright"	"snow.WalkRight"
+}
+
+
+// changed to use its unique sounds from HL2 and to be louder
+"metalvehicle"
+{
+	"base"		"metal"
+	"thickness"	"0.1"
+	"density"	"2700"
+	"elasticity"	"0.2"
+	"friction"	"0.8"
+
+//	"audioreflectivity"	"0.7"	//"0.33"
+//	"audioroughnessfactor"	"0.5"	//"0.1"
+//	"audioHardMinVelocity"	"500"	// 500
+
+//	"impactHardThreshold"	"0.8"	//"0.5"  
+
+	"impacthard"	"MetalVehicle.ImpactHard"
+	"impactsoft"	"MetalVehicle.ImpactSoft"
+	"scraperough"	"MetalVehicle.ScrapeRough"
+	"scrapesmooth"	"MetalVehicle.ScrapeSmooth"
+
+	"gamematerial"	"M"
+}
+
+
+// altered so it would no longer be slippery
+"pottery"
+{
+	"base"		"glassbottle"
+// not slippery
+//	"elasticity"	"0.25"		//was 0.4
+//	"friction"	"0.8"		//was 0.3
+// less slippery
+	"elasticity"	"0.325"		
+	"friction"	"0.55"		
+
+	"impacthard"	"Pottery.ImpactHard"
+	"impactsoft"	"Pottery.ImpactSoft"
+	"bulletimpact"	"Pottery.BulletImpact"
+
+	"break"			"Pottery.Break"
+
+	"gamematerial"	"1"
+}
