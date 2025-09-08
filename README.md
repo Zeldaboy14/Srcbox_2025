@@ -44,5 +44,4 @@ Special thanks:
 
 	TheMaster974 - Advice and video tutorials
 	Shiro - Shader advice
-	Ficool2 - Shader override patch
 	And others who gave some valuable input
