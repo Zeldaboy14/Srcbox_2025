@@ -116,6 +116,17 @@ extern ConVar tf_mm_servermode;
 #include "econ_item_system.h"
 #endif // USES_ECON_ITEMS
 
+//#ifdef LUA_SDK
+#include "luamanager.h"
+#include "luacachefile.h"
+//#include "mountaddons.h"
+//#endif
+
+#ifdef HL2SB
+#include "mountsteamcontent.h"
+#include "ticketfix.h"
+#endif
+
 #ifdef CSTRIKE_DLL // BOTPORT: TODO: move these ifdefs out
 #include "bot/bot.h"
 #endif
@@ -130,6 +141,7 @@ extern ConVar tf_mm_servermode;
 #endif
 
 #define SWARM_INTERFACE_SERVER 1
+#define LUA_SDK 1
 
 #ifdef SWARM_INTERFACE_SERVER
 //#pragma message(FILE_LINE_STRING " !!FIXME!! replace all this with Sys_LoadGameModule")
@@ -983,6 +995,34 @@ bool CServerGameDLL::LevelInit( const char *pMapName, char const *pMapEntities, 
 	}
 #endif // USES_ECON_ITEMS
 
+//#ifdef LUA_SDK
+	lcf_recursivedeletefile(LUA_PATH_CACHE);
+
+	// Add Lua environment
+	luasrc_init();
+
+	luasrc_dofolder(L, LUA_PATH_EXTENSIONS);
+	luasrc_dofolder(L, LUA_PATH_MODULES);
+	luasrc_dofolder(L, LUA_PATH_GAME_SHARED);
+	luasrc_dofolder(L, LUA_PATH_GAME_SERVER);
+
+	luasrc_LoadWeapons();
+	luasrc_LoadEntities();
+	// luasrc_LoadEffects();
+
+	//Andrew; loadup base gamemode.
+	luasrc_LoadGamemode(LUA_BASE_GAMEMODE);
+
+	luasrc_LoadGamemode(gamemode.GetString());
+	luasrc_SetGamemode(gamemode.GetString());
+
+	if (gpGlobals->maxClients > 1)
+	{
+		// load LCF into stringtable
+		lcf_preparecachefile();
+	}
+//#endif
+
 	ResetWindspeed();
 	UpdateChapterRestrictions( pMapName );
 
@@ -1090,6 +1130,17 @@ bool CServerGameDLL::LevelInit( const char *pMapName, char const *pMapEntities, 
 	// clear any pending autosavedangerous
 	m_fAutoSaveDangerousTime = 0.0f;
 	m_fAutoSaveDangerousMinHealthToCommit = 0.0f;
+
+#if defined ( LUA_SDK )
+	BEGIN_LUA_CALL_HOOK("LevelInit");
+	lua_pushstring(L, pMapName);
+	lua_pushstring(L, pMapEntities);
+	lua_pushstring(L, pOldLevel);
+	lua_pushstring(L, pLandmarkName);
+	lua_pushboolean(L, loadGame);
+	lua_pushboolean(L, background);
+	END_LUA_CALL_HOOK(6, 0);
+#endif
 	return true;
 }
 
@@ -1164,6 +1215,14 @@ void CServerGameDLL::ServerActivate( edict_t *pEdictList, int edictCount, int cl
 
 #ifdef NEXT_BOT
 	TheNextBots().OnMapLoaded();
+#endif
+
+//Andrew; call activate on the gamemode
+#if defined ( LUA_SDK )
+	BEGIN_LUA_CALL_HOOK("ServerActivate");
+	lua_pushinteger(L, edictCount);
+	lua_pushinteger(L, clientMax);
+	END_LUA_CALL_HOOK(2, 0);
 #endif
 }
 
@@ -1392,6 +1451,14 @@ void CServerGameDLL::OnQueryCvarValueFinished( QueryCvarCookie_t iCookie, edict_
 // Called when a level is shutdown (including changing levels)
 void CServerGameDLL::LevelShutdown( void )
 {
+#if defined ( LUA_SDK )
+	if (g_bLuaInitialized)
+	{
+		BEGIN_LUA_CALL_HOOK("LevelShutdown");
+		END_LUA_CALL_HOOK(0, 0);
+	}
+#endif
+
 #ifndef NO_STEAM
 	IGameSystem::LevelShutdownPreClearSteamAPIContextAllSystems();
 
@@ -1432,6 +1499,10 @@ void CServerGameDLL::LevelShutdown( void )
 		TheNavMesh->Reset();
 	}
 #endif
+#endif
+
+#if defined ( LUA_SDK )
+	luasrc_shutdown();
 #endif
 }
 
@@ -1858,6 +1929,16 @@ void CServerGameDLL::PreSaveGameLoaded( char const *pSaveName, bool bInGame )
 //-----------------------------------------------------------------------------
 bool CServerGameDLL::ShouldHideServer( void )
 {
+#if defined ( LUA_SDK )
+	/*if (g_bLuaInitialized)
+	{
+		BEGIN_LUA_CALL_HOOK("ShouldHideServer");
+		END_LUA_CALL_HOOK(0, 1);
+
+		RETURN_LUA_BOOLEAN();
+	}*/
+#endif
+
 	if ( g_pcv_commentary && g_pcv_commentary->GetBool() )
 		return true;
 
@@ -3233,6 +3314,12 @@ void CServerGameClients::ClientVoice( edict_t *pEdict )
 //-----------------------------------------------------------------------------
 void CServerGameClients::NetworkIDValidated( const char *pszUserName, const char *pszNetworkID )
 {
+#if defined ( LUA_SDK )
+	BEGIN_LUA_CALL_HOOK("NetworkIDValidated");
+	lua_pushstring(L, pszUserName);
+	lua_pushstring(L, pszNetworkID);
+	END_LUA_CALL_HOOK(2, 0);
+#endif
 }
 
 // The client has submitted a keyvalues command
