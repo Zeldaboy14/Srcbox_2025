@@ -3423,7 +3423,8 @@ void CBasePlayer::PhysicsSimulate( void )
 			}
 		}
 	}
-	else if ( GetTimeSinceLastUserCommand() > sv_player_usercommand_timeout.GetFloat() )
+	// This will break singleplayer save restore. Make sure its only running in mulitplayer games.
+	else if (GetTimeSinceLastUserCommand() > sv_player_usercommand_timeout.GetFloat() && gpGlobals->maxClients != 1)
 	{
 		// no usercommand from player after some threshold
 		// server should start RunNullCommand as if client sends an empty command so that Think and gamestate related things run properly

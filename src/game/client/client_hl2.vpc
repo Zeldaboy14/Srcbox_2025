@@ -11,6 +11,11 @@ $Macro GAMENAME 	"mod_hl2" [$SOURCESDK]
 $Include "$SRCDIR\game\client\client_base.vpc"
 $Include "$SRCDIR\game\protobuf_include.vpc"
 
+//-----------------------------------------
+// Alien Swarms GameUI for Half-Life 2
+//-----------------------------------------
+$Include "$SRCDIR\game\client\client_gameui_hl2.vpc"
+
 $Configuration
 {
 	$Compiler

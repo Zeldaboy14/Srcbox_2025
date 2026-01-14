@@ -17,6 +17,8 @@ $Project "client"
 {
 	"game\client\client_tf.vpc"			[$TF]
 	"game\client\client_hl2mp.vpc"		[$HL2MP]
+	"game\client\client_hl2.vpc"		[$HL2]
+	"game\client\client_episodic.vpc"	[$EPISODIC]
 }
 
 $Project "fgdlib"
@@ -28,6 +30,8 @@ $Project "game_shader_generic_example"
 {
 	"materialsystem\stdshaders\game_shader_generic_example_hl2mp.vpc" [$HL2MP]
 	"materialsystem\stdshaders\game_shader_generic_example_tf.vpc" [$TF]
+	"materialsystem\stdshaders\game_shader_generic_example_hl2.vpc" [$HL2]
+	"materialsystem\stdshaders\game_shader_generic_example_episodic.vpc" [$EPISODIC]
 }
 
 // Use this project if you want to override all std shaders with your own.
@@ -36,16 +40,22 @@ $Project "game_shader_generic_std"
 {
 	"materialsystem\stdshaders\game_shader_generic_std_hl2mp.vpc" [$HL2MP]
 	"materialsystem\stdshaders\game_shader_generic_std_tf.vpc" [$TF]
+	"materialsystem\stdshaders\game_shader_generic_std_hl2.vpc" [$HL2MP]
+	"materialsystem\stdshaders\game_shader_generic_std_episodic.vpc" [$EPISODIC]
 }
 
 $Project "gamepadui"
 {
-	"game\gamepadui\gamepadui_hl2.vpc" [$HL2MP]
+	"game\gamepadui\gamepadui_hl2mp.vpc" [$HL2MP]
+	"game\gamepadui\gamepadui_hl2.vpc" [$HL2]
+	"game\gamepadui\gamepadui_episodic.vpc" [$EPISODIC]
 }
 
 $Project "gameui_stub"
 {
-	"gameui_stub\gameui_stub_hl2.vpc" [$HL2MP]
+	"gameui_stub\gameui_stub_hl2mp.vpc" [$HL2MP]
+	"gameui_stub\gameui_stub_hl2.vpc" [$HL2]
+	"gameui_stub\gameui_stub_episodic.vpc" [$EPISODIC]
 	"gameui_stub\gameui_stub_tf.vpc" [$TF]
 }
 
@@ -64,15 +74,24 @@ $Project "hlmv"
 	"utils\hlmv\hlmv.vpc" [$WINDOWS]
 }
 
+$Project "hlmv2"
+{
+	"utils\hlmv2\app.vpc" [$WINDOWS]
+}
+
 $Project "server"
 {
 	"game\server\server_tf.vpc"			[$TF]
 	"game\server\server_hl2mp.vpc"		[$HL2MP]
+	"game\server\server_hl2.vpc"		[$HL2]
+	"game\server\server_episodic.vpc"		[$EPISODIC]
 }
 
 $Project "launcher_main"
 {
 	"launcher_main\launcher_main_mod_hl2mp.vpc" [$HL2MP]
+	"launcher_main\launcher_main_mod_hl2.vpc" [$HL2]
+	"launcher_main\launcher_main_mod_episodic.vpc" [$EPISODIC]
 	"launcher_main\launcher_main_mod_tf.vpc" [$TF]
 }
 

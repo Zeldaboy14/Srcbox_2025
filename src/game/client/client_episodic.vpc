@@ -10,6 +10,11 @@ $Macro GAMENAME 	"mod_episodic" [$SOURCESDK]
 
 $Include "$SRCDIR\game\client\client_base.vpc"
 
+//-----------------------------------------
+// Alien Swarms GameUI for Half-Life 2 Episodes
+//-----------------------------------------
+$Include "$SRCDIR\game\client\client_gameui_episodic.vpc"
+
 $Configuration
 {
 	$Compiler
