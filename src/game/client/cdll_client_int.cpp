@@ -156,9 +156,11 @@
 #include "GameUI/IGameUI.h"
 
 #include "mem.h"
+#ifndef TF_CLIENT_DLL
 #include "pattern.h"
 #include "module.h"
 #include "protect.h"
+#endif
 
 #undef CreateEvent
 
@@ -228,6 +230,8 @@ void ApplyShaderConstantHack()
 #endif
 
 extern IClientMode *GetClientModeNormal();
+
+#ifndef TF_CLIENT_DLL
 
 // HACKHACK2025:	Until VPhysics fixes its save/restore functionality, this has to be done to
 //					restore it to a functional state
@@ -332,6 +336,8 @@ static void PatchLocalBackdoor()
 		}
 	}
 }
+
+#endif
 
 // IF YOU ADD AN INTERFACE, EXTERN IT IN THE HEADER FILE.
 IVEngineClient	*engine = NULL;
@@ -1402,8 +1408,10 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 	}
 
 	// Patch specific dll's, incase we need to.
+#ifndef TF_CLIENT_DLL
 	PatchVphysicsSaveRestore();
 	PatchLocalBackdoor();
+#endif
 
 	// Discord RPC
 	DiscordEventHandlers handlers;
