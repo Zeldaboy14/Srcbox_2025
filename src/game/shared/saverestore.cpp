@@ -91,6 +91,7 @@ static int gSizes[FIELD_TYPECOUNT] =
 	FIELD_SIZE( FIELD_MATERIALINDEX ),
 
 	FIELD_SIZE( FIELD_VECTOR2D ),
+	FIELD_SIZE( FIELD_INTEGER64 ),
 };
 
 
@@ -395,6 +396,13 @@ void CSave::WriteInt( const int *value, int count )
 
 //-------------------------------------
 
+void CSave::WriteInt64(const int64* value, int count)
+{
+	BufferData((const char*)value, sizeof(int64) * count);
+}
+
+//-------------------------------------
+
 void CSave::WriteBool( const bool *value, int count )
 {
 	COMPILE_TIME_ASSERT( sizeof(bool) == sizeof(char) );
@@ -479,6 +487,13 @@ void CSave::WriteShort( const char *pname, const short *data, int count )
 void CSave::WriteInt( const char *pname, const int *data, int count )
 {
 	BufferField( pname, sizeof(int) * count, (const char *)data );
+}
+
+//-------------------------------------
+
+void CSave::WriteInt64(const char* pname, const int64* data, int count)
+{
+	BufferField(pname, sizeof(int64) * count, (const char*)data);
 }
 
 //-------------------------------------
@@ -736,6 +751,10 @@ bool CSave::WriteBasicField( const char *pname, void *pData, datamap_t *pRootMap
 			WriteInt( pField->fieldName, (int *)pData, pField->fieldSize );
 			break;
 
+		case FIELD_INTEGER64:
+			WriteInt64(pField->fieldName, (int64*)pData, pField->fieldSize);
+			break;
+
 		case FIELD_BOOLEAN:
 			WriteBool( pField->fieldName, (bool *)pData, pField->fieldSize );
 			break;
@@ -805,7 +824,7 @@ bool CSave::WriteField( const char *pname, void *pData, datamap_t *pRootMap, typ
 	Log( pname, (fieldtype_t)pField->fieldType, pData, pField->fieldSize );
 #endif
 
-	if ( pField->fieldType <= FIELD_CUSTOM )
+	if (pField->fieldType <= FIELD_CUSTOM || pField->fieldType == FIELD_INTEGER64)
 	{
 		return WriteBasicField( pname, pData, pRootMap, pField );
 	}
@@ -1395,6 +1414,12 @@ void CRestore::ReadBasicField( const SaveRestoreRecordHeader_t &header, void *pD
 			break;
 		}
 
+		case FIELD_INTEGER64:
+		{
+			ReadInt64((int64*)pDest, pField->fieldSize, header.size);
+			break;
+		}
+
 		case FIELD_BOOLEAN:
 		{
 			ReadBool( (bool *)pDest, pField->fieldSize, header.size );
@@ -1475,7 +1500,7 @@ void CRestore::ReadBasicField( const SaveRestoreRecordHeader_t &header, void *pD
 
 void CRestore::ReadField( const SaveRestoreRecordHeader_t &header, void *pDest, datamap_t *pRootMap, typedescription_t *pField )
 {
-	if ( pField->fieldType <= FIELD_CUSTOM )
+	if (pField->fieldType <= FIELD_CUSTOM || pField->fieldType == FIELD_INTEGER64)
 		ReadBasicField( header, pDest, pRootMap, pField );
 	else
 		ReadGameField( header, pDest, pRootMap, pField );
@@ -1780,6 +1805,13 @@ int CRestore::ReadBool( bool *pValue, int nElems, int nBytesAvailable )
 {
 	COMPILE_TIME_ASSERT( sizeof(bool) == sizeof(char) );
 	return ReadSimple( pValue, nElems, nBytesAvailable );
+}
+
+//-------------------------------------
+
+int CRestore::ReadInt64(int64* pValue, int nElems, int nBytesAvailable)
+{
+	return ReadSimple(pValue, nElems, nBytesAvailable);
 }
 
 //-------------------------------------

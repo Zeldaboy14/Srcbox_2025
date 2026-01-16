@@ -75,6 +75,7 @@ public:
 	
 	void			WriteShort( const short *value, int count = 1 );
 	void			WriteInt( const int *value, int count = 1 );		                           // Save an int
+	void			WriteInt64(const int64* value, int count = 1);								   // Save an int
 	void			WriteBool( const bool *value, int count = 1 );		                           // Save a bool
 	void			WriteFloat( const float *value, int count = 1 );	                           // Save a float
 	void			WriteData( const char *pdata, int size );		                               // Save a binary data block
@@ -90,6 +91,7 @@ public:
 	// this needs to be cracked
 	void			WriteShort( const char *pname, const short *value, int count = 1 );
 	void			WriteInt( const char *pname, const int *value, int count = 1 );		           // Save an int
+	void			WriteInt64(const char* pname, const int64* value, int count = 1);		       // Save an int
 	void			WriteBool( const char *pname, const bool *value, int count = 1 );		       // Save a bool
 	void			WriteFloat( const char *pname, const float *value, int count = 1 );	           // Save a float
 	void			WriteData( const char *pname, int size, const char *pdata );		           // Save a binary data block
@@ -228,6 +230,7 @@ public:
 	short			ReadShort( void );
 	int				ReadShort( short *pValue, int count = 1, int nBytesAvailable = 0);
 	int				ReadInt( int *pValue, int count = 1, int nBytesAvailable = 0);
+	int				ReadInt64(int64* pValue, int count = 1, int nBytesAvailable = 0);
 	int				ReadInt( void );
 	int 			ReadBool( bool *pValue, int count = 1, int nBytesAvailable = 0);
 	int				ReadFloat( float *pValue, int count = 1, int nBytesAvailable = 0);
