@@ -25,17 +25,15 @@ https://github.com/Planimeter/hl2sb-src
 Some code for Srcbox (lua, physgun implantetion) have been ported and updated for the modern SDK, from the most recent branch, and the original 2007 code.
 The lua dll that is compatible with this mod can be found here (x64) https://sourceforge.net/projects/luabinaries/files/5.1.5/Windows%20Libraries/Dynamic/ (lua-5.1.5_Win64_dll17_lib.zip)
 
-<img width="88" height="31" alt="lux_icon" src="https://github.com/user-attachments/assets/b355ca87-8beb-4f63-a75f-43653f79c810" />
+<img src="https://github.com/user-attachments/assets/baa74c07-c669-4d25-82f0-01201567808e" alt="800" width="400">
 
 **LUX Shaders**  
 By Shiro (WhiteRedDragons)
-https://github.com/LUX-Shaders-Team
+https://github.com/LUX-Shaders-Team/LUX-Shaders
 
 Rewritten Shaders with features up-to L4D2/Portal 2/CSGO/.
 
 It is important for sandbox enviroment, as later game maps use newer params not found in the SDK 2013.
-
-**Notice! LUX Shaders IS NOT included at the current moment! It will be included with this project once its open-sourced**
 
 <img width="266" height="104" alt="fortconnect" src="https://github.com/user-attachments/assets/363e9a2a-97e5-4793-b7b6-535e1d8847d2" />
 
