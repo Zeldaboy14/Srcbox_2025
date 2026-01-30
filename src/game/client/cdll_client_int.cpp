@@ -202,32 +202,69 @@ DLL_IMPORT HANDLE STDCALL GetCurrentProcess(void);
 #include "sixense/in_sixense.h"
 #endif
 
+// Need this so using constants doesn't crash the game.
+// Credits go to Ficool ( for the initial hack on sdk2013sp )
+// and Carve Tool ( for finding TF2SDK compatible offsets )
+#include "materialsystem/shaderapihack.h"
+
 #if defined( GAMEPADUI )
 #include "../gamepadui/igamepadui.h"
 #endif // GAMEPADUI
 
-#ifdef SHADERCONSTHACK
-#include "materialsystem/shaderapihack.h"
-#endif // PS30 Shader Constant Hack
-
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-#ifdef SHADERCONSTHACK
 //-----------------------------------------------------------------------------
 // Purpose: Override Constant Register Amount. So that we can use more of them
 //-----------------------------------------------------------------------------
-void ApplyShaderConstantHack()
+struct CHardwareConfig_Internal_t
 {
-	CMaterialConfigWrapper Wrapper;
+	struct HardwareCaps_t : MaterialAdapterInfo_t
+	{
+		uint8 gap[0x28];
+		int  m_NumPixelShaderConstants;
+		int  m_NumBooleanPixelShaderConstants;
+		int  m_NumIntegerPixelShaderConstants;
+		int  m_NumVertexShaderConstants;
+		int  m_NumBooleanVertexShaderConstants;
+		int  m_NumIntegerVertexShaderConstants;
+		int  m_TextureMemorySize;
+		uint8 gap2[0x14];
+		HDRType_t m_HDRType;
+		uint8 gap3[0x60];
+		HDRType_t m_MaxHDRType;
+	};
 
-	Wrapper.PrintPixelConstants();
-	Wrapper.SetNumPixelConstants(224); // 224 is the max according to microsoft documentation
-	Wrapper.SetNumBooleanPixelConstants(16); // 16 is the max according to microsoft documentation
-	Wrapper.SetNumIntegerPixelConstants(16); // 16 is the max according to microsoft documentation
-	Wrapper.PrintPixelConstants();
-}
+#ifndef WIN64
+	// offset to this, typeinfo
+	uint8 gap[0x10];
 #endif
+
+	uint8 gap2[8];
+
+	HardwareCaps_t m_ActualCaps;
+	HardwareCaps_t m_Caps;
+	HardwareCaps_t m_UnOverriddenCaps;
+};
+
+// ShiroDkxtro2: Ported from TF2C ( newer Version of the Constant Register Hack )
+static void ApplyShaderConstantHack()
+{
+	CHardwareConfig_Internal_t* pInternalConfig = reinterpret_cast<CHardwareConfig_Internal_t*>(g_pMaterialSystemHardwareConfig);
+
+	// Set our video config to enable usage of pixel shader constant registers beyond c31.
+	pInternalConfig->m_ActualCaps.m_NumPixelShaderConstants = 224;
+	pInternalConfig->m_Caps.m_NumPixelShaderConstants = 224;
+	pInternalConfig->m_UnOverriddenCaps.m_NumPixelShaderConstants = 224;
+
+	pInternalConfig->m_ActualCaps.m_MaxHDRType = HDR_TYPE_FLOAT;
+	pInternalConfig->m_Caps.m_MaxHDRType = HDR_TYPE_FLOAT;
+	pInternalConfig->m_UnOverriddenCaps.m_MaxHDRType = HDR_TYPE_FLOAT;
+
+	MaterialSystem_Config_t config = materials->GetCurrentConfigForVideoCard();
+	config.m_nReserved++;
+	materials->OverrideConfig(config, true);
+}
 
 extern IClientMode *GetClientModeNormal();
 
@@ -336,8 +373,6 @@ static void PatchLocalBackdoor()
 		}
 	}
 }
-
-#endif
 
 // IF YOU ADD AN INTERFACE, EXTERN IT IN THE HEADER FILE.
 IVEngineClient	*engine = NULL;
