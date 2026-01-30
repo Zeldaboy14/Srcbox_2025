@@ -56,7 +56,7 @@ Some Mapbase changes originate from here, like the postprocess controller, dof, 
 *Special thanks:*
 
 	TheMaster974 - Advice, video tutorials, sdk examples
-	Shiro - Shader backend (currently not public)
+	Shiro - LUX Shaders, and for letting me test it under this mod prior to release!
 	VDC - Fixs to specific things, so some stuff is akin to the newer branchs
 	PiMoNFeeD - BSPConvert, some other technical advice
 	Vvis/Vis/Lambdagon - Valuable tester and issue reporter from Fortress Connected
