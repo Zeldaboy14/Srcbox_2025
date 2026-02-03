@@ -80,6 +80,12 @@ static void LeaveGameOkCallback()
 
 void ShowPlayerList();
 
+// Re-open the main menu. Required to replication
+CON_COMMAND(OpenInGameMainMenu, "")
+{
+	CBaseModPanel::GetSingleton().OpenInGameFrontScreen();
+};
+
 //=============================================================================
 void InGameMainMenu::OnCommand( const char *command )
 {
@@ -200,7 +206,7 @@ void InGameMainMenu::OnCommand( const char *command )
 	}
 	else if( !Q_strcmp( command, "ExitToMainMenu" ) )
 	{
-		GenericConfirmation* confirmation = 
+		/*GenericConfirmation* confirmation =
 			static_cast< GenericConfirmation* >( CBaseModPanel::GetSingleton().OpenWindow( WT_GENERICCONFIRMATION, this, true ) );
 
 		GenericConfirmation::Data_t data;
@@ -212,6 +218,17 @@ void InGameMainMenu::OnCommand( const char *command )
 		data.bCancelButtonEnabled = true;
 
 		confirmation->SetUsageData(data);
+		*/
+
+		InGameMainMenu* self =
+			static_cast<InGameMainMenu*>(CBaseModPanel::GetSingleton().GetWindow(WT_INGAMEMAINMENU));
+
+		if (self)
+		{
+			self->Close();
+		}
+
+		engine->ClientCmd("OpenReturnToMainMenuDialog");
 	}
 	else if (!Q_strcmp(command, "OpenLegacyOptions"))
 	{

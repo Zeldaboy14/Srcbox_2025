@@ -62,11 +62,10 @@ protected:
 	virtual void OnCommand(const char* pcCommand) override;
 
 private:
-	Button* Next;
-	Button* Prev;
-	Button* Play;
-	Button* Close;
-	Button* Cancel;
+	vgui::Frame* m_pQuitPanel;
+	vgui::Label* m_pQuitConfirmText;
+	Button* m_pCancelButton;
+	Button* m_pQuitButton;
 };
 
 ConVar cancel("", "0", FCVAR_CLIENTDLL, "");
@@ -76,7 +75,7 @@ CSaveBeforeQuitQueryDialog::CSaveBeforeQuitQueryDialog(vgui::VPANEL parent)
 {
 	SetParent(parent);
 
-	SetKeyBoardInputEnabled(false);
+	SetKeyBoardInputEnabled(true);
 	SetMouseInputEnabled(true);
 
 	SetProportional(false);
@@ -84,8 +83,12 @@ CSaveBeforeQuitQueryDialog::CSaveBeforeQuitQueryDialog(vgui::VPANEL parent)
 	SetSizeable(false);
 	SetMinimizeButtonVisible(false);
 	SetMaximizeButtonVisible(false);
-	SetCloseButtonVisible(true);
+	SetCloseButtonVisible(false);
 	SetMoveable(true);
+	SetTabPosition(2);
+	PaintBackground();
+	MoveToCenterOfScreen();
+
 	SetTitle("#GameUI_Quit", false);
 
 	SetScheme(vgui::scheme()->LoadSchemeFromFile("resource/SourceScheme.res", "SourceScheme"));
@@ -135,6 +138,109 @@ public:
 static CSaveBeforeQuitQueryDialogInterface g_SavebeforeQuit;
 ISaveBeforeQuitDialog* savebeforequitdialog = (ISaveBeforeQuitDialog*)&g_SavebeforeQuit;
 
+class CReturntoMainMenuDialog : public vgui::Frame
+{
+	DECLARE_CLASS_SIMPLE(CReturntoMainMenuDialog, vgui::Frame);
+
+public:
+	CReturntoMainMenuDialog(vgui::VPANEL parent);
+	~CReturntoMainMenuDialog() {}
+
+protected:
+	virtual void OnTick();
+	virtual void OnCommand(const char* pcCommand) override;
+
+private:
+	vgui::Frame* m_pQuitPanel;
+	vgui::Label* m_pQuitConfirmText;
+	Button* m_pCancelButton;
+	Button* m_pQuitButton;
+};
+
+CReturntoMainMenuDialog::CReturntoMainMenuDialog(vgui::VPANEL parent)
+	: BaseClass(nullptr, "")
+{
+	SetParent(parent);
+
+	SetKeyBoardInputEnabled(true);
+	SetMouseInputEnabled(true);
+
+	SetProportional(false);
+	SetTitleBarVisible(true);
+	SetSizeable(false);
+	SetMinimizeButtonVisible(false);
+	SetMaximizeButtonVisible(false);
+	SetCloseButtonVisible(false);
+	SetMoveable(true);
+	SetTabPosition(2);
+	PaintBackground();
+	MoveToCenterOfScreen();
+
+	SetScheme(vgui::scheme()->LoadSchemeFromFile("resource/SourceScheme.res", "SourceScheme"));
+
+	SetTitle("#GameUI_GameMenu_ReturnToMainMenu", false);
+	m_pQuitPanel = new vgui::Frame(this, "QuitQueryDialog");
+	SetBounds(656, 384, 288, 132);
+	SetScheme(vgui::scheme()->LoadSchemeFromFile("resource/SourceScheme.res", "SourceScheme"));
+
+	m_pQuitConfirmText = new vgui::Label(this, "", "#GameUI_MainMenuWarning");
+	m_pQuitConfirmText->SetBounds(54, 35, 190, 32);
+
+	m_pQuitButton = new Button(this, "", "#GameUI_OK");
+	m_pQuitButton->SetCommand("OK");
+	m_pQuitButton->SetTabPosition(1);
+	m_pQuitButton->SetBounds(78, 85, 64, 26);
+	m_pQuitButton->SetVisible(true);
+
+	m_pCancelButton = new Button(this, "", "#QueryBox_Cancel");
+	m_pCancelButton->SetCommand("Cancel");
+	m_pCancelButton->SetBounds(158, 85, 64, 26);
+	m_pCancelButton->SetVisible(true);
+
+	SetVisible(false);
+}
+
+// Class for managing panel instance
+class CReturntoMainMenuInterface : public IReturntoMainMenuDialog
+{
+private:
+	CReturntoMainMenuDialog* m_pPanel;
+
+public:
+	CReturntoMainMenuInterface()
+		: m_pPanel(nullptr) {
+	}
+
+	void Create(vgui::VPANEL parent) override
+	{
+		if (!m_pPanel)
+		{
+			m_pPanel = new CReturntoMainMenuDialog(parent);
+		}
+	}
+
+	void Destroy() override
+	{
+		if (m_pPanel)
+		{
+			m_pPanel->SetParent(nullptr);
+			delete m_pPanel;
+			m_pPanel = nullptr;
+		}
+	}
+
+	void Activate() override
+	{
+		if (m_pPanel)
+		{
+			m_pPanel->Activate();
+		}
+	}
+};
+
+static CReturntoMainMenuInterface g_ReturntoMainMenu;
+IReturntoMainMenuDialog* returntomainmenudialog = (IReturntoMainMenuDialog*)&g_ReturntoMainMenu;
+
 class CQuitQueryBoxDialog : public vgui::Frame
 {
 	DECLARE_CLASS_SIMPLE(CQuitQueryBoxDialog, vgui::Frame);
@@ -158,6 +264,7 @@ private:
 CQuitQueryBoxDialog::CQuitQueryBoxDialog(vgui::VPANEL parent)
 	: BaseClass(nullptr, "QuitQueryDialog")
 {
+
 	SetParent(parent);
 
 	SetKeyBoardInputEnabled(true);
@@ -171,6 +278,16 @@ CQuitQueryBoxDialog::CQuitQueryBoxDialog(vgui::VPANEL parent)
 	SetCloseButtonVisible(false);
 	SetMoveable(true);
 	SetTabPosition(2);
+	PaintBackground();
+	MoveToCenterOfScreen();
+
+	/*vgui::ImagePanel* pGameBackground = new vgui::ImagePanel(this, "Back");
+	pGameBackground->SetImage("../vgui/appchooser/background_hl2");
+	pGameBackground->SetPos(0, 0);
+	pGameBackground->SetSize(1600, 900);
+	pGameBackground->SetShouldScaleImage(1);
+	pGameBackground->SetScaleAmount(1);*/
+	//GetWindowPriority();
 	SetTitle("#GameUI_QuitConfirmationTitle", false);
 
 	m_pQuitPanel = new vgui::Frame(this, "QuitQueryDialog");
@@ -234,7 +351,22 @@ public:
 };
 
 static CQuitQueryBoxDialogInterface g_QuitQueryBoxDialog;
-IQuitQueryBoxDialog* quitquerybox = (IQuitQueryBoxDialog*)&g_QuitQueryBoxDialog;
+IQuitQueryBoxDialog* quitqueryboxdialog = (IQuitQueryBoxDialog*)&g_QuitQueryBoxDialog;
+
+CON_COMMAND(OpenSaveBeforeQuitDialog, "")
+{
+	savebeforequitdialog->Activate();
+};
+
+CON_COMMAND(OpenReturnToMainMenuDialog, "")
+{
+	returntomainmenudialog->Activate();
+};
+
+CON_COMMAND(OpenQuitDialog, "")
+{
+	quitqueryboxdialog->Activate();
+};
 
 void CSaveBeforeQuitQueryDialog::OnTick()
 {
@@ -242,27 +374,17 @@ void CSaveBeforeQuitQueryDialog::OnTick()
 	SetVisible(cancel.GetBool());
 }
 
-
-CON_COMMAND(OpenSaveBeforeQuitDialog, "")
-{
-	savebeforequitdialog->Activate();
-};
-
-CON_COMMAND(OpenQuitDialog, "")
-{
-	quitquerybox->Activate();
-};
-
 void CSaveBeforeQuitQueryDialog::OnCommand(const char* pcCommand)
 {
 	if (FStrEq(pcCommand, "Cancel"))
 	{
 		SetVisible(false);
+		engine->ClientCmd("OpenInGameMainMenu");
 	}
 
-	if (FStrEq(pcCommand, "OK"))
+	if (FStrEq(pcCommand, "Quit"))
 	{
-		engine->ClientCmd_Unrestricted("quit");
+		engine->ClientCmd("disconnect");
 	}
 }
 
@@ -272,18 +394,39 @@ void CQuitQueryBoxDialog::OnTick()
 	SetVisible(cancel.GetBool());
 }
 
+void CReturntoMainMenuDialog::OnCommand(const char* pcCommand)
+{
+	if (FStrEq(pcCommand, "Cancel"))
+	{
+		SetVisible(false);
+		engine->ClientCmd("OpenInGameMainMenu");
+	}
+
+	if (FStrEq(pcCommand, "Ok"))
+	{
+		SetVisible(false);
+		engine->ClientCmd("disconnect");
+	}
+}
+
+void CReturntoMainMenuDialog::OnTick()
+{
+	BaseClass::OnTick();
+	SetVisible(cancel.GetBool());
+}
+
 void CQuitQueryBoxDialog::OnCommand(const char* pcCommand)
 {
 	if (FStrEq(pcCommand, "OnCancel"))
 	{
-		engine->ClientCmd_Unrestricted("quit");
+		engine->ClientCmd("OpenMainMenu");
 		Close();
 	}
 
 	if (FStrEq(pcCommand, "OK"))
 	{
 		SetVisible(false);
-		engine->ClientCmd_Unrestricted("quit");
+		engine->ClientCmd("quit");
 	}
 }
 

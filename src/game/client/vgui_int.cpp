@@ -23,12 +23,9 @@
 #include <KeyValues.h>
 #include "filesystem.h"
 #include "matsys_controls/matsyscontrols.h"
-//#include "MyPanel.h"
 #include "vgui2_panels/vgui_singeplayer.h"
-#include "vgui2_panels/vgui_friends.h"
 #include "vgui2_panels/vgui_newgame.h"
 #include "vgui2_panels/vgui_savenquit.h"
-#include "MountGames.h"
 
 //IGameMountPanel* gamemountpanel;
 
@@ -217,8 +214,9 @@ void VGui_CreateGlobalPanels( void )
 	// End
 	mypanel->Create(GameUiDll);
 	newgamedialog->Create(GameUiDll);
+	returntomainmenudialog->Create(GameUiDll);
 	savebeforequitdialog->Create(GameUiDll);
-	quitquerybox->Create(GameUiDll);
+	quitqueryboxdialog->Create(GameUiDll);
 	//gamemountpanel->Create(GameUiDll);
 #if defined( TRACK_BLOCKING_IO )
 	VPANEL gameDLLPanel = enginevgui->GetPanel( PANEL_GAMEDLL );
@@ -280,8 +278,9 @@ void VGui_Shutdown()
 	vgui::ivgui()->RunFrame();
 	mypanel->Destroy();
 	newgamedialog->Destroy();
+	returntomainmenudialog->Destroy();
 	savebeforequitdialog->Destroy();
-	quitquerybox->Destroy();
+	quitqueryboxdialog->Destroy();
 	//gamemountpanel->Destroy();
 }
 
