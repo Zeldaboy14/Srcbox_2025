@@ -41,6 +41,7 @@
 #include "fx.h"
 #include "dt_utlvector_recv.h"
 #include "cam_thirdperson.h"
+#include "flashlighteffect.h"
 #if defined( REPLAY_ENABLED )
 #include "replay/replaycamera.h"
 #include "replay/ireplaysystem.h"
@@ -492,7 +493,11 @@ void C_BasePlayer::Spawn( void )
 
 	m_iFOV	= 0;	// init field of view.
 
-    SetModel( "models/player.mdl" );
+#ifdef PORTAL_CLIENT_DLL
+    SetModel( "models/player/chell.mdl" );
+#else
+	SetModel( "models/player.mdl" );
+#endif
 
 	Precache();
 
@@ -1250,37 +1255,107 @@ void C_BasePlayer::TeamChange( int iNewTeam )
 	// Base class does nothing
 }
 
+ConVar srcbox_use_l4d_flashlight("srcbox_use_l4d_flashlight", "1", FCVAR_ARCHIVE, "Use L4D attachment based flashlight");
 
 //-----------------------------------------------------------------------------
 // Purpose: Creates, destroys, and updates the flashlight effect as needed.
 //-----------------------------------------------------------------------------
 void C_BasePlayer::UpdateFlashlight()
 {
+	C_BasePlayer* pPlayer = C_BasePlayer::GetLocalPlayer();
 	// The dim light is the flashlight.
-	if ( IsEffectActive( EF_DIMLIGHT ) )
+	if (srcbox_use_l4d_flashlight.GetBool())
 	{
-		if (!m_pFlashlight)
+		if (IsEffectActive(EF_DIMLIGHT))
 		{
-			// Turned on the headlight; create it.
-			m_pFlashlight = new CFlashlightEffect(index);
-
 			if (!m_pFlashlight)
-				return;
+			{
+				// Turned on the headlight; create it.
+				m_pFlashlight = new CFlashlightEffect(index);
 
-			m_pFlashlight->TurnOn();
+				if (!m_pFlashlight)
+					return;
+
+				m_pFlashlight->TurnOn();
+			}
+
+			Vector vecForward, vecRight, vecUp;
+			EyeVectors(&vecForward, &vecRight, &vecUp);
+
+			// mimics l4d flashlight offset.
+			//flashlight origin is the player pos if a weapon isn't detected.
+			Vector vecOrigin = EyePosition();
+			QAngle angFlashlightAngle = EyeAngles();
+
+			int iAttachment = pPlayer->LookupAttachment("camera");
+
+			C_BaseViewModel* pViewModel = dynamic_cast<C_BaseViewModel*>(GetViewModel());
+			if (!ShouldDrawThisPlayer())
+			{
+				if (GetActiveWeapon() && GetActiveWeapon()->IsMeleeWeapon())
+				{
+					Vector aimFwd;
+					AngleVectors(angFlashlightAngle, &aimFwd);
+					vecOrigin += aimFwd * (VEC_HULL_MAX).Length2D();
+				}
+				else
+				{
+					if (pViewModel)
+					{
+						pViewModel->GetAttachment(pViewModel->LookupAttachment("muzzle"), vecOrigin, angFlashlightAngle);
+						iAttachment = pViewModel->LookupAttachment("muzzle");
+					}
+				}
+			}
+			else
+			{
+				Vector aimFwd;
+				AngleVectors(angFlashlightAngle, &aimFwd);
+				vecOrigin += aimFwd * (VEC_HULL_MAX).Length2D();
+			}
+
+			AngleVectors(angFlashlightAngle, &vecForward, &vecRight, &vecUp);
+
+			// Update the light with the new position and direction.		
+			m_pFlashlight->UpdateLight(EyePosition(), vecForward, vecRight, vecUp, FLASHLIGHT_DISTANCE);
 		}
-
-		Vector vecForward, vecRight, vecUp;
-		EyeVectors( &vecForward, &vecRight, &vecUp );
-
-		// Update the light with the new position and direction.		
-		m_pFlashlight->UpdateLight( EyePosition(), vecForward, vecRight, vecUp, FLASHLIGHT_DISTANCE );
+		else
+		{
+			if (m_pFlashlight)
+			{
+				delete m_pFlashlight;
+				m_pFlashlight = NULL;
+			}
+		}
 	}
-	else if (m_pFlashlight)
+	else
 	{
-		// Turned off the flashlight; delete it.
-		delete m_pFlashlight;
-		m_pFlashlight = NULL;
+		// The dim light is the flashlight.
+		if (IsEffectActive(EF_DIMLIGHT))
+		{
+			if (!m_pFlashlight)
+			{
+				// Turned on the headlight; create it.
+				m_pFlashlight = new CFlashlightEffect(index);
+
+				if (!m_pFlashlight)
+					return;
+
+				m_pFlashlight->TurnOn();
+			}
+
+			Vector vecForward, vecRight, vecUp;
+			EyeVectors(&vecForward, &vecRight, &vecUp);
+
+			// Update the light with the new position and direction.		
+			m_pFlashlight->UpdateLight(EyePosition(), vecForward, vecRight, vecUp, FLASHLIGHT_DISTANCE);
+		}
+		else if (m_pFlashlight)
+		{
+			// Turned off the flashlight; delete it.
+			delete m_pFlashlight;
+			m_pFlashlight = NULL;
+		}
 	}
 }
 
