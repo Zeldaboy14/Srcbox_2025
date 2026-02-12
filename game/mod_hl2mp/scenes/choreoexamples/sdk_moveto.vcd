@@ -1,0 +1,24 @@
+// Choreo version 1
+actor "barney4"
+{
+  channel "MoveTo"
+  {
+    event moveto "mark_Barney4"
+    {
+      time 0.086022 5.456988
+      param "mark_Barney4"
+      param2 "crouch_walk_all"
+    }
+  }
+}
+
+scalesettings
+{
+  "CChoreoView" "62"
+  "ExpressionTool" "100"
+  "RampTool" "46"
+  "GestureTool" "100"
+  "SceneRampTool" "100"
+}
+fps 60
+snap off

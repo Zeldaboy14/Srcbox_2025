@@ -1,0 +1,35 @@
+// Choreo version 1
+actor "narrator"
+{
+  channel "voice"
+  {
+    event speak "narration.CargoLiftDeath_00"
+    {
+      time 0.006666 9.126485
+      param "narration.CargoLiftDeath_00"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.CargoLiftDeath_01"
+    {
+      time 9.126667 12.900908
+      param "narration.CargoLiftDeath_01"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+  }
+}
+
+scalesettings
+{
+  "CChoreoView" "100"
+  "RampTool" "100"
+  "ExpressionTool" "100"
+  "GestureTool" "100"
+  "SceneRampTool" "100"
+}
+fps 60
+snap off
+ignorePhonemes off

@@ -1,0 +1,75 @@
+// Choreo version 1
+actor "narrator"
+{
+  channel "voice"
+  {
+    event speak "narration.WindowGag_3_00"
+    {
+      time 0.000000 12.351724
+      param "narration.WindowGag_3_00"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.WindowGag_3_01"
+    {
+      time 12.360002 22.878277
+      param "narration.WindowGag_3_01"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.WindowGag_3_02"
+    {
+      time 22.886669 39.448120
+      param "narration.WindowGag_3_02"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.WindowGag_3_03"
+    {
+      time 39.459999 49.845577
+      param "narration.WindowGag_3_03"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.WindowGag_3_04"
+    {
+      time 49.853336 60.938530
+      param "narration.WindowGag_3_04"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.WindowGag_3_05"
+    {
+      time 60.940002 71.144653
+      param "narration.WindowGag_3_05"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.WindowGag_3_06"
+    {
+      time 71.146675 84.764931
+      param "narration.WindowGag_3_06"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+  }
+}
+
+scalesettings
+{
+  "CChoreoView" "100"
+  "RampTool" "100"
+  "ExpressionTool" "100"
+  "GestureTool" "100"
+  "SceneRampTool" "100"
+}
+fps 60
+snap off
+ignorePhonemes off

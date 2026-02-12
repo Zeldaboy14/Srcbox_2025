@@ -1,0 +1,91 @@
+// Choreo version 1
+actor "narrator"
+{
+  channel "voice"
+  {
+    event speak "narration.Freedom_2_00"
+    {
+      time 0.006667 2.859479
+      param "narration.Freedom_2_00"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Freedom_2_01"
+    {
+      time 2.860000 12.089705
+      param "narration.Freedom_2_01"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Freedom_2_02"
+    {
+      time 12.086667 20.561226
+      param "narration.Freedom_2_02"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Freedom_2_03"
+    {
+      time 20.573332 29.719137
+      param "narration.Freedom_2_03"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Freedom_2_04"
+    {
+      time 29.713335 41.208527
+      param "narration.Freedom_2_04"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Freedom_2_05"
+    {
+      time 41.226665 46.261063
+      param "narration.Freedom_2_05"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Freedom_2_06"
+    {
+      time 46.266666 56.083717
+      param "narration.Freedom_2_06"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Freedom_2_07"
+    {
+      time 56.086670 62.841137
+      param "narration.Freedom_2_07"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Freedom_2_08"
+    {
+      time 62.846668 65.489731
+      param "narration.Freedom_2_08"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+  }
+}
+
+scalesettings
+{
+  "SceneRampTool" "100"
+  "GestureTool" "100"
+  "ExpressionTool" "100"
+  "RampTool" "100"
+  "CChoreoView" "100"
+}
+fps 60
+snap off
+ignorePhonemes off

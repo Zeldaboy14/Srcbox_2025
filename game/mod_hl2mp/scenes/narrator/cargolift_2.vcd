@@ -1,0 +1,51 @@
+// Choreo version 1
+actor "narrator"
+{
+  channel "voice"
+  {
+    event speak "narration.CargoLift_2_00"
+    {
+      time 0.006667 3.901837
+      param "narration.CargoLift_2_00"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.CargoLift_2_01"
+    {
+      time 3.906666 15.938797
+      param "narration.CargoLift_2_01"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.CargoLift_2_02"
+    {
+      time 15.940001 24.951725
+      param "narration.CargoLift_2_02"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.CargoLift_2_03"
+    {
+      time 24.953335 28.997053
+      param "narration.CargoLift_2_03"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+  }
+}
+
+scalesettings
+{
+  "CChoreoView" "100"
+  "RampTool" "100"
+  "ExpressionTool" "100"
+  "GestureTool" "100"
+  "SceneRampTool" "100"
+}
+fps 60
+snap off
+ignorePhonemes off

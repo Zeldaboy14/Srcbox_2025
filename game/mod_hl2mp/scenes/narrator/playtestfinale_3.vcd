@@ -1,0 +1,83 @@
+// Choreo version 1
+actor "narrator"
+{
+  channel "voice"
+  {
+    event speak "narration.PlaytestFinale_3_00"
+    {
+      time 0.006666 2.147074
+      param "narration.PlaytestFinale_3_00"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.PlaytestFinale_3_01"
+    {
+      time 2.146667 9.726236
+      param "narration.PlaytestFinale_3_01"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.PlaytestFinale_3_02"
+    {
+      time 9.726668 15.518370
+      param "narration.PlaytestFinale_3_02"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.PlaytestFinale_3_03"
+    {
+      time 15.520000 25.743605
+      param "narration.PlaytestFinale_3_03"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.PlaytestFinale_3_04"
+    {
+      time 25.753334 29.580885
+      param "narration.PlaytestFinale_3_04"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.PlaytestFinale_3_05"
+    {
+      time 29.586668 38.123131
+      param "narration.PlaytestFinale_3_05"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.PlaytestFinale_3_06"
+    {
+      time 38.126667 43.011837
+      param "narration.PlaytestFinale_3_06"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.PlaytestFinale_3_07"
+    {
+      time 43.006668 44.240524
+      param "narration.PlaytestFinale_3_07"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+  }
+}
+
+scalesettings
+{
+  "CChoreoView" "100"
+  "RampTool" "100"
+  "ExpressionTool" "100"
+  "GestureTool" "100"
+  "SceneRampTool" "100"
+}
+fps 60
+snap off
+ignorePhonemes off

@@ -1,0 +1,99 @@
+// Choreo version 1
+actor "narrator"
+{
+  channel "voice"
+  {
+    event speak "narration.Inc_0c_00"
+    {
+      time 0.006666 3.373265
+      param "narration.Inc_0c_00"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Inc_0c_01"
+    {
+      time 3.373333 6.358594
+      param "narration.Inc_0c_01"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Inc_0c_02"
+    {
+      time 6.359999 16.612335
+      param "narration.Inc_0c_02"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Inc_0c_03"
+    {
+      time 16.613335 25.536465
+      param "narration.Inc_0c_03"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Inc_0c_04"
+    {
+      time 25.546667 30.231588
+      param "narration.Inc_0c_04"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Inc_0c_05"
+    {
+      time 30.233335 38.350227
+      param "narration.Inc_0c_05"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Inc_0c_06"
+    {
+      time 38.353336 48.627464
+      param "narration.Inc_0c_06"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Inc_0c_07"
+    {
+      time 48.640007 55.602001
+      param "narration.Inc_0c_07"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Inc_0c_08"
+    {
+      time 55.606667 65.085442
+      param "narration.Inc_0c_08"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Inc_0c_09"
+    {
+      time 65.086670 76.570137
+      param "narration.Inc_0c_09"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+  }
+}
+
+scalesettings
+{
+  "CChoreoView" "100"
+  "RampTool" "100"
+  "ExpressionTool" "100"
+  "GestureTool" "100"
+  "SceneRampTool" "100"
+}
+fps 60
+snap off
+ignorePhonemes off

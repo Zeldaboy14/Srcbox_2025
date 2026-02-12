@@ -1,0 +1,75 @@
+// Choreo version 1
+actor "narrator"
+{
+  channel "voice"
+  {
+    event speak "narration.PlaytestP_4_00"
+    {
+      time 0.013333 2.751814
+      param "narration.PlaytestP_4_00"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.PlaytestP_4_01"
+    {
+      time 2.753334 13.861497
+      param "narration.PlaytestP_4_01"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.PlaytestP_4_02"
+    {
+      time 13.866667 19.113810
+      param "narration.PlaytestP_4_02"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.PlaytestP_4_03"
+    {
+      time 19.126667 29.985352
+      param "narration.PlaytestP_4_03"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.PlaytestP_4_04"
+    {
+      time 29.986668 41.464809
+      param "narration.PlaytestP_4_04"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.PlaytestP_4_05"
+    {
+      time 41.473339 57.615631
+      param "narration.PlaytestP_4_05"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.PlaytestP_4_06"
+    {
+      time 57.626671 64.039894
+      param "narration.PlaytestP_4_06"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+  }
+}
+
+scalesettings
+{
+  "CChoreoView" "100"
+  "RampTool" "100"
+  "ExpressionTool" "100"
+  "GestureTool" "100"
+  "SceneRampTool" "100"
+}
+fps 60
+snap off
+ignorePhonemes off

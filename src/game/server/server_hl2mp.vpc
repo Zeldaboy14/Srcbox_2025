@@ -14,7 +14,7 @@ $Include "$SRCDIR\game\server\nav_mesh.vpc"
 //-----------------------------------------
 // LUA from Half-Life 2: Sandbox (server)
 //-----------------------------------------
-$Include "$SRCDIR\game\server\server_lua.vpc"
+//$Include "$SRCDIR\game\server\server_lua.vpc"
 
 $Configuration
 {
@@ -33,11 +33,13 @@ $Project "Server (HL2MP)"
 		{
 			$File	"terror\prop_car_alarm.cpp"
 		}
-		$Folder	"HL1"
+		
+		$Folder	"HL2 DLL"
 		{
-			$File	"hl1\scientist.cpp"
-			$File	"hl1\scientist.h"
+			$File	"hl2\weapon_citizenpackage.cpp"
+			$File	"hl2\weapon_citizenpackage.h"
 		}
+		
 		$File	"ai_relationship.cpp"
 		$File	"basegrenade_concussion.cpp"
 		$File	"basegrenade_contact.cpp"

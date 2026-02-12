@@ -1,0 +1,307 @@
+// Choreo version 1
+actor "narrator"
+{
+  channel "voice"
+  {
+    event speak "narration.Countdown_00"
+    {
+      time 0.006666 4.806666
+      param "narration.Countdown_00"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Countdown_01"
+    {
+      time 4.800000 13.400001
+      param "narration.Countdown_01"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Countdown_02"
+    {
+      time 13.400000 22.000000
+      param "narration.Countdown_02"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Countdown_03"
+    {
+      time 22.000000 32.200001
+      param "narration.Countdown_03"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Countdown_04"
+    {
+      time 32.200001 38.600002
+      param "narration.Countdown_04"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Countdown_05"
+    {
+      time 38.599998 55.000000
+      param "narration.Countdown_05"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Countdown_06"
+    {
+      time 55.000000 61.400002
+      param "narration.Countdown_06"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Countdown_07"
+    {
+      time 61.400002 64.800003
+      param "narration.Countdown_07"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Countdown_08"
+    {
+      time 64.800003 77.600006
+      param "narration.Countdown_08"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Countdown_09"
+    {
+      time 77.599998 93.000000
+      param "narration.Countdown_09"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Countdown_10"
+    {
+      time 93.000000 100.000000
+      param "narration.Countdown_10"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Countdown_11"
+    {
+      time 100.000000 105.300003
+      param "narration.Countdown_11"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Countdown_12"
+    {
+      time 105.300003 110.000000
+      param "narration.Countdown_12"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Countdown_13"
+    {
+      time 110.000000 120.699997
+      param "narration.Countdown_13"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Countdown_14"
+    {
+      time 120.699997 128.300003
+      param "narration.Countdown_14"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Countdown_15"
+    {
+      time 128.300003 141.199997
+      param "narration.Countdown_15"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Countdown_16"
+    {
+      time 141.199997 146.699997
+      param "narration.Countdown_16"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Countdown_17"
+    {
+      time 146.699997 152.300003
+      param "narration.Countdown_17"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Countdown_18"
+    {
+      time 152.300003 158.100006
+      param "narration.Countdown_18"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Countdown_19"
+    {
+      time 158.100006 164.200012
+      param "narration.Countdown_19"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Countdown_20"
+    {
+      time 164.199997 166.699997
+      param "narration.Countdown_20"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Countdown_21"
+    {
+      time 166.699997 177.000000
+      param "narration.Countdown_21"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Countdown_22"
+    {
+      time 177.000000 184.500000
+      param "narration.Countdown_22"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Countdown_23"
+    {
+      time 184.500000 190.899994
+      param "narration.Countdown_23"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Countdown_24"
+    {
+      time 190.899994 194.299988
+      param "narration.Countdown_24"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Countdown_25"
+    {
+      time 194.300003 203.699997
+      param "narration.Countdown_25"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Countdown_26"
+    {
+      time 203.699997 210.000000
+      param "narration.Countdown_26"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Countdown_27"
+    {
+      time 210.000000 217.800003
+      param "narration.Countdown_27"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Countdown_28"
+    {
+      time 217.800003 226.400009
+      param "narration.Countdown_28"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Countdown_29"
+    {
+      time 226.399994 232.599991
+      param "narration.Countdown_29"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Countdown_30"
+    {
+      time 232.600006 237.700012
+      param "narration.Countdown_30"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Countdown_31"
+    {
+      time 237.699997 242.300003
+      param "narration.Countdown_31"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Countdown_32"
+    {
+      time 242.300003 248.699997
+      param "narration.Countdown_32"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Countdown_33"
+    {
+      time 248.699997 255.899994
+      param "narration.Countdown_33"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Countdown_34"
+    {
+      time 255.899994 259.600006
+      param "narration.Countdown_34"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Countdown_35"
+    {
+      time 259.600006 267.381653
+      param "narration.Countdown_35"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+  }
+}
+
+scalesettings
+{
+  "CChoreoView" "4"
+  "RampTool" "100"
+  "ExpressionTool" "100"
+  "GestureTool" "100"
+  "SceneRampTool" "100"
+}
+fps 10
+snap on
+ignorePhonemes off

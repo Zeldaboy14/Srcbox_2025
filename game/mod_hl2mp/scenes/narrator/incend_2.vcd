@@ -1,0 +1,91 @@
+// Choreo version 1
+actor "narrator"
+{
+  channel "voice"
+  {
+    event speak "narration.IncEnd_2_00"
+    {
+      time 0.013333 5.455057
+      param "narration.IncEnd_2_00"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.IncEnd_2_01"
+    {
+      time 5.446666 12.436870
+      param "narration.IncEnd_2_01"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.IncEnd_2_02"
+    {
+      time 12.433334 18.671429
+      param "narration.IncEnd_2_02"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.IncEnd_2_03"
+    {
+      time 18.673336 27.300480
+      param "narration.IncEnd_2_03"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.IncEnd_2_04"
+    {
+      time 27.313334 38.506485
+      param "narration.IncEnd_2_04"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.IncEnd_2_05"
+    {
+      time 38.519997 49.049522
+      param "narration.IncEnd_2_05"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.IncEnd_2_06"
+    {
+      time 49.053337 55.822315
+      param "narration.IncEnd_2_06"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.IncEnd_2_07"
+    {
+      time 55.826668 68.457687
+      param "narration.IncEnd_2_07"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.IncEnd_2_08"
+    {
+      time 68.466667 77.735306
+      param "narration.IncEnd_2_08"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+  }
+}
+
+scalesettings
+{
+  "CChoreoView" "100"
+  "RampTool" "100"
+  "ExpressionTool" "100"
+  "GestureTool" "100"
+  "SceneRampTool" "100"
+}
+fps 60
+snap off
+ignorePhonemes off

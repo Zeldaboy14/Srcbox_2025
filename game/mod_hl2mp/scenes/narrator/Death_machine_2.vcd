@@ -1,0 +1,51 @@
+// Choreo version 1
+actor "narrator"
+{
+  channel "voice"
+  {
+    event speak "narration.Death_Machine_2_01"
+    {
+      time 0.006666 9.381949
+      param "narration.Death_Machine_2_01"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Death_Machine_2_02"
+    {
+      time 9.386666 17.627346
+      param "narration.Death_Machine_2_02"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Death_Machine_2_03"
+    {
+      time 17.639997 23.193512
+      param "narration.Death_Machine_2_03"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Death_Machine_2_04"
+    {
+      time 23.193333 31.075714
+      param "narration.Death_Machine_2_04"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+  }
+}
+
+scalesettings
+{
+  "CChoreoView" "100"
+  "RampTool" "100"
+  "ExpressionTool" "100"
+  "GestureTool" "100"
+  "SceneRampTool" "100"
+}
+fps 60
+snap off
+ignorePhonemes off

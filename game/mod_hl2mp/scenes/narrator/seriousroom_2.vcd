@@ -1,0 +1,83 @@
+// Choreo version 1
+actor "narrator"
+{
+  channel "voice"
+  {
+    event speak "narration.SeriousRoom_2_00"
+    {
+      time 0.006667 5.468685
+      param "narration.SeriousRoom_2_00"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.SeriousRoom_2_01"
+    {
+      time 5.473333 18.303923
+      param "narration.SeriousRoom_2_01"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.SeriousRoom_2_02"
+    {
+      time 18.318182 27.284145
+      param "narration.SeriousRoom_2_02"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.SeriousRoom_2_03"
+    {
+      time 27.287882 31.444504
+      param "narration.SeriousRoom_2_03"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.SeriousRoom_2_04"
+    {
+      time 31.454548 40.248741
+      param "narration.SeriousRoom_2_04"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.SeriousRoom_2_05"
+    {
+      time 40.242424 44.364693
+      param "narration.SeriousRoom_2_05"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.SeriousRoom_2_06"
+    {
+      time 44.363640 55.837315
+      param "narration.SeriousRoom_2_06"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.SeriousRoom_2_07"
+    {
+      time 55.833332 60.350677
+      param "narration.SeriousRoom_2_07"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+  }
+}
+
+scalesettings
+{
+  "CChoreoView" "44"
+  "RampTool" "100"
+  "ExpressionTool" "100"
+  "GestureTool" "100"
+  "SceneRampTool" "100"
+}
+fps 60
+snap off
+ignorePhonemes off

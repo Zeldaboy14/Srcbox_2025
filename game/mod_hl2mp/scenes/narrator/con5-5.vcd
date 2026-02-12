@@ -1,0 +1,115 @@
+// Choreo version 1
+actor "narrator"
+{
+  channel "voice"
+  {
+    event speak "narration.Con5-5_00"
+    {
+      time 0.006666 5.651066
+      param "narration.Con5-5_00"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Con5-5_01"
+    {
+      time 5.646666 16.207142
+      param "narration.Con5-5_01"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Con5-5_02"
+    {
+      time 16.206667 22.033131
+      param "narration.Con5-5_02"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Con5-5_03"
+    {
+      time 22.033335 36.356735
+      param "narration.Con5-5_03"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Con5-5_04"
+    {
+      time 36.373337 44.566807
+      param "narration.Con5-5_04"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Con5-5_05"
+    {
+      time 44.580006 59.935177
+      param "narration.Con5-5_05"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Con5-5_06"
+    {
+      time 59.933338 70.797264
+      param "narration.Con5-5_06"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Con5-5_07"
+    {
+      time 70.800003 78.568619
+      param "narration.Con5-5_07"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Con5-5_08"
+    {
+      time 78.573334 83.671494
+      param "narration.Con5-5_08"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Con5-5_09"
+    {
+      time 83.679993 93.694229
+      param "narration.Con5-5_09"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Con5-5_10"
+    {
+      time 93.700005 103.805290
+      param "narration.Con5-5_10"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Con5-5_11"
+    {
+      time 103.813339 106.635490
+      param "narration.Con5-5_11"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+  }
+}
+
+scalesettings
+{
+  "CChoreoView" "100"
+  "RampTool" "100"
+  "ExpressionTool" "100"
+  "GestureTool" "100"
+  "SceneRampTool" "100"
+}
+fps 60
+snap off
+ignorePhonemes off

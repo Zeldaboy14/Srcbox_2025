@@ -1,0 +1,91 @@
+// Choreo version 1
+actor "narrator"
+{
+  channel "voice"
+  {
+    event speak "narration.Broomcloset_7_00"
+    {
+      time 0.006667 6.096803
+      param "narration.Broomcloset_7_00"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Broomcloset_7_01"
+    {
+      time 6.100000 18.042994
+      param "narration.Broomcloset_7_01"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Broomcloset_7_02"
+    {
+      time 18.046667 28.130999
+      param "narration.Broomcloset_7_02"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Broomcloset_7_03"
+    {
+      time 28.146666 34.078617
+      param "narration.Broomcloset_7_03"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Broomcloset_7_04"
+    {
+      time 34.080002 44.243427
+      param "narration.Broomcloset_7_04"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Broomcloset_7_05"
+    {
+      time 44.253338 50.976219
+      param "narration.Broomcloset_7_05"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Broomcloset_7_06"
+    {
+      time 50.980000 59.877937
+      param "narration.Broomcloset_7_06"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Broomcloset_7_07"
+    {
+      time 59.886662 66.214073
+      param "narration.Broomcloset_7_07"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Broomcloset_7_08"
+    {
+      time 66.213326 69.495682
+      param "narration.Broomcloset_7_08"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+  }
+}
+
+scalesettings
+{
+  "CChoreoView" "100"
+  "RampTool" "100"
+  "ExpressionTool" "100"
+  "GestureTool" "100"
+  "SceneRampTool" "100"
+}
+fps 60
+snap off
+ignorePhonemes off

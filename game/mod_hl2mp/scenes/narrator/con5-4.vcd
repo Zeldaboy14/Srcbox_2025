@@ -1,0 +1,67 @@
+// Choreo version 1
+actor "narrator"
+{
+  channel "voice"
+  {
+    event speak "narration.Con5-4_00"
+    {
+      time -0.000000 9.747233
+      param "narration.Con5-4_00"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Con5-4_01"
+    {
+      time 9.753333 14.733900
+      param "narration.Con5-4_01"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Con5-4_02"
+    {
+      time 14.726667 26.918369
+      param "narration.Con5-4_02"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Con5-4_03"
+    {
+      time 26.926666 35.085011
+      param "narration.Con5-4_03"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Con5-4_04"
+    {
+      time 35.093334 41.785011
+      param "narration.Con5-4_04"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Con5-4_05"
+    {
+      time 41.786671 53.672817
+      param "narration.Con5-4_05"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+  }
+}
+
+scalesettings
+{
+  "CChoreoView" "100"
+  "RampTool" "100"
+  "ExpressionTool" "100"
+  "GestureTool" "100"
+  "SceneRampTool" "100"
+}
+fps 60
+snap off
+ignorePhonemes off

@@ -1,0 +1,43 @@
+// Choreo version 1
+actor "narrator"
+{
+  channel "voice"
+  {
+    event speak "narration.Lounge_1f_00"
+    {
+      time 0.006666 9.624036
+      param "narration.Lounge_1f_00"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Lounge_1f_01"
+    {
+      time 9.613333 15.017368
+      param "narration.Lounge_1f_01"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Lounge_1f_02"
+    {
+      time 15.013335 17.862926
+      param "narration.Lounge_1f_02"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+  }
+}
+
+scalesettings
+{
+  "CChoreoView" "100"
+  "RampTool" "100"
+  "ExpressionTool" "100"
+  "GestureTool" "100"
+  "SceneRampTool" "100"
+}
+fps 60
+snap off
+ignorePhonemes off

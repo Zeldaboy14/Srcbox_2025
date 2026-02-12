@@ -1,0 +1,51 @@
+// Choreo version 1
+actor "narrator"
+{
+  channel "voice"
+  {
+    event speak "narration.Boss_interrupt_1_00"
+    {
+      time 0.006667 8.282427
+      param "narration.Boss_interrupt_1_00"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Boss_interrupt_1_01"
+    {
+      time 8.286666 14.996847
+      param "narration.Boss_interrupt_1_01"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Boss_interrupt_1_02"
+    {
+      time 14.993334 28.030090
+      param "narration.Boss_interrupt_1_02"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Boss_interrupt_1_03"
+    {
+      time 28.046671 34.460026
+      param "narration.Boss_interrupt_1_03"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+  }
+}
+
+scalesettings
+{
+  "CChoreoView" "100"
+  "RampTool" "100"
+  "ExpressionTool" "100"
+  "GestureTool" "100"
+  "SceneRampTool" "100"
+}
+fps 60
+snap off
+ignorePhonemes off

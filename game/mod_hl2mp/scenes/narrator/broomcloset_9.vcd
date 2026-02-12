@@ -1,0 +1,43 @@
+// Choreo version 1
+actor "narrator"
+{
+  channel "voice"
+  {
+    event speak "narration.Broomcloset_9_00"
+    {
+      time 0.013333 6.204829
+      param "narration.Broomcloset_9_00"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Broomcloset_9_01"
+    {
+      time 6.206667 14.339207
+      param "narration.Broomcloset_9_01"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Broomcloset_9_02"
+    {
+      time 14.340000 17.495464
+      param "narration.Broomcloset_9_02"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+  }
+}
+
+scalesettings
+{
+  "CChoreoView" "100"
+  "RampTool" "100"
+  "ExpressionTool" "100"
+  "GestureTool" "100"
+  "SceneRampTool" "100"
+}
+fps 60
+snap off
+ignorePhonemes off

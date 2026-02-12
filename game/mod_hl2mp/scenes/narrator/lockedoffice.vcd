@@ -1,0 +1,67 @@
+// Choreo version 1
+actor "narrator"
+{
+  channel "voice"
+  {
+    event speak "narration.LockedOffice_00"
+    {
+      time 0.006667 3.231111
+      param "narration.LockedOffice_00"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.LockedOffice_01"
+    {
+      time 3.226666 13.755487
+      param "narration.LockedOffice_01"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.LockedOffice_02"
+    {
+      time 13.753332 25.071812
+      param "narration.LockedOffice_02"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.LockedOffice_03"
+    {
+      time 25.073334 33.298981
+      param "narration.LockedOffice_03"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.LockedOffice_04"
+    {
+      time 33.299999 43.730114
+      param "narration.LockedOffice_04"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.LockedOffice_05"
+    {
+      time 43.726669 57.776035
+      param "narration.LockedOffice_05"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+  }
+}
+
+scalesettings
+{
+  "CChoreoView" "100"
+  "RampTool" "100"
+  "ExpressionTool" "100"
+  "GestureTool" "100"
+  "SceneRampTool" "100"
+}
+fps 60
+snap off
+ignorePhonemes off

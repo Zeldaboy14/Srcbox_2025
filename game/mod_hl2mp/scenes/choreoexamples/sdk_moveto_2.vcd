@@ -1,0 +1,109 @@
+// Choreo version 1
+actor "barney5"
+{
+  channel "Audio"
+  {
+  }
+  channel "MoveTo"
+  {
+    event moveto "mark_barney5"
+    {
+      time 2.159421 9.905798
+      param "mark_barney5"
+    }
+  }
+  channel "LookAt"
+  {
+    event lookat "Mossman"
+    {
+      time 7.038803 11.585554
+      param "Mossman"
+      event_ramp
+      {
+        0.5261 0.7659
+        0.7739 0.9463
+        1.1522 1.0000
+        2.8791 1.0000
+        3.5487 0.9854
+        3.9530 0.8341
+      }
+    }
+  }
+  channel "FaceTo"
+  {
+    event face "mossman3"
+    {
+      time 7.043479 11.630436
+      param "mossman3"
+      event_ramp
+      {
+        0.9087 0.7970
+        1.3957 1.0000
+        2.8043 1.0000
+        4.5870 1.0000
+      }
+    }
+  }
+}
+
+actor "mossman3"
+{
+  channel "Audio"
+  {
+  }
+  channel "MoveTo"
+  {
+    event moveto "Barney5"
+    {
+      time 0.033334 9.944469
+      param "Barney5"
+      distancetotarget 72.00
+    }
+  }
+  channel "FaceTo"
+  {
+    event face "Barney5"
+    {
+      time 1.150538 11.441561
+      param "Barney5"
+      event_ramp
+      {
+        0.9130 0.7902
+        1.2522 0.9561
+        1.9652 1.0000
+        8.6105 1.0000
+        9.8453 1.0000
+        10.2910 1.0000
+      }
+    }
+  }
+  channel "LookAt"
+  {
+    event lookat "Barney2"
+    {
+      time 1.139785 11.506543
+      param "Barney2"
+      event_ramp
+      {
+        0.5000 0.7024
+        0.7957 0.9415
+        1.2217 1.0000
+        1.8391 1.0000
+        8.3739 1.0000
+        9.1783 1.0000
+        9.6435 0.9317
+      }
+    }
+  }
+}
+
+scalesettings
+{
+  "CChoreoView" "46"
+  "ExpressionTool" "100"
+  "RampTool" "46"
+  "GestureTool" "100"
+  "SceneRampTool" "100"
+}
+fps 60
+snap off

@@ -1,0 +1,43 @@
+// Choreo version 1
+actor "narrator"
+{
+  channel "voice"
+  {
+    event speak "narration.RedBlue_1_00"
+    {
+      time 0.006667 9.230885
+      param "narration.RedBlue_1_00"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.RedBlue_1_01"
+    {
+      time 9.233335 16.366735
+      param "narration.RedBlue_1_01"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.RedBlue_1_02"
+    {
+      time 16.373333 21.612698
+      param "narration.RedBlue_1_02"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+  }
+}
+
+scalesettings
+{
+  "CChoreoView" "100"
+  "RampTool" "100"
+  "ExpressionTool" "100"
+  "GestureTool" "100"
+  "SceneRampTool" "100"
+}
+fps 60
+snap off
+ignorePhonemes off

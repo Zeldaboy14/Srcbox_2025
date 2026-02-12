@@ -200,6 +200,7 @@ public:
 #endif
 #endif
 	void	CheckAllPlayersReady( void );
+	void	InitDefaultAIRelationships( void );
 
 	virtual bool IsConnectedUserInfoChangeAllowed( CBasePlayer *pPlayer );
 	

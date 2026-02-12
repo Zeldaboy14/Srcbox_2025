@@ -1,0 +1,23 @@
+// Choreo version 1
+actor "!Target1"
+{
+  channel "MoveTo"
+  {
+    event moveto "!Target2"
+    {
+      time 0.126667 4.728772
+      param "!target2"
+    }
+  }
+}
+
+scalesettings
+{
+  "CChoreoView" "76"
+  "RampTool" "100"
+  "ExpressionTool" "100"
+  "GestureTool" "100"
+  "SceneRampTool" "100"
+}
+fps 60
+snap off

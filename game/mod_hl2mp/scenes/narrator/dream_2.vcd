@@ -1,0 +1,107 @@
+// Choreo version 1
+actor "narrator"
+{
+  channel "voice"
+  {
+    event speak "narration.Dream_2_00"
+    {
+      time 0.006667 5.358753
+      param "narration.Dream_2_00"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Dream_2_01"
+    {
+      time 5.366667 13.238503
+      param "narration.Dream_2_01"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Dream_2_02"
+    {
+      time 13.253332 23.684103
+      param "narration.Dream_2_02"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Dream_2_03"
+    {
+      time 23.693333 31.443310
+      param "narration.Dream_2_03"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Dream_2_04"
+    {
+      time 31.440002 37.508369
+      param "narration.Dream_2_04"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Dream_2_05"
+    {
+      time 37.506672 42.161526
+      param "narration.Dream_2_05"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Dream_2_06"
+    {
+      time 42.166668 50.087234
+      param "narration.Dream_2_06"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Dream_2_07"
+    {
+      time 50.100002 59.775284
+      param "narration.Dream_2_07"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Dream_2_08"
+    {
+      time 59.773335 67.084625
+      param "narration.Dream_2_08"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Dream_2_09"
+    {
+      time 67.093338 73.990326
+      param "narration.Dream_2_09"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.Dream_2_10"
+    {
+      time 73.993340 76.098785
+      param "narration.Dream_2_10"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+  }
+}
+
+scalesettings
+{
+  "CChoreoView" "100"
+  "RampTool" "100"
+  "ExpressionTool" "100"
+  "GestureTool" "100"
+  "SceneRampTool" "100"
+}
+fps 60
+snap off
+ignorePhonemes off

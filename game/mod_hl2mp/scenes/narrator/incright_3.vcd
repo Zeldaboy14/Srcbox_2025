@@ -1,0 +1,83 @@
+// Choreo version 1
+actor "narrator"
+{
+  channel "voice"
+  {
+    event speak "narration.IncRight_3_00"
+    {
+      time 0.013333 3.384126
+      param "narration.IncRight_3_00"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.IncRight_3_01"
+    {
+      time 3.380000 10.458662
+      param "narration.IncRight_3_01"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.IncRight_3_02"
+    {
+      time 10.466666 18.455442
+      param "narration.IncRight_3_02"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.IncRight_3_03"
+    {
+      time 18.460001 26.246532
+      param "narration.IncRight_3_03"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.IncRight_3_04"
+    {
+      time 26.246668 33.156803
+      param "narration.IncRight_3_04"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.IncRight_3_05"
+    {
+      time 33.166672 41.323997
+      param "narration.IncRight_3_05"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.IncRight_3_06"
+    {
+      time 41.339996 53.053513
+      param "narration.IncRight_3_06"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+    event speak "narration.IncRight_3_07"
+    {
+      time 53.060005 59.245403
+      param "narration.IncRight_3_07"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+  }
+}
+
+scalesettings
+{
+  "CChoreoView" "100"
+  "RampTool" "100"
+  "ExpressionTool" "100"
+  "GestureTool" "100"
+  "SceneRampTool" "100"
+}
+fps 60
+snap off
+ignorePhonemes off

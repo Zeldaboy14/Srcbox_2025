@@ -1,0 +1,86 @@
+// Choreo version 1
+event section "Pause"
+{
+  time 0.508070 -1.000000
+  param "noaction"
+}
+actor "!Target1"
+{
+  channel "Audio"
+  {
+    event speak "nexus.ba_illopenthis"
+    {
+      time 1.053334 2.635737
+      param "nexus.ba_illopenthis"
+      fixedlength
+      cctype "cc_master"
+      cctoken ""
+    }
+  }
+  channel "MoveTo"
+  {
+    event moveto "!Target2"
+    {
+      time 0.013334 2.376842
+      param "!target2"
+      resumecondition
+    }
+  }
+  channel "FaceTo"
+  {
+    event face "!target3"
+    {
+      time 0.533334 3.380001
+      param "!target3"
+      event_ramp
+      {
+        0.6963 0.8376
+        0.9222 0.9645
+        1.7844 1.0000
+        2.8467 1.0000
+      }
+    }
+  }
+  channel "LookAt"
+  {
+  }
+  channel "Gestures"
+  {
+    event gesture "NULL"
+    {
+      time 0.000000 0.433333
+      param ""
+    }
+    event gesture "GestureButton"
+    {
+      time 1.740000 3.873333
+      param "GestureButton"
+      absolutetags playback_time
+      {
+        "apex" 0.222222
+        "accent" 0.904762
+        "loop" 0.920635
+        "end" 0.936508
+      }
+      absolutetags shifted_time
+      {
+        "apex" 0.222222
+        "accent" 0.904762
+        "loop" 0.920635
+        "end" 0.936508
+      }
+      sequenceduration 2.133333
+    }
+  }
+}
+
+scalesettings
+{
+  "CChoreoView" "100"
+  "RampTool" "54"
+  "ExpressionTool" "100"
+  "GestureTool" "100"
+  "SceneRampTool" "100"
+}
+fps 60
+snap off
