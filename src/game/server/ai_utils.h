@@ -23,17 +23,53 @@
 
 inline CBasePlayer *AI_GetSinglePlayer()
 {
+#if !defined ( HL2MP ) && !defined( TF_DLL )
 	if ( gpGlobals->maxClients > 1 )
 	{
 		return NULL;
 	}
+#elif defined( HL2MP ) && !defined( TF_DLL )
+	//try to return the listenserver-host
+	CBasePlayer* pHost = UTIL_GetListenServerHost();
+	if (pHost) {
+		return pHost;
+	}
+
+	//try to return literally any other client on the server
+	for (int i = 1; i < gpGlobals->maxClients; i++)
+	{
+		CBasePlayer* pPlayer = UTIL_PlayerByIndex(i);
+
+		if (pPlayer) {
+			return pPlayer;
+		}
+	}
+#endif
 	
 	return UTIL_GetLocalPlayer();
 }
 
 inline bool AI_IsSinglePlayer()
 {
+#if !defined ( HL2MP ) && !defined( TF_DLL )
 	return ( gpGlobals->maxClients == 1 );
+#elif defined( HL2MP ) && !defined( TF_DLL )
+	//try to return the listenserver-host
+	CBasePlayer* pHost = UTIL_GetListenServerHost();
+	if (pHost) {
+		return pHost;
+	}
+
+	//try to return literally any other client on the server
+	for (int i = 1; i < gpGlobals->maxClients; i++)
+	{
+		CBasePlayer* pPlayer = UTIL_PlayerByIndex(i);
+
+		if (pPlayer) {
+			return pPlayer;
+		}
+	}
+#endif
 }
 
 
