@@ -711,10 +711,24 @@ void CNPC_Citizen::SelectModel()
 			return;
 	}
 
+	bool bIsInHeadTable = false;
+	for (int i = 0; i < ARRAYSIZE(g_ppszRandomHeads); ++i)
+	{
+		if (Q_stristr(pszModelName, g_ppszRandomHeads[i]))
+		{
+			bIsInHeadTable = true;
+			break;
+		}
+	}
+
 	// Unique citizen models are left alone
 	if ( m_Type != CT_UNIQUE )
 	{
-		SetModelName( AllocPooledString( CFmtStr( "models/Humans/%s/%s", (const char *)(CFmtStr(g_ppszModelLocs[ m_Type ], ( IsMedic() ) ? "m" : "" )), pszModelName ) ) );
+		if (!bIsInHeadTable)
+		{
+		} else {
+			SetModelName(AllocPooledString(CFmtStr("models/Humans/%s/%s", (const char*)(CFmtStr(g_ppszModelLocs[m_Type], (IsMedic()) ? "m" : "")), pszModelName)));
+		}
 	}
 }
 
