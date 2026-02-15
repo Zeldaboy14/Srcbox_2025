@@ -372,7 +372,18 @@ static void PatchLocalBackdoor()
 			write.fill(0x90);
 		}
 	}
+	// CanChanngeLevel2
+	// In Half-Life 2: Deathmatch, the engine checks if your on MP, and doesn't let changelevel2 works. This fixs it.
+	mem::pointer ptr_ChangeLevel2 = mem::scan(mem::pattern("0F 8F D8 01 00 00 33 D2 48 8D 4C 24 20 41 B8 04 01 00 00 E8 9D"), executable_engine);
+
+	if (ptr_ChangeLevel2)
+	{
+		mem::protect write({ ptr_ChangeLevel2, 6 });
+		write.fill(0x90);
+	}
 }
+
+#endif
 
 // IF YOU ADD AN INTERFACE, EXTERN IT IN THE HEADER FILE.
 IVEngineClient	*engine = NULL;
@@ -1309,7 +1320,7 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 
 	g_pcv_ThreadMode = g_pCVar->FindVar( "host_thread_mode" );
 
-#ifdef HL2MP
+#if defined HL2MP
 	MountExtraContent();
 #endif
 
