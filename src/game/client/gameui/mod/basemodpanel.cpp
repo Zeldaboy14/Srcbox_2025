@@ -739,6 +739,17 @@ void CBaseModPanel::OpenFrontScreen()
 	}
 }
 
+void CBaseModPanel::OpenInGameFrontScreen()
+{
+	WINDOW_TYPE ingamefrontWindow = WT_INGAMEMAINMENU;
+
+	if (GetActiveWindowType() != ingamefrontWindow)
+	{
+		CloseAllWindows();
+		OpenWindow(ingamefrontWindow, NULL);
+	}
+}
+
 //=============================================================================
 void CBaseModPanel::RunFrame()
 {
@@ -890,7 +901,11 @@ void CBaseModPanel::OnLevelLoadingStarted( char const *levelName, bool bShowProg
 	pLoadingProgress->SetLoadingType( type );
 	pLoadingProgress->SetProgress( 0.0f );
 
-	m_LevelLoading = true;
+	if (Q_stricmp("0", "changelevel2")) {
+		m_LevelLoading = false;
+	} else {
+		m_LevelLoading = true;
+	}
 }
 
 
