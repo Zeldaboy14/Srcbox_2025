@@ -590,24 +590,26 @@ CBasePlayer	*UTIL_PlayerByIndex( int playerIndex )
 //
 // Return the local player.
 // If this is a multiplayer game, return NULL.
-// 
-CBasePlayer *UTIL_GetLocalPlayer( void )
+//
+CBasePlayer* UTIL_GetLocalPlayer(void)
 {
-	if ( gpGlobals->maxClients > 1 )
-	{
-		if ( developer.GetBool() )
-		{
-			Assert( !"UTIL_GetLocalPlayer" );
-			
-#ifdef	DEBUG
-			Warning( "UTIL_GetLocalPlayer() called in multiplayer game.\n" );
-#endif
-		}
-
-		return NULL;
+	//try to return the listenserver-host
+	CBasePlayer* pHost = UTIL_GetListenServerHost();
+	if (pHost) {
+		return pHost;
 	}
 
-	return UTIL_PlayerByIndex( 1 );
+	//try to return literally any other client on the server
+	for (int i = 1; i < gpGlobals->maxClients; i++)
+	{
+		CBasePlayer* pPlayer = UTIL_PlayerByIndex(i);
+
+		if (pPlayer) {
+			return pPlayer;
+		}
+	}
+
+	return NULL;
 }
 
 //
