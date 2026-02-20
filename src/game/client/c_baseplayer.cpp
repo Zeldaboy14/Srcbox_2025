@@ -246,6 +246,13 @@ END_RECV_TABLE()
 
 		RecvPropVector		( RECVINFO( m_vecBaseVelocity ) ),
 
+//#ifdef ARGG
+	// adnan
+	// get the use angles
+	RecvPropVector(RECVINFO(m_vecUseAngles)),
+	// end adnan
+//#endif
+
 		RecvPropEHandle		( RECVINFO( m_hConstraintEntity)),
 		RecvPropVector		( RECVINFO( m_vecConstraintCenter) ),
 		RecvPropFloat		( RECVINFO( m_flConstraintRadius )),
@@ -1289,7 +1296,7 @@ void C_BasePlayer::UpdateFlashlight()
 
 			int iAttachment = pPlayer->LookupAttachment("camera");
 
-			C_BaseViewModel* pViewModel = dynamic_cast<C_BaseViewModel*>(GetViewModel());
+			C_BaseAnimating* pViewModel = dynamic_cast<C_BaseAnimating*>(GetRenderedWeaponModel());
 			if (!ShouldDrawThisPlayer())
 			{
 				if (GetActiveWeapon() && GetActiveWeapon()->IsMeleeWeapon())
@@ -1307,6 +1314,21 @@ void C_BasePlayer::UpdateFlashlight()
 					}
 				}
 			}
+			else if (ShouldDrawThisPlayer())
+				if (GetActiveWeapon() && GetActiveWeapon()->IsMeleeWeapon())
+				{
+					Vector aimFwd;
+					AngleVectors(angFlashlightAngle, &aimFwd);
+					vecOrigin += aimFwd * (VEC_HULL_MAX).Length2D();
+				}
+				else
+				{
+					if (pViewModel)
+					{
+						pViewModel->GetAttachment(pViewModel->LookupAttachment("muzzle"), vecOrigin, angFlashlightAngle);
+						iAttachment = pViewModel->LookupAttachment("muzzle");
+					}
+				}
 			else
 			{
 				Vector aimFwd;
@@ -1495,6 +1517,24 @@ void C_BasePlayer::CreateWaterEffects( void )
 //-----------------------------------------------------------------------------
 void C_BasePlayer::OverrideView( CViewSetup *pSetup )
 {
+//#ifdef ARGG
+	// adnan
+	// OVERRIDING THE VIEW
+	// need to override the angles too
+	C_BaseCombatWeapon* pWeapon = GetActiveWeapon();
+	if (pWeapon)
+	{
+		// adnan
+		if (pWeapon->OverrideViewAngles())
+		{
+			// use the useAngles!
+			// override with the angles the server sends to us as useAngles
+			// use the useAngles only if we're holding and rotating with the grav gun
+			pSetup->angles = m_vecUseAngles;
+		}
+	}
+	// end adnan
+//#endif
 }
 
 bool C_BasePlayer::ShouldInterpolate()

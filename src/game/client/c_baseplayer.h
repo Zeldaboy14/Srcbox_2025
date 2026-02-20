@@ -455,13 +455,13 @@ public:
 
 	CUserCmd		*m_pCurrentCommand;
 
-#ifdef ARGG
+//#ifdef ARGG
 	// adnan
 	// store the use angles
 	// set when the player presses use
 	QAngle		m_vecUseAngles;
 	// end adnan
-#endif
+//#endif
 
 	// Movement constraints
 	EHANDLE			m_hConstraintEntity;
@@ -491,7 +491,10 @@ protected:
 
 	// Used by prediction, sets the view angles for the player
 	virtual void SetLocalViewAngles( const QAngle &viewAngles );
+public:
 	virtual void SetViewAngles( const QAngle& ang );
+protected:
+
 
 	// used by client side player footsteps 
 	surfacedata_t* GetGroundSurface();
