@@ -105,6 +105,11 @@ $Project "mathlib"
 	"mathlib\mathlib.vpc"
 }
 
+$Project "matsys_controls"
+{
+	"vgui2\matsys_controls\matsys_controls.vpc"
+}
+
 $Project "motionmapper"
 {
 	"utils\motionmapper\motionmapper.vpc" [$WINDOWS]
@@ -183,5 +188,29 @@ $Project "vvis_dll"
 $Project "vvis_launcher"
 {
 	"utils\vvis_launcher\vvis_launcher.vpc" [$WINDOWS]
+}
+
+//
+// Non-Valve (Related) Projects
+//
+
+$Project "lua54"
+{
+    "lua\lua_base.vpc"
+}
+
+$Project "luasocket"
+{
+    "luasocket\luasocket_base.vpc"
+}
+
+$Project "libpng"
+{
+    "libpng\libpng_base.vpc"
+}
+
+$Project "helloworldmodule"
+{
+    "modules\helloworld\helloworld_base.vpc"		[$EXPERIMENT]
 }
 

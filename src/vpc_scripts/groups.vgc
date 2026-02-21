@@ -12,19 +12,28 @@ $Group "gamedlls"
 {
 	"client"
 	"server"
+	
+    "lua54"
+    "luasocket"
+    "libpng"
 }
 
 $Group "game"
 {
 	"client"
-	"gamepadui"
 	"gameui_stub"
 	"launcher_main"
 	"mathlib"
+		"matsys_controls"
 	"raytrace"
 	"server"
 	"tier1"
 	"vgui_controls"
+	
+    "lua54"
+    "luasocket"
+    "libpng"
+    "helloworldmodule"
 }
 
 $Group "shaders"
@@ -43,8 +52,10 @@ $Group "everything"
 	"glview"
 	"height2normal"
 	"hlmv"
+	"hlmv2"
 	"launcher_main"
 	"mathlib"
+	"matsys_controls"
 	"motionmapper"
 	"phonemeextractor"
 	"qc_eyes"
@@ -63,6 +74,11 @@ $Group "everything"
 	"vtfdiff"
 	"vvis_dll"
 	"vvis_launcher"
+	
+    "lua54"
+    "luasocket"
+    "libpng"
+    "helloworldmodule"
 
 	"game_shader_generic_example"
 
@@ -76,5 +92,8 @@ $Group "dedicated"
 	"mathlib"
 	"server"
 	"tier1"
+	
+	"lua54"
+    "luasocket"
 }
 
