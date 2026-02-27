@@ -125,6 +125,7 @@ namespace BaseModUI
 		void OnGameUIActivated();
 		void OnGameUIHidden();
 		void OpenFrontScreen();
+		void OpenInGameFrontScreen();
 		void RunFrame();
 		void OnLevelLoadingStarted( char const *levelName, bool bShowProgressDialog );
 		void OnLevelLoadingFinished( KeyValues *kvEvent );
