@@ -64,6 +64,7 @@ typedef enum _fieldtypes
 	FIELD_MATERIALINDEX,	// a material index (using the material precache string table)
 	
 	FIELD_VECTOR2D,			// 2 floats
+	FIELD_INTEGER64,		// int64
 
 	FIELD_TYPECOUNT,		// MUST BE LAST
 } fieldtype_t;
@@ -123,6 +124,7 @@ DECLARE_FIELD_SIZE( FIELD_MATRIX3X4_WORLDSPACE,	12 * sizeof(float))
 DECLARE_FIELD_SIZE( FIELD_INTERVAL,		2 * sizeof( float) )  // NOTE:  Must match interval.h definition
 DECLARE_FIELD_SIZE( FIELD_MODELINDEX,	sizeof(int) )
 DECLARE_FIELD_SIZE( FIELD_MATERIALINDEX,	sizeof(int) )
+DECLARE_FIELD_SIZE( FIELD_INTEGER64,	sizeof(int64) )
 
 
 #define ARRAYSIZE2D(p)		(sizeof(p)/sizeof(p[0][0]))
