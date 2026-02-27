@@ -13,6 +13,7 @@
 #include "materialsystem/materialsystem_config.h"
 #include "tier1/callqueue.h"
 #include "colorcorrectionmgr.h"
+#include "postprocess_shared.h"
 #include "view_scene.h"
 #include "c_world.h"
 #include "bitmap/tgawriter.h"
@@ -1112,6 +1113,32 @@ void CLuminanceHistogramSystem::DisplayHistogram( void )
 	pRenderContext->PopRenderTargetAndViewport();
 }
 
+// Local contrast setting
+PostProcessParameters_t s_LocalPostProcessParameters;
+
+// view fade param settings
+static Vector4D s_viewFadeColor;
+static bool  s_bViewFadeModulate;
+
+static bool s_bOverridePostProcessParams = false;
+
+void SetPostProcessParams(const PostProcessParameters_t* pPostProcessParameters)
+{
+	if (!s_bOverridePostProcessParams)
+		s_LocalPostProcessParameters = *pPostProcessParameters;
+}
+
+void SetPostProcessParams(const PostProcessParameters_t* pPostProcessParameters, bool bOverride)
+{
+	s_bOverridePostProcessParams = bOverride;
+	s_LocalPostProcessParameters = *pPostProcessParameters;
+}
+
+void SetViewFadeParams(byte r, byte g, byte b, byte a, bool bModulate)
+{
+	s_viewFadeColor.Init(float(r) / 255.0f, float(g) / 255.0f, float(b) / 255.0f, float(a) / 255.0f);
+	s_bViewFadeModulate = bModulate;
+}
 
 static CLuminanceHistogramSystem g_HDR_HistogramSystem;
 
@@ -2211,6 +2238,11 @@ static ConVar r_queued_post_processing( "r_queued_post_processing", "0" );
 // This has really marginal effects, but 4x1 does seem vaguely better for post-processing
 static ConVar mat_postprocess_x( "mat_postprocess_x", "4" );
 static ConVar mat_postprocess_y( "mat_postprocess_y", "1" );
+#ifdef SSAO
+//crossroads devtest
+ConVar cr_ssao_blur( "cr_ssao_blur", "1" );
+ConVar cr_ssao_combine( "cr_ssao_combine", "1" );
+#endif
 
 void DoEnginePostProcessing( int x, int y, int w, int h, bool bFlashlightIsOn, bool bPostVGui )
 {
@@ -2999,3 +3031,71 @@ void DoImageSpaceMotionBlur( const CViewSetup &viewBlur, int x, int y, int w, in
 		}
 	}
 }
+
+#ifdef SSAO
+// Crossroads devtest
+void DoSSAO( const CViewSetup &view )
+{
+	UpdateScreenEffectTexture();
+
+	CMatRenderContextPtr pRenderContext( materials );
+
+	ITexture *pSrc = materials->FindTexture( "_rt_FullFrameFB", TEXTURE_GROUP_RENDER_TARGET );
+	int nSrcWidth = pSrc->GetActualWidth();
+	int nSrcHeight = pSrc->GetActualHeight();
+	
+	ITexture *pSSAOTex = materials->FindTexture( "_rt_SSAO", TEXTURE_GROUP_RENDER_TARGET );
+
+	int nViewportWidth = 0;
+	int nViewportHeight = 0;
+	int nDummy = 0;
+	pRenderContext->GetViewport( nDummy, nDummy, nViewportWidth, nViewportHeight );
+
+	Rect_t	DestRect;
+	DestRect.x = 0;
+	DestRect.y = 0;
+	DestRect.width = nSrcWidth;
+	DestRect.height = nSrcHeight;
+
+	IMaterial *pSSAOCalcMat = materials->FindMaterial( "dev/ssao", TEXTURE_GROUP_OTHER, true );
+
+	if ( pSSAOCalcMat == NULL )
+		return;
+
+	// ssao in Crossroads consist of 3 separate passes:
+	// 1. ssao calculation (outputs white texture with black shadows)
+	pRenderContext->PushRenderTargetAndViewport( pSSAOTex );
+	pRenderContext->DrawScreenSpaceRectangle(
+		pSSAOCalcMat,
+		0, 0, nViewportWidth, nViewportHeight,
+		0, 0, nSrcWidth-1, nSrcHeight-1,
+		nSrcWidth, nSrcHeight, GetClientWorldEntity()->GetClientRenderable() );
+	pRenderContext->PopRenderTargetAndViewport();
+	
+	// 2. blurring that texture to avoid grain
+	if( cr_ssao_blur.GetBool() )
+	{
+		IMaterial *pSSAOBlurMat = materials->FindMaterial( "dev/ssaoblur", TEXTURE_GROUP_OTHER, true );
+
+		pRenderContext->DrawScreenSpaceRectangle(
+			pSSAOBlurMat,
+			0, 0, nViewportWidth, nViewportHeight,
+			0, 0, nSrcWidth-1, nSrcHeight-1,
+			nSrcWidth, nSrcHeight, GetClientWorldEntity()->GetClientRenderable() );
+		
+		pRenderContext->CopyRenderTargetToTextureEx( pSSAOTex, 0, &DestRect, NULL );
+	}
+
+	// 3. combine what we got with framebuffer texture
+	if( cr_ssao_combine.GetBool() )
+	{
+		IMaterial *pSSAOCombineMat = materials->FindMaterial( "dev/ssao_combine", TEXTURE_GROUP_OTHER, true );
+		
+		pRenderContext->DrawScreenSpaceRectangle(
+			pSSAOCombineMat,
+			0, 0, nViewportWidth, nViewportHeight,
+			0, 0, nSrcWidth-1, nSrcHeight-1,
+			nSrcWidth, nSrcHeight, GetClientWorldEntity()->GetClientRenderable() );
+	}
+}
+#endif
