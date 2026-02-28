@@ -368,7 +368,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 #endif
 	}
 #endif
-#ifdef LUA_SDK
+//#ifdef LUA_SDK
 	//=========================================================
 	//=========================================================
 	void CMultiplayRules::Think(void)
@@ -1551,7 +1551,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 
 
 #endif		
-#endif		
+//#endif		
 
 
 	//-----------------------------------------------------------------------------
