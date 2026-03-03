@@ -70,6 +70,11 @@ public:
 
 	static CMissile *Create( const Vector &vecOrigin, const QAngle &vecAngles, edict_t *pentOwner );
 
+	void CreateDangerSounds(bool bState) { m_bCreateDangerSounds = bState; }
+
+	static void AddCustomDetonator(CBaseEntity* pEntity, float radius, float height = -1);
+	static void RemoveCustomDetonator(CBaseEntity* pEntity);
+
 protected:
 	virtual void DoExplosion();	
 	virtual void ComputeActualDotPosition( CLaserDot *pLaserDot, Vector *pActualDotPosition, float *pHomingSpeed );
@@ -86,8 +91,18 @@ protected:
 	float					m_flMarkDeadTime;
 	float					m_flDamage;
 
+	struct CustomDetonator_t
+	{
+		EHANDLE hEntity;
+		float radiusSq;
+		float halfHeight;
+	};
+
+	static CUtlVector<CustomDetonator_t> gm_CustomDetonators;
+
 private:
 	float					m_flGracePeriodEndsAt;
+	bool					m_bCreateDangerSounds;
 
 	DECLARE_DATADESC();
 };
