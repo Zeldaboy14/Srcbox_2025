@@ -10,10 +10,7 @@
 #include "gameeventdefs.h"
 #include <KeyValues.h>
 #include "ammodef.h"
-
-#ifdef HL2SB
 #include "hl2_shareddefs.h"
-#endif
 
 #ifdef LUA_SDK
 #include "takedamageinfo.h"
@@ -64,6 +61,10 @@ extern ConVar mp_chattime;
 
 extern CBaseEntity	 *g_pLastCombineSpawn;
 extern CBaseEntity	 *g_pLastRebelSpawn;
+
+#ifdef HL2_EPISODIC
+extern ConVar alyx_darkness_force;
+#endif
 
 #define WEAPON_MAX_DISTANCE_FROM_SPAWN 64
 

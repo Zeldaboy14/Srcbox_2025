@@ -16,16 +16,21 @@ $Include "$SRCDIR\game\client\client_base.vpc"
 $Include "$SRCDIR\game\client\client_gameui_hl2mp.vpc"
 
 //-----------------------------------------
-// LUA from Half-Life 2: Sandbox
+// LUA 5.4 from EXPERIMENT. Compatible with Garry's Mod
 //-----------------------------------------
 //$Include "$SRCDIR\game\client\client_lua.vpc"
+
+//-----------------------------------------
+// EXPERIMENT Lua Weapons setups
+//-----------------------------------------
+//$Include "$SRCDIR\game\client\client_experiment.vpc"
 
 $Configuration
 {
 	$Compiler
 	{
-		$AdditionalIncludeDirectories		"$BASE;hl2mp\ui,.\hl2mp,$SRCDIR\game\shared\hl2mp,.\hl2,.\hl2\elements,$SRCDIR\game\shared\hl2;$SRCDIR\thirdparty\mem"
-		$PreprocessorDefinitions			"$BASE;HL2MP;HL2_CLIENT_DLL;NEXT_BOT"
+		$AdditionalIncludeDirectories		"$BASE;hl2mp\ui,.\hl2mp,$SRCDIR\game\shared\hl2mp,.\hl2,.\hl2\elements,$SRCDIR\game\shared\hl2;$SRCDIR\thirdparty\mem;$SRCDIR\thirdparty\lighthook"
+		$PreprocessorDefinitions			"$BASE;HL2MP;HL2_CLIENT_DLL;HL2_EPISODIC;NEXT_BOT;ASW_PROJECTED_TEXTURES;GAMEUI_EMBEDDED;GAMEUI_EXPORTS"
 	}
 }
 
@@ -82,6 +87,7 @@ $Project "Client (HL2MP)"
 			$File	"hl2\c_plasma_beam_node.cpp"
 			$File	"hl2\c_prop_combine_ball.cpp"
 			$File	"hl2\c_prop_combine_ball.h"
+			$File	"episodic\c_prop_scalable.cpp"
 			$File	"hl2\c_rotorwash.cpp"
 			$File	"hl2\c_script_intro.cpp"
 			$File	"$SRCDIR\game\shared\script_intro_shared.cpp"
@@ -93,12 +99,18 @@ $Project "Client (HL2MP)"
 			$File	"hl2\c_vehicle_cannon.cpp"
 			$File	"hl2\c_vehicle_crane.cpp"
 			$File	"hl2\c_vehicle_crane.h"
+			$File	"episodic\c_vehicle_jeep_episodic.cpp"
 			$File	"hl2\c_vehicle_prisoner_pod.cpp"
+			$File	"episodic\c_vort_charge_token.cpp"
 			$File	"hl2\c_weapon__stubs_hl2.cpp"
 			$File	"hl2\c_weapon_crossbow.cpp"
 			$File	"$SRCDIR\game\shared\hl2\citadel_effects_shared.h"
 			$File	"$SRCDIR\game\shared\hl2\env_headcrabcanister_shared.cpp"
 			$File	"$SRCDIR\game\shared\hl2\env_headcrabcanister_shared.h"
+			$File	"episodic\c_npc_advisor.cpp"
+			$File	"episodic\episodic_screenspaceeffects.cpp"
+			$File	"episodic\episodic_screenspaceeffects.h"
+			$File	"episodic\flesh_internal_material_proxy.cpp"
 			$File	"hl2\fx_antlion.cpp"
 			$File	"hl2\fx_bugbait.cpp"
 			$File	"hl2\fx_hl2_impacts.cpp"
@@ -121,6 +133,8 @@ $Project "Client (HL2MP)"
 			$File	"hl2\hud_health.cpp"
 			$File	"hl2\hud_poisondamageindicator.cpp"
 			$File	"hl2\hud_quickinfo.cpp"
+			$File	"hl2\hud_radar.cpp"
+			$File	"hl2\hud_radar.h"
 			$File	"hud_squadstatus.cpp"
 			$File	"hl2\hud_suitpower.cpp"
 			$File	"hl2\hud_suitpower.h"
