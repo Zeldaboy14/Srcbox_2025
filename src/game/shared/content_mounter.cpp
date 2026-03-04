@@ -30,6 +30,7 @@ void AddHL2(const char* path)
 	filesystem->AddSearchPath(CFmtStr("%s/hl2/hl2_pak_dir.vpk", path), "GAME", PATH_ADD_TO_HEAD);
 	filesystem->AddSearchPath(CFmtStr("%s/hl2/hl2_sound_vo_english_dir.vpk", path), "GAME", PATH_ADD_TO_HEAD);
 	filesystem->AddSearchPath(CFmtStr("%s/hl2", path), "GAME", PATH_ADD_TO_HEAD);
+	filesystem->AddSearchPath(CFmtStr("%s/hl2/maps", path), "GAME", PATH_ADD_TO_HEAD);
 	filesystem->AddSearchPath(CFmtStr("%s/hl2_complete/hl2_complete_misc_dir.vpk", path), "GAME", PATH_ADD_TO_HEAD);
 	filesystem->AddSearchPath(CFmtStr("%s/hl2_complete", path), "GAME", PATH_ADD_TO_HEAD);
 	filesystem->AddSearchPath(CFmtStr("%s/episodic/ep1_pak_dir.vpk", path), "GAME", PATH_ADD_TO_HEAD);
@@ -112,11 +113,9 @@ void AddPortal2(const char* path)
 
 void AddCSGO(const char* path)
 {
-	filesystem->AddSearchPath(CFmtStr("%s/game/csgo/pak01_dir.vpk", path), "GAME", PATH_ADD_TO_HEAD);
-	filesystem->AddSearchPath(CFmtStr("%s/game/csgo", path), "GAME", PATH_ADD_TO_HEAD);
-	filesystem->AddSearchPath(CFmtStr("%s/game/csgo_core/pak01_dir.vpk", path), "GAME", PATH_ADD_TO_HEAD);
-	filesystem->AddSearchPath(CFmtStr("%s/game/csgo_imported/pak01_dir.vpk", path), "GAME", PATH_ADD_TO_HEAD);
-	filesystem->AddSearchPath(CFmtStr("%s/game/csgo_lv/pak01_dir.vpk", path), "GAME", PATH_ADD_TO_HEAD);
+	filesystem->AddSearchPath(CFmtStr("%s/csgo/pak01_dir.vpk", path), "GAME", PATH_ADD_TO_HEAD);
+	filesystem->AddSearchPath(CFmtStr("%s/csgo/pakxv_lowviolence_dir.vpk", path), "GAME", PATH_ADD_TO_HEAD);
+	filesystem->AddSearchPath(CFmtStr("%s/csgo/pakxv_perfectworld_dir.vpk", path), "GAME", PATH_ADD_TO_HEAD);
 	filesystem->AddSearchPath(CFmtStr("%s/csgo", path), "GAME", PATH_ADD_TO_TAIL);
 }
 
@@ -227,10 +226,10 @@ void MountExtraContent()
 		AddPortal2(portal2Path);
 	}
 
-	if (steamapicontext->SteamApps()->BIsAppInstalled(730) && mountdepots->GetBool("csgo"))
+	if (steamapicontext->SteamApps()->BIsAppInstalled(4465480) && mountdepots->GetBool("csgo"))
 	{
 		char csgoPath[MAX_PATH];
-		steamapicontext->SteamApps()->GetAppInstallDir(730, csgoPath, sizeof(csgoPath));
+		steamapicontext->SteamApps()->GetAppInstallDir(4465480, csgoPath, sizeof(csgoPath));
 		AddCSGO(csgoPath);
 	}
 
