@@ -50,8 +50,8 @@ public:
 		m_pElapsedTimeLabel = new Label( this, "ElapsedTimeLabel", "" );
 		m_pFileTimeLabel = new Label( this, "FileTimeLabel", "" );
 
-		CMouseMessageForwardingPanel *panel = new CMouseMessageForwardingPanel(this, NULL);
-		panel->SetZPos(2);
+		//CMouseMessageForwardingPanel *panel = new CMouseMessageForwardingPanel(this, NULL);
+		//panel->SetZPos(2);
 
 		SetSize( 200, 140 );
 

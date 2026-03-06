@@ -6,6 +6,7 @@
 //=============================================================================//
 #include "cbase.h"
 #include "hl2mp_gamerules.h"
+#include "hl2_gamerules.h"
 #include "viewport_panel_names.h"
 #include "gameeventdefs.h"
 #include <KeyValues.h>
@@ -43,9 +44,7 @@
 	#include "weapon_hl2mpbasehlmpcombatweapon.h"
 	#include "team.h"
 	#include "voice_gamemgr.h"
-#ifdef HL2SB
-#include "globalstate.h"
-#endif
+	#include "globalstate.h"
 	#include "hl2mp_gameinterface.h"
 	#include "hl2mp_cvars.h"
 

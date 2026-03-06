@@ -11,10 +11,11 @@
 #include "tier0/memdbgon.h"
 
 // Default implementation for games that don't add custom data to the weapon scripts.
+#if !defined HL2MP
 FileWeaponInfo_t* CreateWeaponInfo()
 {
 	return new FileWeaponInfo_t;
 }
-
+#endif
 
 

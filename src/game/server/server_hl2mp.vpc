@@ -33,14 +33,6 @@ $Project "Server (HL2MP)"
 		{
 			$File	"terror\prop_car_alarm.cpp"
 		}
-		$Folder	"HL1"
-		{
-			$File	"hl1\scientist.cpp"
-			$File	"hl1\scientist.h"
-			$File	"hl1\barney.cpp"
-			$File	"hl1\barney.h"
-			$File	"hl1\roach.cpp"
-		}
 		
 		$Folder	"HL2 DLL"
 		{
