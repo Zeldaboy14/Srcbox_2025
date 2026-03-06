@@ -3,11 +3,11 @@
 	"CacheVersion"		"1"
 	"win64"
 	{
-		"CRCFile"		"gamepadui_win64_hl2mp.vcxproj.vpc_crc"
+		"CRCFile"		"gamepadui_win64_hl2.vcxproj.vpc_crc"
 		"OutputFiles"
 		{
-			"0"		"gamepadui_win64_hl2mp.vcxproj"
-			"1"		"gamepadui_win64_hl2mp.vcxproj.filters"
+			"0"		"gamepadui_win64_hl2.vcxproj"
+			"1"		"gamepadui_win64_hl2.vcxproj.filters"
 		}
 	}
 }

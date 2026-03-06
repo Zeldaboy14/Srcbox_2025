@@ -559,3 +559,5 @@ game/mod_hl2mp/shaders/fxc/lux_lightmappedgeneric_decal_ps30.vcs
 game/mod_hl2mp/shaders/fxc/lux_lightmappedgeneric_flashlight_ps30.vcs
 game/mod_hl2mp/shaders/fxc/lux_lightmappedgeneric_phong_ps30.vcs
 game/mod_hl2mp/shaders/fxc/lux_lightmappedgeneric_simple_ps30.vcs
+src/game/gamepadui/gamepadui_hl2.vpc.vpc_cache
+src/fgdlib/_vpc_/manifest_fgdlib/win64/manifest.txt
