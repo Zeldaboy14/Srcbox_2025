@@ -561,3 +561,8 @@ game/mod_hl2mp/shaders/fxc/lux_lightmappedgeneric_phong_ps30.vcs
 game/mod_hl2mp/shaders/fxc/lux_lightmappedgeneric_simple_ps30.vcs
 src/game/gamepadui/gamepadui_hl2.vpc.vpc_cache
 src/fgdlib/_vpc_/manifest_fgdlib/win64/manifest.txt
+src/game/gamepadui/gamepadui_win64_hl2mp.vcxproj
+src/game/gamepadui/gamepadui_win64_hl2mp.vcxproj.filters
+src/game/gamepadui/gamepadui_win64_hl2mp.vcxproj.user
+src/game/gamepadui/gamepadui_win64_hl2mp.vcxproj.vpc_crc
+src/game/gamepadui/_vpc_/manifest_gamepadui_hl2mp/win64/manifest.txt

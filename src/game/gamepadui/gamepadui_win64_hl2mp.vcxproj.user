@@ -3,7 +3,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <LocalDebuggerCommand>H:\SteamLibrary\steamapps\common\Source SDK Base 2013 Multiplayer\hl2_win64.exe</LocalDebuggerCommand>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>-game "C:\Users\zelda\Documents\GitHub\Srcbox\game\mod_hl2mp" -dev -w 1920 -h 1080 -windowed</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-game "D:\GitHub\Srcbox_2025\game\mod_hl2mp" -dev -w 1920 -h 1080 -windowed</LocalDebuggerCommandArguments>
     <LocalDebuggerWorkingDirectory>H:\SteamLibrary\steamapps\common\Source SDK Base 2013 Multiplayer</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
 </Project>

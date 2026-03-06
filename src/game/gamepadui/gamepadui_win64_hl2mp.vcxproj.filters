@@ -152,7 +152,7 @@
     <None Include="..\..\game\gamepadui\gamepadui_base.vpc">
       <Filter>VPC Scripts</Filter>
     </None>
-    <None Include="gamepadui_hl2.vpc">
+    <None Include="gamepadui_hl2mp.vpc">
       <Filter>VPC Scripts</Filter>
     </None>
     <None Include="..\..\vpc_scripts\loadaddress.vpc">

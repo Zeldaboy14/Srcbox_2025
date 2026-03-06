@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectName>GamepadUI (HL2)</ProjectName>
+    <ProjectName>GamepadUI (HL2MP)</ProjectName>
     <ProjectGuid>{EF402B78-B953-3F45-6D2C-3CA220C8646C}</ProjectGuid>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -70,7 +70,7 @@
       <AdditionalOptions>/Zm200 /Gw /Zc:inline /Zc:threadSafeInit- /Wv:18 /Zc:__cplusplus</AdditionalOptions>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>..\..\common;..\..\public;..\..\public\tier0;..\..\public\tier1;.\;..\..\vgui2\include;..\..\vgui2\controls;..\..\game\gamepadui;..\..\public</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>VPC;SOURCESDK;SOURCE_HAS_FREETYPE;WIN32;_WIN32;_DEBUG;DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions);PLATFORM_64BITS;WIN64;_WIN64;COMPILER_MSVC64;PLATFORM_64BITS;WIN64;_WIN64;COMPILER_MSVC64;COMPILER_MSVC;_DLL_EXT=.dll;DLLNAME=gamepadui;DEV_BUILD;FRAME_POINTER_OMISSION_DISABLED;GAMEPADUI_DLL;VERSION_SAFE_STEAM_API_INTERFACES;strncpy=use_Q_strncpy_instead;_snprintf=use_Q_snprintf_instead;GAMEPADUI_GAME_HL2;_DLL_EXT=.dll;_DLL_PREFIX=;_EXTERNAL_DLL_EXT=.dll;PROJECTDIR=C:\Users\zelda\Documents\GitHub\Srcbox\src\game\gamepadui;VPCGAME=valve;VPCGAMECAPS=VALVE</PreprocessorDefinitions>
+      <PreprocessorDefinitions>VPC;SOURCESDK;SOURCE_HAS_FREETYPE;WIN32;_WIN32;_DEBUG;DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions);PLATFORM_64BITS;WIN64;_WIN64;COMPILER_MSVC64;PLATFORM_64BITS;WIN64;_WIN64;COMPILER_MSVC64;COMPILER_MSVC;_DLL_EXT=.dll;DLLNAME=gamepadui;DEV_BUILD;FRAME_POINTER_OMISSION_DISABLED;GAMEPADUI_DLL;VERSION_SAFE_STEAM_API_INTERFACES;strncpy=use_Q_strncpy_instead;_snprintf=use_Q_snprintf_instead;GAMEPADUI_GAME_HL2;_DLL_EXT=.dll;_DLL_PREFIX=;_EXTERNAL_DLL_EXT=.dll;PROJECTDIR=D:\GitHub\Srcbox_2025\src\game\gamepadui;VPCGAME=valve;VPCGAMECAPS=VALVE</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>false</ExceptionHandling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -144,7 +144,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <AdditionalIncludeDirectories>..\..\common;..\..\public;..\..\public\tier0;..\..\public\tier1;.\;..\..\vgui2\include;..\..\vgui2\controls;..\..\game\gamepadui;..\..\public</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>VPC;SOURCESDK;SOURCE_HAS_FREETYPE;WIN32;_WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_ALLOW_RUNTIME_LIBRARY_MISMATCH;_ALLOW_ITERATOR_DEBUG_LEVEL_MISMATCH;_ALLOW_MSC_VER_MISMATCH;%(PreprocessorDefinitions);PLATFORM_64BITS;WIN64;_WIN64;COMPILER_MSVC64;PLATFORM_64BITS;WIN64;_WIN64;COMPILER_MSVC64;COMPILER_MSVC;_DLL_EXT=.dll;DLLNAME=gamepadui;DEV_BUILD;FRAME_POINTER_OMISSION_DISABLED;GAMEPADUI_DLL;VERSION_SAFE_STEAM_API_INTERFACES;strncpy=use_Q_strncpy_instead;_snprintf=use_Q_snprintf_instead;GAMEPADUI_GAME_HL2;_DLL_EXT=.dll;_DLL_PREFIX=;_EXTERNAL_DLL_EXT=.dll;PROJECTDIR=C:\Users\zelda\Documents\GitHub\Srcbox\src\game\gamepadui;VPCGAME=valve;VPCGAMECAPS=VALVE</PreprocessorDefinitions>
+      <PreprocessorDefinitions>VPC;SOURCESDK;SOURCE_HAS_FREETYPE;WIN32;_WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_ALLOW_RUNTIME_LIBRARY_MISMATCH;_ALLOW_ITERATOR_DEBUG_LEVEL_MISMATCH;_ALLOW_MSC_VER_MISMATCH;%(PreprocessorDefinitions);PLATFORM_64BITS;WIN64;_WIN64;COMPILER_MSVC64;PLATFORM_64BITS;WIN64;_WIN64;COMPILER_MSVC64;COMPILER_MSVC;_DLL_EXT=.dll;DLLNAME=gamepadui;DEV_BUILD;FRAME_POINTER_OMISSION_DISABLED;GAMEPADUI_DLL;VERSION_SAFE_STEAM_API_INTERFACES;strncpy=use_Q_strncpy_instead;_snprintf=use_Q_snprintf_instead;GAMEPADUI_GAME_HL2;_DLL_EXT=.dll;_DLL_PREFIX=;_EXTERNAL_DLL_EXT=.dll;PROJECTDIR=D:\GitHub\Srcbox_2025\src\game\gamepadui;VPCGAME=valve;VPCGAMECAPS=VALVE</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>false</ExceptionHandling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -262,7 +262,7 @@
   <ItemGroup />
   <ItemGroup>
     <None Include="..\..\game\gamepadui\gamepadui_base.vpc" />
-    <None Include="gamepadui_hl2.vpc" />
+    <None Include="gamepadui_hl2mp.vpc" />
     <None Include="..\..\vpc_scripts\loadaddress.vpc" />
     <None Include="_vpc_\manifest_gamepadui_hl2mp\win64\manifest.txt" />
     <None Include="..\..\vpc_scripts\platform_dirs.vpc" />

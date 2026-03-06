@@ -1,7 +1,7 @@
 [vpc crc file version 3]
 _.HOST_WIN64.HOST_WINDOWS.SOURCESDK.VS2022.WINDOWS_/vpcgame:valve_
 PROJECT.gamepadui.GAME.hl2mp.PLATFORM.win64
-d61d163b gamepadui_hl2.vpc
+6c80e811 gamepadui_hl2mp.vpc
 f4a39d4b ..\..\game\gamepadui\gamepadui_base.vpc
 2093e423 ..\..\vpc_scripts\source_dll_base.vpc
 8ef6e028 ..\..\vpc_scripts\platform_dirs.vpc
