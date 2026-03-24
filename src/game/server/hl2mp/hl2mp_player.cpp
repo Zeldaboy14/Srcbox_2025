@@ -1588,6 +1588,7 @@ CBaseEntity* CHL2MP_Player::EntSelectSpawnPoint( void )
 	if ( !pSpot  )
 	{
 		pSpot = gEntList.FindEntityByClassname( pSpot, "info_player_start" );
+		pSpot = gEntList.FindEntityByClassname( pSpot, "info_survivor_position" );
 
 		if ( pSpot )
 			goto ReturnSpot;
