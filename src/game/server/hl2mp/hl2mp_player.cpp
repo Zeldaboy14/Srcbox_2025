@@ -1518,6 +1518,7 @@ CBaseEntity* CHL2MP_Player::EntSelectSpawnPoint( void )
 #endif
 
 	CBaseEntity *pSpot = NULL;
+	CBaseEntity *pSpot2 = NULL;
 	CBaseEntity *pLastSpawnPoint = g_pLastSpawn;
 	edict_t		*player = edict();
 	const char *pSpawnpointName = "info_player_deathmatch";
@@ -1588,10 +1589,13 @@ CBaseEntity* CHL2MP_Player::EntSelectSpawnPoint( void )
 	if ( !pSpot  )
 	{
 		pSpot = gEntList.FindEntityByClassname( pSpot, "info_player_start" );
-		pSpot = gEntList.FindEntityByClassname( pSpot, "info_survivor_position" );
+		pSpot2 = gEntList.FindEntityByClassname( pSpot2, "info_survivor_position" );
 
-		if ( pSpot )
+
+		if (pSpot)
 			goto ReturnSpot;
+		else if (!pSpot)
+			return pSpot2;
 	}
 
 ReturnSpot:
