@@ -1,0 +1,33 @@
+// Choreo version 1
+actor "Eli"
+{
+  channel "audio"
+  {
+    event speak "now if that were a real portal core"
+    {
+      time 0.093334 2.814808
+      param "eli_lab.eli_realcore01"
+      fixedlength
+    }
+    event speak "you'd have about 5 minutes"
+    {
+      time 3.120000 7.703356
+      param "eli_lab.eli_realcore02"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+  }
+  channel "face to"
+  {
+  }
+  channel "move to"
+  {
+  }
+  faceposermodel "U:\HL2\hl2\models\Eli.mdl"
+}
+
+mapname "maps\eli_lab.bsp"
+fps 60
+snap off

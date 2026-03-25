@@ -1,0 +1,100 @@
+// Choreo version 1
+actor "Alyx"
+{
+  channel "audio"
+  {
+    event speak "my father - where?"
+    {
+      time 0.120001 1.570545
+      param "eli_lab.al_fatherwhere"
+      fixedlength
+    }
+    event speak "no"
+    {
+      time 3.986667 5.032858
+      param "eli_lab.al_scouts01"
+      fixedlength
+    }
+    event speak "where? Use your scouts - can you see them?"
+    {
+      time 5.153335 7.488618
+      param "eli_lab.al_scouts02"
+      fixedlength
+    }
+    event speak "oh no"
+    {
+      time 15.686663 16.756617
+      param "eli_lab.al_keepwatch01"
+      fixedlength
+    }
+    event speak "oh please"
+    {
+      time 17.319998 18.383059
+      param "eli_lab.al_keepwatch02"
+      fixedlength
+    }
+    event speak "keep watching"
+    {
+      time 18.619997 19.548092
+      param "eli_lab.al_keepwatch03"
+      fixedlength
+    }
+    event speak "gordon"
+    {
+      time 21.753332 22.218004
+      param "eli_lab.al_goafter01"
+      fixedlength
+    }
+    event speak "we have to go after them"
+    {
+      time 22.493332 23.951359
+      param "eli_lab.al_goafter02"
+      fixedlength
+    }
+    event speak "put the word out - make sure you track them..."
+    {
+      time 25.593332 30.051586
+      param "eli_lab.al_trackthem"
+      fixedlength
+    }
+    event speak "come on gordon, this way"
+    {
+      time 31.186665 33.205486
+      param "eli_lab.al_thisway"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+  }
+  channel "face to"
+  {
+  }
+  channel "move to"
+  {
+  }
+  faceposermodel "U:\HL2\hl2\models\alyx.mdl"
+}
+
+actor "Vortigaunt"
+{
+  channel "audio"
+  {
+    event speak "taken"
+    {
+      time 1.760001 4.149117
+      param "eli_lab.vort_taken"
+      fixedlength
+    }
+    event speak "dead sea"
+    {
+      time 7.526668 15.932291
+      param "eli_lab.vort_deadsea"
+      fixedlength
+    }
+  }
+}
+
+mapname "maps\eli_lab.bsp"
+fps 60
+snap off

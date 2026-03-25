@@ -1,0 +1,66 @@
+// Choreo version 1
+actor "mossman"
+{
+  channel "audio"
+  {
+    event speak "01"
+    {
+      time 0.066667 6.216690
+      param "kraken_teleport.mossman_01"
+      fixedlength
+    }
+    event speak "02"
+    {
+      time 6.433334 15.841951
+      param "kraken_teleport.mossman_02"
+      fixedlength
+    }
+    event speak "03"
+    {
+      time 16.086668 28.707983
+      param "kraken_teleport.mossman_03"
+      fixedlength
+    }
+    event speak "04"
+    {
+      time 29.233334 30.885578
+      param "kraken_teleport.mossman_04"
+      fixedlength
+    }
+    event speak "05"
+    {
+      time 32.200012 33.668674
+      param "kraken_teleport.mossman_05"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+    event lookat "look at gordon"
+    {
+      time 0.080000 30.866665
+      param "!player"
+    }
+  }
+  channel "move to"
+  {
+    event firetrigger "pre blast"
+    {
+      time 30.773335 -1.000000
+      param "1"
+    }
+  }
+  faceposermodel "D:\anon-hl2\hl2\models\mossman.mdl"
+}
+
+mapname "maps\d1_lab_01b.bsp"
+scalesettings
+{
+  "CChoreoView" "100"
+  "ExpressionTool" "100"
+  "GestureTool" "100"
+  "RampTool" "100"
+  "SceneRampTool" "100"
+}
+fps 60
+snap off

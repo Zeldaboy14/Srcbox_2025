@@ -1,0 +1,122 @@
+// Choreo version 1
+actor "kleiner"
+{
+  channel "audio"
+  {
+    event speak "07"
+    {
+      time 1.066667 4.738322
+      param "kraken_teleport.kleiner_07"
+      fixedlength
+    }
+    event speak "09"
+    {
+      time 6.346666 9.100408
+      param "kraken_teleport.kleiner_09"
+      fixedlength
+    }
+    event speak "11"
+    {
+      time 12.633333 15.846031
+      param "kraken_teleport.kleiner_11"
+      fixedlength
+    }
+    event speak "13"
+    {
+      time 18.093332 19.011246
+      param "kraken_teleport.kleiner_13"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+  }
+  channel "move to"
+  {
+  }
+  channel "anims"
+  {
+  }
+  faceposermodel "D:\anon-hl2\hl2\models\Kleiner.mdl"
+}
+
+actor "barney"
+{
+  channel "audio"
+  {
+    event speak "06"
+    {
+      time 0.060000 0.794331
+      param "kraken_teleport.barney_06"
+      fixedlength
+    }
+    event speak "08"
+    {
+      time 4.960000 6.153288
+      param "kraken_teleport.barney_08"
+      fixedlength
+    }
+    event speak "14"
+    {
+      time 19.186666 20.793016
+      param "kraken_teleport.barney_14"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+  }
+  channel "move to"
+  {
+    event firetrigger "run to"
+    {
+      time 6.059999 -1.000000
+      param "1"
+    }
+  }
+  channel "anims"
+  {
+  }
+  channel "animations"
+  {
+  }
+  faceposermodel "D:\anon-hl2\hl2\models\Barney.mdl"
+}
+
+actor "mossman"
+{
+  channel "audio"
+  {
+    event speak "10"
+    {
+      time 9.560000 12.267846
+      param "kraken_teleport.mossman_10"
+      fixedlength
+    }
+    event speak "12"
+    {
+      time 15.913332 17.932743
+      param "kraken_teleport.mossman_12"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+  }
+  channel "move to"
+  {
+  }
+  faceposermodel "D:\anon-hl2\hl2\models\mossman.mdl"
+}
+
+mapname "maps\d1_lab_01b.bsp"
+scalesettings
+{
+  "CChoreoView" "100"
+  "ExpressionTool" "100"
+  "GestureTool" "100"
+  "RampTool" "100"
+  "SceneRampTool" "100"
+}
+fps 60
+snap off

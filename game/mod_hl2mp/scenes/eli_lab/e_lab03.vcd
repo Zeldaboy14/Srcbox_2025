@@ -1,0 +1,264 @@
+// Choreo version 1
+actor "Mossman"
+{
+  channel "audio"
+  {
+    event speak "I didn't doubt you"
+    {
+      time 11.893322 13.605453
+      param "eli_lab.mo_nodoubt"
+      fixedlength
+    }
+    event speak "the dresscode has relaxed"
+    {
+      time 30.013342 33.587219
+      param "eli_lab.mo_dresscode"
+      fixedlength
+    }
+    event speak "It's going to make a huge difference..."
+    {
+      time 48.006660 50.806976
+      param "eli_lab.mo_difference"
+      fixedlength
+    }
+    event speak "I'll see what I can dig up"
+    {
+      time 56.333351 57.588818
+      param "eli_lab.mo_digup01"
+      fixedlength
+    }
+    event speak "are you 2 all right for now"
+    {
+      time 57.780006 58.781548
+      param "eli_lab.mo_digup02"
+      fixedlength
+    }
+    event speak "Sure"
+    {
+      time 59.766682 60.191399
+      param "eli_lab.mo_realhonor01"
+      fixedlength
+    }
+    event speak "Dr. Freeman"
+    {
+      time 60.300026 61.320004
+      param "eli_lab.mo_realhonor02"
+      fixedlength
+    }
+    event speak "It's been a real honor"
+    {
+      time 61.613342 62.667152
+      param "eli_lab.mo_realhonor03"
+      fixedlength
+    }
+    event speak "I'm looking forward to working together"
+    {
+      time 63.160004 64.487984
+      param "eli_lab.mo_realhonor04"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+    event speak "Eli..."
+    {
+      time 42.693329 43.480949
+      param "eli_lab.mo_eli01"
+      fixedlength
+    }
+    event lookat "look at player"
+    {
+      time 60.333336 64.279999
+      param "!player"
+    }
+    event lookat "look at Eli"
+    {
+      time 56.360001 60.079998
+      param "eli"
+    }
+  }
+  channel "face to"
+  {
+    event lookat "look at Eli"
+    {
+      time 40.939999 44.659996
+      param "eli"
+    }
+  }
+  channel "triggers"
+  {
+  }
+  channel "move to"
+  {
+    event moveto "back to lab"
+    {
+      time 17.179987 -1.000000
+      param "mark_mo_into_lab"
+    }
+    event moveto "exit lab"
+    {
+      time 64.473343 -1.000000
+      param "mark_mo_out_lab"
+    }
+  }
+}
+
+actor "Eli"
+{
+  channel "audio"
+  {
+    event speak "I heard, I heard"
+    {
+      time 0.026665 1.920248
+      param "eli_lab.eli_letmelook01"
+      fixedlength
+    }
+    event speak "I've been saying all along"
+    {
+      time 8.039984 11.546083
+      param "eli_lab.eli_letmelook07"
+      fixedlength
+    }
+    event speak "well, come in..."
+    {
+      time 13.999988 15.139670
+      param "eli_lab.eli_writsmall01"
+      fixedlength
+    }
+    event speak "You'll feel right at home"
+    {
+      time 15.246654 18.938581
+      param "eli_lab.eli_writsmall02"
+      fixedlength
+    }
+    event speak "I still recall the first day"
+    {
+      time 19.520002 23.383268
+      param "eli_lab.eli_shiny04"
+      fixedlength
+    }
+    event speak "Dr. Shiny Penny"
+    {
+      time 23.453341 27.739803
+      param "eli_lab.eli_shiny05"
+      fixedlength
+    }
+    event speak "We've come by some hard roads..."
+    {
+      time 33.693352 36.144917
+      param "eli_lab.eli_hardroads01"
+      fixedlength
+    }
+    event speak "I count myself lucky..."
+    {
+      time 36.306664 38.925144
+      param "eli_lab.eli_hardroads02"
+      fixedlength
+    }
+    event speak "Damn few of us escaped"
+    {
+      time 39.159992 41.536774
+      param "eli_lab.eli_hardroads03"
+      fixedlength
+    }
+    event speak "Damn few..."
+    {
+      time 41.606663 42.267662
+      param "eli_lab.eli_hardroads04"
+      fixedlength
+    }
+    event speak "What's important is that we survived."
+    {
+      time 43.899986 46.251053
+      param "eli_lab.eli_crater01"
+      fixedlength
+    }
+    event speak "and I've got my daughter with me."
+    {
+      time 46.493324 47.933212
+      param "eli_lab.eli_crater04"
+      fixedlength
+    }
+    event speak "Right you are"
+    {
+      time 50.906662 51.721062
+      param "eli_lab.eli_mit01"
+      fixedlength
+    }
+    event speak "We'll get you out of that hazard suit"
+    {
+      time 52.126667 55.418026
+      param "eli_lab.eli_mit04"
+      fixedlength
+    }
+    event speak "where you belong"
+    {
+      time 55.486668 56.222858
+      param "eli_lab.eli_mit05"
+      fixedlength
+    }
+    event speak "and look at you now"
+    {
+      time 28.073336 29.525309
+      param "eli_lab.eli_shiny06"
+      fixedlength
+    }
+    event speak "We'll be fine"
+    {
+      time 58.900013 59.630196
+      param "eli_lab.eli_fine01"
+      fixedlength
+    }
+    event speak "letmelook04"
+    {
+      time 3.506667 4.743311
+      param "eli_lab.eli_letmelook04"
+      fixedlength
+    }
+    event speak "letmelook03"
+    {
+      time 2.120001 3.253833
+      param "eli_lab.eli_letmelook03"
+      fixedlength
+    }
+    event speak "you haven't changed one iota"
+    {
+      time 4.953333 7.578911
+      param "eli_lab.eli_letmelook05"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+    event lookat "look at player"
+    {
+      time 0.026667 7.600000
+      param "!player"
+    }
+    event lookat "look at player"
+    {
+      time 19.506668 29.573334
+      param "!player"
+    }
+    event face "look at Mossman"
+    {
+      time 8.000000 12.793333
+      param "mossman"
+    }
+  }
+  channel "face to"
+  {
+  }
+  channel "move to"
+  {
+    event moveto "back into lab"
+    {
+      time 16.519989 -1.000000
+      param "mark_eli_into_lab"
+    }
+  }
+}
+
+mapname "maps\eli_lab.bsp"
+fps 60
+snap off

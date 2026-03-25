@@ -1,0 +1,53 @@
+// Choreo version 1
+actor "Consul"
+{
+  channel "audio"
+  {
+    event speak "01"
+    {
+      time 0.093333 7.338594
+      param "k_lab.br_significant"
+      fixedlength
+    }
+    event speak "02"
+    {
+      time 7.833333 8.599931
+      param "k_lab.br_thereheis"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+    event lookat "look at gordon"
+    {
+      time 7.620000 8.599999
+      param "!player"
+    }
+  }
+  channel "turn to"
+  {
+    event face "face gordon"
+    {
+      time 7.539999 8.040000
+      param "!player"
+    }
+    event face "turn to advisor"
+    {
+      time -0.020000 0.480000
+      param "target_advisor"
+    }
+  }
+  faceposermodel "D:\anon-hl2\hl2\models\breen.mdl"
+}
+
+mapname "maps\d1_lab_01b.bsp"
+scalesettings
+{
+  "CChoreoView" "100"
+  "ExpressionTool" "100"
+  "GestureTool" "100"
+  "RampTool" "100"
+  "SceneRampTool" "100"
+}
+fps 60
+snap off

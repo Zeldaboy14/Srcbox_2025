@@ -1,0 +1,28 @@
+// Choreo version 1
+actor "Eli"
+{
+  channel "audio"
+  {
+    event speak "Here now is our teleport"
+    {
+      time 0.133333 2.059047
+      param "eli_lab.eli_teleport01"
+      fixedlength
+    }
+    event speak "Still trying to figure out what went wrong"
+    {
+      time 3.000000 6.619569
+      param "eli_lab.eli_teleport03"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+  }
+  channel "face to"
+  {
+  }
+}
+
+fps 60
+snap off

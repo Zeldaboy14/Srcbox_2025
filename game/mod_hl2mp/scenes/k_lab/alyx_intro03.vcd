@@ -1,0 +1,59 @@
+// Choreo version 1
+actor "Alyx"
+{
+  channel "audio"
+  {
+    event speak "well, come on"
+    {
+      time 0.086667 0.909071
+      param "k_lab.al_docswaiting01"
+      fixedlength
+    }
+    event speak "docs waiting"
+    {
+      time 1.160000 2.196394
+      param "k_lab.al_docswaiting02"
+      fixedlength
+    }
+    event speak "docswaiting03"
+    {
+      time 3.406667 4.228118
+      param "k_lab.al_docswaiting03"
+      fixedlength
+    }
+  }
+  channel "triggers"
+  {
+    event moveto "move to soda"
+    {
+      time 0.920000 -1.000000
+      param "mark_alyx_soda"
+    }
+  }
+  channel "look at"
+  {
+    event lookat "look at player"
+    {
+      time 0.106666 0.853333
+      param "!player"
+    }
+    event lookat "look at soda machine"
+    {
+      time 1.266667 2.706667
+      param "soda_machine_entry_door_model"
+    }
+    event lookat "look at player"
+    {
+      time 3.226666 3.860000
+      param "!player"
+    }
+  }
+  channel "face to"
+  {
+  }
+  faceposermodel "U:\HL2\hl2\models\alyx.mdl"
+}
+
+mapname "maps\d1_trainstation_05.bsp"
+fps 60
+snap off

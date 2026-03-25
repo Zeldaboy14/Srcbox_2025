@@ -1,0 +1,29 @@
+// Choreo version 1
+actor "Alyx"
+{
+  channel "audio"
+  {
+    event speak "there's the bridge"
+    {
+      time 0.406666 1.245509
+      param "streetwar.al_theresbridge01"
+      fixedlength
+    }
+    event speak "let's get across"
+    {
+      time 1.393333 2.299478
+      param "streetwar.al_theresbridge02"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+  }
+  channel "move to"
+  {
+  }
+  faceposermodel "U:\HL2\hl2\models\alyx.mdl"
+}
+
+fps 60
+snap off

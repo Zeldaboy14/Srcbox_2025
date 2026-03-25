@@ -1,0 +1,29 @@
+// Choreo version 1
+actor "Soldier 1"
+{
+  channel "Voice"
+  {
+    event speak "temp"
+    {
+      time 8.946667 30.150476
+      param "Sky.sky_temp"
+      fixedlength
+    }
+  }
+  channel "Look at"
+  {
+  }
+}
+
+actor "Soldier 2"
+{
+  channel "Voice"
+  {
+  }
+  channel "Look at"
+  {
+  }
+}
+
+fps 60
+snap off

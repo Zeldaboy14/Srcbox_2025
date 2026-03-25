@@ -1,0 +1,29 @@
+// Choreo version 1
+actor "Alyx"
+{
+  channel "audio"
+  {
+    event speak "no!"
+    {
+      time 0.160000 1.099660
+      param "streetwar.al_no"
+      fixedlength
+    }
+    event speak "the bridge"
+    {
+      time 2.086667 2.903538
+      param "streetwar.al_thebridge"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+  }
+  channel "move to"
+  {
+  }
+  faceposermodel "U:\HL2\hl2\models\alyx.mdl"
+}
+
+fps 60
+snap off

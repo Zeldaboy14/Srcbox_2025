@@ -1,0 +1,28 @@
+// Choreo version 1
+actor "Monk"
+{
+  channel "audio"
+  {
+    event speak "I have cried out to thee!"
+    {
+      time 0.133334 4.521905
+      param "town.monk_fire01"
+      param2 "85dB"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+  }
+}
+
+scalesettings
+{
+  "CChoreoView" "100"
+  "RampTool" "100"
+  "ExpressionTool" "100"
+  "GestureTool" "100"
+  "SceneRampTool" "100"
+}
+fps 60
+snap off

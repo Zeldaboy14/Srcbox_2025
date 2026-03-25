@@ -1,0 +1,132 @@
+// Choreo version 1
+actor "npc_animal"
+{
+  channel "audio"
+  {
+    event speak "00"
+    {
+      time 0.046667 2.341452
+      param "Sniper.animal00"
+      fixedlength
+    }
+    event speak "01"
+    {
+      time 4.080001 5.548663
+      param "Sniper.animal01"
+      fixedlength
+    }
+    event speak "02"
+    {
+      time 7.193333 9.396326
+      param "Sniper.animal02"
+      fixedlength
+    }
+    event speak "03"
+    {
+      time 11.893334 13.637371
+      param "Sniper.animal03"
+      fixedlength
+    }
+    event speak "04"
+    {
+      time 25.980001 28.137098
+      param "Sniper.animal04"
+      fixedlength
+    }
+    event speak "05"
+    {
+      time 28.519999 31.595009
+      param "Sniper.animal05"
+      fixedlength
+    }
+  }
+  channel "sequence"
+  {
+    event sequence "shout"
+    {
+      time 0.959999 4.293332
+      param "anshout"
+      fixedlength
+    }
+    event sequence "shoot"
+    {
+      time 4.306666 7.139999
+      param "anshoot"
+      fixedlength
+    }
+    event lookat "look at leader"
+    {
+      time 9.653332 14.326665
+      param "npc_leader"
+    }
+    event firetrigger "shoot"
+    {
+      time 4.453333 -1.000000
+      param "1"
+    }
+    event firetrigger "run"
+    {
+      time 27.093336 -1.000000
+      param "2"
+    }
+  }
+}
+
+actor "npc_leader"
+{
+  channel "audio"
+  {
+    event speak "00"
+    {
+      time 9.540001 11.513515
+      param "Sniper.leader00"
+      fixedlength
+    }
+    event speak "01"
+    {
+      time 14.313334 25.695465
+      param "Sniper.leader01"
+      fixedlength
+    }
+    event speak "02"
+    {
+      time 28.853331 31.607073
+      param "Sniper.leader02"
+      fixedlength
+    }
+  }
+  channel "sequence"
+  {
+    event lookat "look at animal"
+    {
+      time 4.073334 11.520000
+      param "npc_animal"
+    }
+    event lookat "look at player"
+    {
+      time 13.993334 25.706669
+      param "!player"
+    }
+    event face "face pllayer"
+    {
+      time 14.493334 25.740000
+      param "!player"
+    }
+    event face "face manwich"
+    {
+      time 26.700001 31.540001
+      param "npc_animal"
+    }
+  }
+}
+
+scalesettings
+{
+  "CChoreoView" "100"
+  "ExpressionTool" "100"
+  "GestureTool" "100"
+  "RampTool" "100"
+  "SceneRampTool" "100"
+}
+fps 60
+snap off

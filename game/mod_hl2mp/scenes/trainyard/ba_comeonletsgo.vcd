@@ -1,0 +1,19 @@
+// Choreo version 1
+actor "Barney"
+{
+  channel "Audio"
+  {
+    event speak "comeonletsgo"
+    {
+      time 0.033334 1.092427
+      param "Trainyard.ba_comeonletsgo"
+      fixedlength
+    }
+  }
+  channel "Look at"
+  {
+  }
+}
+
+fps 60
+snap off

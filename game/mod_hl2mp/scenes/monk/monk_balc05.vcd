@@ -1,0 +1,43 @@
+// Choreo version 1
+actor "Monk"
+{
+  channel "Audio"
+  {
+    event speak "Behind those pallets"
+    {
+      time 0.153334 1.906441
+      param "town.monk_balc05"
+      param2 "90dB"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+    event lookat "look at player"
+    {
+      time 0.013334 0.780000
+      param "!player"
+    }
+    event lookat "look at palettes"
+    {
+      time 0.800000 1.693333
+      param "!target1"
+    }
+    event lookat "look at player2"
+    {
+      time 1.706666 2.606666
+      param "!player"
+    }
+  }
+}
+
+scalesettings
+{
+  "CChoreoView" "100"
+  "RampTool" "100"
+  "ExpressionTool" "100"
+  "GestureTool" "100"
+  "SceneRampTool" "100"
+}
+fps 60
+snap off

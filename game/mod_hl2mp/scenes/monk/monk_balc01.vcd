@@ -1,0 +1,44 @@
+// Choreo version 1
+actor "monk"
+{
+  channel "targets"
+  {
+    event moveto "cues"
+    {
+      time 0.500000 -1.000000
+      param "balcony_cue_01"
+    }
+    event moveto "cue2"
+    {
+      time 1.486667 -1.000000
+      param "balcony_cue_02"
+    }
+  }
+  channel "audio"
+  {
+    event speak "audio1"
+    {
+      time 0.473334 1.692382
+      param "town.monk_balc01"
+      fixedlength
+    }
+    event speak "audio2"
+    {
+      time 2.380001 3.465534
+      param "town.monk_balc13"
+      fixedlength
+    }
+  }
+}
+
+mapname "maps\balcony_large.bsp"
+scalesettings
+{
+  "CChoreoView" "100"
+  "RampTool" "100"
+  "ExpressionTool" "100"
+  "GestureTool" "100"
+  "SceneRampTool" "100"
+}
+fps 60
+snap off

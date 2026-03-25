@@ -1,0 +1,19 @@
+// Choreo version 1
+actor "gman"
+{
+  channel "exp"
+  {
+    event flexanimation "expressions"
+    {
+      time 0.000000 7.006667
+      param ""
+      flexanimations samples_use_time
+      {
+      }
+    }
+  }
+  faceposermodel "U:\HL2\hl2\models\gman.mdl"
+}
+
+fps 60
+snap off

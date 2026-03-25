@@ -1,0 +1,33 @@
+// Choreo version 1
+actor "Alyx"
+{
+  channel "audio"
+  {
+    event speak "hey doc"
+    {
+      time 0.073333 0.898186
+      param "k_lab.al_gotcompany01"
+      fixedlength
+    }
+    event speak "we got company"
+    {
+      time 1.400000 2.292540
+      param "k_lab.al_gotcompany02"
+      fixedlength
+    }
+  }
+  channel "triggers"
+  {
+  }
+  channel "look at"
+  {
+  }
+  channel "face to"
+  {
+  }
+  faceposermodel "U:\HL2\hl2\models\alyx.mdl"
+}
+
+mapname "maps\d1_trainstation_05.bsp"
+fps 60
+snap off

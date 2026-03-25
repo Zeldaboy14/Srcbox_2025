@@ -1,0 +1,65 @@
+// Choreo version 1
+actor "kleiner"
+{
+  channel "audio"
+  {
+    event speak "39"
+    {
+      time 0.166667 1.222268
+      param "k_teleport.kleiner_39"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+    event lookat "look at gordon"
+    {
+      time 0.046667 1.380000
+      param "!player"
+    }
+  }
+  channel "move to"
+  {
+  }
+  channel "anims"
+  {
+  }
+  faceposermodel "D:\anon-hl2\hl2\models\Kleiner.mdl"
+}
+
+actor "barney"
+{
+  channel "audio"
+  {
+  }
+  channel "look at"
+  {
+    event lookat "look at gordon"
+    {
+      time 0.146667 1.373333
+      param "!player"
+    }
+  }
+  channel "move to"
+  {
+  }
+  channel "anims"
+  {
+  }
+  channel "animations"
+  {
+  }
+  faceposermodel "D:\anon-hl2\hl2\models\Barney.mdl"
+}
+
+mapname "maps\d1_lab_01b.bsp"
+scalesettings
+{
+  "CChoreoView" "100"
+  "ExpressionTool" "100"
+  "GestureTool" "100"
+  "RampTool" "100"
+  "SceneRampTool" "100"
+}
+fps 60
+snap off

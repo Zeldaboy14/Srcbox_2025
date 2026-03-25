@@ -1,0 +1,1019 @@
+// Choreo version 1
+actor "kleiner"
+{
+  channel "audio"
+  {
+    event speak "kleiner02"
+    {
+      time 4.506667 6.939139
+      param "vo\kleiner_workshop\kleiner_02.wav"
+      fixedlength
+    }
+    event speak "kleiner03"
+    {
+      time 7.133333 8.647891
+      param "vo\kleiner_workshop\kleiner_03.wav"
+      fixedlength
+    }
+    event speak "kleiner05"
+    {
+      time 10.579999 14.848298
+      param "vo\kleiner_workshop\kleiner_05.wav"
+      fixedlength
+      tags
+      {
+        "you can't keep dragging" 0.457325
+        "barn" 0.099337
+        "fug" 0.336434
+        "you" 0.471382
+        "drag" 0.653656
+        "you" 0.936673
+        "end" 0.998056
+      }
+    }
+    event speak "kleiner06"
+    {
+      time 15.253335 17.226851
+      param "vo\kleiner_workshop\kleiner_06.wav"
+      fixedlength
+      tags
+      {
+        "oh" 0.001013
+        "good" 0.581703
+      }
+    }
+    event speak "kleiner08"
+    {
+      time 18.313335 31.531296
+      param "vo\kleiner_workshop\kleiner_08.wav"
+      fixedlength
+      tags
+      {
+        "it is Gordon..." 0.409292
+        "gordon freeman" 0.207899
+        "really" 0.082312
+        "is" 0.014223
+        "I" 0.150099
+        "free" 0.248752
+        "I" 0.313664
+        "hope" 0.367984
+        "gord" 0.445908
+        "isn't" 0.486459
+        "and" 0.551371
+        "why" 0.590560
+        "earth" 0.677412
+        "here" 0.742021
+        "if" 0.808748
+        "follow" 0.831596
+        "my" 0.885462
+        "ruined" 0.953249
+      }
+    }
+    event speak "kleiner10"
+    {
+      time 37.100002 45.957870
+      param "vo\kleiner_workshop\kleiner_10.wav"
+      fixedlength
+      tags
+      {
+        "but I really think..." 0.204112
+        "years of my research" 0.785516
+      }
+    }
+    event speak "kleiner12"
+    {
+      time 48.166672 62.761501
+      param "vo\kleiner_workshop\kleiner_12.wav"
+      fixedlength
+      tags
+      {
+        "you look a bit pale..." 0.422615
+        "my god, barney..." 0.651875
+      }
+    }
+    event speak "kleiner15"
+    {
+      time 64.786659 68.779587
+      param "vo\kleiner_workshop\kleiner_15.wav"
+      fixedlength
+    }
+    event speak "kleiner17"
+    {
+      time 71.026672 81.674469
+      param "vo\kleiner_workshop\kleiner_17.wav"
+      fixedlength
+      tags
+      {
+        "I'm sure she'll think of something" 0.166983
+        "I must say" 0.346550
+        "it's extremely secure..." 0.865531
+      }
+    }
+    event speak "kleiner_19"
+    {
+      time 85.740005 93.404587
+      param "k_lab.kleiner_19"
+      fixedlength
+    }
+  }
+  channel "flex 1"
+  {
+    event flexanimation "flex1"
+    {
+      time 10.213335 17.360001
+      param ""
+      flexanimations samples_use_time
+      {
+        "lid_raiser"         combo        
+        {
+          0.0765 0.0000
+          2.3548 0.0000
+          4.3352 0.0100
+          4.8969 0.0600
+          5.0498 0.9316
+          5.2371 0.9784
+          5.5415 0.6353
+          6.0454 0.6163
+          6.1683 0.8953
+          6.2741 0.9253
+          6.4377 0.6126
+        }
+        {
+        }
+        "lid_tightener"         combo        
+        {
+          0.0000 0.7553
+          2.1204 0.5400
+          2.3198 0.5232
+          2.9058 0.5342
+          3.1224 0.7205
+          3.2339 0.7295
+          3.4211 0.5200
+          4.0772 0.5300
+          4.3645 0.5100
+          4.8855 0.0300
+          5.3714 0.0195
+        }
+        {
+        }
+        "inner_raiser"         combo        
+        {
+          3.7956 0.0000
+          4.8676 0.2174
+          5.0320 0.8100
+          5.1956 0.9311
+          5.6530 0.7653
+          6.1040 0.6837
+          6.2097 0.9768
+          6.3913 1.0000
+          6.7950 0.8353
+          7.1352 0.7989
+        }
+        {
+        }
+        "outer_raiser"         combo        
+        {
+          3.8020 0.0105
+          4.8383 0.2163
+          5.0320 0.8300
+          5.2078 0.9174
+          5.7059 0.5568
+          6.0861 0.5442
+          6.2033 0.9100
+          6.4141 0.9895
+          6.8072 0.8084
+        }
+        {
+        }
+        "lowerer"         combo        
+        {
+          0.0000 0.5900
+          0.6089 0.5800
+          0.7969 0.8837
+          1.1249 0.8753
+          1.6109 0.6600
+          2.3141 0.7789
+          3.1631 0.8089
+          3.9307 0.9337
+          4.3702 0.7789
+          4.8211 0.0189
+          5.3950 0.0000
+        }
+        {
+        }
+        "wrinkler"        
+        {
+          0.0000 0.2658
+          0.6911 0.3111
+          0.8083 0.8505
+          0.8555 0.8537
+          0.9898 0.4000
+          1.6752 0.2763
+          1.8103 0.8737
+          1.8924 0.9074
+          1.9568 0.3205
+          2.1847 0.1963
+          2.9409 0.2800
+          3.0931 0.3326
+          3.1460 0.8400
+          3.2339 0.9458
+          3.3039 0.2968
+          3.5497 0.2711
+          5.0670 0.0000
+        }
+        "chin_raiser"        
+        {
+          0.0350 0.3600
+          0.6503 0.3600
+          0.7790 0.6353
+          0.8669 0.6353
+          1.0248 0.2900
+          1.6516 0.3000
+          1.7809 0.6200
+          1.8567 0.6200
+          1.9446 0.2300
+          2.9873 0.2300
+          3.1167 0.7600
+          3.1981 0.7700
+          3.3039 0.2800
+          4.1887 0.0316
+        }
+        "tightener"        
+        {
+          0.0293 0.6200
+          3.1981 0.5847
+          4.0186 0.5521
+          4.7625 0.0000
+        }
+      }
+    }
+  }
+  channel "flex 2"
+  {
+    event flexanimation "kluge"
+    {
+      time 14.860001 15.253334
+      param ""
+      flexanimations samples_use_time
+      {
+        "jaw_drop"        
+        {
+          0.0058 0.5100
+          0.0787 0.8458
+          0.2602 0.8768
+          0.3198 0.5942
+          0.3595 0.0279
+          0.3930 0.0000
+        }
+        "mouth_drop"         combo        
+        {
+          0.0006 0.4300
+          0.0758 0.6026
+          0.2653 0.6726
+          0.3205 0.4747
+          0.3630 0.0063
+          0.3924 0.0000
+        }
+        {
+        }
+      }
+    }
+    event flexanimation "flex2"
+    {
+      time 17.153334 25.379997
+      param ""
+      flexanimations samples_use_time
+      {
+        "lid_raiser"         combo        
+        {
+          0.0132 0.6000
+          0.7149 0.5016
+          1.3418 0.0211
+          3.2364 0.0000
+          3.7900 0.0500
+          3.9175 0.4400
+          4.0590 0.4626
+          4.3626 0.2600
+          4.4506 0.7642
+          4.8414 0.7695
+          5.4551 0.0426
+          5.8804 0.1100
+          6.0482 0.4874
+          6.2918 0.4032
+          6.5813 0.0326
+          6.9721 0.0463
+          7.0601 0.0484
+          7.1613 0.0442
+          7.4649 0.1542
+          7.5726 0.4268
+          7.7347 0.4300
+          8.0111 0.2037
+          8.2201 0.1053
+        }
+        {
+        }
+        "lid_tightener"         combo        
+        {
+          0.8835 0.0105
+          1.2809 0.0700
+          1.3418 0.4037
+          1.3961 0.4931
+          1.5515 0.3710
+          2.0567 0.3158
+          2.1982 0.3627
+          2.2656 0.5000
+          2.3199 0.6243
+          2.4343 0.2079
+          2.7510 0.0605
+          4.3766 0.0126
+          6.2506 0.0174
+          6.5007 0.0400
+          6.5813 0.4200
+          6.6759 0.5242
+          6.8512 0.2626
+          7.0330 0.0579
+          7.2354 0.0105
+        }
+        {
+        }
+        "inner_raiser"         combo        
+        {
+          0.0000 0.7021
+          0.0206 0.7595
+          0.8967 0.7116
+          1.2003 0.5642
+          1.3484 0.0737
+          1.5647 0.0395
+          2.1447 0.0400
+          2.9336 0.0421
+          3.1961 0.0616
+          3.8163 0.0316
+          3.9175 0.9121
+          4.0796 0.9158
+          4.2145 0.7068
+          4.3832 0.6469
+          4.4506 0.8584
+          4.5921 1.0000
+          5.1046 0.9632
+          5.3070 0.5216
+          5.9545 0.5384
+          6.0482 1.0000
+          6.2375 0.9816
+          6.4933 0.8032
+          6.5682 0.4600
+          6.9729 0.4005
+          7.0601 0.2947
+          7.2016 0.1795
+          7.5249 0.2421
+          7.5866 0.9053
+          7.6804 0.9842
+          7.9906 0.5700
+        }
+        {
+        }
+        "outer_raiser"         combo        
+        {
+          0.0000 0.6889
+          0.0271 0.7195
+          0.9239 0.7095
+          1.1871 0.6058
+          1.3558 0.0853
+          1.6856 0.0189
+          2.1241 0.0000
+          2.9937 0.0316
+          3.7695 0.1242
+          3.9175 0.9158
+          4.1339 0.8805
+          4.2820 0.5779
+          4.4301 0.4574
+          4.4844 0.7774
+          4.6053 0.9121
+          5.1384 0.8100
+          5.2930 0.3579
+          5.8730 0.4900
+          6.0417 0.6821
+          6.2177 0.7100
+          6.4670 0.5684
+          6.5887 0.1305
+          6.9992 0.1058
+          7.0667 0.0547
+          7.1473 0.0726
+          7.3637 0.0626
+          7.5932 0.1158
+        }
+        {
+        }
+        "lowerer"         combo        
+        {
+          0.7083 0.0174
+          1.2406 0.0574
+          1.3549 0.4632
+          1.5302 0.5906
+          1.7128 0.4589
+          1.8617 0.3437
+          2.1718 0.3915
+          2.2525 0.7358
+          2.3536 0.8600
+          2.5898 0.7590
+          2.7987 0.5084
+          3.0077 0.2421
+          3.3919 0.4000
+          3.7695 0.4700
+          3.9175 0.0174
+          4.3157 0.1879
+          4.4572 0.0000
+          4.9294 0.0200
+          5.1993 0.0200
+          5.3342 0.4621
+          5.9273 0.5768
+          6.0688 0.0800
+          6.4596 0.0358
+          6.5813 0.5137
+          6.9927 0.4800
+          7.0601 0.8505
+          7.1950 0.7984
+          7.4780 0.4811
+          7.5998 0.0000
+          7.8219 0.0000
+        }
+        {
+        }
+        "wrinkler"        
+        {
+          1.0382 0.0284
+          1.2611 0.0800
+          1.3418 0.5511
+          1.4495 0.5395
+          1.5713 0.1095
+          1.9152 0.0368
+          2.1644 0.0653
+          2.2056 0.5132
+          2.2525 0.7705
+          2.3265 0.6426
+          2.4951 0.0984
+          3.5202 0.0800
+        }
+        "cheek_raiser"         combo        
+        {
+          0.9913 0.0484
+          1.2406 0.0589
+          1.3286 0.5300
+          1.4495 0.5226
+          1.5779 0.0611
+          2.1579 0.0600
+          2.2459 0.6600
+          2.2928 0.7437
+          2.3462 0.6121
+          2.5626 0.0532
+          3.6551 0.1042
+        }
+        {
+        }
+      }
+    }
+    event sequence "tableidle"
+    {
+      time 88.420006 91.220001
+      param "tableidle"
+    }
+    event sequence "type"
+    {
+      time 88.553337 91.080002
+      param "typegesture"
+    }
+  }
+  channel "animations"
+  {
+    event sequence "look for Lamarr"
+    {
+      time 0.013334 10.013334
+      param "workshop1idle1"
+      fixedlength
+    }
+    event lookat "look at barney07"
+    {
+      time 36.513332 44.300003
+      param "Barney"
+      event_ramp
+      {
+        0.5451 1.0000
+        3.3483 1.0000
+        6.1515 1.0000
+      }
+    }
+    event lookat "look at floor2"
+    {
+      time 46.853336 48.099998
+      param "!self"
+      event_ramp
+      {
+        0.5859 1.0000
+        0.8353 1.0000
+        1.0846 1.0000
+      }
+    }
+    event lookat "look at playerk10"
+    {
+      time 48.093334 54.726665
+      param "Player"
+      event_ramp
+      {
+        0.1990 1.0000
+        2.7197 1.0000
+        5.2403 1.0000
+      }
+    }
+    event lookat "look at floor4"
+    {
+      time 54.713337 57.686668
+      param "target_floor01"
+      event_ramp
+      {
+        1.2785 0.5600
+        2.0962 0.5600
+        2.9139 0.5600
+      }
+    }
+    event lookat "look at barney44"
+    {
+      time 74.793335 80.333328
+      param "Barney"
+      event_ramp
+      {
+        0.1108 1.0000
+        2.7423 1.0000
+        5.3738 1.0000
+      }
+    }
+    event lookat "look at  playerk45"
+    {
+      time 80.333336 81.713326
+      param "Player"
+      event_ramp
+      {
+        0.1518 1.0000
+        0.7659 1.0000
+        1.3800 1.0000
+      }
+    }
+    event lookat "look at barney55"
+    {
+      time 81.713326 85.566666
+      param "Barney"
+    }
+    event sequence "workshop2"
+    {
+      time 10.040000 10.740000
+      param "crouchhidetostand"
+      fixedlength
+    }
+    event sequence "tableidle"
+    {
+      time 30.033337 35.053333
+      param "tableidle"
+    }
+    event moveto "walk to pc"
+    {
+      time 85.606674 -1.000000
+      param "target_pc01"
+    }
+    event firetrigger "open sesame"
+    {
+      time 90.373337 -1.000000
+      param "1"
+    }
+  }
+  channel "look at"
+  {
+    event lookat "look at player"
+    {
+      time 14.020000 25.519999
+      param "!player"
+      event_ramp
+      {
+        2.3000 0.9500
+        6.7275 0.9500
+        11.1550 0.9500
+      }
+    }
+    event lookat "look at barney03"
+    {
+      time 25.566669 34.640003
+      param "Barney"
+      event_ramp
+      {
+        0.2722 1.0000
+        4.1737 1.0000
+        8.0753 1.0000
+      }
+    }
+    event lookat "look at playerk05"
+    {
+      time 34.653336 36.513336
+      param "Player"
+      event_ramp
+      {
+        0.1860 1.0000
+        0.9579 1.0000
+        1.7298 1.0000
+      }
+    }
+    event lookat "look at barney"
+    {
+      time 12.546667 14.020000
+      param "!target2"
+      event_ramp
+      {
+        0.2799 0.6200
+        0.5230 0.6200
+        0.7661 0.6200
+      }
+    }
+    event lookat "look at barney21"
+    {
+      time 57.673336 72.833321
+      param "Barney"
+    }
+    event lookat "look at playerk33"
+    {
+      time 72.840004 74.786667
+      param "Player"
+      event_ramp
+      {
+        0.1557 1.0000
+        0.9733 1.0000
+        1.7909 1.0000
+      }
+    }
+    event lookat "lookself1"
+    {
+      time 0.000000 11.506666
+      param "Kleiner"
+      event_ramp
+      {
+        0.0000 1.0000
+        4.8328 1.0000
+        9.6656 1.0000
+      }
+    }
+  }
+  channel "walk to"
+  {
+    event moveto "walk to floor01"
+    {
+      time 12.353338 -1.000000
+      param "target_floor01"
+    }
+    event moveto "walk to pc"
+    {
+      time 27.713333 -1.000000
+      param "target_pc01"
+    }
+    event moveto "walk to floor2"
+    {
+      time 36.933334 -1.000000
+      param "target_floor01"
+    }
+  }
+  channel "gestures"
+  {
+    event sequence "type"
+    {
+      time 30.260002 35.080006
+      param "typegesture"
+    }
+  }
+  faceposermodel "D:\anon-hl2\hl2\models\Kleiner.mdl"
+}
+
+actor "barney"
+{
+  channel "audio"
+  {
+    event speak "barney01"
+    {
+      time 1.500000 4.483220
+      param "vo\kleiner_workshop\barney_01.wav"
+      fixedlength
+      tags
+      {
+        "look who's here" 0.694552
+      }
+    }
+    event speak "barney04"
+    {
+      time 8.846667 10.361225
+      param "vo\kleiner_workshop\barney_04.wav"
+      fixedlength
+    }
+    event speak "barney07"
+    {
+      time 16.413336 18.524538
+      param "vo\kleiner_workshop\barney_07.wav"
+      fixedlength
+      tags
+      {
+        "your attention" 0.649867
+      }
+    }
+    event speak "barney09"
+    {
+      time 31.279999 37.108753
+      param "vo\kleiner_workshop\barney_09.wav"
+      fixedlength
+      tags
+      {
+        "though, we should keep moving" 0.783358
+      }
+    }
+    event speak "barney11"
+    {
+      time 45.853340 48.194019
+      param "vo\kleiner_workshop\barney_11.wav"
+      fixedlength
+    }
+    event speak "barney14"
+    {
+      time 62.233334 64.987076
+      param "vo\kleiner_workshop\barney_14.wav"
+      fixedlength
+    }
+    event speak "barney16"
+    {
+      time 68.639999 70.751198
+      param "vo\kleiner_workshop\barney_16.wav"
+      fixedlength
+    }
+    event speak "barney18"
+    {
+      time 81.426674 85.557289
+      param "vo\kleiner_workshop\barney_18.wav"
+      fixedlength
+    }
+  }
+  channel "flex 1"
+  {
+  }
+  channel "flex 2"
+  {
+  }
+  channel "animation"
+  {
+    event sequence "idle"
+    {
+      time 8.533334 20.466667
+      param "idle01"
+    }
+    event lookat "look at kleiner07"
+    {
+      time 38.873341 44.000004
+      param "Kleiner"
+      event_ramp
+      {
+        0.0000 1.0000
+        2.1532 1.0000
+        4.3064 1.0000
+      }
+    }
+  }
+  channel "look at"
+  {
+    event lookat "look at playerb01"
+    {
+      time 0.013334 1.606666
+      param "Player"
+      event_ramp
+      {
+        0.4939 1.0000
+        0.8365 1.0000
+        1.1791 1.0000
+      }
+    }
+    event lookat "look at playerb02"
+    {
+      time 3.560000 4.613333
+      param "Player"
+      event_ramp
+      {
+        0.3055 1.0000
+        0.5951 1.0000
+        0.8848 1.0000
+      }
+    }
+    event lookat "look at kleiner2"
+    {
+      time 8.139999 10.506666
+      param "Kleiner"
+      event_ramp
+      {
+        0.1183 1.0000
+        1.1478 1.0000
+        2.1773 1.0000
+      }
+    }
+    event lookat "look at Kleiner"
+    {
+      time 1.593335 3.553335
+      param "Kleiner"
+      event_ramp
+      {
+        0.4116 1.0000
+        0.9898 1.0000
+        1.5680 1.0000
+      }
+    }
+    event lookat "look at kleiner03"
+    {
+      time 11.513333 18.180004
+      param "Kleiner"
+      event_ramp
+      {
+        0.8000 1.0000
+        2.9000 1.0000
+        5.0000 1.0000
+      }
+    }
+    event lookat "look at playerb4"
+    {
+      time 10.513334 11.500002
+      param "Player"
+      event_ramp
+      {
+        0.1875 1.0000
+        0.4243 1.0000
+        0.6611 1.0000
+      }
+    }
+    event face "look at playerb10"
+    {
+      time 45.846672 48.246666
+      param "Player"
+      event_ramp
+      {
+        0.0000 1.0000
+        1.0800 1.0000
+        2.1600 1.0000
+      }
+    }
+    event lookat "look at kleiner11"
+    {
+      time 48.246670 54.700005
+      param "Kleiner"
+      event_ramp
+      {
+        0.0000 1.0000
+        3.0653 1.0000
+        6.1307 1.0000
+      }
+    }
+    event lookat "look at floor"
+    {
+      time 43.999996 45.853333
+      param "target_lamp"
+      event_ramp
+      {
+        0.8525 0.6100
+        1.3251 0.6100
+        1.7977 0.6100
+      }
+    }
+    event lookat "look at playerb05"
+    {
+      time 18.186670 19.053339
+      param "Player"
+      event_ramp
+      {
+        0.3380 1.0000
+        0.5157 1.0000
+        0.6933 1.0000
+      }
+    }
+    event lookat "look at playerb04"
+    {
+      time 23.673330 26.553333
+      param "Player"
+      event_ramp
+      {
+        0.7200 1.0000
+        1.7712 1.0000
+        2.8224 1.0000
+      }
+    }
+    event lookat "look at kleiner06"
+    {
+      time 26.573334 35.853333
+      param "Kleiner"
+      event_ramp
+      {
+        0.0000 1.0000
+        4.5472 1.0000
+        9.0944 1.0000
+      }
+    }
+    event lookat "look at player06"
+    {
+      time 35.853336 38.873329
+      param "Player"
+      event_ramp
+      {
+        0.3926 1.0000
+        1.6006 1.0000
+        2.8086 1.0000
+      }
+    }
+    event lookat "look at kleiner22"
+    {
+      time 57.853333 72.166656
+      param "Kleiner"
+    }
+    event lookat "look at playerb22"
+    {
+      time 54.713333 57.860001
+      param "Player"
+      event_ramp
+      {
+        0.1573 1.0000
+        1.6520 1.0000
+        3.1467 1.0000
+      }
+    }
+    event lookat "look at playerb33"
+    {
+      time 72.166672 72.966667
+      param "Player"
+      event_ramp
+      {
+        0.0160 1.0000
+        0.3960 1.0000
+        0.7760 1.0000
+      }
+    }
+    event lookat "look at kleiner33"
+    {
+      time 72.973335 85.559998
+      param "Kleiner"
+    }
+    event lookat "look at kleiner19"
+    {
+      time 4.620001 6.893334
+      param "Kleiner"
+      event_ramp
+      {
+        0.2501 1.0000
+        1.1708 1.0000
+        2.0915 1.0000
+      }
+    }
+    event lookat "look at playerb19"
+    {
+      time 6.919998 8.146666
+      param "Player"
+      event_ramp
+      {
+        0.3189 1.0000
+        0.6440 1.0000
+        0.9691 1.0000
+      }
+    }
+    event lookat "look at kleiner17"
+    {
+      time 19.053333 23.693335
+      param "Kleiner"
+      event_ramp
+      {
+        0.7888 1.0000
+        2.3432 1.0000
+        3.8976 1.0000
+      }
+    }
+    event face "face Kleiner"
+    {
+      time 57.893337 58.393337
+      param "Kleiner"
+    }
+  }
+  channel "walk to"
+  {
+    event moveto "walk to position"
+    {
+      time 1.233333 -1.000000
+      param "target_floor02"
+    }
+  }
+  channel "other "
+  {
+  }
+  faceposermodel "D:\anon-hl2\hl2\models\Barney.mdl"
+}
+
+mapname "maps\d1_lab_01a.bsp"
+scalesettings
+{
+  "CChoreoView" "100"
+  "SceneRampTool" "100"
+  "ExpressionTool" "100"
+  "GestureTool" "100"
+  "RampTool" "100"
+}
+fps 60
+snap off

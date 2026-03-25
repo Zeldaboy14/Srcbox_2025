@@ -1,0 +1,40 @@
+// Choreo version 1
+actor "Monk"
+{
+  channel "audio"
+  {
+    event speak "Once this was a heaven"
+    {
+      time 0.133334 6.216962
+      param "town.monk_greet02a"
+      param2 "90dB"
+      fixedlength
+    }
+    event speak "Darkness has its heart here"
+    {
+      time 6.513332 11.447573
+      param "town.monk_greet02b"
+      param2 "90dB"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+    event lookat "look at player"
+    {
+      time 0.020000 11.506668
+      param "!player"
+    }
+  }
+}
+
+scalesettings
+{
+  "CChoreoView" "100"
+  "RampTool" "100"
+  "ExpressionTool" "100"
+  "GestureTool" "100"
+  "SceneRampTool" "100"
+}
+fps 60
+snap off

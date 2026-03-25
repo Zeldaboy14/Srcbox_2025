@@ -1,0 +1,89 @@
+// Choreo version 1
+actor "Alyx"
+{
+  channel "audio"
+  {
+    event speak "ahem"
+    {
+      time 0.073333 0.758979
+      param "k_lab.al_checkguyout01"
+      fixedlength
+    }
+    event speak "hmmm"
+    {
+      time 1.066667 1.505397
+      param "k_lab.al_checkguyout02"
+      fixedlength
+    }
+    event speak "check this out"
+    {
+      time 1.713334 2.345511
+      param "k_lab.al_checkguyout03"
+      fixedlength
+    }
+    event speak "the last newspaper ever printed"
+    {
+      time 2.573333 4.935283
+      param "k_lab.al_checkguyout04"
+      fixedlength
+    }
+    event speak "and this guy on the cover"
+    {
+      time 5.186667 6.348504
+      param "k_lab.al_checkguyout05"
+      fixedlength
+    }
+    event speak "Gordon Freeman"
+    {
+      time 6.826667 7.537234
+      param "k_lab.al_checkguyout06"
+      fixedlength
+    }
+    event speak "looks like you"
+    {
+      time 8.066666 9.405078
+      param "k_lab.al_soundslikeyou"
+      fixedlength
+    }
+    event speak "but how could you be the same guy"
+    {
+      time 10.486667 14.152200
+      param "k_lab.al_sameguy"
+      fixedlength
+    }
+  }
+  channel "triggers"
+  {
+    event moveto "move to mark_alyx_intro"
+    {
+      time 0.953333 -1.000000
+      param "mark_alyx_intro"
+    }
+  }
+  channel "look at"
+  {
+    event lookat "look at player"
+    {
+      time 0.140000 2.426666
+      param "!player"
+    }
+    event lookat "look at player"
+    {
+      time 7.860000 14.160000
+      param "!player"
+    }
+  }
+  channel "face to"
+  {
+    event face "turn to player"
+    {
+      time 8.620001 9.120001
+      param "!player"
+    }
+  }
+  faceposermodel "U:\HL2\hl2\models\alyx.mdl"
+}
+
+mapname "maps\d1_trainstation_05.bsp"
+fps 60
+snap off

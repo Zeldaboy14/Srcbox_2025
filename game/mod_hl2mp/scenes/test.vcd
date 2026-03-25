@@ -1,0 +1,200 @@
+// Choreo version 1
+event section "get to console"
+{
+  time 9.180000 -1.000000
+  ramp 1.00 1.00 1.00
+  param "noaction"
+}
+event section "get to wall"
+{
+  time 3.420000 -1.000000
+  ramp 1.00 1.00 1.00
+  param "noaction"
+}
+actor "Alyx"
+{
+  channel "audio"
+  {
+    event speak "Rip11"
+    {
+      time 0.680000 1.270658
+      ramp 1.00 1.00 1.00
+      param "vo\alien_test\A12-Rip11.wav"
+    }
+    event speak "Rip12"
+    {
+      time 2.100000 3.280000
+      ramp 1.00 1.00 1.00
+      param "vo\alien_test\A13-Rip12.wav"
+    }
+    event speak "Rip04"
+    {
+      time 4.410588 8.967459
+      ramp 1.00 1.00 1.00
+      param "vo\alien_test\A05-Rip04.wav"
+      tags
+      {
+        "floorplan" 0.625868
+        "understand" 0.811961
+        "terminal" 0.282211
+      }
+    }
+    event speak "Rip05"
+    {
+      time 10.169180 14.122377
+      ramp 1.00 1.00 1.00
+      param "vo\alien_test\A06-Rip05.wav"
+      tags
+      {
+        "dontcare" 0.292927
+        "listening" 0.823131
+      }
+    }
+  }
+  channel "movements"
+  {
+    event moveto "starttomark"
+    {
+      time 3.310000 -1.000000
+      ramp 1.00 1.00 1.00
+      param "alyx_mark2"
+      resumecondition
+    }
+    event moveto "walk to console"
+    {
+      time 8.840001 -1.000000
+      ramp 1.00 1.00 1.00
+      param "alyx_mark3"
+      resumecondition
+    }
+    event expression "open"
+    {
+      time 4.120234 7.540236
+      ramp 0.80 0.50 0.80
+      param "class2"
+      param2 "open mouth"
+    }
+  }
+  channel "Expressions"
+  {
+    event expression "sternish"
+    {
+      time 0.538196 3.383765
+      ramp 0.90 0.80 0.80
+      param "class2"
+      param2 "Force1"
+    }
+  }
+  channel "other expressions"
+  {
+    event expression "grin"
+    {
+      time 2.072628 3.154745
+      ramp 0.80 0.70 0.20
+      param "class2"
+      param2 "Smile"
+    }
+    event expression "eye1"
+    {
+      time 0.595451 0.893176
+      ramp 0.80 1.00 0.20
+      param "class2"
+      param2 "Flare"
+    }
+    event expression "eye2"
+    {
+      time 1.168001 2.089804
+      ramp 0.30 0.50 0.70
+      param "billeyes"
+      param2 "squint"
+    }
+  }
+  channel "Face"
+  {
+    event lookat "faceplayer1"
+    {
+      time 0.471960 3.530666
+      ramp 0.80 1.00 0.80
+      param "Player"
+    }
+    event face "face again"
+    {
+      time 8.110589 8.733766
+      ramp 1.00 1.00 1.00
+      param "Player"
+      relativetag "understand" "vo\alien_test\A05-Rip04.wav"
+    }
+    event face "faceoncemore"
+    {
+      time 12.404588 14.001059
+      ramp 1.00 1.00 1.00
+      param "Player"
+    }
+    event face "face console"
+    {
+      time 9.218863 11.726628
+      ramp 1.00 1.00 1.00
+      param "alien_button"
+    }
+  }
+  channel "lookat"
+  {
+    event lookat "lookagain"
+    {
+      time 6.466438 10.527649
+      ramp 1.00 1.00 1.00
+      param "Player"
+    }
+    event lookat "look at console"
+    {
+      time 11.327178 12.078233
+      ramp 1.00 1.00 1.00
+      param "alien_console"
+      relativetag "dontcare" "vo\alien_test\A06-Rip05.wav"
+    }
+    event lookat "finallook"
+    {
+      time 12.420707 14.351060
+      ramp 1.00 1.00 1.00
+      param "Player"
+    }
+    event lookat "eyecontact"
+    {
+      time 0.257647 5.054862
+      ramp 1.00 1.00 1.00
+      param "Player"
+    }
+    event lookat "terminal glance"
+    {
+      time 5.090750 6.447794
+      ramp 0.50 1.00 0.50
+      param "alien_console"
+    }
+  }
+  channel "background"
+  {
+    event gesture "parent gesture"
+    {
+      time 0.200392 3.534509
+      ramp 1.00 1.00 1.00
+      param "attitude"
+    }
+  }
+  channel "gestures"
+  {
+    event gesture "hudson"
+    {
+      time 0.606902 1.906588
+      ramp 1.00 1.00 1.00
+      param "gesture4"
+    }
+    event gesture "relax"
+    {
+      time 2.278745 2.778745
+      ramp 1.00 1.00 1.00
+      param "gesture2"
+    }
+  }
+}
+
+mapname "maps\aliens_test.bsp"

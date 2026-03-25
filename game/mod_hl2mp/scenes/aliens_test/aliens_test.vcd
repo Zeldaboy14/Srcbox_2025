@@ -1,0 +1,215 @@
+// Choreo version 1
+actor "Alyx"
+{
+  channel "audio"
+  {
+    event speak "Rip01"
+    {
+      time 0.110000 3.140159
+      param "Aliens.A01-Rip01"
+      fixedlength
+    }
+    event speak "Rip11"
+    {
+      time 6.380000 6.970658
+      param "Aliens.A12-Rip11"
+      fixedlength
+    }
+    event speak "Rip12"
+    {
+      time 7.430001 8.538754
+      param "Aliens.A13-Rip12"
+      fixedlength
+    }
+    event speak "Rip04"
+    {
+      time 8.869999 13.426869
+      param "Aliens.A05-Rip04"
+      fixedlength
+    }
+    event speak "Rip05"
+    {
+      time 14.060001 18.013199
+      param "Aliens.A06-Rip05"
+      fixedlength
+    }
+    event speak "Rip02"
+    {
+      time 18.840000 19.613470
+      param "Aliens.A03-Rip02"
+      fixedlength
+    }
+    event speak "Rip03"
+    {
+      time 20.689999 24.022062
+      param "Aliens.A04-Rip03"
+      fixedlength
+    }
+    event speak "Rip06"
+    {
+      time 24.090000 25.425102
+      param "Aliens.A07-Rip06"
+      fixedlength
+    }
+    event speak "Rip07"
+    {
+      time 25.900000 28.047800
+      param "Aliens.A08-Rip07"
+      fixedlength
+    }
+    event speak "Rip08"
+    {
+      time 28.170002 29.201794
+      param "Aliens.A09-Rip08"
+      fixedlength
+    }
+    event speak "Rip09"
+    {
+      time 29.556664 31.808954
+      param "Aliens.A10-Rip09"
+      fixedlength
+    }
+    event speak "Rip10"
+    {
+      time 32.415905 33.571098
+      param "Aliens.A11-Rip10"
+      fixedlength
+    }
+    event speak "Rip13"
+    {
+      time 37.699997 39.032242
+      param "Aliens.A15-Rip13"
+      fixedlength
+    }
+    event speak "Rip14"
+    {
+      time 39.267422 41.313679
+      param "Aliens.A16-Rip14"
+      fixedlength
+    }
+    event speak "Rip15"
+    {
+      time 41.678787 42.897789
+      param "Aliens.A17-Rip15"
+      fixedlength
+    }
+    event speak "Rip16"
+    {
+      time 49.072723 51.287281
+      param "Aliens.A27-Rip16"
+      fixedlength
+    }
+    event speak "Rip17"
+    {
+      time 52.390907 53.856621
+      param "Aliens.A28-Rip17"
+      fixedlength
+    }
+    event speak "Rip18"
+    {
+      time 77.481819 78.546989
+      param "Aliens.A33-Rip18"
+      fixedlength
+    }
+  }
+}
+
+actor "Barney"
+{
+  channel "audio"
+  {
+    event speak "Hicks01"
+    {
+      time 3.960000 4.994739
+      param "Aliens.A02-Hicks01"
+      fixedlength
+    }
+    event speak "Hicks02"
+    {
+      time 35.509087 37.154800
+      param "Aliens.A14-Hicks02"
+      fixedlength
+    }
+    event speak "Hicks10"
+    {
+      time 43.972725 45.850594
+      param "Aliens.A25-Hicks10"
+      fixedlength
+    }
+    event speak "Hicks11"
+    {
+      time 46.627270 47.735977
+      param "Aliens.A26-Hicks11"
+      fixedlength
+    }
+    event speak "Hicks12"
+    {
+      time 54.609085 55.921013
+      param "Aliens.A29-Hicks12"
+      fixedlength
+    }
+    event speak "Hicks13"
+    {
+      time 56.309090 57.435257
+      param "Aliens.A30-Hicks13"
+      fixedlength
+    }
+    event speak "Hicks14"
+    {
+      time 58.881813 61.032516
+      param "Aliens.A31-Hicks14"
+      fixedlength
+    }
+    event speak "Hicks15"
+    {
+      time 61.336361 62.170830
+      param "Aliens.A32-Hicks15"
+      fixedlength
+    }
+    event speak "Hicks05"
+    {
+      time 65.236366 65.998222
+      param "Aliens.A20-Hicks05"
+      fixedlength
+    }
+    event speak "Hicks06"
+    {
+      time 66.699997 68.084488
+      param "Aliens.A21-Hicks06"
+      fixedlength
+    }
+    event speak "Hicks07"
+    {
+      time 68.481812 69.799545
+      param "Aliens.A22-Hicks07"
+      fixedlength
+    }
+    event speak "Hicks08"
+    {
+      time 70.400002 71.273651
+      param "Aliens.A23-Hicks08"
+      fixedlength
+    }
+    event speak "Hicks09"
+    {
+      time 72.072731 74.420807
+      param "Aliens.A24-Hicks09"
+      fixedlength
+    }
+    event speak "Hicks16"
+    {
+      time 79.336365 81.812782
+      param "Aliens.A35-Hicks16"
+      fixedlength
+    }
+    event speak "Hicks04"
+    {
+      time 82.572723 83.322975
+      param "Aliens.A19-Hicks04"
+      fixedlength
+    }
+  }
+}
+
+fps 60
+snap off

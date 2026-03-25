@@ -1,0 +1,19 @@
+// Choreo version 1
+actor "Barney"
+{
+  channel "Audio"
+  {
+    event speak "awaywindow"
+    {
+      time 0.033334 2.986962
+      param "Trainyard.ba_awaywindow"
+      fixedlength
+    }
+  }
+  channel "Look at"
+  {
+  }
+}
+
+fps 60
+snap off

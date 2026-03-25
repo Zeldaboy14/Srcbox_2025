@@ -1,0 +1,27 @@
+// Choreo version 1
+actor "!target1"
+{
+  channel "audio"
+  {
+    event speak "run!"
+    {
+      time 0.013333 2.068299
+      ramp 1.00 1.00 1.00
+      param "E3_C17_02.CitizenRun"
+      param2 "75dB"
+      fixedlength
+    }
+  }
+  channel "Lookatplayer"
+  {
+    event lookat "lookit"
+    {
+      time 0.013333 2.073333
+      ramp 1.00 1.00 1.00
+      param "!player"
+    }
+  }
+}
+
+fps 60
+snap off

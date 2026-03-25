@@ -1,0 +1,121 @@
+// Choreo version 1
+actor "Mossman"
+{
+  channel "audio"
+  {
+    event speak "not calling about that"
+    {
+      time 4.180001 9.291724
+      param "novaprospekt.mo_promised"
+      fixedlength
+    }
+    event speak "if you'd waited"
+    {
+      time 19.686666 23.249342
+      param "novaprospekt.mo_signal"
+      fixedlength
+    }
+    event speak "as i stated"
+    {
+      time 30.240002 36.574764
+      param "novaprospekt.mo_asistated"
+      fixedlength
+    }
+    event speak "feelings"
+    {
+      time 47.966660 59.660286
+      param "novaprospekt.mo_feelings"
+      fixedlength
+    }
+    event speak "puppet"
+    {
+      time 70.499992 78.568726
+      param "novaprospekt.mo_puppet"
+      fixedlength
+    }
+    event speak "dr please"
+    {
+      time 110.799988 112.147270
+      param "novaprospekt.mo_drplease"
+      fixedlength
+    }
+  }
+  faceposermodel "U:\HL2\hl2\models\mossman.mdl"
+}
+
+actor "Breen"
+{
+  channel "audio"
+  {
+    event speak "disturbing reports"
+    {
+      time 0.040000 3.897143
+      param "novaprospekt.br_disturb"
+      fixedlength
+    }
+    event speak "overzealous soldiers"
+    {
+      time 9.853333 19.461723
+      param "novaprospekt.br_overzealous"
+      fixedlength
+    }
+    event speak "loyalties"
+    {
+      time 23.653334 30.457165
+      param "novaprospekt.br_loyalties"
+      fixedlength
+    }
+    event speak "blinded"
+    {
+      time 36.439999 48.768070
+      param "novaprospekt.br_blinded"
+      fixedlength
+    }
+    event speak "believe"
+    {
+      time 59.793339 70.314110
+      param "novaprospekt.br_believe"
+      fixedlength
+    }
+    event speak "leeway01"
+    {
+      time 79.026665 82.044739
+      param "novaprospekt.br_leeway01"
+      fixedlength
+    }
+    event speak "leeway02"
+    {
+      time 82.346657 88.767563
+      param "novaprospekt.br_leeway02"
+      fixedlength
+    }
+    event speak "leeway03"
+    {
+      time 89.479996 95.208252
+      param "novaprospekt.br_leeway03"
+      fixedlength
+    }
+    event speak "leeway04"
+    {
+      time 95.439995 98.772491
+      param "novaprospekt.br_leeway04"
+      fixedlength
+    }
+    event speak "leeway05"
+    {
+      time 99.559990 110.630943
+      param "novaprospekt.br_leeway05"
+      fixedlength
+    }
+    event speak "out of time"
+    {
+      time 111.866661 113.998383
+      param "novaprospekt.br_outoftime"
+      fixedlength
+    }
+  }
+  faceposermodel "U:\HL2\hl2\models\breen.mdl"
+}
+
+fps 60
+snap off

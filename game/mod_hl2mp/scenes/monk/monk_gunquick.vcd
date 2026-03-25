@@ -1,0 +1,25 @@
+// Choreo version 1
+actor "Monk"
+{
+  channel "Audio"
+  {
+    event speak "gunquick"
+    {
+      time 0.153334 1.755511
+      param "town.monk_gunquick"
+      param2 "90dB"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+    event lookat "look at player"
+    {
+      time 0.020000 1.926667
+      param "!player"
+    }
+  }
+}
+
+fps 60
+snap off

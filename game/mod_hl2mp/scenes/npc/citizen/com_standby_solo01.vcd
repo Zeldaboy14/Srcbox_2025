@@ -1,0 +1,28 @@
+// Choreo version 1
+actor "!Target1"
+{
+  channel "Audio"
+  {
+    event speak "com_standby_solo01"
+    {
+      time 0.006667 1.269252
+      param "npc_citizen.com_standby_solo01"
+      param2 "75dB"
+      fixedlength
+    }
+  }
+  channel "Expression"
+  {
+  }
+  channel "Look"
+  {
+    event lookat "Lookatplayer"
+    {
+      time 0.000000 1.200000
+      param "!player"
+    }
+  }
+}
+
+fps 60
+snap off

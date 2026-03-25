@@ -4811,3 +4811,2381 @@
 	"wave"			"*vo/npc/$gender01/cantbeseen02.wav"
 }
 
+// BETA HL2 CITIZENS
+
+//*********************************************************
+// Citizen Sentences
+
+
+//Command Mode Sentences
+
+"npc_citizen.com_standby_solo01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NONE"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/com_standby_solo01.wav"
+}
+"npc_citizen.com_standby_multi01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NONE"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/com_standby_multi01.wav"
+}
+"npc_citizen.com_movingout"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NONE"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/com_movingout.wav"
+}
+
+"npc_citizen.com_delayed01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NONE"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/com_delayed01.wav"
+}
+
+"npc_citizen.com_cantgetthru01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NONE"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/com_cantgetthru01.wav"
+}
+
+"npc_citizen.com_onmyway01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NONE"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/com_onmyway01.wav"
+}
+
+"npc_citizen.com_onourway01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NONE"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/com_onourway01.wav"
+}
+
+
+
+//
+
+"npc_citizen.die"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1.000"
+	"pitch"		"PITCH_NORM"
+
+	"soundlevel"	"SNDLVL_NORM"
+
+	"rndwave"
+	{
+		"wave"	"npc/citizen/pain01.wav"
+		"wave"	"npc/citizen/pain02.wav"
+		"wave"	"npc/citizen/pain03.wav"
+		"wave"	"npc/citizen/pain04.wav"
+		"wave"	"npc/citizen/pain05.wav"
+		"wave"	"npc/citizen/pain06.wav"
+		"wave"	"npc/citizen/pain07.wav"
+		"wave"	"npc/citizen/pain08.wav"
+		"wave"	"npc/citizen/pain09.wav"
+	}
+}
+
+
+"npc_citizen.abouttime01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/abouttime01.wav"
+}
+
+"npc_citizen.abouttime02"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/abouttime02.wav"
+}
+
+
+"npc_citizen.almosthityou01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/almosthityou01.wav"
+}
+
+"npc_citizen.areyoucrazy"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/areyoucrazy.wav"
+}
+
+"npc_citizen.almosthityou02"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/almosthityou02.wav"
+}
+
+"npc_citizen.careful01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/careful01.wav"
+}
+
+"npc_citizen.careful02"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/careful02.wav"
+}
+
+"npc_citizen.carefultherefm"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/carefultherefm.wav"
+}
+
+"npc_citizen.combine01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/combine01.wav"
+}
+
+"npc_citizen.combine02"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/combine02.wav"
+}
+
+"npc_citizen.cops01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/cops01.wav"
+}
+
+"npc_citizen.cops02"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/cops02.wav"
+}
+
+"npc_citizen.doingsomething"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/doingsomething.wav"
+}
+
+"npc_citizen.getdown01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/getdown01.wav"
+}
+
+"npc_citizen.getdown02"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/getdown02.wav"
+}
+
+"npc_citizen.getgoingsoon"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/getgoingsoon.wav"
+}
+
+"npc_citizen.gethellout"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/gethellout.wav"
+}
+
+
+"npc_citizen.goodgod"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/goodgod.wav"
+}
+
+"npc_citizen.gotone01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/gotone01.wav"
+}
+
+"npc_citizen.gotone02"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/gotone02.wav"
+}
+
+"npc_citizen.gunship01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/gunship01.wav"
+}
+
+"npc_citizen.gunship02"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/gunship02.wav"
+}
+
+"npc_citizen.howdoyoulike02"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/howdoyoulike02.wav"
+}
+
+"npc_citizen.howdoyoulikeit01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/howdoyoulikeit01.wav"
+}
+
+"npc_citizen.imhurt01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/imhurt01.wav"
+}
+
+"npc_citizen.imhurt02"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/imhurt02.wav"
+}
+
+"npc_citizen.itsamanhack01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/itsamanhack01.wav"
+}
+
+"npc_citizen.itsamanhack02"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/itsamanhack02.wav"
+}
+
+"npc_citizen.itscoming"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/itscoming.wav"
+}
+
+"npc_citizen.likethat"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/likethat.wav"
+}
+
+"npc_citizen.likethemapples"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/likethemapples.wav"
+}
+
+"npc_citizen.lookoutfm01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/lookoutfm01.wav"
+}
+
+"npc_citizen.lookoutfm02"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/lookoutfm02.wav"
+}
+
+"npc_citizen.manhacks01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/manhacks01.wav"
+}
+
+"npc_citizen.manhacks02"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/manhacks02.wav"
+}
+
+"npc_citizen.myturn"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/myturn.wav"
+}
+
+"npc_citizen.ohno"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/ohno.wav"
+}
+
+"npc_citizen.ok01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/ok01.wav"
+}
+
+
+"npc_citizen.ok02"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/ok02.wav"
+}
+
+"npc_citizen.oneless01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/oneless01.wav"
+}
+
+"npc_citizen.onyourside"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/onyourside.wav"
+}
+"npc_citizen.overhere01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+//	"wave"	"npc/citizen/overhere01.wav"
+	
+	"rndwave"
+	{
+		"wave"	"npc/citizen/cit2_overhere1.wav"
+		"wave"	"npc/citizen/cit2_overhere2.wav"
+		"wave"	"npc/citizen/overhere01.wav"
+	}
+}
+"npc_citizen.upthere01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	
+	"rndwave"
+	{
+		"wave"	"npc/citizen/cit1_upthere1.wav"
+		"wave"	"npc/citizen/cit2_upthere1.wav"
+		"wave"	"npc/citizen/cit2_upthere2.wav"
+	}
+}
+"npc_citizen.downthere01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"rndwave"
+	{
+		"wave"	"npc/citizen/cit1_downthere1.wav"
+		"wave"	"npc/citizen/cit2_downthere1.wav"
+		"wave"	"npc/citizen/cit2_downthere2.wav"
+	}
+}
+"npc_citizen.ow01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/ow01.wav"
+}
+
+"npc_citizen.ow02"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/ow02.wav"
+}
+
+"npc_citizen.pain01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/pain01.wav"
+}
+
+"npc_citizen.pain02"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/pain02.wav"
+}
+
+"npc_citizen.pain03"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/pain03.wav"
+}
+
+"npc_citizen.pain04"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/pain04.wav"
+}
+
+"npc_citizen.pain05"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/pain05.wav"
+}
+
+"npc_citizen.pain06"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/pain06.wav"
+}
+
+"npc_citizen.pain07"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/pain07.wav"
+}
+
+"npc_citizen.pain08"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/pain08.wav"
+}
+
+"npc_citizen.pain09"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/pain09.wav"
+}
+
+
+
+"npc_citizen.scanners01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/scanners01.wav"
+}
+
+"npc_citizen.scanners02"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/scanners02.wav"
+}
+
+"npc_citizen.seehowyoulikeit"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/seehowyoulikeit.wav"
+}
+
+"npc_citizen.startle01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/startle01.wav"
+}
+
+"npc_citizen.startle02"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/startle02.wav"
+}
+
+"npc_citizen.stopitfm"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/stopitfm.wav"
+}
+
+"npc_citizen.strider"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/strider.wav"
+}
+
+"npc_citizen.strider_run"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/strider_run.wav"
+}
+
+"npc_citizen.strider_run02"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/strider_run02.wav"
+}
+
+"npc_citizen.strider02"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/strider02.wav"
+}
+
+"npc_citizen.turret"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/turret.wav"
+}
+
+"npc_citizen.turrets"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/turrets.wav"
+}
+
+"npc_citizen.uhoh"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/uhoh.wav"
+}
+
+"npc_citizen.waitingsomebody"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/waitingsomebody.wav"
+}
+
+"npc_citizen.watchout"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/watchout.wav"
+}
+
+"npc_citizen.watchwhat"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/watchwhat.wav"
+}
+
+"npc_citizen.whatwaitfor"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/whatwaitfor.wav"
+}
+
+"npc_citizen.wowniceshot01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/wowniceshot01.wav"
+}
+
+"npc_citizen.wowniceshot02"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/wowniceshot02.wav"
+}
+
+//Question and Answer 
+
+"npc_citizen.question01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/question01.wav"
+}
+
+"npc_citizen.question02"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/question02.wav"
+}
+"npc_citizen.question03"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/question03.wav"
+}
+
+"npc_citizen.question04"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/question04.wav"
+}
+"npc_citizen.question05"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/question05.wav"
+}
+
+"npc_citizen.question06"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/question06.wav"
+}
+"npc_citizen.question07"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/question07.wav"
+}
+
+"npc_citizen.question08"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/question08.wav"
+}
+"npc_citizen.question09"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/question09.wav"
+}
+
+"npc_citizen.question10"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/question10.wav"
+}
+
+"npc_citizen.question11"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/question11.wav"
+}
+
+"npc_citizen.question12"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/question12.wav"
+}
+
+"npc_citizen.question13"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/question13.wav"
+}
+
+"npc_citizen.question14"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/question14.wav"
+}
+
+"npc_citizen.question15"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/question15.wav"
+}
+
+"npc_citizen.question16"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/question16.wav"
+}
+
+"npc_citizen.question17"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/question17.wav"
+}
+
+"npc_citizen.question18"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/question18.wav"
+}
+
+"npc_citizen.question19"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/question19.wav"
+}
+
+"npc_citizen.question20"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/question20.wav"
+}
+
+"npc_citizen.question21"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/question21.wav"
+}
+"npc_citizen.question22"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/question22.wav"
+}
+"npc_citizen.question23"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/question23.wav"
+}
+"npc_citizen.question24"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/question24.wav"
+}
+"npc_citizen.question25"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/question25.wav"
+}
+"npc_citizen.question26"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/question26.wav"
+}
+
+"npc_citizen.answer01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/answer01.wav"
+}
+"npc_citizen.answer02"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/answer02.wav"
+}
+
+
+"npc_citizen.answer03"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/answer03.wav"
+}
+"npc_citizen.answer04"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/answer04.wav"
+}
+
+"npc_citizen.answer05"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/answer05.wav"
+}
+"npc_citizen.answer06"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/answer06.wav"
+}
+
+"npc_citizen.answer07"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/answer07.wav"
+}
+"npc_citizen.answer08"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/answer08.wav"
+}
+
+"npc_citizen.answer09"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/answer09.wav"
+}
+"npc_citizen.answer10"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/answer10.wav"
+}
+
+"npc_citizen.answer11"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/answer11.wav"
+}
+"npc_citizen.answer12"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/answer12.wav"
+}
+
+"npc_citizen.answer13"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/answer13.wav"
+}
+"npc_citizen.answer14"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/answer14.wav"
+}
+"npc_citizen.answer15"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/answer15.wav"
+}
+"npc_citizen.answer16"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/answer16.wav"
+}
+"npc_citizen.answer17"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/answer17.wav"
+}
+"npc_citizen.answer18"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/answer18.wav"
+}
+"npc_citizen.answer19"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/answer19.wav"
+}
+"npc_citizen.answer20"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/answer20.wav"
+}
+"npc_citizen.answer21"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/answer21.wav"
+}
+"npc_citizen.answer22"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/answer22.wav"
+}
+"npc_citizen.answer23"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/answer23.wav"
+}
+"npc_citizen.answer24"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/answer24.wav"
+}
+"npc_citizen.answer25"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/answer25.wav"
+}
+"npc_citizen.answer26"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/answer26.wav"
+}
+"npc_citizen.answer27"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/answer27.wav"
+}
+"npc_citizen.answer28"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/answer28.wav"
+}
+
+//add for Wedge 7/28/03
+
+"npc_citizen.ahgordon01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/ahgordon01.wav"
+}
+
+"npc_citizen.ahgordon02"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/ahgordon02.wav"
+}
+
+"npc_citizen.docfreeman01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/docfreeman01.wav"
+}
+
+"npc_citizen.docfreeman02"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/docfreeman02.wav"
+}
+
+"npc_citizen.freeman"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/freeman.wav"
+}
+
+"npc_citizen.hellodrfm01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/hellodrfm01.wav"
+}
+
+
+"npc_citizen.hellodrfm02"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/hellodrfm02.wav"
+}
+
+"npc_citizen.heya"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/heya.wav"
+}
+
+"npc_citizen.heydoc01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/heydoc01.wav"
+}
+
+"npc_citizen.heydoc02"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/heydoc02.wav"
+}
+
+"npc_citizen.hi01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/hi01.wav"
+}
+
+"npc_citizen.hi02"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/hi02.wav"
+}
+
+"npc_citizen.leadon01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/leadon01.wav"
+}
+
+"npc_citizen.leadon02"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/leadon02.wav"
+}
+
+"npc_citizen.leadtheway01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/leadtheway01.wav"
+}
+
+"npc_citizen.leadtheway02"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/leadtheway02.wav"
+}
+
+"npc_citizen.letsgo01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/letsgo01.wav"
+}
+
+"npc_citizen.letsgo02"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/letsgo02.wav"
+}
+
+
+
+"npc_citizen.okdoc01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/okdoc01.wav"
+}
+
+"npc_citizen.okdoc02"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/okdoc02.wav"
+}
+
+
+
+"npc_citizen.okimready01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/okimready01.wav"
+}
+
+"npc_citizen.okimready02"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/okimready02.wav"
+}
+
+"npc_citizen.okimready03"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/okimready03.wav"
+}
+
+"npc_citizen.readywhenyouare01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/readywhenyouare01.wav"
+}
+
+"npc_citizen.readywhenyouare02"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/readywhenyouare02.wav"
+}
+
+
+
+"npc_citizen.heretohelp01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/heretohelp01.wav"
+}
+
+"npc_citizen.heretohelp02"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/heretohelp02.wav"
+}
+
+"npc_citizen.wetrustedyou01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/wetrustedyou01.wav"
+}
+
+"npc_citizen.wetrustedyou02"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/wetrustedyou02.wav"
+}
+
+
+"npc_citizen.notthemanithought01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/notthemanithought01.wav"
+}
+
+
+"npc_citizen.quiet02"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/quiet02.wav"
+}
+
+"npc_citizen.notthemanithought02"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/notthemanithought02.wav"
+}
+
+"npc_citizen.goodluckwherever01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/goodluckwherever01.wav"
+}
+
+"npc_citizen.goodluckwherever02"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/goodluckwherever02.wav"
+}
+
+"npc_citizen.holddownspot01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/holddownspot01.wav"
+}
+
+"npc_citizen.holddownspot02"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/holddownspot02.wav"
+}
+
+"npc_citizen.imstickinghere01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/imstickinghere01.wav"
+}
+
+"npc_citizen.imstickinghere02"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/imstickinghere02.wav"
+}
+
+"npc_citizen.littlecorner01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/littlecorner01.wav"
+}
+
+"npc_citizen.littlecorner02"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/littlecorner02.wav"
+}
+
+"npc_citizen.thanksforhelp01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/thanksforhelp01.wav"
+}
+
+"npc_citizen.thanksforhelp02"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/thanksforhelp02.wav"
+}
+
+//Mourning Conversation
+
+"npc_citizen.gordead_ques01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/gordead_ques01.wav"
+}
+
+"npc_citizen.gordead_ques02"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/gordead_ques02.wav"
+}
+
+"npc_citizen.gordead_ques03"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/gordead_ques03.wav"
+}
+
+"npc_citizen.gordead_ques04"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/gordead_ques04.wav"
+}
+
+"npc_citizen.gordead_ques05"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/gordead_ques05.wav"
+}
+
+"npc_citizen.gordead_ques06"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/gordead_ques06.wav"
+}
+
+"npc_citizen.gordead_ques07"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/gordead_ques07.wav"
+}
+
+"npc_citizen.gordead_ques08"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/gordead_ques08.wav"
+}
+
+"npc_citizen.gordead_ques09"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/gordead_ques09.wav"
+}
+
+"npc_citizen.gordead_ques10"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/gordead_ques10.wav"
+}
+
+"npc_citizen.gordead_ques11"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/gordead_ques11.wav"
+}
+
+"npc_citizen.gordead_ques12"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/gordead_ques12.wav"
+}
+
+"npc_citizen.gordead_ques13"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/gordead_ques13.wav"
+}
+
+"npc_citizen.gordead_ans01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/gordead_ans01.wav"
+}
+
+"npc_citizen.gordead_ans02"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/gordead_ans02.wav"
+}
+
+"npc_citizen.gordead_ans03"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/gordead_ans03.wav"
+}
+
+"npc_citizen.gordead_ans04"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/gordead_ans04.wav"
+}
+
+"npc_citizen.gordead_ans05"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/gordead_ans05.wav"
+}
+
+"npc_citizen.gordead_ans06"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/gordead_ans06.wav"
+}
+
+"npc_citizen.gordead_ans07"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/gordead_ans07.wav"
+}
+
+"npc_citizen.gordead_ans08"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/gordead_ans08.wav"
+}
+
+"npc_citizen.gordead_ans09"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/gordead_ans09.wav"
+}
+
+"npc_citizen.gordead_ans10"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/gordead_ans10.wav"
+}
+
+"npc_citizen.gordead_ans11"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/gordead_ans11.wav"
+}
+
+"npc_citizen.gordead_ans12"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/gordead_ans12.wav"
+}
+
+"npc_citizen.gordead_ans13"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/gordead_ans13.wav"
+}
+
+"npc_citizen.gordead_ans14"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/gordead_ans14.wav"
+}
+
+"npc_citizen.gordead_ans15"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/gordead_ans15.wav"
+}
+
+//Citizen Conversation for Train Station
+
+
+"npc_citizen.cit_term_ques01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/cit_term_ques01.wav"
+}
+
+
+"npc_citizen.cit_term_ques02"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/cit_term_ques02.wav"
+}
+
+
+"npc_citizen.cit_term_ques03"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/cit_term_ques03.wav"
+}
+
+
+"npc_citizen.cit_term_ques04"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/cit_term_ques04.wav"
+}
+
+
+"npc_citizen.cit_term_ques05"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/cit_term_ques05.wav"
+}
+
+
+"npc_citizen.cit_term_ques06"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/cit_term_ques06.wav"
+}
+
+
+"npc_citizen.cit_term_ques07"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/cit_term_ques07.wav"
+}
+
+
+"npc_citizen.cit_term_ques08"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/cit_term_ques08.wav"
+}
+
+
+"npc_citizen.cit_term_ques09"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/cit_term_ques09.wav"
+}
+
+"npc_citizen.cit_term_ans01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/cit_term_ans01.wav"
+}
+
+"npc_citizen.cit_term_ans02"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/cit_term_ans02.wav"
+}
+
+"npc_citizen.cit_term_ans03"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/cit_term_ans03.wav"
+}
+
+"npc_citizen.cit_term_ans04"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/cit_term_ans04.wav"
+}
+
+"npc_citizen.cit_term_ans05"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/cit_term_ans05.wav"
+}
+
+"npc_citizen.cit_term_ans06"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/cit_term_ans06.wav"
+}
+
+"npc_citizen.cit_term_ans07"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/cit_term_ans07.wav"
+}
+
+"npc_citizen.cit_term_ans08"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/cit_term_ans08.wav"
+}
+
+"npc_citizen.doiknowyoufromsomewhere"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/doiknowyoufromsomewhere.wav"
+}
+
+
+"npc_citizen.whohellryou01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/whohellryou01.wav"
+}
+
+
+"npc_citizen.getawayfromme01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/getawayfromme01.wav"
+}
+
+
+"npc_citizen.cantbeseen02"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/cantbeseen02.wav"
+}
+"npc_citizen.cantgetawaywiththat"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/cantgetawaywiththat.wav"
+}
+
+
+//Citizen Use/Unuse
+
+
+"npc_citizen.didiletyoudown01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/didiletyoudown01.wav"
+}
+
+
+"npc_citizen.fine01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/fine01.wav"
+}
+
+"npc_citizen.gotcha01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/gotcha01.wav"
+}
+
+"npc_citizen.gotitdoc01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/gotitdoc01.wav"
+}
+
+"npc_citizen.illstayhere01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/illstayhere01.wav"
+}
+
+"npc_citizen.okfreeman01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/okfreeman01.wav"
+}
+
+"npc_citizen.rightdoc01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/rightdoc01.wav"
+}
+
+"npc_citizen.rightdoc02"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/rightdoc02.wav"
+}
+
+"npc_citizen.surething"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/surething.wav"
+}
+
+"npc_citizen.understood01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/understood01.wav"
+}
+
+"npc_citizen.whatdoyaneeddoc01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/whatdoyaneeddoc01.wav"
+}
+
+"npc_citizen.whateveryousay01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/whateveryousay01.wav"
+}
+
+"npc_citizen.yougotitdoc01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/yougotitdoc01.wav"
+}
+
+//Citizen gives items
+
+"npc_citizen.heretakethis01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/heretakethis01.wav"
+}
+
+"npc_citizen.heretakethis02"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/heretakethis02.wav"
+}
+
+"npc_citizen.hereyoucouldusethis"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/hereyoucouldusethis.wav"
+}
+
+"npc_citizen.youcouldusemorethani"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/youcouldusemorethani.wav"
+}
+
+"npc_citizen.gotsomethingforya01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/gotsomethingforya01.wav"
+}
+
+"npc_citizen.gotsomethingforya02"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/gotsomethingforya02.wav"
+}
+
+//whistler voice
+"npc_citizen.joe00"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/joe00.wav"
+}
+
+//underground greetings
+
+"npc_citizen.undergreet01"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/undergreet01.wav"
+}
+
+"npc_citizen.undergreet02"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/undergreet02.wav"
+}
+
+"npc_citizen.undergreet03"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/undergreet03.wav"
+}
+
+"npc_citizen.undergreet04"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/undergreet04.wav"
+}
+
+"npc_citizen.undergreet05"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/undergreet05.wav"
+}
+//Boxcar/Canal scripts
+
+
+"npc_citizen.boxcarphil01a"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_75dB"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/boxcarphil01a.wav"
+}
+
+
+"npc_citizen.boxcarphil02a"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_75dB"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/boxcarphil02a.wav"
+}
+
+"npc_citizen.boxcarphil03a"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_75dB"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/boxcarphil03a.wav"
+}
+
+"npc_citizen.boxcarphil04"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_75dB"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/boxcarphil04.wav"
+}
+
+"npc_citizen.drainage_doug"
+{
+	"channel"	"CHAN_VOICE"
+	"volume"	"VOL_NORM"
+	"soundlevel"	"SNDLVL_90dB"
+	"pitch"		"PITCH_NORM"
+	"wave"	"npc/citizen/drainage_doug.wav"
+}
+
+

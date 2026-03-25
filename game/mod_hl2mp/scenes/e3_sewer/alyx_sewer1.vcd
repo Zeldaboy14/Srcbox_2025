@@ -1,0 +1,50 @@
+// Choreo version 1
+actor "alyx"
+{
+  channel "vo"
+  {
+    event speak "vo1"
+    {
+      time 1.026667 2.311746
+      param "E3_strider.alyx_03"
+      fixedlength
+    }
+    event speak "vo2"
+    {
+      time 3.126666 3.906893
+      param "E3_strider.alyx_04"
+      fixedlength
+    }
+  }
+  channel "body\"
+  {
+    event sequence "overhere"
+    {
+      time 0.020000 6.286667
+      param "E3sewer"
+      fixedlength
+    }
+  }
+  channel "flex"
+  {
+    event flexanimation "flex1"
+    {
+      time 0.000000 5.039999
+      param ""
+      flexanimations samples_use_time
+      {
+      }
+    }
+  }
+  channel "lookat"
+  {
+    event lookat "lookat"
+    {
+      time 0.480000 5.886667
+      param "Player"
+    }
+  }
+}
+
+fps 60
+snap off

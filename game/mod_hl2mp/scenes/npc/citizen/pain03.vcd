@@ -1,0 +1,28 @@
+// Choreo version 1
+actor "!Target1"
+{
+  channel "Audio"
+  {
+    event speak "pain03"
+    {
+      time 0.006667 0.317778
+      param "npc_citizen.pain03"
+      param2 "75dB"
+      fixedlength
+    }
+  }
+  channel "Expression"
+  {
+  }
+  channel "Look"
+  {
+    event lookat "Lookatplayer"
+    {
+      time 0.000000 0.340001
+      param "!player"
+    }
+  }
+}
+
+fps 60
+snap off

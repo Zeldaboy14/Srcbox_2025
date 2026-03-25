@@ -1,0 +1,164 @@
+// Choreo version 1
+actor "Eli"
+{
+  channel "audio"
+  {
+    event speak "where are you now?"
+    {
+      time 5.366667 6.425239
+      param "eli_lab.eli_pickedup03"
+      fixedlength
+    }
+    event speak "is Gordon with you?"
+    {
+      time 10.873332 11.933219
+      param "eli_lab.eli_north"
+      fixedlength
+    }
+    event speak "good "
+    {
+      time 12.659997 13.054056
+      param "eli_lab.eli_letmethink01"
+      fixedlength
+    }
+    event speak "well"
+    {
+      time 13.559999 13.909023
+      param "eli_lab.eli_letmethink02"
+      fixedlength
+    }
+    event speak "Gordon I want you to stay with Alyx"
+    {
+      time 15.126660 17.131853
+      param "eli_lab.eli_evac01"
+      fixedlength
+    }
+    event speak "Everyone else knows the evac..."
+    {
+      time 17.306662 20.318884
+      param "eli_lab.eli_evac02"
+      fixedlength
+    }
+    event speak "we picked them up"
+    {
+      time 3.200000 4.980204
+      param "eli_lab.eli_pickedup01"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+  }
+  channel "face to"
+  {
+  }
+  channel "move to"
+  {
+  }
+  faceposermodel "U:\HL2\hl2\models\Eli.mdl"
+}
+
+actor "Alyx"
+{
+  channel "audio"
+  {
+    event speak "Dad - we just saw a full wave of scanners"
+    {
+      time 0.293333 2.924172
+      param "eli_lab.al_fullwave"
+      fixedlength
+    }
+    event speak "we're in the airlock"
+    {
+      time 6.540000 10.627052
+      param "eli_lab.al_autocycle"
+      fixedlength
+    }
+    event speak "yes"
+    {
+      time 12.006665 12.402176
+      param "eli_lab.al_yes"
+      fixedlength
+    }
+    event speak "dad?"
+    {
+      time 14.266664 14.697457
+      param "eli_lab.al_dad_ques01"
+      fixedlength
+    }
+    event speak "we're not going anywhere without..."
+    {
+      time 20.273333 21.988253
+      param "eli_lab.al_notgoing"
+      fixedlength
+    }
+    event speak "dad?"
+    {
+      time 23.346666 23.792812
+      param "eli_lab.al_dad_scared01"
+      fixedlength
+    }
+    event speak "dad?!"
+    {
+      time 24.240004 24.765989
+      param "eli_lab.al_dad_scared02"
+      fixedlength
+    }
+    event speak "dammit!"
+    {
+      time 25.793333 26.448412
+      param "eli_lab.al_dogairlock01"
+      fixedlength
+    }
+    event speak "dog open the airlock"
+    {
+      time 27.400003 29.742542
+      param "eli_lab.al_dogairlock02"
+      fixedlength
+    }
+    event speak "hurry"
+    {
+      time 31.046675 31.786856
+      param "eli_lab.al_getitopen01"
+      fixedlength
+    }
+    event speak "tear it apart if you have to"
+    {
+      time 31.926676 35.406948
+      param "eli_lab.al_getitopen02"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+  }
+  channel "face to"
+  {
+  }
+  channel "move to"
+  {
+  }
+  channel "trigger"
+  {
+    event firetrigger "close airlock exit"
+    {
+      time 2.486667 -1.000000
+      param "1"
+    }
+    event firetrigger "explosion"
+    {
+      time 21.920000 -1.000000
+      param "2"
+    }
+    event firetrigger "metal groan"
+    {
+      time 14.146663 -1.000000
+      param "3"
+    }
+  }
+  faceposermodel "U:\HL2\hl2\models\alyx.mdl"
+}
+
+mapname "maps\eli_lab.bsp"
+fps 60
+snap off

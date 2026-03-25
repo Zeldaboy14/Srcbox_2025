@@ -1,0 +1,19 @@
+// Choreo version 1
+actor "Squad Leader"
+{
+  channel "Voice"
+  {
+    event speak "drop"
+    {
+      time 0.060000 6.619637
+      param "Sky.sky_drop1"
+      fixedlength
+    }
+  }
+  channel "Look at"
+  {
+  }
+}
+
+fps 60
+snap off

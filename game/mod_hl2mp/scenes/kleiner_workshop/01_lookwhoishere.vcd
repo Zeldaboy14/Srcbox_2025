@@ -1,0 +1,45 @@
+// Choreo version 1
+actor "Barney"
+{
+  channel "Audio"
+  {
+    event speak "hey"
+    {
+      time 0.155342 3.138562
+      ramp 1.00 1.00 1.00
+      param "vo\kleiner_workshop\barney_01.wav"
+    }
+    event speak "someone here"
+    {
+      time 8.057534 9.572092
+      ramp 1.00 1.00 1.00
+      param "vo\kleiner_workshop\barney_04.wav"
+    }
+  }
+  channel "movement"
+  {
+  }
+}
+
+actor "Kleiner"
+{
+  channel "Audio"
+  {
+    event speak "blast"
+    {
+      time 3.187397 5.619868
+      ramp 1.00 1.00 1.00
+      param "vo\kleiner_workshop\kleiner_02.wav"
+    }
+    event speak "lamar"
+    {
+      time 6.216439 7.730997
+      ramp 1.00 1.00 1.00
+      param "vo\kleiner_workshop\kleiner_03.wav"
+    }
+  }
+  channel "movement"
+  {
+  }
+}
+

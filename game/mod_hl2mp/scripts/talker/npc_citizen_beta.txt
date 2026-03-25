@@ -1,0 +1,439 @@
+response "CitizenDanger" 
+{
+	speak "npc_citizen.watchout"
+	speak "npc_citizen.uhoh"
+}
+
+response "CitizenHello"
+{
+	speak "npc_citizen.ahgordon01"
+	speak "npc_citizen.ahgordon02"
+	speak "npc_citizen.docfreeman01"
+	speak "npc_citizen.docfreeman02"
+	speak "npc_citizen.freeman"
+	speak "npc_citizen.hellodrfm01"
+	speak "npc_citizen.hellodrfm02"
+	speak "npc_citizen.heydoc01"
+	speak "npc_citizen.heydoc02"
+	speak "npc_citizen.hi01"
+	speak "npc_citizen.hi02"
+}
+
+response "CitizenSeeCombine"
+{
+	speak "npc_citizen.combine01"
+	speak "npc_citizen.combine02"
+}
+
+response "CitizenEnemyDead"
+{
+	speak "npc_citizen.gotone01"
+	speak "npc_citizen.gotone02"
+	speak "npc_citizen.likethemapples"
+	speak "npc_citizen.goodgod"
+	speak "npc_citizen.likethat"
+	speak "npc_citizen.myturn"
+//	speak "npc_citizen.oneless01"
+
+}
+
+response "CitizenQuestion"
+{
+	speak "npc_citizen.question01" delay 1
+	speak "npc_citizen.question02" delay 1
+	speak "npc_citizen.question03" delay 1
+	speak "npc_citizen.question04" delay 1
+	speak "npc_citizen.question05" delay 1
+	speak "npc_citizen.question06" delay 1
+	speak "npc_citizen.question07" delay 1
+	speak "npc_citizen.question08" delay 1
+	speak "npc_citizen.question09" delay 1
+	speak "npc_citizen.question10" delay 1
+	speak "npc_citizen.question11" delay 1
+	speak "npc_citizen.question12" delay 1
+	speak "npc_citizen.question13" delay 1
+	speak "npc_citizen.question14" delay 1
+	speak "npc_citizen.question15" delay 1
+	speak "npc_citizen.question16" delay 1
+	speak "npc_citizen.question17" delay 1
+	speak "npc_citizen.question18" delay 1
+	speak "npc_citizen.question19" delay 1
+	speak "npc_citizen.question20" delay 1
+	speak "npc_citizen.question21" delay 1
+	speak "npc_citizen.question22" delay 1
+	speak "npc_citizen.question23" delay 1
+	speak "npc_citizen.question24" delay 1
+	speak "npc_citizen.question25" delay 1
+	speak "npc_citizen.question26" delay 1
+
+}
+
+response "CitizenAnswer"
+{
+	speak "npc_citizen.answer01" delay 2
+	speak "npc_citizen.answer02" delay 2
+	speak "npc_citizen.answer03" delay 2
+	speak "npc_citizen.answer04" delay 2
+	speak "npc_citizen.answer05" delay 2
+	speak "npc_citizen.answer06" delay 2
+	speak "npc_citizen.answer07" delay 2
+	speak "npc_citizen.answer08" delay 2
+	speak "npc_citizen.answer09" delay 2
+	speak "npc_citizen.answer10" delay 2
+	speak "npc_citizen.answer11" delay 2
+	speak "npc_citizen.answer12" delay 2
+	speak "npc_citizen.answer13" delay 2
+	speak "npc_citizen.answer14" delay 2
+	speak "npc_citizen.answer15" delay 2
+	speak "npc_citizen.answer16" delay 2
+	speak "npc_citizen.answer17" delay 2
+	speak "npc_citizen.answer18" delay 2
+	speak "npc_citizen.answer19" delay 2
+	speak "npc_citizen.answer20" delay 2
+	speak "npc_citizen.answer21" delay 2
+	speak "npc_citizen.answer22" delay 2
+	speak "npc_citizen.answer23" delay 2
+	speak "npc_citizen.answer24" delay 2
+	speak "npc_citizen.answer25" delay 2
+	speak "npc_citizen.answer26" delay 2
+	speak "npc_citizen.answer27" delay 2
+	speak "npc_citizen.answer28" delay 2
+}
+
+response "CitizenWounded"
+{
+	speak "npc_citizen.imhurt01"
+	speak "npc_citizen.imhurt02"
+}
+
+response "CitizenSelected"
+{
+	speak "npc_citizen.ok01"
+	speak "npc_citizen.okimready01"
+	speak "npc_citizen.okimready02"
+	speak "npc_citizen.readywhenyouare01"
+	speak "npc_citizen.readywhenyouare02"
+}
+
+response "CitizenGroupSelectedRadio"
+{
+	speak "npc_citizen.com_standby_multi01"
+}
+
+response "CitizenSoloSelectedRadio"
+{
+	speak "npc_citizen.com_standby_solo01"
+}
+
+response "CitizenCommanded"
+{
+	speak "npc_citizen.letsgo01"
+	speak "npc_citizen.letsgo02"
+}
+
+response "CitizenCommandedRadio"
+{
+	speak "npc_citizen.com_onmyway01"
+}
+
+response "CitizenCommandFailedRadio"
+{
+	speak "npc_citizen.com_cantgetthru01" respeakdelay .5
+}
+
+response "CitizenNoShoot"
+{
+	speak "npc_citizen.onyourside"
+	speak "npc_citizen.stopitfm"
+	speak "npc_citizen.watchwhat"
+}
+
+response "CitizenBetrayed"
+{
+	speak "npc_citizen.myturn"
+	speak "npc_citizen.heretohelp01"
+	speak "npc_citizen.heretohelp02"
+	speak "npc_citizen.wetrustedyou01"
+	speak "npc_citizen.wetrustedyou02"
+	speak "npc_citizen.notthemanithought01"
+	speak "npc_citizen.notthemanithought02"
+}
+
+response "CitizenFollow"
+{
+	speak "npc_citizen.leadtheway01"
+	speak "npc_citizen.leadtheway02"
+	speak "npc_citizen.leadon01"
+	speak "npc_citizen.leadon02"
+//	speak "npc_citizen.rightdoc01"
+//	speak "npc_citizen.gotitdoc01"
+//	speak "npc_citizen.surething"
+//	speak "npc_citizen.whatdoyaneeddoc01"
+//	speak "npc_citizen.yougotitdoc01"
+//	speak "npc_citizen.okfreeman01"
+//	speak "npc_citizen.gotcha01"
+}
+
+response "CitizenUnFollow"
+{
+//	speak "npc_citizen.ok01"
+//	speak "npc_citizen.ok02
+//	speak "npc_citizen.okdoc01"
+//	speak "npc_citizen.okdoc02"
+//	speak "npc_citizen.understood01"
+//	speak "npc_citizen.whateveryousay01"
+//	speak "npc_citizen.fine01"
+//	speak "npc_citizen.didiletyoudown01"
+	speak "npc_citizen.illstayhere01"
+//	speak "npc_citizen.rightdoc02"
+//	speak "npc_citizen.goodluckwherever01"
+//	speak "npc_citizen.goodluckwhereover02"
+	speak "npc_citizen.holddownspot01"
+	speak "npc_citizen.holddownspot02"
+//	speak "npc_citizen.imstickinghere01"
+//	speak "npc_citizen.imstickinghere02"
+//	speak "npc_citizen.littlecorner01"
+//	speak "npc_citizen.littlecorner02"
+//	speak "npc_citizen.thanksforhelp01"
+//	speak "npc_citizen.thanksforhelp02"
+
+}
+
+response "CitizenAnswerTerminal"
+{
+	speak "npc_citizen.cit_term_ans01"
+	speak "npc_citizen.cit_term_ans02"
+	speak "npc_citizen.cit_term_ans03"
+	speak "npc_citizen.cit_term_ans04"
+	speak "npc_citizen.cit_term_ans05"
+	speak "npc_citizen.cit_term_ans06"
+	speak "npc_citizen.cit_term_ans07"
+	speak "npc_citizen.cit_term_ans08"
+}
+
+response "CitizenQuestionTerminal"
+{
+	speak "npc_citizen.cit_term_ques01"
+	speak "npc_citizen.cit_term_ques02"
+	speak "npc_citizen.cit_term_ques03"
+	speak "npc_citizen.cit_term_ques04"
+	speak "npc_citizen.cit_term_ques05"
+	speak "npc_citizen.cit_term_ques06"
+	speak "npc_citizen.cit_term_ques07"
+	speak "npc_citizen.cit_term_ques08"
+	speak "npc_citizen.cit_term_ques09"
+
+}
+
+response "CitizenHelloTerminal"
+{
+	speak "npc_citizen.hi01"
+	speak "npc_citizen.hi02"
+	speak "npc_citizen.cantgetawaywiththat"
+	speak "npc_citizen.cantbeseen02"
+	speak "npc_citizen.doiknowyoufromsomewhere"
+	speak "npc_citizen.whohellryou01"
+	speak "npc_citizen.getawayfromme01"
+}
+
+response "CitizenHeal"
+{
+	speak "npc_citizen.heretakethis01"
+	speak "npc_citizen.heretakethis02"
+	speak "npc_citizen.hereyoucouldusethis"
+}
+
+response "CitizenAllyKilled"
+{
+	speak "npc_citizen.ohno"
+}
+
+criterion "IsCitizen" "classname" "npc_citizen" "required"
+criterion "IsTerminal" "worldterminal" "1" required
+criterion "NotTerminal" "worldterminal" "0" required
+criterion "IsOnlySelected" "numselected" "1" required
+criterion "NotOnlySelected" "numselected" "2" required
+criterion "UseRadio" "useradio" "1" required
+
+rule CitizenQuestionTerminal
+{
+	criteria		IsCitizen ConceptTalkQuestion IsTerminal
+	response		CitizenQuestionTerminal
+}
+
+rule CitizenAnswerTerminal
+{
+	criteria		IsCitizen ConceptTalkAnswer IsTerminal
+	response		CitizenAnswerTerminal
+}
+
+rule CitizenHelloTerminal
+{
+	criteria		IsCitizen ConceptTalkHello IsTerminal
+	response		CitizenHelloTerminal
+}
+
+response "CitizenHelloUnderground"
+{
+	speak "npc_citizen.undergreet01"
+	speak "npc_citizen.undergreet02"
+	speak "npc_citizen.undergreet03"
+	speak "npc_citizen.undergreet04"
+	speak "npc_citizen.undergreet05"
+}
+
+
+criterion "IsCitizen" "classname" "npc_citizen" "required"
+criterion "IsUnderground" "worldunderground" "1" required
+criterion "NotUnderground" "worldunderground" "0" required
+
+rule CitizenHelloUnderground
+{
+	criteria		IsCitizen ConceptTalkHello IsUnderground
+	response		CitizenHelloUnderground
+}
+
+rule CitizenDanger
+{
+	criteria		IsCitizen ConceptTalkDanger
+	response		CitizenDanger
+}
+
+rule CitizenHello
+{
+	criteria		IsCitizen ConceptTalkHello NotTerminal
+	response		CitizenHello
+}
+
+rule CitizenEnemyDead
+{
+	criteria		IsCitizen ConceptEnemyDead NotTerminal
+	response		CitizenEnemyDead
+	respeakdelay 		3
+}
+
+rule CitizenQuestion
+{
+	criteria		IsCitizen ConceptTalkQuestion NotTerminal
+	response 		CitizenQuestion
+}
+
+rule CitizenAnswer
+{
+	criteria		IsCitizen ConceptTalkAnswer NotTerminal
+	response		CitizenAnswer
+}
+
+rule CitizenWounded
+{
+	criteria		IsCitizen  ConceptTalkWound
+	response		CitizenWounded
+}
+
+rule CitizenSelected
+{
+	criteria		IsCitizen ConceptTalkSelected
+	response 		CitizenSelected
+}
+
+rule CitizenGroupSelectedRadio
+{
+	criteria		IsCitizen ConceptTalkSelected NotOnlySelected UseRadio
+	response 	CitizenGroupSelectedRadio
+}
+
+rule CitizenSoloSelectedRadio
+{
+	criteria		IsCitizen ConceptTalkSelected UseRadio
+	response 	CitizenSoloSelectedRadio
+}
+
+rule CitizenCommanded
+{
+	criteria		IsCitizen ConceptTalkCommanded
+	response		CitizenCommanded
+}
+
+rule CitizenCommandedRadio
+{
+	criteria		IsCitizen ConceptTalkCommanded UseRadio
+	response		CitizenCommandedRadio
+}
+
+rule CitizenCommandFailedRadio
+{
+	criteria 		IsCitizen ConceptTalkCommandFailed UseRadio
+	response		CitizenCommandFailedRadio
+}
+
+rule CitizenNoShoot
+{
+	criteria		IsCitizen ConceptTalkNoShoot
+	response		CitizenNoShoot
+}
+
+rule CitizenBetrayed
+{
+	criteria		IsCitizen ConceptTalkBetrayed
+	response		CitizenBetrayed
+}
+
+rule CitizenFollow
+{
+	criteria		IsCitizen ConceptTalkUse
+	response		CitizenFollow
+}
+
+rule CitizenUnFollow
+{
+	criteria		IsCitizen ConceptTalkUnuse
+	response		CitizenUnFollow
+}
+
+rule CitizenAllyKilled
+{
+	criteria 		IsCitizen ConceptTalkAllyKilled
+	response		CitizenAllyKilled
+}
+
+rule CitizenHeal
+{
+	criteria		IsCitizen ConceptTalkHeal 
+	response		CitizenHeal
+}
+
+response "CitizenSpeakFiringRPG"
+{
+	speak "npc_citizen.gotone02"
+}
+
+criterion "IsCitizen" "classname" "npc_citizen" "required"
+criterion "IsRPGUser" "attacking_with_weapon" "weapon_rpg" required
+
+rule CitizenFiringRPG
+{
+	criteria		IsCitizen IsRPGUser
+	response		CitizenSpeakFiringRPG
+}
+
+response "CitizenSpeakLeadWaitOver"
+{
+	speak "npc_citizen.gotone02"
+}
+
+rule CitizenLeadWaitOver
+{
+	criteria		ConceptLeadWaitOver
+	response		CitizenSpeakLeadWaitOver
+}
+
+response "CitizenSpeakLeadAttractPlayer"
+{
+	speak "npc_citizen.overhere01"
+}
+
+rule CitizenLeadAttractPlayer
+{
+	criteria		ConceptLeadAttractPlayer
+	response		CitizenSpeakLeadAttractPlayer
+}

@@ -913,3 +913,4 @@ rule CitizenPlayerPhysAttack
 #include "talker/npc_citizen_coast.txt"
 #include "talker/npc_citizen_canals.txt"
 #include "talker/npc_citizen_c17.txt"
+#include "talker/npc_citizen_beta.txt"

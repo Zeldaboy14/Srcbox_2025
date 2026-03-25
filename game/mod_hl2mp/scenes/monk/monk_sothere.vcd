@@ -1,0 +1,31 @@
+// Choreo version 1
+actor "Monk"
+{
+  channel "Audio"
+  {
+    event speak "sothere"
+    {
+      time 0.153334 1.598776
+      param "town.monk_sothere"
+      param2 "90dB"
+      fixedlength
+    }
+    event speak "stirredup"
+    {
+      time 2.086668 6.962858
+      param "town.monk_stirredup"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+    event lookat "look at player"
+    {
+      time 0.020000 7.066667
+      param "!player"
+    }
+  }
+}
+
+fps 60
+snap off

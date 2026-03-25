@@ -1,0 +1,53 @@
+// Choreo version 1
+actor "Alyx"
+{
+  channel "audio"
+  {
+    event speak "diet or regular"
+    {
+      time 1.720000 2.852857
+      param "k_lab.al_dietregular"
+      fixedlength
+    }
+    event speak "let me buy you a drink"
+    {
+      time 0.033334 1.031769
+      param "k_lab.al_buyyoudrink03"
+      fixedlength
+    }
+  }
+  channel "triggers"
+  {
+    event firetrigger "open machine"
+    {
+      time 3.026666 -1.000000
+      param "1"
+    }
+    event firetrigger "teleport alyx"
+    {
+      time 3.540001 -1.000000
+      param "2"
+    }
+  }
+  channel "look at"
+  {
+    event lookat "look at player"
+    {
+      time 0.020000 3.046667
+      param "!player"
+    }
+  }
+  channel "face to"
+  {
+    event face "face player"
+    {
+      time 0.520000 1.020000
+      param "!player"
+    }
+  }
+  faceposermodel "U:\HL2\hl2\models\alyx.mdl"
+}
+
+mapname "maps\d1_trainstation_05.bsp"
+fps 60
+snap off

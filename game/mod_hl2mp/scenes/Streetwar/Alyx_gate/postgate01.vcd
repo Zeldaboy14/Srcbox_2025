@@ -1,0 +1,42 @@
+// Choreo version 1
+actor "Alyx"
+{
+  channel "audio"
+  {
+    event speak "thank god"
+    {
+      time 0.160000 1.031565
+      param "streetwar.al_thankgod"
+      fixedlength
+    }
+    event speak "I was afraid..."
+    {
+      time 1.220000 3.636939
+      param "streetwar.al_iwasafraid"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+    event lookat "look at player"
+    {
+      time 0.186667 3.793333
+      param "!player"
+    }
+  }
+  channel "move to"
+  {
+  }
+  channel "face to"
+  {
+    event face "face player"
+    {
+      time 0.846666 3.246666
+      param "!player"
+    }
+  }
+  faceposermodel "U:\HL2\hl2\models\alyx.mdl"
+}
+
+fps 60
+snap off

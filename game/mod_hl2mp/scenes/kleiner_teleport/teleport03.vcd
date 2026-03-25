@@ -1,0 +1,355 @@
+// Choreo version 1
+actor "kleiner"
+{
+  channel "audio"
+  {
+    event speak "49"
+    {
+      time 0.053333 1.659682
+      param "k_teleport.kleiner_49"
+      fixedlength
+    }
+    event speak "51"
+    {
+      time 4.746665 23.426212
+      param "k_teleport.kleiner_51"
+      fixedlength
+    }
+    event speak "53"
+    {
+      time 30.519999 38.735329
+      param "k_teleport.kleiner_53"
+      fixedlength
+    }
+    event speak "55"
+    {
+      time 42.206669 48.264900
+      param "k_teleport.kleiner_55"
+      fixedlength
+    }
+    event speak "56"
+    {
+      time 55.006668 57.071976
+      param "k_teleport.kleiner_56"
+      fixedlength
+    }
+    event speak "58"
+    {
+      time 62.066666 65.462944
+      param "k_teleport.kleiner_58"
+      fixedlength
+    }
+    event speak "61"
+    {
+      time 69.066673 76.731255
+      param "k_teleport.kleiner_61"
+      fixedlength
+    }
+    event speak "63"
+    {
+      time 81.793350 83.766869
+      param "k_teleport.kleiner_63"
+      fixedlength
+    }
+    event speak "65"
+    {
+      time 84.713341 86.181999
+      param "k_teleport.kleiner_65"
+      fixedlength
+    }
+    event speak "67"
+    {
+      time 87.506668 89.204811
+      param "k_teleport.kleiner_67"
+      fixedlength
+    }
+    event speak "69"
+    {
+      time 90.713333 91.906624
+      param "k_teleport.kleiner_69"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+    event lookat "look at gordon"
+    {
+      time 0.066667 0.766667
+      param "!player"
+    }
+    event lookat "look at barney"
+    {
+      time 0.806667 5.473334
+      param "barney"
+    }
+    event lookat "look at barney"
+    {
+      time 16.493336 23.513336
+      param "barney"
+    }
+    event lookat "look at barney"
+    {
+      time 30.200001 33.046669
+      param "barney"
+    }
+    event lookat "look at gordon"
+    {
+      time 35.820004 38.840000
+      param "!player"
+    }
+    event lookat "look at barney"
+    {
+      time 38.899998 44.093330
+      param "barney"
+    }
+    event lookat "look at gordon"
+    {
+      time 48.233337 57.086666
+      param "!player"
+    }
+    event lookat "look at barney"
+    {
+      time 63.166664 65.533333
+      param "barney"
+    }
+    event lookat "look at barney"
+    {
+      time 69.086670 71.059998
+      param "barney"
+    }
+    event lookat "look at gordon"
+    {
+      time 71.106674 76.753342
+      param "!player"
+    }
+    event lookat "look at gordon"
+    {
+      time 65.986671 68.920006
+      param "!player"
+    }
+    event lookat "loor at lamarr"
+    {
+      time 87.393341 91.893349
+      param "lamarr"
+    }
+  }
+  channel "move to"
+  {
+  }
+  channel "anims"
+  {
+    event firetrigger "lamarr scene"
+    {
+      time 86.073334 -1.000000
+      param "3"
+    }
+    event firetrigger "warmup start"
+    {
+      time 48.273335 -1.000000
+      param "1"
+    }
+    event sequence "tableidle"
+    {
+      time 7.340000 16.420000
+      param "tableidle"
+    }
+    event sequence "typegesture"
+    {
+      time 7.600000 16.173336
+      param "typegesture"
+    }
+    event sequence "typegesture"
+    {
+      time 43.953339 48.166672
+      param "typegesture"
+    }
+    event sequence "tableidle"
+    {
+      time 43.780003 48.486668
+      param "tableidle"
+    }
+    event sequence "tableidle"
+    {
+      time 76.666672 86.053337
+      param "tableidle"
+    }
+    event sequence "typegesture"
+    {
+      time 76.873329 85.826668
+      param "typegesture"
+    }
+  }
+  faceposermodel "D:\anon-hl2\hl2\models\Kleiner.mdl"
+}
+
+actor "barney"
+{
+  channel "audio"
+  {
+    event speak "50"
+    {
+      time 1.933333 4.457596
+      param "k_teleport.barney_50"
+      fixedlength
+    }
+    event speak "52"
+    {
+      time 23.660000 30.314875
+      param "k_teleport.barney_52"
+      fixedlength
+    }
+    event speak "54"
+    {
+      time 38.966667 42.041679
+      param "k_teleport.barney_54"
+      fixedlength
+    }
+    event speak "57"
+    {
+      time 57.206669 59.914513
+      param "k_teleport.barney_57"
+      fixedlength
+    }
+    event speak "59"
+    {
+      time 65.480003 66.627396
+      param "k_teleport.barney_59"
+      fixedlength
+    }
+    event speak "60"
+    {
+      time 68.206657 69.399948
+      param "k_teleport.barney_60"
+      fixedlength
+    }
+    event speak "62"
+    {
+      time 76.666656 80.338310
+      param "k_teleport.barney_62"
+      fixedlength
+    }
+    event speak "64"
+    {
+      time 83.259995 84.407387
+      param "k_teleport.barney_64"
+      fixedlength
+    }
+    event speak "66"
+    {
+      time 86.626671 87.544586
+      param "k_teleport.barney_66"
+      fixedlength
+    }
+    event speak "68"
+    {
+      time 88.879997 91.358368
+      param "k_teleport.barney_68"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+    event lookat "look at kleiner"
+    {
+      time 16.493334 21.913334
+      param "kleiner"
+    }
+    event lookat "look at kleiner"
+    {
+      time 1.599999 5.313333
+      param "kleiner"
+    }
+    event lookat "look at kleiner"
+    {
+      time 29.460001 31.713335
+      param "kleiner"
+    }
+    event lookat "look at kleiner"
+    {
+      time 36.480000 43.066662
+      param "kleiner"
+    }
+    event lookat "look at kleiner"
+    {
+      time 57.200001 60.099998
+      param "kleiner"
+    }
+    event lookat "look at kleiner"
+    {
+      time 63.026669 64.660004
+      param "kleiner"
+    }
+    event lookat "look at gordon"
+    {
+      time 67.606674 81.113342
+      param "!player"
+    }
+    event lookat "look at kleiner"
+    {
+      time 82.100006 84.460007
+      param "kleiner"
+    }
+    event lookat "look at lamarr"
+    {
+      time 86.486671 91.733337
+      param "lamarr"
+    }
+  }
+  channel "move to"
+  {
+    event face "turn to gordon"
+    {
+      time 67.540009 68.040001
+      param "!player"
+    }
+    event face "turn to lamarr"
+    {
+      time 86.400009 86.900009
+      param "lamarr"
+    }
+    event face "turn to kleiner"
+    {
+      time 38.793331 47.946667
+      param "kleiner"
+    }
+    event face "turn to console"
+    {
+      time 64.793335 67.473335
+      param "target_console"
+    }
+    event face "turn to console"
+    {
+      time 23.646669 30.380003
+      param "target_console"
+    }
+    event firetrigger "move to"
+    {
+      time 80.093330 -1.000000
+      param "4"
+    }
+  }
+  channel "anims"
+  {
+    event firetrigger "beams"
+    {
+      time 67.120003 -1.000000
+      param "2"
+    }
+  }
+  channel "animations"
+  {
+  }
+  faceposermodel "D:\anon-hl2\hl2\models\Barney.mdl"
+}
+
+mapname "maps\d1_lab_01b.bsp"
+scalesettings
+{
+  "CChoreoView" "100"
+  "ExpressionTool" "100"
+  "GestureTool" "100"
+  "RampTool" "100"
+  "SceneRampTool" "100"
+}
+fps 60
+snap off

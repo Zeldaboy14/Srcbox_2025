@@ -1,0 +1,43 @@
+// Choreo version 1
+actor "barney"
+{
+  channel "audio"
+  {
+    event speak "3"
+    {
+      time 0.133334 2.657597
+      param "kraken_teleport.barney_use_03"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+    event lookat "look at gordon"
+    {
+      time 0.120000 2.820000
+      param "!player"
+    }
+  }
+  channel "move to"
+  {
+  }
+  channel "anims"
+  {
+  }
+  channel "animations"
+  {
+  }
+  faceposermodel "D:\anon-hl2\hl2\models\Barney.mdl"
+}
+
+mapname "maps\d1_lab_01b.bsp"
+scalesettings
+{
+  "CChoreoView" "100"
+  "ExpressionTool" "100"
+  "GestureTool" "100"
+  "RampTool" "100"
+  "SceneRampTool" "100"
+}
+fps 60
+snap off

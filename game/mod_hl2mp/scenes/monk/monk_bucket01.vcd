@@ -1,0 +1,33 @@
+// Choreo version 1
+actor "Monk"
+{
+  channel "audio"
+  {
+    event speak "you are almost there, brother"
+    {
+      time 0.066667 4.292699
+      param "town.monk_bucket01"
+      param2 "90dB"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+    event lookat "look at player"
+    {
+      time 0.020000 4.460000
+      param "!player"
+    }
+  }
+}
+
+scalesettings
+{
+  "CChoreoView" "100"
+  "SceneRampTool" "100"
+  "RampTool" "100"
+  "ExpressionTool" "100"
+  "GestureTool" "100"
+}
+fps 60
+snap off

@@ -1,0 +1,24 @@
+// Choreo version 1
+actor "peters"
+{
+  channel "audio"
+  {
+    event speak "00"
+    {
+      time 0.046668 3.167575
+      param "Sniper.peters00"
+      fixedlength
+    }
+  }
+}
+
+scalesettings
+{
+  "CChoreoView" "100"
+  "RampTool" "100"
+  "ExpressionTool" "100"
+  "GestureTool" "100"
+  "SceneRampTool" "100"
+}
+fps 60
+snap off

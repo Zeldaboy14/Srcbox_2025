@@ -1,0 +1,106 @@
+// Choreo version 1
+actor "Kleiner"
+{
+  channel "audio"
+  {
+    event speak "53"
+    {
+      time 0.060000 2.400680
+      param "k_lab.kleiner_53"
+      fixedlength
+    }
+    event speak "55"
+    {
+      time 8.913333 19.010386
+      param "k_lab.kleiner_55"
+      fixedlength
+    }
+    event speak "57"
+    {
+      time 24.419998 39.886848
+      param "k_lab.kleiner_57"
+      fixedlength
+    }
+  }
+  channel "move to"
+  {
+    event moveto "move to target"
+    {
+      time 9.506667 -1.000000
+      param "target_floor04"
+    }
+  }
+  channel "look at"
+  {
+    event lookat "look at gordon"
+    {
+      time 0.053333 2.539999
+      param "!player"
+    }
+    event lookat "look at barney"
+    {
+      time 3.233334 37.873337
+      param "barney"
+    }
+    event lookat "look at gordon"
+    {
+      time 37.886669 39.880001
+      param "!player"
+    }
+  }
+  channel "animations"
+  {
+  }
+  faceposermodel "D:\anon-hl2\hl2\models\Kleiner.mdl"
+}
+
+actor "Barney"
+{
+  channel "audio"
+  {
+    event speak "54"
+    {
+      time 3.266667 8.820045
+      param "k_lab.barney_54"
+      fixedlength
+    }
+    event speak "56"
+    {
+      time 19.033333 24.357233
+      param "k_lab.barney_56"
+      fixedlength
+    }
+  }
+  channel "move to"
+  {
+    event moveto "move to target"
+    {
+      time 7.980000 -1.000000
+      param "target_floor03"
+    }
+  }
+  channel "look at"
+  {
+    event lookat "look at kleiner"
+    {
+      time 1.166667 39.893333
+      param "kleiner"
+    }
+  }
+  channel "animations"
+  {
+  }
+  faceposermodel "D:\anon-hl2\hl2\models\Barney.mdl"
+}
+
+mapname "maps\d1_lab_01a.bsp"
+scalesettings
+{
+  "CChoreoView" "100"
+  "SceneRampTool" "100"
+  "ExpressionTool" "100"
+  "GestureTool" "100"
+  "RampTool" "100"
+}
+fps 60
+snap off

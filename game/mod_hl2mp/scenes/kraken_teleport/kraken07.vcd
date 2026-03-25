@@ -1,0 +1,136 @@
+// Choreo version 1
+actor "kleiner"
+{
+  channel "audio"
+  {
+    event speak "27"
+    {
+      time 0.120001 2.919638
+      param "kraken_teleport.kleiner_27"
+      fixedlength
+    }
+    event speak "29"
+    {
+      time 5.446666 8.934738
+      param "kraken_teleport.kleiner_29"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+    event firetrigger "run to lamarr"
+    {
+      time 7.340000 -1.000000
+      param "1"
+    }
+    event lookat "look at gordon"
+    {
+      time 0.113333 2.919999
+      param "!player"
+    }
+    event lookat "look at barney"
+    {
+      time 2.953333 6.606667
+      param "barney"
+    }
+  }
+  channel "move to"
+  {
+    event firetrigger "kleiner teleport"
+    {
+      time 10.586668 -1.000000
+      param "2"
+    }
+  }
+  channel "anims"
+  {
+  }
+  faceposermodel "D:\anon-hl2\hl2\models\Kleiner.mdl"
+}
+
+actor "barney"
+{
+  channel "audio"
+  {
+    event speak "28"
+    {
+      time 2.946666 5.379138
+      param "kraken_teleport.barney_28"
+      fixedlength
+    }
+    event speak "30"
+    {
+      time 8.506667 10.847347
+      param "kraken_teleport.barney_30"
+      fixedlength
+    }
+    event speak "31"
+    {
+      time 16.053331 18.348116
+      param "kraken_teleport.barney_31"
+      fixedlength
+    }
+    event speak "32"
+    {
+      time 19.919996 27.905846
+      param "kraken_teleport.barney_32"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+    event lookat "look at kleiner"
+    {
+      time 0.026667 11.613335
+      param "kleiner"
+    }
+    event face "face Gordon"
+    {
+      time 19.726665 21.933332
+      param "!player"
+    }
+    event lookat "look at Gordon"
+    {
+      time 19.233330 27.213331
+      param "!player"
+    }
+  }
+  channel "move to"
+  {
+    event firetrigger "gibs"
+    {
+      time 13.960000 -1.000000
+      param "3"
+    }
+  }
+  channel "anims"
+  {
+    event sequence "fear"
+    {
+      time 14.413333 15.080000
+      param "Fear_Reaction"
+      fixedlength
+    }
+    event firetrigger "run"
+    {
+      time 24.259995 -1.000000
+      param "4"
+    }
+  }
+  channel "animations"
+  {
+  }
+  faceposermodel "D:\anon-hl2\hl2\models\Barney.mdl"
+}
+
+mapname "maps\d1_lab_01b.bsp"
+scalesettings
+{
+  "CChoreoView" "100"
+  "ExpressionTool" "100"
+  "GestureTool" "100"
+  "RampTool" "100"
+  "SceneRampTool" "100"
+}
+fps 60
+snap off

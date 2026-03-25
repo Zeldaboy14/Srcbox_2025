@@ -1,0 +1,42 @@
+// Choreo version 1
+actor "Eli"
+{
+  channel "Voice"
+  {
+    event speak "1"
+    {
+      time 0.113333 7.803129
+      param "eli_old.Maxwell1B1lwv"
+      fixedlength
+    }
+    event speak "2"
+    {
+      time 8.140002 13.609163
+      param "eli_old.Maxwell1B2lwv"
+      fixedlength
+    }
+    event speak "3"
+    {
+      time 13.893333 24.746349
+      param "eli_old.Maxwell1B3lwv"
+      fixedlength
+    }
+    event speak "4"
+    {
+      time 24.980000 31.983265
+      param "eli_old.Maxwell1B4lwv"
+      fixedlength
+    }
+  }
+  channel "Look at"
+  {
+    event lookat "look at player"
+    {
+      time 0.013333 32.066666
+      param "!player"
+    }
+  }
+}
+
+fps 60
+snap off

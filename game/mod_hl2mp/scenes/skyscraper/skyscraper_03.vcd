@@ -1,0 +1,83 @@
+// Choreo version 1
+actor "Soldier 1"
+{
+  channel "Voice"
+  {
+    event speak "1"
+    {
+      time 0.120000 2.827846
+      param "Sky.1sky_sol1"
+      fixedlength
+    }
+    event speak "3"
+    {
+      time 7.273334 11.266259
+      param "Sky.3sky_sol1"
+      fixedlength
+    }
+    event speak "5"
+    {
+      time 14.100000 15.935828
+      param "Sky.5sky_sol1"
+      fixedlength
+    }
+    event speak "7"
+    {
+      time 20.400002 24.668301
+      param "Sky.7sky_sol1"
+      fixedlength
+    }
+    event speak "9"
+    {
+      time 28.680002 31.892700
+      param "Sky.9sky_sol1"
+      fixedlength
+    }
+  }
+  channel "Look at"
+  {
+  }
+}
+
+actor "Soldier 2"
+{
+  channel "Voice"
+  {
+    event speak "2"
+    {
+      time 3.013333 5.721179
+      param "Sky.2sky_sol2"
+      fixedlength
+    }
+    event speak "4"
+    {
+      time 11.466667 13.761452
+      param "Sky.4sky_sol2"
+      fixedlength
+    }
+    event speak "6"
+    {
+      time 16.100002 20.138823
+      param "Sky.6sky_sol2"
+      fixedlength
+    }
+    event speak "8"
+    {
+      time 24.799999 27.737324
+      param "Sky.8sky_sol2"
+      fixedlength
+    }
+    event speak "10"
+    {
+      time 32.846668 35.462723
+      param "Sky.10sky_sol2"
+      fixedlength
+    }
+  }
+  channel "Look at"
+  {
+  }
+}
+
+fps 60
+snap off

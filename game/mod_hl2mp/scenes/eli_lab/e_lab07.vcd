@@ -1,0 +1,156 @@
+// Choreo version 1
+actor "Eli"
+{
+  channel "audio"
+  {
+    event speak "Alyx where are you"
+    {
+      time 3.220000 4.763493
+      param "eli_lab.eli_whereyou"
+      fixedlength
+    }
+    event speak "he's right here with me"
+    {
+      time 10.646667 12.797709
+      param "eli_lab.eli_withme"
+      fixedlength
+    }
+    event speak "you can ask him"
+    {
+      time 17.066668 18.310068
+      param "eli_lab.eli_askhim01"
+      fixedlength
+    }
+    event speak "we're in the lab"
+    {
+      time 18.526669 19.764990
+      param "eli_lab.eli_askhim02"
+      fixedlength
+    }
+    event speak "(laughs)"
+    {
+      time 24.986666 26.497324
+      param "eli_lab.eli_impressed01"
+      fixedlength
+    }
+    event speak "you've impressed her"
+    {
+      time 26.566666 28.231586
+      param "eli_lab.eli_impressed02"
+      fixedlength
+    }
+    event speak "if anything were to happen to her..."
+    {
+      time 32.020004 34.724812
+      param "eli_lab.eli_impressed07"
+      fixedlength
+    }
+    event speak "sorry gordon"
+    {
+      time 36.773323 37.807472
+      param "eli_lab.eli_youwerethere01"
+      fixedlength
+    }
+    event speak "I know you understand"
+    {
+      time 37.986664 39.712898
+      param "eli_lab.eli_youwerethere03"
+      fixedlength
+    }
+    event speak "she knows how hard it is out there"
+    {
+      time 28.473331 30.670361
+      param "eli_lab.eli_impressed03"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+  }
+  channel "face to"
+  {
+  }
+  channel "move to"
+  {
+  }
+  channel "trigger"
+  {
+    active "0"
+  }
+  faceposermodel "U:\HL2\hl2\models\Eli.mdl"
+}
+
+actor "Alyx"
+{
+  channel "audio"
+  {
+    event speak "dad do you read?"
+    {
+      time 0.266667 2.931293
+      param "eli_lab.al_doyouread"
+      fixedlength
+    }
+    event speak "approaching the south entrance"
+    {
+      time 5.133333 6.613265
+      param "eli_lab.al_south01"
+      fixedlength
+    }
+    event speak "lots of antlions - no sign of gordon"
+    {
+      time 6.780000 10.316168
+      param "eli_lab.al_south02"
+      fixedlength
+    }
+    event speak "what? you're joking"
+    {
+      time 13.213333 14.250861
+      param "eli_lab.al_joking01"
+      fixedlength
+    }
+    event speak "you're serious"
+    {
+      time 14.700002 15.427621
+      param "eli_lab.al_joking02"
+      fixedlength
+    }
+    event speak "how'd he get past me"
+    {
+      time 15.773335 16.742971
+      param "eli_lab.al_joking03"
+      fixedlength
+    }
+    event speak "all right dad, be right there"
+    {
+      time 19.993334 21.605646
+      param "eli_lab.al_bethere01"
+      fixedlength
+    }
+    event speak "can't believe he got thru..."
+    {
+      time 22.206667 23.527189
+      param "eli_lab.al_bethere02"
+      fixedlength
+    }
+    event speak "out"
+    {
+      time 23.866667 24.327597
+      param "eli_lab.al_bethere03"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+  }
+  channel "face to"
+  {
+  }
+  channel "move to"
+  {
+  }
+  faceposermodel "U:\HL2\hl2\models\alyx.mdl"
+}
+
+mapname "maps\eli_lab.bsp"
+fps 60
+snap off

@@ -1,0 +1,84 @@
+// Choreo version 1
+actor "!target1"
+{
+  channel "Audio"
+  {
+    event speak "gotyourback"
+    {
+      time 0.020000 2.347551
+      param "E3_C17_01.CitizenGotYourBack"
+      fixedlength
+    }
+  }
+  channel "Lookatplayer"
+  {
+    event lookat "lookatplayer"
+    {
+      time 0.026667 2.906667
+      param "!player"
+      event_ramp
+      {
+        0.3060 0.3226
+        0.6100 0.5029
+        1.9740 0.5081
+        2.4320 0.1210
+      }
+    }
+  }
+  channel "Flex"
+  {
+    event flexanimation "Flexanim"
+    {
+      time -0.000000 3.226666
+      param ""
+      flexanimations samples_use_time
+      {
+        "body_tilt"         range 15.0 -15.0        
+        {
+          0.2431 0.3800
+          0.6540 0.3600
+          1.9546 0.3700
+          2.3869 0.4980
+        }
+        "chest_rightleft"         range 40.0 -40.0        
+        {
+          0.2472 0.7000
+          0.6540 0.8600
+          0.9161 0.8700
+          1.2396 0.8500
+          1.9504 0.8300
+          2.3869 0.5052
+        }
+        "chest_updown"         range 50.0 -25.0        
+        {
+          0.2617 0.5700
+          0.6540 0.5800
+          1.9484 0.5700
+          2.3869 0.6652
+        }
+        "head_updown"         range 35.0 -30.0        
+        {
+          0.2256 0.2400
+          0.5400 0.2100
+          0.7450 0.1900
+          0.8467 0.2500
+          1.1588 0.1900
+          2.1868 0.2100
+          2.4749 0.5337
+        }
+        "head_tilt"         range 18.0 -18.0        
+        {
+          0.5360 0.6500
+          0.7409 0.6800
+          0.8464 0.5400
+          1.2390 0.6600
+          1.8428 0.6500
+          2.3869 0.5022
+        }
+      }
+    }
+  }
+}
+
+fps 60
+snap off

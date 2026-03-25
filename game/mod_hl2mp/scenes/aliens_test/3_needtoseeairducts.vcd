@@ -1,0 +1,42 @@
+// Choreo version 1
+actor "Alyx"
+{
+  channel "audio"
+  {
+    event speak "Rip06"
+    {
+      time 0.168039 1.503141
+      param "Aliens.A07-Rip06"
+      fixedlength
+    }
+    event speak "Rip07"
+    {
+      time 1.714667 3.862468
+      param "Aliens.A08-Rip07"
+      fixedlength
+    }
+    event speak "Rip08"
+    {
+      time 4.041924 5.073715
+      param "Aliens.A09-Rip08"
+      fixedlength
+    }
+    event speak "Rip09"
+    {
+      time 5.440037 7.692327
+      param "Aliens.A10-Rip09"
+      fixedlength
+    }
+  }
+}
+
+scalesettings
+{
+  "CChoreoView" "100"
+  "SceneRampTool" "100"
+  "RampTool" "100"
+  "ExpressionTool" "100"
+  "GestureTool" "100"
+}
+fps 60
+snap off

@@ -1,0 +1,40 @@
+// Choreo version 1
+actor "alyx"
+{
+  channel "vo"
+  {
+    event speak "down here"
+    {
+      time 1.260000 2.636871
+      param "E3_strider.alyx_05"
+      fixedlength
+    }
+  }
+  channel "body"
+  {
+    event sequence "down here"
+    {
+      time 0.000000 6.000000
+      param "E3sewershout"
+      fixedlength
+    }
+  }
+  channel "lookat"
+  {
+    event lookat "lookat"
+    {
+      time 0.000000 6.193333
+      param "Player"
+      event_ramp
+      {
+        1.9199 1.0000
+        4.0566 1.0000
+        6.1933 1.0000
+      }
+    }
+  }
+}
+
+mapname "maps\e3_strider.bsp"
+fps 60
+snap off

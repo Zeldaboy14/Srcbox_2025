@@ -1,0 +1,32 @@
+// Choreo version 1
+actor "Alyx"
+{
+  channel "audio"
+  {
+    event speak "there's the socket"
+    {
+      time 0.073333 0.800816
+      param "k_lab.al_socket"
+      fixedlength
+    }
+  }
+  channel "triggers"
+  {
+  }
+  channel "look at"
+  {
+    event lookat "look at player"
+    {
+      time 0.040000 0.786667
+      param "!player"
+    }
+  }
+  channel "face to"
+  {
+  }
+  faceposermodel "U:\HL2\hl2\models\alyx.mdl"
+}
+
+mapname "maps\d1_trainstation_05.bsp"
+fps 60
+snap off

@@ -1,0 +1,40 @@
+// Choreo version 1
+actor "Eli"
+{
+  channel "audio"
+  {
+    event speak "I don't like to dwell"
+    {
+      time 0.133333 2.695487
+      param "eli_lab.eli_dwell01"
+      fixedlength
+    }
+    event speak "Pointless"
+    {
+      time 3.026667 3.669410
+      param "eli_lab.eli_dwell02"
+      fixedlength
+    }
+    event speak "only thing we can do is press on"
+    {
+      time 4.293334 6.124196
+      param "eli_lab.eli_dwell04"
+      fixedlength
+    }
+    event speak "try and repair the damage"
+    {
+      time 6.273332 7.713490
+      param "eli_lab.eli_dwell05"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+  }
+  channel "face to"
+  {
+  }
+}
+
+fps 60
+snap off

@@ -1,0 +1,32 @@
+// Choreo version 1
+actor "male01"
+{
+  channel "lookat"
+  {
+    event lookat "lookatplayer"
+    {
+      time 0.033334 3.493334
+      param "!player"
+      event_ramp
+      {
+        0.0000 1.0000
+        1.0890 1.0000
+        3.2180 1.0000
+      }
+    }
+  }
+  channel "audio"
+  {
+    event speak "likethemapples"
+    {
+      time 2.306666 3.422403
+      param "E3_Techdemos.LikeThemApples"
+      param2 "105dB"
+      fixedlength
+    }
+  }
+  faceposermodel "U:\HL2\hl2\models\Humans\Male_01.mdl"
+}
+
+fps 60
+snap off

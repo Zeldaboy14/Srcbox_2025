@@ -1,0 +1,58 @@
+// Choreo version 1
+actor "Alyx"
+{
+  channel "audio"
+  {
+    event speak "what now?"
+    {
+      time 0.106667 0.969751
+      param "streetwar.al_whatnow01"
+      fixedlength
+    }
+    event speak "have to get across..."
+    {
+      time 1.320000 3.231814
+      param "streetwar.al_whatnow02"
+      fixedlength
+    }
+    event speak "instead of going over"
+    {
+      time 5.793334 7.650930
+      param "streetwar.al_goingthru01"
+      fixedlength
+    }
+    event speak "going through"
+    {
+      time 7.973332 8.898094
+      param "streetwar.al_goingthru02"
+      fixedlength
+    }
+    event speak "at anyway..."
+    {
+      time 9.606667 10.746099
+      param "streetwar.al_onewill01"
+      fixedlength
+    }
+    event speak "one of us will"
+    {
+      time 11.313333 12.115601
+      param "streetwar.al_onewill02"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+    event lookat "look at player"
+    {
+      time 9.593333 12.126666
+      param "!player"
+    }
+  }
+  channel "move to"
+  {
+  }
+  faceposermodel "U:\HL2\hl2\models\alyx.mdl"
+}
+
+fps 60
+snap off

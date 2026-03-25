@@ -1,0 +1,84 @@
+// Choreo version 1
+actor "Alyx"
+{
+  channel "audio"
+  {
+    event speak "Rip04"
+    {
+      time 0.535240 5.092111
+      ramp 1.00 1.00 1.00
+      param "vo\alien_test\A05-Rip04.wav"
+      tags
+      {
+        "floorplan" 0.625868
+        "understand" 0.811961
+        "terminal" 0.282211
+      }
+    }
+  }
+  channel "lookat"
+  {
+    event lookat "eyecontact"
+    {
+      time 0.257647 5.505749
+      ramp 1.00 1.00 1.00
+      param "Player"
+    }
+  }
+  channel "glance"
+  {
+    event lookat "terminal glance"
+    {
+      time 1.329608 3.078263
+      ramp 0.74 0.79 0.20
+      param "alien_console"
+    }
+    event expression "move eyes"
+    {
+      time 2.918299 3.387516
+      ramp 1.00 1.00 1.00
+      param "class2"
+      param2 "think"
+    }
+  }
+  channel "expressions"
+  {
+    event expression "ummm"
+    {
+      time 0.795379 1.665147
+      ramp 0.62 0.77 0.69
+      param "class2"
+      param2 "up left"
+    }
+    event expression "base"
+    {
+      time 0.240331 0.709547
+      ramp 1.00 1.00 1.00
+      param "class2"
+      param2 "Force1"
+    }
+    event expression "hit"
+    {
+      time 1.739536 2.111476
+      ramp 0.76 0.97 0.18
+      param "class2"
+      param2 "down"
+    }
+    event expression "and"
+    {
+      time 3.244464 3.973350
+      ramp 0.80 0.66 0.10
+      param "class2"
+      param2 "tilt"
+    }
+    event expression "down2"
+    {
+      time 3.999788 4.675002
+      ramp 0.74 1.00 0.18
+      param "class2"
+      param2 "down"
+    }
+  }
+}
+
+mapname "maps\aliens_test.bsp"

@@ -1,0 +1,28 @@
+// Choreo version 1
+actor "!Target1"
+{
+  channel "Audio"
+  {
+    event speak "gotone02"
+    {
+      time 0.006667 1.220726
+      param "npc_citizen.gotone02"
+      param2 "75dB"
+      fixedlength
+    }
+  }
+  channel "Expression"
+  {
+  }
+  channel "Look"
+  {
+    event lookat "Lookatplayer"
+    {
+      time 0.000000 1.213334
+      param "!player"
+    }
+  }
+}
+
+fps 60
+snap off

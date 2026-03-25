@@ -1,0 +1,179 @@
+// Choreo version 1
+actor "Mossman"
+{
+  channel "audio"
+  {
+    event speak "I'll take you to Eli right now"
+    {
+      time 0.426667 4.758957
+      param "eli_lab.mo_taketoeli"
+      fixedlength
+    }
+    event speak "We can certainly use the help"
+    {
+      time 5.660000 11.158707
+      param "eli_lab.mo_extrahelp01"
+      fixedlength
+    }
+    event speak "things would go much faster..."
+    {
+      time 11.240001 14.319683
+      param "eli_lab.mo_extrahelp02"
+      fixedlength
+    }
+    event speak "we're clsoing in on a reliable teleport tech..."
+    {
+      time 14.440001 18.238482
+      param "eli_lab.mo_extrahelp03"
+      fixedlength
+    }
+    event speak "something the combine still hasn't mastered"
+    {
+      time 18.360001 20.847143
+      param "eli_lab.mo_extrahelp04"
+      fixedlength
+    }
+    event speak "Eli thinks their portals are string-based."
+    {
+      time 21.020000 25.076237
+      param "eli_lab.mo_extrahelp05"
+      fixedlength
+    }
+    event speak "but they've failed to factor in dark energy"
+    {
+      time 25.153334 27.750727
+      param "eli_lab.mo_extrahelp06"
+      fixedlength
+    }
+    event speak "They can tunnel through from their universe..."
+    {
+      time 27.940001 30.809774
+      param "eli_lab.mo_extrahelp07"
+      fixedlength
+    }
+    event speak "they're dependent on local trans..."
+    {
+      time 30.906668 32.907505
+      param "eli_lab.mo_extrahelp08"
+      fixedlength
+    }
+    event speak "If they knew what we were doing with entanglement..."
+    {
+      time 33.006668 35.346191
+      param "eli_lab.mo_extrahelp09"
+      fixedlength
+    }
+    event speak "Listen to me I sound like a post-doc"
+    {
+      time 35.686665 40.285984
+      param "eli_lab.mo_postdoc01"
+      fixedlength
+    }
+    event speak "I'm just excited to think..."
+    {
+      time 40.453335 44.633583
+      param "eli_lab.mo_postdoc02"
+      fixedlength
+    }
+    event speak "Dr. Kleiner compressed the Xen relay"
+    {
+      time 45.206661 50.022850
+      param "eli_lab.mo_relay01"
+      fixedlength
+    }
+    event speak "We've figured out how to use Xen"
+    {
+      time 50.146664 55.142830
+      param "eli_lab.mo_relay02"
+      fixedlength
+    }
+    event speak "so we can swing around the borderworld"
+    {
+      time 55.226662 59.287544
+      param "eli_lab.mo_relay03"
+      fixedlength
+    }
+    event speak "Ahh -"
+    {
+      time 60.366665 60.713852
+      param "eli_lab.mo_hereseli01"
+      fixedlength
+    }
+    event speak "Here's Eli now"
+    {
+      time 60.799999 62.387280
+      param "eli_lab.mo_hereseli02"
+      fixedlength
+    }
+    event speak "Eli..."
+    {
+      time 62.526661 63.316208
+      param "eli_lab.mo_lookwho01"
+      fixedlength
+    }
+    event speak "look who I found"
+    {
+      time 63.546677 64.872009
+      param "eli_lab.mo_lookwho02"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+  }
+  channel "face to"
+  {
+  }
+  channel "triggers"
+  {
+    event firetrigger "open lab door"
+    {
+      time 58.333328 -1.000000
+      param "1"
+    }
+  }
+  channel "move to"
+  {
+    event moveto "head down hall"
+    {
+      time 5.193333 -1.000000
+      param "mark_mo_walk_to_lab1"
+    }
+    event moveto "head down hall"
+    {
+      time 15.980000 -1.000000
+      param "mark_mo_walk_to_lab2"
+    }
+    event moveto "head down hall"
+    {
+      time 27.960009 -1.000000
+      param "mark_mo_walk_to_lab3"
+    }
+    event moveto "head down hall"
+    {
+      time 45.020000 -1.000000
+      param "mark_mo_walk_to_lab4"
+    }
+  }
+}
+
+actor "Eli"
+{
+  channel "move to"
+  {
+    event moveto "move into hall"
+    {
+      time 59.793324 -1.000000
+      param "mark_eli_greet"
+    }
+    event face "face player"
+    {
+      time 61.486660 61.986660
+      param "!player"
+    }
+  }
+}
+
+mapname "maps\eli_lab.bsp"
+fps 60
+snap off

@@ -1,0 +1,287 @@
+// Choreo version 1
+actor "alyx"
+{
+  channel "seq"
+  {
+    event sequence "clap"
+    {
+      time 0.006668 11.040000
+      param "quietidle"
+      event_ramp
+      {
+        0.3310 1.0000
+        5.5167 1.0000
+        10.7023 1.0000
+      }
+    }
+  }
+  channel "head"
+  {
+    event flexanimation "head bob"
+    {
+      time 0.020000 11.033333
+      param ""
+      flexanimations samples_use_time
+      {
+        "head_updown"         range 35.0 -30.0        
+        {
+          1.4961 0.8000
+          1.5961 0.8000
+          1.6961 0.0100
+          1.7961 0.0000
+          1.8961 0.5000
+          2.9761 0.8000
+          3.0761 0.8000
+          3.1761 0.0100
+          3.2761 0.0000
+          3.3761 0.5000
+          4.4163 0.8000
+          4.5163 0.8000
+          4.6163 0.0100
+          4.7163 0.0000
+          4.8163 0.5000
+          6.0625 0.8000
+          6.1625 0.8000
+          6.2625 0.0100
+          6.3625 0.0000
+          6.4625 0.5000
+          7.4509 0.8000
+          7.5509 0.8000
+          7.6509 0.0100
+          7.7509 0.0000
+          7.8509 0.5000
+          8.8910 0.8000
+          8.9910 0.8000
+          9.0910 0.0100
+          9.1910 0.0000
+          9.2966 0.5000
+          10.2673 0.8000
+          10.3673 0.8000
+          10.4673 0.0100
+          10.5673 0.0000
+          10.6673 0.5000
+        }
+      }
+    }
+  }
+  channel "posture"
+  {
+    event sequence "arm pose"
+    {
+      time 0.026666 11.033333
+      param "armpose09"
+    }
+  }
+  channel "gesture"
+  {
+    event gesture "gesture1"
+    {
+      time 0.773334 2.086667
+      param "gesture05"
+      absolutetags playback_time
+      {
+        "apex" 0.525000
+        "accent" 0.700000
+        "followthrough" 0.900000
+      }
+      absolutetags shifted_time
+      {
+        "apex" 0.532995
+        "accent" 0.710660
+        "followthrough" 0.913705
+      }
+      sequenceduration 1.333333
+    }
+    event gesture "gesture1b"
+    {
+      time 2.266667 3.583334
+      param "gesture05"
+      absolutetags playback_time
+      {
+        "apex" 0.525000
+        "accent" 0.700000
+        "followthrough" 0.900000
+      }
+      absolutetags shifted_time
+      {
+        "apex" 0.531646
+        "accent" 0.708861
+        "followthrough" 0.911392
+      }
+      sequenceduration 1.333333
+    }
+    event gesture "gesture1b"
+    {
+      time 3.686667 5.020000
+      param "gesture05"
+      absolutetags playback_time
+      {
+        "apex" 0.525000
+        "accent" 0.700000
+        "followthrough" 0.900000
+      }
+      absolutetags shifted_time
+      {
+        "apex" 0.525000
+        "accent" 0.700000
+        "followthrough" 0.900000
+      }
+      sequenceduration 1.333333
+    }
+    event gesture "gesture1b"
+    {
+      time 5.326667 6.660000
+      param "gesture05"
+      absolutetags playback_time
+      {
+        "apex" 0.525000
+        "accent" 0.700000
+        "followthrough" 0.900000
+      }
+      absolutetags shifted_time
+      {
+        "apex" 0.525000
+        "accent" 0.700000
+        "followthrough" 0.900000
+      }
+      sequenceduration 1.333333
+    }
+    event gesture "gesture1b"
+    {
+      time 6.720000 8.053333
+      param "gesture05"
+      absolutetags playback_time
+      {
+        "apex" 0.525000
+        "accent" 0.700000
+        "followthrough" 0.900000
+      }
+      absolutetags shifted_time
+      {
+        "apex" 0.525000
+        "accent" 0.700000
+        "followthrough" 0.900000
+      }
+      sequenceduration 1.333333
+    }
+    event gesture "gesture1b"
+    {
+      time 8.160001 9.493334
+      param "gesture05"
+      absolutetags playback_time
+      {
+        "apex" 0.525000
+        "accent" 0.700000
+        "followthrough" 0.900000
+      }
+      absolutetags shifted_time
+      {
+        "apex" 0.525000
+        "accent" 0.700000
+        "followthrough" 0.900000
+      }
+      sequenceduration 1.333333
+    }
+    event gesture "gesture1b"
+    {
+      time 9.540001 10.873334
+      param "gesture05"
+      absolutetags playback_time
+      {
+        "apex" 0.525000
+        "accent" 0.700000
+        "followthrough" 0.900000
+      }
+      absolutetags shifted_time
+      {
+        "apex" 0.525000
+        "accent" 0.700000
+        "followthrough" 0.900000
+      }
+      sequenceduration 1.333333
+    }
+    active "0"
+  }
+  channel "audio"
+  {
+    event speak "clank"
+    {
+      time 0.333333 0.585805
+      param "impact\physics\metal\hit_med.wav"
+      fixedlength
+    }
+    event speak "clank"
+    {
+      time 1.700000 1.952472
+      param "impact\physics\metal\hit_med.wav"
+      fixedlength
+      tags
+      {
+        "boop" 0.010802
+      }
+    }
+    event speak "clank3"
+    {
+      time 3.193667 3.446138
+      param "impact\physics\metal\hit_med.wav"
+      fixedlength
+      tags
+      {
+        "boop" 0.010802
+      }
+    }
+    event speak "clank4"
+    {
+      time 4.619667 4.872138
+      param "impact\physics\metal\hit_med.wav"
+      fixedlength
+      tags
+      {
+        "boop" 0.010802
+      }
+    }
+    event speak "clank5"
+    {
+      time 6.273333 6.525805
+      param "impact\physics\metal\hit_med.wav"
+      fixedlength
+      tags
+      {
+        "boop" 0.010802
+      }
+    }
+    event speak "clank6"
+    {
+      time 7.663333 7.915804
+      param "impact\physics\metal\hit_med.wav"
+      fixedlength
+      tags
+      {
+        "boop" 0.010802
+      }
+    }
+    event speak "clank7"
+    {
+      time 9.103333 9.355805
+      param "impact\physics\metal\hit_med.wav"
+      fixedlength
+      tags
+      {
+        "boop" 0.010802
+      }
+    }
+    event speak "clank8"
+    {
+      time 10.483334 10.735806
+      param "impact\physics\metal\hit_med.wav"
+      fixedlength
+      tags
+      {
+        "boop" 0.010802
+      }
+    }
+  }
+}
+
+fps 60
+snap off

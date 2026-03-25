@@ -1,0 +1,19 @@
+// Choreo version 1
+actor "Barney"
+{
+  channel "Audio"
+  {
+    event speak "twoway"
+    {
+      time 0.033334 2.039275
+      param "Trainyard.ba_twoway"
+      fixedlength
+    }
+  }
+  channel "Look at"
+  {
+  }
+}
+
+fps 60
+snap off

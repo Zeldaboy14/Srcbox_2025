@@ -1,0 +1,28 @@
+// Choreo version 1
+actor "rocketman"
+{
+  channel "Audio"
+  {
+    event speak "greet"
+    {
+      time 0.006667 3.234241
+      param "coast.rpgguy_greet"
+      param2 "75dB"
+      fixedlength
+    }
+  }
+  channel "Expression"
+  {
+  }
+  channel "Look"
+  {
+    event lookat "Lookatplayer"
+    {
+      time 0.000000 3.240000
+      param "!player"
+    }
+  }
+}
+
+fps 60
+snap off

@@ -1,0 +1,28 @@
+// Choreo version 1
+actor "!Target1"
+{
+  channel "Audio"
+  {
+    event speak "hobo3_fittoeat"
+    {
+      time 0.006667 5.964059
+      param "vienna.hobo3_fittoeat"
+      param2 "75dB"
+      fixedlength
+    }
+  }
+  channel "Expression"
+  {
+  }
+  channel "Look"
+  {
+    event lookat "Lookatplayer"
+    {
+      time 0.000000 5.933334
+      param "!player"
+    }
+  }
+}
+
+fps 60
+snap off

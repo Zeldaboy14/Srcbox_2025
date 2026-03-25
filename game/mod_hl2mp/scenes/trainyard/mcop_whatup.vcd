@@ -1,0 +1,28 @@
+// Choreo version 1
+actor "!Target1"
+{
+  channel "Audio"
+  {
+    event speak "mcop_whatup"
+    {
+      time 0.006667 1.672699
+      param "Trainyard.mcop_whatup"
+      param2 "75dB"
+      fixedlength
+    }
+  }
+  channel "Expression"
+  {
+  }
+  channel "Look"
+  {
+    event lookat "Lookatplayer"
+    {
+      time 0.000000 1.666667
+      param "!player"
+    }
+  }
+}
+
+fps 60
+snap off

@@ -1,0 +1,38 @@
+// Choreo version 1
+actor "odell"
+{
+  channel "look at"
+  {
+    event lookat "Player"
+    {
+      time 0.046666 1.593333
+      param "Player"
+      event_ramp
+      {
+        0.2320 0.8700
+        0.6032 0.8700
+        0.9744 0.8700
+      }
+    }
+  }
+  channel "audio"
+  {
+    event speak "warmer"
+    {
+      time 0.273333 1.420725
+      param "borealis.Odell_11a"
+      fixedlength
+    }
+  }
+}
+
+scalesettings
+{
+  "CChoreoView" "100"
+  "RampTool" "100"
+  "SceneRampTool" "100"
+  "ExpressionTool" "100"
+  "GestureTool" "100"
+}
+fps 60
+snap off

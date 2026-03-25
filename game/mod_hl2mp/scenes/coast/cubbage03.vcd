@@ -1,0 +1,23 @@
+// Choreo version 1
+actor "!Target1"
+{
+  channel "Audio"
+  {
+    event speak "cubbage03"
+    {
+      time 0.006667 1.628050
+      param "coast.cubbage03"
+      param2 "75dB"
+      fixedlength
+    }
+  }
+  channel "Expression"
+  {
+  }
+  channel "Look"
+  {
+  }
+}
+
+fps 60
+snap off

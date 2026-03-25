@@ -1,0 +1,355 @@
+// Choreo version 1
+actor "alyx"
+{
+  channel "dialogue"
+  {
+    event speak "Rip04"
+    {
+      time 0.320000 4.876871
+      param "Aliens.A05-Rip04"
+      fixedlength
+      tags
+      {
+        "w" 0.064079
+        "t" 0.278261
+        "c" 0.413003
+        "f" 0.620162
+        "p" 0.693019
+        "d" 0.812400
+        "s" 0.884379
+        "a" 0.919659
+        "y" 0.133020
+      }
+    }
+    event speak "Rip05"
+    {
+      time 5.340001 9.293199
+      param "Aliens.A06-Rip05"
+      fixedlength
+      tags
+      {
+        "c" 0.055651
+        "i" 0.288880
+        "a" 0.426490
+        "l" 0.615060
+        "l" 0.845392
+      }
+    }
+    event speak "Rip03"
+    {
+      time 10.100000 13.432064
+      param "Aliens.A04-Rip03"
+      fixedlength
+      tags
+      {
+        "h" 0.019808
+        "n" 0.504192
+        "i" 0.630240
+        "b" 0.817669
+        "i" 0.902190
+      }
+    }
+  }
+  channel "sequences"
+  {
+    event sequence "start acting"
+    {
+      time 0.321464 -1.000000
+      param "voctest"
+    }
+  }
+  channel "brows"
+  {
+    event expression "ltup"
+    {
+      time 4.028341 4.315937
+      param "billbrows"
+      param2 "ltup trans"
+    }
+    event expression "rtup"
+    {
+      time 0.637923 1.592079
+      param "billbrows"
+      param2 "rtup"
+    }
+    event expression "down"
+    {
+      time 10.133687 10.373878
+      param "billbrows"
+      param2 "down"
+    }
+    event expression "med rtup"
+    {
+      time 0.103334 0.635871
+      param "billbrows"
+      param2 "med rtup"
+    }
+    event expression "med up"
+    {
+      time 2.251362 3.119689
+      param "billbrows"
+      param2 "med up"
+    }
+    event expression "med ltup"
+    {
+      time 4.267575 5.541811
+      param "billbrows"
+      param2 "med ltup"
+    }
+    event expression "down"
+    {
+      time 5.541559 6.142774
+      param "billbrows"
+      param2 "MED DOWN"
+    }
+    event expression "neutral"
+    {
+      time 6.090550 6.478224
+      param "billbrows"
+      param2 "neutral"
+    }
+    event expression "med up"
+    {
+      time 12.080719 12.408164
+      param "billbrows"
+      param2 "med up"
+    }
+    event expression "neutral"
+    {
+      time 10.983215 11.775761
+      param "billbrows"
+      param2 "neutral"
+    }
+    event expression "down"
+    {
+      time 12.824526 13.058281
+      param "billbrows"
+      param2 "down"
+    }
+    event expression "ltup"
+    {
+      time 8.604905 9.132873
+      param "billbrows"
+      param2 "ltup"
+    }
+  }
+  channel "mouth"
+  {
+    event expression "MED DOWN"
+    {
+      time 1.577345 2.001601
+      param "billbrows"
+      param2 "MED DOWN"
+    }
+    event expression "MED DOWN"
+    {
+      time 3.135897 3.475982
+      param "billbrows"
+      param2 "MED DOWN"
+    }
+    event expression "neutral"
+    {
+      time 1.867595 2.244471
+      param "billbrows"
+      param2 "neutral"
+    }
+    event expression "neutral"
+    {
+      time 3.467303 4.030457
+      param "billbrows"
+      param2 "neutral"
+    }
+    event expression "up"
+    {
+      time 6.474033 6.982345
+      param "billbrows"
+      param2 "up"
+    }
+    event expression "MED DOWN"
+    {
+      time 7.771455 8.607497
+      param "billbrows"
+      param2 "MED DOWN"
+    }
+    event expression "MED DOWN"
+    {
+      time 10.382627 10.987794
+      param "billbrows"
+      param2 "MED DOWN"
+    }
+    event expression "up"
+    {
+      time 12.409337 12.825643
+      param "billbrows"
+      param2 "up"
+    }
+    event expression "med inraise"
+    {
+      time 11.772635 12.080000
+      param "billbrows"
+      param2 "med inraise"
+    }
+    event expression "MED DOWN"
+    {
+      time 13.090190 14.063422
+      param "billbrows"
+      param2 "MED DOWN"
+    }
+    event expression "ltup trans"
+    {
+      time 9.108782 10.130291
+      param "billbrows"
+      param2 "ltup trans"
+    }
+    event expression "ltup"
+    {
+      time 6.979678 7.787200
+      param "billbrows"
+      param2 "ltup trans"
+    }
+  }
+  channel "lids"
+  {
+    event expression "neutral"
+    {
+      time 3.487738 4.487739
+      param "billeyes"
+      param2 "neutral"
+    }
+    event expression "neutral"
+    {
+      time 5.257361 5.564251
+      param "billeyes"
+      param2 "neutral"
+    }
+    event expression "neutral"
+    {
+      time 7.083004 8.083004
+      param "billeyes"
+      param2 "neutral"
+    }
+    event expression "slight dw"
+    {
+      time 9.081796 10.154991
+      param "billeyes"
+      param2 "slight dw"
+    }
+    event expression "wide"
+    {
+      time 12.840886 13.118648
+      param "billeyes"
+      param2 "wide"
+    }
+    event expression "wide"
+    {
+      time 0.926155 1.055784
+      param "billeyes"
+      param2 "wide"
+    }
+    event expression "neutral"
+    {
+      time 5.781510 6.656034
+      param "billeyes"
+      param2 "neutral"
+    }
+  }
+  channel "lids2"
+  {
+    event expression "slight dw"
+    {
+      time 4.511785 5.264814
+      param "billeyes"
+      param2 "slight dw"
+    }
+    event expression "slight dw"
+    {
+      time 6.661571 7.052691
+      param "billeyes"
+      param2 "slight dw"
+    }
+    event expression "wide"
+    {
+      time 10.140122 10.298382
+      param "billeyes"
+      param2 "wide"
+    }
+    event expression "neutral"
+    {
+      time 13.127692 14.127692
+      param "billeyes"
+      param2 "neutral"
+    }
+    event expression "wide"
+    {
+      time 5.560000 5.779256
+      param "billeyes"
+      param2 "wide"
+    }
+  }
+  channel "mouth"
+  {
+    event expression "sl rtsneer"
+    {
+      time 8.725288 9.741970
+      param "billmouth"
+      param2 "sl mad"
+    }
+    event expression "rtsneer"
+    {
+      time 10.166002 10.566004
+      param "billmouth"
+      param2 "sler mad"
+    }
+    event expression "sl rtsneer"
+    {
+      time 4.372929 4.523802
+      param "billmouth"
+      param2 "sl mad"
+    }
+    event expression "sl mad"
+    {
+      time 12.824526 13.127434
+      param "billmouth"
+      param2 "sl mad"
+    }
+    event expression "sl sad"
+    {
+      time 11.763144 12.276923
+      param "billmouth"
+      param2 "sl sad"
+    }
+    event expression "neutral"
+    {
+      time 3.377741 4.377742
+      param "billmouth"
+      param2 "neutral"
+    }
+    event expression "sler mad"
+    {
+      time 13.124057 14.124057
+      param "billmouth"
+      param2 "sler mad"
+    }
+    event expression "sler mad"
+    {
+      time 4.524958 5.283962
+      param "billmouth"
+      param2 "sler mad"
+    }
+    event expression "neutral"
+    {
+      time 5.288668 8.742437
+      param "billmouth"
+      param2 "neutral"
+    }
+    event expression "neutral"
+    {
+      time 9.745148 10.156104
+      param "billmouth"
+      param2 "neutral"
+    }
+  }
+}
+
+fps 60
+snap off

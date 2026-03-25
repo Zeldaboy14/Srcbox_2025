@@ -1,0 +1,106 @@
+// Choreo version 1
+actor "alyx"
+{
+  channel "dialogue"
+  {
+    event speak "Rip03"
+    {
+      time 0.987529 4.319592
+      ramp 1.00 1.00 1.00
+      param "vo\alien_test\A04-Rip03.wav"
+      fixedlength
+      tags
+      {
+        "h" 0.019808
+        "n" 0.504192
+        "i" 0.630240
+        "b" 0.817669
+        "i" 0.902190
+      }
+    }
+  }
+  channel "sequences"
+  {
+    event sequence "stand there"
+    {
+      time 0.006668 5.700001
+      ramp 0.74 1.00 0.74
+      param "quietidle"
+    }
+  }
+  channel "looking"
+  {
+    event lookat "lookat player"
+    {
+      time 0.626667 5.526667
+      ramp 0.92 1.00 0.89
+      param "!player"
+    }
+  }
+  channel "gestures"
+  {
+    event gesture "G2"
+    {
+      time 2.133333 3.626666
+      ramp 0.83 1.00 0.75
+      param "gesture2"
+      absolutetags playback_time
+      {
+        "up" 0.298824
+        "down" 0.480000
+      }
+      absolutetags shifted_time
+      {
+        "up" 0.657143
+        "down" 0.828571
+      }
+      sequenceduration 1.166667
+    }
+  }
+  channel "gestures2"
+  {
+    event gesture "G1"
+    {
+      time 0.506667 2.426667
+      ramp 0.72 1.00 0.93
+      param "gesture1"
+      absolutetags playback_time
+      {
+        "hold" 0.303529
+        "up hold" 0.468235
+        "up" 0.609412
+        "down" 0.729412
+      }
+      absolutetags shifted_time
+      {
+        "hold" 0.277647
+        "up hold" 0.661176
+        "up" 0.697674
+        "down" 0.883721
+      }
+      sequenceduration 1.433333
+    }
+    event gesture "G3"
+    {
+      time 3.240000 4.959999
+      ramp 0.85 1.00 0.81
+      param "gesture1"
+      absolutetags playback_time
+      {
+        "hold" 0.277647
+        "up" 0.341176
+        "down" 0.444706
+      }
+      absolutetags shifted_time
+      {
+        "hold" 0.271517
+        "up" 0.697674
+        "down" 0.883721
+      }
+      sequenceduration 1.433333
+    }
+  }
+}
+
+fps 60
+snap off

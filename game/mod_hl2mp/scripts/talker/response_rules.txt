@@ -145,6 +145,13 @@ enumeration "NPCState"
 	"Dead"		"6"
 }
 
+// For choosing pre and post-disaster responses
+enumeration disaster
+{
+	"pre"		"1"
+	"post"		"2"
+}
+
 response "NullResponse"
 
 // Question / Answer concepts
@@ -260,3 +267,6 @@ criterion "IsMap_d3_c17_09" "map" "d3_c17_09" "required"
 #include "talker/npc_barney.txt"
 #include "talker/npc_alyx.txt"
 
+// HL1 Talkers
+#include "talker/npc_barney.txt"
+#include "talker/npc_scientist.txt"

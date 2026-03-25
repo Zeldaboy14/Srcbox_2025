@@ -1,0 +1,120 @@
+// Choreo version 1
+actor "Alyx"
+{
+  channel "audio"
+  {
+    event speak "alyx_takethis"
+    {
+      time 3.880002 5.317349
+      param "E3_lab.alyx_takethis"
+      param2 "90dB"
+      fixedlength
+    }
+    event speak "alyx_toolate"
+    {
+      time 10.006668 11.595602
+      param "E3_lab.alyx_toolate"
+      param2 "90dB"
+      fixedlength
+    }
+    event speak "alyx_getout01"
+    {
+      time 7.193333 8.293787
+      param "E3_lab.alyx_getout"
+      param2 "90dB"
+      fixedlength
+    }
+  }
+  channel "Lookat"
+  {
+    event lookat "look at player"
+    {
+      time 3.933333 6.440002
+      param "!player"
+    }
+    event lookat "a_lookit_k3"
+    {
+      time 9.273332 11.266667
+      param "kleiner"
+    }
+    event lookat "lookatplayer12"
+    {
+      time 11.340002 13.206666
+      param "!player"
+    }
+    event lookat "a_lookit_strider1"
+    {
+      time 8.286667 9.213335
+      param "alyx_lookatweapon"
+    }
+    event lookat "a_lookit_k1"
+    {
+      time 6.886666 8.279999
+      param "kleiner"
+    }
+    event moveto "goto Gordon"
+    {
+      time 2.026666 -1.000000
+      param "!player"
+    }
+  }
+  channel "Goto"
+  {
+    event firetrigger "attack"
+    {
+      time 10.433332 -1.000000
+      param "2"
+    }
+    event firetrigger "start strider"
+    {
+      time 2.573333 -1.000000
+      param "1"
+    }
+    event moveto "gotoKleiner"
+    {
+      time 7.213332 -1.000000
+      param "alyx_with_player"
+    }
+  }
+  faceposermodel "U:\HL2\hl2\models\alyx.mdl"
+}
+
+actor "Kleiner"
+{
+  channel "audio"
+  {
+    event speak "kleiner_onlymoment"
+    {
+      time 8.306668 10.004808
+      param "E3_lab.kleiner_onlymoment"
+      param2 "90dB"
+      fixedlength
+    }
+  }
+  channel "Lookat"
+  {
+    event lookat "lookatwork"
+    {
+      time 2.166667 8.813332
+      param "kleiner_desk_work"
+    }
+    event lookat "k_lookit_a2"
+    {
+      time 10.106666 11.100000
+      param "alyx"
+    }
+    event lookat "k_lookatstrider1"
+    {
+      time 11.186668 12.900001
+      param "alyx_lookatweapon"
+    }
+  }
+  channel "Goto"
+  {
+  }
+  faceposermodel "U:\HL2\hl2\models\Kleiner.mdl"
+}
+
+mapname "maps\e3_lab.bsp"
+fps 60
+snap off

@@ -1,0 +1,109 @@
+// Choreo version 1
+actor "gman"
+{
+  channel "lookit"
+  {
+    event lookat "lookit_player"
+    {
+      time 3.380000 5.613333
+      param "!player"
+      event_ramp
+      {
+        0.0040 0.0133
+        0.2760 1.0000
+        1.8920 1.0000
+        2.2320 0.0044
+      }
+    }
+    event lookat "lookit_camera"
+    {
+      time 0.026666 3.006666
+      param "multimon_camera"
+      event_ramp
+      {
+        0.0040 0.0000
+        0.2000 1.0000
+        2.7060 1.0000
+        2.9800 0.0000
+      }
+    }
+    event lookat "lookit_camera2"
+    {
+      time 5.686667 8.013334
+      param "multimon_camera"
+      event_ramp
+      {
+        0.0053 0.0088
+        0.5120 1.0000
+        2.0040 1.0000
+        2.3267 0.0088
+      }
+    }
+    event lookat "lookit_poi1"
+    {
+      time 8.073334 9.420001
+      param "point_of_interest_1"
+      event_ramp
+      {
+        0.0053 0.0088
+        0.3653 0.7611
+        0.8800 0.9823
+        1.3440 0.0088
+      }
+    }
+    event lookat "lookit_camera3"
+    {
+      time 9.506667 13.480000
+      param "multimon_camera"
+      event_ramp
+      {
+        0.0080 0.0044
+        0.9493 1.0000
+        3.6427 0.9735
+        3.9653 0.0044
+      }
+    }
+    event lookat "lookit2_player2"
+    {
+      time 13.866667 16.279999
+      param "!player"
+      event_ramp
+      {
+        0.0027 0.0088
+        0.2720 0.9823
+        1.6747 0.9956
+        2.4080 0.0044
+      }
+    }
+    event lookat "lookit_tv"
+    {
+      time 16.386669 18.666668
+      param "e3tech_prop_tvcave_pushovertv"
+      event_ramp
+      {
+        0.0053 0.0177
+        0.4080 0.8053
+        1.0267 0.9912
+        1.7680 0.7168
+        2.2773 0.0133
+      }
+    }
+    event lookat "lookitplayer4"
+    {
+      time 18.873331 23.480000
+      param "!player"
+      event_ramp
+      {
+        0.0027 0.0044
+        0.4053 1.0000
+        3.9573 0.9867
+        4.6000 0.0088
+      }
+    }
+  }
+  faceposermodel "U:\HL2\hl2\models\gman.mdl"
+}
+
+mapname "maps\e3_techdemo_5.bsp"
+fps 60
+snap off

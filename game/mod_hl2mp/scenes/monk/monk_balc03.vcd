@@ -1,0 +1,102 @@
+// Choreo version 1
+actor "monk"
+{
+  channel "targets"
+  {
+    event lookat "look at player"
+    {
+      time 1.200000 4.860000
+      param "!player"
+    }
+    event moveto "cue2"
+    {
+      time 0.080000 -1.000000
+      param "balcony_cue_02"
+    }
+    event lookat "look at player"
+    {
+      time 7.726666 9.873335
+      param "!player"
+      event_ramp
+      {
+        0.0429 1.0000
+        1.0948 1.0000
+        2.1467 1.0000
+      }
+    }
+  }
+  channel "audio"
+  {
+    event speak "audio1"
+    {
+      time 0.126667 4.666168
+      param "town.monk_balc02"
+      fixedlength
+    }
+    event speak "they come"
+    {
+      time 7.720000 8.608163
+      param "town.monk_balc09"
+      fixedlength
+    }
+  }
+  channel "scripted"
+  {
+    event sequence "pose"
+    {
+      time 1.760000 5.093333
+      param "balc_rail_leanpose"
+      event_ramp
+      {
+        0.5000 1.0000
+        1.9167 1.0000
+        3.3333 1.0000
+      }
+      fixedlength
+    }
+    event sequence "pose2"
+    {
+      time 5.099999 8.433332
+      param "balc_rail_leanpose"
+      fixedlength
+    }
+    event sequence "pose3"
+    {
+      time 8.426666 11.759999
+      param "balc_rail_leanpose"
+      fixedlength
+    }
+  }
+  channel "head"
+  {
+    event flexanimation "head"
+    {
+      time 4.920000 7.693332
+      param ""
+      flexanimations samples_use_time
+      {
+        "head_rightleft"         range 55.0 -55.0        
+        {
+          0.0646 0.5000
+          0.3073 0.7900
+          0.4552 0.8600
+          1.0305 0.8200
+          1.4519 0.1900
+          2.1778 0.1100
+        }
+      }
+    }
+  }
+}
+
+mapname "maps\balcony_large.bsp"
+scalesettings
+{
+  "CChoreoView" "100"
+  "RampTool" "100"
+  "ExpressionTool" "100"
+  "GestureTool" "100"
+  "SceneRampTool" "100"
+}
+fps 60
+snap off

@@ -1,0 +1,25 @@
+// Choreo version 1
+actor "Monk"
+{
+  channel "Audio"
+  {
+    event speak "allover"
+    {
+      time 0.153334 2.225715
+      param "town.monk_allover"
+      param2 "90dB"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+    event lookat "look at player"
+    {
+      time 0.020000 2.299999
+      param "!player"
+    }
+  }
+}
+
+fps 60
+snap off

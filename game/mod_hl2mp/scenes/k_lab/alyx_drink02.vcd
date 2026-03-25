@@ -1,0 +1,64 @@
+// Choreo version 1
+actor "Alyx"
+{
+  channel "audio"
+  {
+    event speak "I think it's unplugged."
+    {
+      time 0.073333 1.908027
+      param "k_lab.al_unplugged"
+      fixedlength
+    }
+    event speak "mind plugging it in?"
+    {
+      time 2.826667 5.134105
+      param "k_lab.al_plugitin"
+      fixedlength
+    }
+    event speak "thanks"
+    {
+      time 6.280000 7.192857
+      param "k_lab.al_thanks"
+      fixedlength
+    }
+  }
+  channel "triggers"
+  {
+    event firetrigger "open secret door"
+    {
+      time 5.726666 -1.000000
+      param "1"
+    }
+  }
+  channel "look at"
+  {
+    event lookat "look at player"
+    {
+      time 1.713333 5.166667
+      param "!player"
+    }
+    event lookat "look at machine"
+    {
+      time 0.033333 1.446667
+      param "soda_machine_entry_door_model"
+    }
+    event lookat "look at player"
+    {
+      time 6.186667 7.086668
+      param "!player"
+    }
+    event lookat "look at machine"
+    {
+      time 5.320000 6.066667
+      param "soda_machine_entry_door_1"
+    }
+  }
+  channel "face to"
+  {
+  }
+  faceposermodel "U:\HL2\hl2\models\alyx.mdl"
+}
+
+mapname "maps\d1_trainstation_05.bsp"
+fps 60
+snap off

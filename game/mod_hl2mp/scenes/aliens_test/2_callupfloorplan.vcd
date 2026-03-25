@@ -1,0 +1,179 @@
+// Choreo version 1
+event section "get to console"
+{
+  time 9.180000 -1.000000
+  param "noaction"
+}
+event section "get to wall"
+{
+  time 3.420000 -1.000000
+  param "noaction"
+}
+actor "Alyx"
+{
+  channel "audio"
+  {
+    event speak "Rip11"
+    {
+      time 0.686667 1.277325
+      param "Aliens.A12-Rip11"
+      fixedlength
+    }
+    event speak "Rip12"
+    {
+      time 2.100000 3.208753
+      param "Aliens.A13-Rip12"
+      fixedlength
+    }
+    event speak "Rip04"
+    {
+      time 4.410587 8.967459
+      param "Aliens.A05-Rip04"
+      fixedlength
+      tags
+      {
+        "floorplan" 0.625868
+        "understand" 0.811961
+        "terminal" 0.282211
+      }
+    }
+    event speak "Rip05"
+    {
+      time 10.169180 14.122377
+      param "Aliens.A06-Rip05"
+      fixedlength
+      tags
+      {
+        "dontcare" 0.292927
+        "listening" 0.823131
+      }
+    }
+  }
+  channel "movements"
+  {
+    event moveto "starttomark"
+    {
+      time 3.310000 -1.000000
+      param "alyx_mark2"
+      resumecondition
+    }
+    event moveto "walk to console"
+    {
+      time 8.840001 -1.000000
+      param "alyx_mark3"
+      resumecondition
+    }
+  }
+  channel "Face"
+  {
+    event lookat "faceplayer1"
+    {
+      time 0.328823 3.240862
+      param "!player"
+    }
+    event face "face again"
+    {
+      time 8.110589 8.733766
+      param "!player"
+    }
+    event face "faceoncemore"
+    {
+      time 12.404588 14.001059
+      param "!player"
+    }
+    event face "face console"
+    {
+      time 9.218863 11.726628
+      param "alien_console"
+    }
+  }
+  channel "lookat"
+  {
+    event lookat "lookagain"
+    {
+      time 6.369411 10.527649
+      param "!player"
+    }
+    event lookat "look at console"
+    {
+      time 11.327178 12.078233
+      param "alien_console"
+    }
+    event lookat "finallook"
+    {
+      time 12.420707 14.351060
+      param "!player"
+    }
+    event lookat "eyecontact"
+    {
+      time 0.257647 5.203255
+      param "!player"
+    }
+    event lookat "terminal glance"
+    {
+      time 5.696587 6.317372
+      param "alien_console"
+    }
+  }
+  channel "background"
+  {
+    event gesture "parent gesture"
+    {
+      time 0.000000 14.351060
+      param "posture04"
+      absolutetags playback_time
+      {
+        "apex" 0.326531
+        "loop" 0.408163
+        "end" 0.714286
+      }
+      absolutetags shifted_time
+      {
+        "apex" 0.326531
+        "loop" 0.408163
+        "end" 0.714286
+      }
+      sequenceduration 3.300000
+    }
+  }
+  channel "gestures"
+  {
+    event gesture "hudson"
+    {
+      time 0.000000 1.906588
+      param "gesture4"
+    }
+    event gesture "relax"
+    {
+      time 2.278745 14.351060
+      param "gesture02"
+      absolutetags playback_time
+      {
+        "apex" 0.284091
+        "accent" 0.477273
+        "loop" 0.534091
+        "end" 0.681818
+      }
+      absolutetags shifted_time
+      {
+        "apex" 0.284091
+        "accent" 0.477273
+        "loop" 0.534091
+        "end" 0.681818
+      }
+      sequenceduration 2.966667
+    }
+  }
+}
+
+mapname "maps\aliens_test.bsp"
+scalesettings
+{
+  "CChoreoView" "100"
+  "SceneRampTool" "100"
+  "ExpressionTool" "100"
+  "GestureTool" "100"
+  "RampTool" "100"
+}
+fps 60
+snap off

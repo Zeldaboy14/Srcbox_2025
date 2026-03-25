@@ -1,0 +1,58 @@
+// Choreo version 1
+actor "Gman"
+{
+  channel "audio"
+  {
+    event speak "3"
+    {
+      time 0.093334 8.684717
+      param "haz.haz_gm01a"
+      fixedlength
+    }
+    event speak "2"
+    {
+      time 9.020000 14.627620
+      param "haz.haz_gm01b"
+      fixedlength
+    }
+    event speak "3"
+    {
+      time 15.166668 16.205761
+      param "haz.haz_gm02"
+      fixedlength
+    }
+    event speak "4"
+    {
+      time 16.786667 18.208889
+      param "haz.haz_gm03"
+      fixedlength
+    }
+  }
+  channel "Lookat"
+  {
+    event lookat "look at player"
+    {
+      time 0.086666 18.813332
+      param "!player"
+      event_ramp
+      {
+        0.0733 0.1190
+        0.2633 0.3413
+        0.5733 0.6032
+        1.3140 1.0000
+        17.7667 1.0000
+        18.1200 0.7897
+        18.3534 0.5754
+        18.5800 0.2063
+      }
+    }
+  }
+  channel "Goto"
+  {
+  }
+  faceposermodel "U:\HL2\hl2\models\gman.mdl"
+}
+
+mapname "maps\hazard01.bsp"
+fps 60
+snap off

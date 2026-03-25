@@ -1,0 +1,28 @@
+// Choreo version 1
+actor "Barney"
+{
+  channel "Audio"
+  {
+    event speak "ba_talking you"
+    {
+      time 0.006667 0.828186
+      param "Trainyard.ba_move01"
+      param2 "75dB"
+      fixedlength
+    }
+  }
+  channel "Expression"
+  {
+  }
+  channel "Look"
+  {
+    event lookat "Lookatplayer"
+    {
+      time 0.000000 0.853335
+      param "!player"
+    }
+  }
+}
+
+fps 60
+snap off

@@ -1,0 +1,28 @@
+// Choreo version 1
+actor "!Target1"
+{
+  channel "Audio"
+  {
+    event speak "ba_cantstay01"
+    {
+      time 0.006667 4.045193
+      param "Trainyard.ba_cantstay01"
+      param2 "75dB"
+      fixedlength
+    }
+  }
+  channel "Expression"
+  {
+  }
+  channel "Look"
+  {
+    event lookat "Lookatplayer"
+    {
+      time 0.000000 4.046668
+      param "!player"
+    }
+  }
+}
+
+fps 60
+snap off

@@ -1,0 +1,169 @@
+// Choreo version 1
+actor "Mossman"
+{
+  channel "audio"
+  {
+    event speak "oh hello alyx"
+    {
+      time 14.586668 17.888187
+      param "eli_lab.mo_excuseus01"
+      fixedlength
+    }
+    event speak "I wonder if you'd excuse us a minute"
+    {
+      time 18.146666 20.302244
+      param "eli_lab.mo_excuseus02"
+      fixedlength
+    }
+    event speak "gordon, I wanted to ask you"
+    {
+      time 20.813334 29.297325
+      param "eli_lab.mo_youropinion"
+      fixedlength
+    }
+    event speak "excuse me, alyx, dr. freeman..."
+    {
+      time 31.533337 36.683338
+      param "eli_lab.mo_important"
+      fixedlength
+    }
+    event speak "All right - that's a good point"
+    {
+      time 46.653336 50.833607
+      param "eli_lab.mo_goodpoint"
+      fixedlength
+    }
+    event speak "be careful out there, Gordon"
+    {
+      time 52.513340 53.556446
+      param "eli_lab.mo_outthere"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+    event lookat "look at alyx"
+    {
+      time 14.606667 19.693335
+      param "alyx"
+    }
+    event lookat "look at player"
+    {
+      time 19.793333 29.680000
+      param "!player"
+    }
+    event lookat "look at Alyx"
+    {
+      time 29.880001 36.706669
+      param "alyx"
+    }
+  }
+  channel "face to"
+  {
+  }
+  channel "move to"
+  {
+    event moveto "move into view"
+    {
+      time 11.080001 -1.000000
+      param "mark_mo_to_alyx"
+    }
+    event firetrigger "open side door"
+    {
+      time 10.153334 -1.000000
+      param "1"
+    }
+    event moveto "go back out side door"
+    {
+      time 54.060001 -1.000000
+      param "mark_mo_leave_alyx"
+    }
+    event firetrigger "close side door"
+    {
+      time 56.280003 -1.000000
+      param "2"
+    }
+  }
+  channel "trigger"
+  {
+  }
+  faceposermodel "U:\HL2\hl2\models\mossman.mdl"
+}
+
+actor "Alyx"
+{
+  channel "audio"
+  {
+    event speak "I've gotta say, Gordon..."
+    {
+      time 0.146669 4.277214
+      param "eli_lab.al_oldrecord01"
+      fixedlength
+    }
+    event speak "Still, you'd have made better time"
+    {
+      time 4.980002 11.375785
+      param "eli_lab.al_oldrecord02"
+      fixedlength
+    }
+    event speak "uh oh"
+    {
+      time 11.886666 12.818072
+      param "eli_lab.al_oldrecord03"
+      fixedlength
+    }
+    event speak "Uh, Judith"
+    {
+      time 26.586664 30.877094
+      param "eli_lab.al_canthiswait"
+      fixedlength
+    }
+    event speak "which is exactly why I'm making sure..."
+    {
+      time 36.293335 40.120205
+      param "eli_lab.al_conduct01"
+      fixedlength
+    }
+    event speak "now, if you'll excuse us..."
+    {
+      time 40.320004 45.841591
+      param "eli_lab.al_conduct02"
+      fixedlength
+    }
+    event speak "i'll do that"
+    {
+      time 51.380001 51.888958
+      param "eli_lab.al_illdothat"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+    event lookat "look at Mossman"
+    {
+      time 21.019999 43.126671
+      param "mossman"
+    }
+    event lookat "look at player"
+    {
+      time 18.933334 20.773333
+      param "!player"
+    }
+  }
+  channel "face to"
+  {
+  }
+  channel "move to"
+  {
+    event moveto "move toward airlock"
+    {
+      time 51.893333 -1.000000
+      param "mark_al_to_airlock_exit"
+    }
+  }
+  faceposermodel "U:\HL2\hl2\models\alyx.mdl"
+}
+
+mapname "maps\eli_lab.bsp"
+fps 60
+snap off

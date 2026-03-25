@@ -1,0 +1,35 @@
+// Choreo version 1
+actor "!target1"
+{
+  channel "Lookaround"
+  {
+    event lookat "lookat 2lookee1"
+    {
+      time 0.033334 1.580001
+      ramp 1.00 1.00 1.00
+      param "2lookee1"
+    }
+    event lookat "lookat 2lookee2"
+    {
+      time 1.726666 3.233333
+      ramp 1.00 1.00 1.00
+      param "2lookee2"
+    }
+    event lookat "lookat 2lookee3"
+    {
+      time 3.353333 4.940001
+      ramp 1.00 1.00 1.00
+      param "2lookee3"
+    }
+    event lookat "lookat 2lookee4"
+    {
+      time 5.106666 6.800000
+      ramp 1.00 1.00 1.00
+      param "2lookee4"
+    }
+  }
+}
+
+mapname "maps\c17_look.bsp"
+fps 60
+snap off

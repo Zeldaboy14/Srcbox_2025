@@ -1,0 +1,108 @@
+// Choreo version 1
+actor "Mossman"
+{
+  channel "audio"
+  {
+    event speak "take it easy in there"
+    {
+      time 0.173334 2.194536
+      param "eli_lab.mo_airlock01"
+      fixedlength
+    }
+    event speak "you're among friends"
+    {
+      time 2.346667 3.596055
+      param "eli_lab.mo_airlock02"
+      fixedlength
+    }
+    event speak "Dr. Freeman"
+    {
+      time 4.753334 5.538572
+      param "eli_lab.mo_airlock03"
+      fixedlength
+    }
+    event speak "Gordon Freeman"
+    {
+      time 6.280000 8.110431
+      param "eli_lab.mo_airlock04"
+      fixedlength
+    }
+    event speak "you made it here so quickly"
+    {
+      time 8.386667 12.962450
+      param "eli_lab.mo_airlock06"
+      fixedlength
+    }
+    event speak "forgive the scanning"
+    {
+      time 14.226665 17.632833
+      param "eli_lab.mo_scanning01"
+      fixedlength
+    }
+    event speak "shouldn't be much longer"
+    {
+      time 18.126667 19.690023
+      param "eli_lab.mo_scanning02"
+      fixedlength
+    }
+    event speak "I'm sorry - forgot to introduce myself"
+    {
+      time 21.120001 27.400455
+      param "eli_lab.mo_introduce01"
+      fixedlength
+    }
+    event speak "our paths have never crossed but..."
+    {
+      time 27.426668 31.178482
+      param "eli_lab.mo_introduce02"
+      fixedlength
+    }
+    event speak "hearing about you since long before Black Mesa"
+    {
+      time 31.493334 34.811836
+      param "eli_lab.mo_introduce03"
+      fixedlength
+    }
+    event speak "It must have been amazing..."
+    {
+      time 35.840004 42.181660
+      param "eli_lab.mo_introduce04"
+      fixedlength
+    }
+    event speak "Black Mesa"
+    {
+      time 42.373337 43.836899
+      param "eli_lab.mo_introduce06"
+      fixedlength
+    }
+    event speak "you can come through now"
+    {
+      time 44.266670 46.279438
+      param "eli_lab.mo_comethrunow"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+  }
+  channel "face to"
+  {
+  }
+  channel "triggers"
+  {
+    event firetrigger "open airlock door"
+    {
+      time 45.753334 -1.000000
+      param "1"
+    }
+    event moveto "move into hall"
+    {
+      time 47.200005 -1.000000
+      param "mark_mo_airexit"
+    }
+  }
+}
+
+mapname "maps\eli_lab.bsp"
+fps 60
+snap off

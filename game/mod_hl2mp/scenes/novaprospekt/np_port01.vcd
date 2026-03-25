@@ -1,0 +1,86 @@
+// Choreo version 1
+actor "Kleiner"
+{
+  channel "audio"
+  {
+    event speak "Alyx?"
+    {
+      time 2.920000 3.885964
+      param "novaprospekt.kl_whatshappening01"
+      fixedlength
+    }
+    event speak "where are you?"
+    {
+      time 4.126667 4.840816
+      param "novaprospekt.kl_whatshappening02"
+      fixedlength
+    }
+    event speak "what's happening?"
+    {
+      time 5.480000 6.570386
+      param "novaprospekt.kl_whatshappening03"
+      fixedlength
+    }
+    event speak "of course"
+    {
+      time 10.793334 11.593538
+      param "novaprospekt.kl_onstandby01"
+      fixedlength
+    }
+    event speak "I've had the receiver on stand-by"
+    {
+      time 11.713334 14.729275
+      param "novaprospekt.kl_onstandby02"
+      fixedlength
+    }
+    event speak "any time your ready"
+    {
+      time 14.846667 16.192608
+      param "novaprospekt.kl_onstandby03"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+  }
+}
+
+actor "Alyx"
+{
+  channel "audio"
+  {
+    event speak "are you there, doc?"
+    {
+      time 0.173328 1.378634
+      param "novaprospekt.al_areyouthere"
+      fixedlength
+    }
+    event speak "got a hybrid working"
+    {
+      time 7.040001 8.812405
+      param "novaprospekt.al_hybridworking01"
+      fixedlength
+    }
+    event speak "ready to receive us?"
+    {
+      time 9.206667 10.353152
+      param "novaprospekt.al_hybridworking02"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+  }
+  channel "move to"
+  {
+    event moveto "move to hybrid"
+    {
+      time 16.173334 -1.000000
+      param "mark_alyx_hybrid"
+    }
+  }
+}
+
+mapname "maps\d3_lab_01.bsp"
+fps 60
+snap off

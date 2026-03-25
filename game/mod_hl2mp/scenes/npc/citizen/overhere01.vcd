@@ -1,0 +1,45 @@
+// Choreo version 1
+actor "!Target1"
+{
+  channel "Audio"
+  {
+    event speak "overhere01"
+    {
+      time 0.506667 1.419615
+      param "npc_citizen.overhere01"
+      param2 "75dB"
+      fixedlength
+    }
+  }
+  channel "Expression"
+  {
+  }
+  channel "Look"
+  {
+    event lookat "Lookatplayer"
+    {
+      time 0.000000 3.326667
+      param "!player"
+    }
+  }
+  channel "animation"
+  {
+    event sequence "wave"
+    {
+      time 0.006666 3.340000
+      param "Wave"
+      fixedlength
+    }
+  }
+  channel "face player"
+  {
+    event face "face player"
+    {
+      time 0.006667 3.313334
+      param "!player"
+    }
+  }
+}
+
+fps 60
+snap off

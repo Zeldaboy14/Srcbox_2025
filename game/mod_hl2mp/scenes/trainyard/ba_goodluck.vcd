@@ -1,0 +1,19 @@
+// Choreo version 1
+actor "Barney"
+{
+  channel "Audio"
+  {
+    event speak "goodluck"
+    {
+      time 0.033334 0.765057
+      param "Trainyard.ba_goodluck"
+      fixedlength
+    }
+  }
+  channel "Look at"
+  {
+  }
+}
+
+fps 60
+snap off

@@ -1,0 +1,26 @@
+// Choreo version 1
+actor "!target1"
+{
+  channel "Audio"
+  {
+    event speak "littlehelp"
+    {
+      time 0.300000 2.064716
+      ramp 1.00 1.00 1.00
+      param "E3_C17_01.BarneyLittleHelp"
+      fixedlength
+    }
+  }
+  channel "lookatplayer"
+  {
+    event lookat "lookatplayer"
+    {
+      time 0.020000 1.753333
+      ramp 1.00 1.00 1.00
+      param "!player"
+    }
+  }
+}
+
+fps 60
+snap off

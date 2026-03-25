@@ -1,0 +1,21 @@
+// Choreo version 1
+actor "!Target1"
+{
+  channel "Audio"
+  {
+  }
+  channel "Expression"
+  {
+  }
+  channel "Look"
+  {
+    event lookat "Lookatplayer"
+    {
+      time 0.000000 0.353335
+      param "!player"
+    }
+  }
+}
+
+fps 60
+snap off

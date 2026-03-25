@@ -1,0 +1,53 @@
+// Choreo version 1
+actor "Eli"
+{
+  channel "audio"
+  {
+    event speak "Fine scientist, Judith"
+    {
+      time 0.133333 2.052335
+      param "eli_lab.eli_budget01"
+      fixedlength
+    }
+    event speak "She would have been at Black Mesa"
+    {
+      time 2.373333 5.536417
+      param "eli_lab.eli_budget02"
+      fixedlength
+    }
+    event speak "but you edged her out"
+    {
+      time 5.600001 9.279752
+      param "eli_lab.eli_budget04"
+      fixedlength
+    }
+    event speak "it could have been her in the test chamber"
+    {
+      time 10.113335 12.758709
+      param "eli_lab.eli_budget05"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+  }
+  channel "face to"
+  {
+  }
+  channel "trigger"
+  {
+    event firetrigger "close lab door"
+    {
+      time 3.126667 -1.000000
+      param "2"
+    }
+    event firetrigger "teleport mossy to new mark"
+    {
+      time 11.560000 -1.000000
+      param "1"
+    }
+  }
+}
+
+fps 60
+snap off

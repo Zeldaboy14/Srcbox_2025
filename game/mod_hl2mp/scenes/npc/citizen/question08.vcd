@@ -1,0 +1,20 @@
+// Choreo version 1
+actor "!Target1"
+{
+  channel "Audio"
+  {
+    event speak "question08"
+    {
+      time 0.006667 2.616100
+      param "npc_citizen.question08"
+      param2 "75dB"
+      fixedlength
+    }
+  }
+  channel "Expression"
+  {
+  }
+}
+
+fps 60
+snap off

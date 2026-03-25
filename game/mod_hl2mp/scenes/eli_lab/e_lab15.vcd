@@ -1,0 +1,75 @@
+// Choreo version 1
+actor "Eli"
+{
+  channel "audio"
+  {
+    event speak "Alyx sweetheart"
+    {
+      time 0.213333 1.226462
+      param "eli_lab.eli_alyxsweet"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+  }
+  channel "face to"
+  {
+  }
+  channel "move to"
+  {
+  }
+  faceposermodel "U:\HL2\hl2\models\Eli.mdl"
+}
+
+actor "Alyx"
+{
+  channel "audio"
+  {
+    event speak "hi dad"
+    {
+      time 1.473333 2.336099
+      param "eli_lab.al_hidad"
+      fixedlength
+    }
+    event speak "so where's the troublemaker"
+    {
+      time 2.806667 4.236622
+      param "eli_lab.al_riled01"
+      fixedlength
+    }
+    event speak "I've never seen the antlions so riled"
+    {
+      time 4.453334 6.356554
+      param "eli_lab.al_riled02"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+  }
+  channel "face to"
+  {
+  }
+  channel "move to"
+  {
+    event moveto "walk into lab"
+    {
+      time 1.493334 -1.000000
+      param "mark_al_into_lab"
+    }
+  }
+  channel "triggers"
+  {
+    event firetrigger "open door"
+    {
+      time 0.040000 -1.000000
+      param "1"
+    }
+  }
+  faceposermodel "U:\HL2\hl2\models\alyx.mdl"
+}
+
+mapname "maps\eli_lab.bsp"
+fps 60
+snap off

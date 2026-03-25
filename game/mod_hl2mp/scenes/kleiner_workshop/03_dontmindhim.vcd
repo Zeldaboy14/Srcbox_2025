@@ -1,0 +1,69 @@
+// Choreo version 1
+actor "Barney"
+{
+  channel "Audio"
+  {
+    event speak "dont mind him"
+    {
+      time 0.352741 2.693421
+      ramp 1.00 1.00 1.00
+      param "vo\kleiner_workshop\barney_11.wav"
+    }
+    event speak "get him in his suit"
+    {
+      time 17.241781 19.995523
+      ramp 1.00 1.00 1.00
+      param "vo\kleiner_workshop\barney_14.wav"
+    }
+    event speak "and hows supposed to work"
+    {
+      time 23.659588 25.770790
+      ramp 1.00 1.00 1.00
+      param "vo\kleiner_workshop\barney_16.wav"
+    }
+    event speak "elis place is a lot closer"
+    {
+      time 36.348633 40.479244
+      ramp 1.00 1.00 1.00
+      param "vo\kleiner_workshop\barney_18.wav"
+    }
+  }
+  channel "movement"
+  {
+  }
+}
+
+actor "Kleiner"
+{
+  channel "Audio"
+  {
+    event speak "i appologize"
+    {
+      time 2.813698 17.408527
+      ramp 1.00 1.00 1.00
+      param "vo\kleiner_workshop\kleiner_12.wav"
+    }
+    event speak "but doctor mossman"
+    {
+      time 19.904108 23.897034
+      ramp 1.00 1.00 1.00
+      param "vo\kleiner_workshop\kleiner_15.wav"
+    }
+    event speak "ill have to call her"
+    {
+      time 25.775341 36.423141
+      ramp 1.00 1.00 1.00
+      param "vo\kleiner_workshop\kleiner_17.wav"
+    }
+    event speak "excelent point"
+    {
+      time 40.334255 47.998837
+      ramp 1.00 1.00 1.00
+      param "vo\kleiner_workshop\kleiner_19.wav"
+    }
+  }
+  channel "movement"
+  {
+  }
+}
+

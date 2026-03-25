@@ -1,0 +1,25 @@
+// Choreo version 1
+actor "Monk"
+{
+  channel "Audio"
+  {
+    event speak "toomany"
+    {
+      time 0.153334 1.372382
+      param "town.monk_toomany"
+      param2 "90dB"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+    event lookat "look at player"
+    {
+      time 0.020000 1.446667
+      param "!player"
+    }
+  }
+}
+
+fps 60
+snap off

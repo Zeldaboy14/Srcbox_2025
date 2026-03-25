@@ -1,0 +1,33 @@
+// Choreo version 1
+actor "standoff_citizen_2coverguy"
+{
+  channel "audio"
+  {
+    event speak "drawfire"
+    {
+      time 0.426667 3.445261
+      ramp 1.00 1.00 1.00
+      param "citizen\drawfire.wav"
+      fixedlength
+    }
+  }
+  channel "lookat"
+  {
+    event lookat "player"
+    {
+      time 0.066666 2.573333
+      ramp 0.97 1.00 0.84
+      param "!player"
+    }
+    event lookat "target"
+    {
+      time 2.693334 4.880001
+      ramp 0.87 1.00 1.00
+      param "standoff_cop_a1"
+    }
+  }
+}
+
+mapname "maps\e3_c17_01.bsp"
+fps 60
+snap off

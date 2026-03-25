@@ -1,0 +1,179 @@
+// Choreo version 1
+actor "Alyx"
+{
+  channel "audio"
+  {
+    event speak "So, you've met Dr. Mossman"
+    {
+      time 0.146669 2.892995
+      param "eli_lab.al_honest01"
+      fixedlength
+    }
+    event speak "she's one of the reasons..."
+    {
+      time 3.533333 6.398253
+      param "eli_lab.al_honest02"
+      fixedlength
+    }
+    event speak "Dog, come!"
+    {
+      time 11.340000 12.020726
+      param "eli_lab.al_comedog01"
+      fixedlength
+    }
+    event speak "c'mere boy"
+    {
+      time 12.473333 13.116984
+      param "eli_lab.al_comedog02"
+      fixedlength
+    }
+    event speak "Gordon, this is dog"
+    {
+      time 15.959998 17.080067
+      param "eli_lab.al_thisisdog01"
+      fixedlength
+    }
+    event speak "My dad built him..."
+    {
+      time 17.660000 19.694399
+      param "eli_lab.al_thisisdog02"
+      fixedlength
+    }
+    event speak "be my little buddy..."
+    {
+      time 20.000004 22.313179
+      param "eli_lab.al_thisisdog03"
+      fixedlength
+    }
+    event speak "That was the first model"
+    {
+      time 23.186668 26.504559
+      param "eli_lab.al_thisisdog04"
+      fixedlength
+    }
+    event speak "I've been adding to him ever since"
+    {
+      time 26.860001 29.047960
+      param "eli_lab.al_thisisdog05"
+      fixedlength
+    }
+    event speak "haven't I boy?"
+    {
+      time 29.333336 30.147350
+      param "eli_lab.al_thisisdog06"
+      fixedlength
+    }
+    event speak "oh my god."
+    {
+      time 32.480003 33.143925
+      param "eli_lab.al_omgscanners01"
+      fixedlength
+    }
+    event speak "those are scanners"
+    {
+      time 33.400002 34.568527
+      param "eli_lab.al_omgscanners02"
+      fixedlength
+    }
+    event speak "Gordon get back inside we've got to warn"
+    {
+      time 34.973331 36.641270
+      param "eli_lab.al_omgscanners03"
+      fixedlength
+    }
+    event speak "They know"
+    {
+      time 38.106667 38.682606
+      param "eli_lab.al_theyknow01"
+      fixedlength
+    }
+    event speak "quick, get in"
+    {
+      time 39.006668 39.937145
+      param "eli_lab.al_theyknow02"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+  }
+  channel "face to"
+  {
+  }
+  channel "move to"
+  {
+    event moveto "go outside"
+    {
+      time 9.046667 -1.000000
+      param "mark_al_to_exterior"
+    }
+    event moveto "go back in airlock"
+    {
+      time 36.086666 -1.000000
+      param "mark_al_return_to_airlock"
+    }
+  }
+  channel "trigger"
+  {
+    event firetrigger "open airlock inner door"
+    {
+      time 0.133333 -1.000000
+      param "1"
+    }
+    event firetrigger "open airlock outer door"
+    {
+      time 4.613334 -1.000000
+      param "3"
+    }
+    event firetrigger "close airlock inner door"
+    {
+      time 19.240004 -1.000000
+      param "2"
+    }
+  }
+  faceposermodel "U:\HL2\hl2\models\alyx.mdl"
+}
+
+actor "Dog"
+{
+  channel "move to"
+  {
+    event moveto "move into airlock"
+    {
+      time 38.833332 -1.000000
+      param "mark_dog_airlock"
+    }
+    event moveto "go to Alyx"
+    {
+      time 14.060000 -1.000000
+      param "Alyx"
+    }
+    event moveto "move to player"
+    {
+      time 23.133335 -1.000000
+      param "!player"
+    }
+    event moveto "move to alyx"
+    {
+      time 33.266666 -1.000000
+      param "alyx"
+    }
+  }
+  channel "look at"
+  {
+    event lookat "look at player"
+    {
+      time 17.053329 22.326668
+      param "!player"
+    }
+    event lookat "look at alyx"
+    {
+      time 22.700005 28.766672
+      param "alyx"
+    }
+  }
+}
+
+mapname "maps\eli_lab.bsp"
+fps 60
+snap off

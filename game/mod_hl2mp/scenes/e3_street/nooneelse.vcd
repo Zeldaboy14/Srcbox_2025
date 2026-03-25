@@ -1,0 +1,26 @@
+// Choreo version 1
+actor "!target1"
+{
+  channel "Audio"
+  {
+    event speak "nooneelse"
+    {
+      time 0.026667 3.882926
+      ramp 1.00 1.00 1.00
+      param "E3_C17_01.CitizenNoOneElse"
+      fixedlength
+    }
+  }
+  channel "Lookatplayer"
+  {
+    event lookat "lookatplayer"
+    {
+      time 0.033334 3.866667
+      ramp 1.00 1.00 1.00
+      param "!player"
+    }
+  }
+}
+
+fps 60
+snap off

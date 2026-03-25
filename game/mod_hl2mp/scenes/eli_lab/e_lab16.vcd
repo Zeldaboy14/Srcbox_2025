@@ -1,0 +1,165 @@
+// Choreo version 1
+actor "Eli"
+{
+  channel "audio"
+  {
+    event speak "I belive you've met Alyx"
+    {
+      time 0.173333 1.643220
+      param "eli_lab.eli_righthand01"
+      fixedlength
+    }
+    event speak "she's my righthand gal"
+    {
+      time 1.893334 3.405102
+      param "eli_lab.eli_righthand02"
+      fixedlength
+    }
+    event speak "now now"
+    {
+      time 6.126667 7.622064
+      param "eli_lab.eli_nownow"
+      fixedlength
+    }
+    event speak "as a matter of fact, I was ..."
+    {
+      time 11.113333 14.141564
+      param "eli_lab.eli_myself"
+      fixedlength
+    }
+    event speak "sure you go ahead"
+    {
+      time 19.413332 20.841019
+      param "eli_lab.eli_micro01"
+      fixedlength
+    }
+    event speak "Gordon, hold onto that zero-point..."
+    {
+      time 20.993334 24.182608
+      param "eli_lab.eli_micro02"
+      fixedlength
+    }
+    event speak "good hands"
+    {
+      time 32.033333 33.881657
+      param "eli_lab.eli_fineidea03"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+    event lookat "look at player"
+    {
+      time 0.186667 1.653333
+      param "!player"
+    }
+    event lookat "look at Alyx"
+    {
+      time 1.886667 14.080000
+      param "alyx"
+    }
+    event lookat "look at player"
+    {
+      time 21.013336 24.200003
+      param "!player"
+    }
+  }
+  channel "face to"
+  {
+  }
+  channel "move to"
+  {
+  }
+  faceposermodel "U:\HL2\hl2\models\Eli.mdl"
+}
+
+actor "Alyx"
+{
+  channel "audio"
+  {
+    event speak "oh, you mean old mossy left me a hand"
+    {
+      time 3.900000 6.314422
+      param "eli_lab.al_lefthand"
+      fixedlength
+    }
+    event speak "I'm not starting anything..."
+    {
+      time 7.286665 9.206166
+      param "eli_lab.al_tour01"
+      fixedlength
+    }
+    event speak "I suppose she already..."
+    {
+      time 9.633333 11.167233
+      param "eli_lab.al_tour02"
+      fixedlength
+    }
+    event speak "let me do it dad"
+    {
+      time 14.066667 15.097891
+      param "eli_lab.al_olddays01"
+      fixedlength
+    }
+    event speak "there's stuff I'd like to ask Gordon about"
+    {
+      time 15.280000 17.035963
+      param "eli_lab.al_olddays02"
+      fixedlength
+    }
+    event speak "you know..."
+    {
+      time 17.473335 17.855602
+      param "eli_lab.al_olddays03"
+      fixedlength
+    }
+    event speak "about the old days"
+    {
+      time 18.253334 19.038504
+      param "eli_lab.al_olddays04"
+      fixedlength
+    }
+    event speak "I'll bring him back in 1 piece"
+    {
+      time 30.200005 31.777351
+      param "eli_lab.al_onepiece"
+      fixedlength
+    }
+    event speak "see what he stirred up"
+    {
+      time 24.333334 26.066145
+      param "eli_lab.al_stirredup02"
+      fixedlength
+    }
+    event speak "antlion's den"
+    {
+      time 26.146666 29.815010
+      param "eli_lab.al_stirredup03"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+    event lookat "look at Eli"
+    {
+      time 2.546667 15.700001
+      param "Eli"
+    }
+  }
+  channel "face to"
+  {
+  }
+  channel "move to"
+  {
+    event moveto "head out of lab"
+    {
+      time 31.906673 -1.000000
+      param "mark_al_to_mossman"
+    }
+  }
+  faceposermodel "U:\HL2\hl2\models\alyx.mdl"
+}
+
+mapname "maps\eli_lab.bsp"
+fps 60
+snap off

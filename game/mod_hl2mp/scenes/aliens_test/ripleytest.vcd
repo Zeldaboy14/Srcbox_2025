@@ -1,0 +1,36 @@
+// Choreo version 1
+actor "alyx"
+{
+  channel "dialogue"
+  {
+    event speak "Rip04"
+    {
+      time 0.320000 4.876871
+      param "Aliens.A05-Rip04"
+      fixedlength
+    }
+    event speak "Rip05"
+    {
+      time 5.340001 9.293199
+      param "Aliens.A06-Rip05"
+      fixedlength
+    }
+    event speak "Rip03"
+    {
+      time 10.100000 13.432064
+      param "Aliens.A04-Rip03"
+      fixedlength
+    }
+  }
+  channel "sequences"
+  {
+    event sequence "start acting"
+    {
+      time 0.330000 -1.000000
+      param "voctest"
+    }
+  }
+}
+
+fps 60
+snap off

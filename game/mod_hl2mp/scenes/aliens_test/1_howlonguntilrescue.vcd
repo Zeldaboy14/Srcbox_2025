@@ -1,0 +1,75 @@
+// Choreo version 1
+actor "Alyx"
+{
+  channel "audio"
+  {
+    event speak "Rip01"
+    {
+      time 1.359091 4.389250
+      param "Aliens.A01-Rip01"
+      fixedlength
+    }
+  }
+  channel "movements"
+  {
+    event moveto "Start walking to mark1"
+    {
+      time 0.143636 -1.000000
+      param "alyx_mark1"
+    }
+  }
+  channel "looktargets"
+  {
+    event lookat "Look at Hicks"
+    {
+      time 0.889248 7.292314
+      param "Barney"
+    }
+  }
+}
+
+actor "Barney"
+{
+  channel "audio"
+  {
+    event speak "Hicks01"
+    {
+      time 6.186079 7.220818
+      param "Aliens.A02-Hicks01"
+      fixedlength
+    }
+  }
+  channel "movement"
+  {
+  }
+  channel "looktargets"
+  {
+    event lookat "Look at Alyx"
+    {
+      time 2.994617 4.055295
+      param "Alyx"
+    }
+    event lookat "Look at player"
+    {
+      time 4.354235 5.757569
+      param "!player"
+    }
+    event lookat "look at alyx"
+    {
+      time 6.057255 7.473255
+      param "alyx"
+    }
+  }
+}
+
+mapname "maps\aliens_test.bsp"
+scalesettings
+{
+  "CChoreoView" "100"
+  "RampTool" "100"
+  "ExpressionTool" "100"
+  "GestureTool" "100"
+  "SceneRampTool" "100"
+}
+fps 60
+snap off

@@ -1,0 +1,24 @@
+// Choreo version 1
+actor "npc_wounded"
+{
+  channel "audio"
+  {
+    event speak "01"
+    {
+      time 0.046669 4.498550
+      param "Sniper.hurt01"
+      fixedlength
+    }
+  }
+}
+
+scalesettings
+{
+  "CChoreoView" "100"
+  "RampTool" "100"
+  "ExpressionTool" "100"
+  "GestureTool" "100"
+  "SceneRampTool" "100"
+}
+fps 60
+snap off

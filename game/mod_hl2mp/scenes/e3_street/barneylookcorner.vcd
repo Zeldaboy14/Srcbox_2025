@@ -1,0 +1,29 @@
+// Choreo version 1
+actor "!Target1"
+{
+  channel "Look"
+  {
+    event lookat "lookleft"
+    {
+      time 0.013334 6.726667
+      ramp 0.92 1.00 1.00
+      param "lookleft"
+    }
+  }
+  channel "Anim"
+  {
+    event sequence "asdf"
+    {
+      time 0.026667 6.753333
+      ramp 1.00 1.00 1.00
+      param "SWI_peekL"
+    }
+  }
+  channel "test"
+  {
+  }
+}
+
+mapname "maps\jake\sw_barney_intro.bsp"
+fps 60
+snap off

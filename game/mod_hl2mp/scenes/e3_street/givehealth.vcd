@@ -1,0 +1,81 @@
+// Choreo version 1
+event section "wait - move to player"
+{
+  time 0.240000 -1.000000
+  ramp 1.00 1.00 1.00
+  param "noaction"
+}
+event section "wait - face player"
+{
+  time 1.053333 -1.000000
+  ramp 1.00 1.00 1.00
+  param "noaction"
+}
+actor "!target1"
+{
+  channel "audio"
+  {
+    event speak "givehealth01"
+    {
+      time 1.400001 4.163176
+      ramp 1.00 1.00 1.00
+      param "E3_C17_01.CitizenGiveHealth"
+      fixedlength
+    }
+  }
+  channel "facial"
+  {
+  }
+  channel "Anim"
+  {
+    event gesture "tossitem"
+    {
+      time 1.153333 4.160000
+      ramp 1.00 1.00 1.00
+      param "ThrowItem"
+      absolutetags playback_time
+      {
+        "you" 0.504795
+        "look" 0.764603
+      }
+      absolutetags shifted_time
+      {
+        "you" 0.499564
+        "look" 0.726242
+      }
+      sequenceduration 1.833333
+    }
+  }
+  channel "LookatPlayer"
+  {
+    event lookat "lookee"
+    {
+      time 1.193333 4.460001
+      ramp 0.85 1.00 0.83
+      param "!player"
+    }
+  }
+  channel "movement"
+  {
+    event moveto "move to target_health"
+    {
+      time 0.093333 -1.000000
+      ramp 1.00 1.00 1.00
+      param "target_health"
+      resumecondition
+    }
+  }
+  channel "facing"
+  {
+    event face "face player"
+    {
+      time 0.493333 -1.000000
+      ramp 1.00 1.00 1.00
+      param "!player"
+      resumecondition
+    }
+  }
+}
+
+fps 60
+snap off

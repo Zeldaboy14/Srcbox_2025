@@ -1,0 +1,344 @@
+// Choreo version 1
+actor "Regis"
+{
+  channel "Audio"
+  {
+    event speak "dunno"
+    {
+      time 3.233333 7.302721
+      param "vienna.hobo2_dunno"
+      fixedlength
+    }
+    event speak "aintgotwhat"
+    {
+      time 14.293335 15.185036
+      param "vienna.hobo2_aintgotwhat"
+      fixedlength
+    }
+    event speak "whichisit"
+    {
+      time 24.320000 27.059954
+      param "vienna.hobo2_whichisit"
+      fixedlength
+    }
+    event speak "suityerself"
+    {
+      time 36.746662 38.578705
+      param "vienna.hobo2_suityerself"
+      fixedlength
+    }
+    event speak "gastro"
+    {
+      time 48.533329 51.840721
+      param "vienna.hobo2_gastro"
+      fixedlength
+    }
+    event speak "stilleatinit"
+    {
+      time 53.973339 55.221706
+      param "vienna.hobo2_stilleatinit"
+      fixedlength
+    }
+    event speak "mansgotpoint"
+    {
+      time 60.773335 61.762291
+      param "vienna.hobo2_mansgotpoint"
+      fixedlength
+    }
+    event speak "vienna"
+    {
+      time 64.933342 68.905449
+      param "vienna.hobo2_vienna"
+      fixedlength
+    }
+  }
+  channel "Looktarget"
+  {
+    event lookat "look at Petti"
+    {
+      time 0.146667 7.313334
+      param "Pettigrew"
+    }
+    event lookat "look at Fludd"
+    {
+      time 7.439999 18.900000
+      param "Fludd"
+    }
+    event lookat "look at Petti"
+    {
+      time 19.306667 24.286669
+      param "Pettigrew"
+    }
+    event lookat "look at Petti"
+    {
+      time 25.546669 27.673334
+      param "Pettigrew"
+    }
+    event lookat "look at Fludd"
+    {
+      time 24.320000 25.500000
+      param "Fludd"
+    }
+    event lookat "look at Fludd"
+    {
+      time 27.733334 34.446663
+      param "Fludd"
+    }
+    event lookat "look at Petti"
+    {
+      time 34.493332 37.539997
+      param "Pettigrew"
+    }
+    event lookat "look at Fludd"
+    {
+      time 37.586670 44.259998
+      param "Fludd"
+    }
+    event lookat "look at Petti"
+    {
+      time 44.359997 46.179996
+      param "Pettigrew"
+    }
+    event lookat "look at Fludd"
+    {
+      time 46.226665 55.299995
+      param "Fludd"
+    }
+    event lookat "look at Petti"
+    {
+      time 55.373337 63.580002
+      param "Pettigrew"
+    }
+  }
+  channel "Animation"
+  {
+  }
+}
+
+actor "Fludd"
+{
+  channel "Audio"
+  {
+    event speak "fittoeat"
+    {
+      time 7.920000 13.877392
+      param "vienna.hobo3_fittoeat"
+      fixedlength
+    }
+    event speak "youknow"
+    {
+      time 15.733334 19.009909
+      param "vienna.hobo3_youknow"
+      fixedlength
+    }
+    event speak "what"
+    {
+      time 23.133335 23.570206
+      param "vienna.hobo3_what"
+      fixedlength
+    }
+    event speak "dontremember"
+    {
+      time 27.759998 34.332993
+      param "vienna.hobo3_dontremember"
+      fixedlength
+    }
+    event speak "lifeinhands"
+    {
+      time 38.986671 42.978123
+      param "vienna.hobo3_lifeinhands"
+      fixedlength
+    }
+    event speak "highblood"
+    {
+      time 45.839996 48.977547
+      param "vienna.hobo3_highblood"
+      fixedlength
+    }
+    event speak "nopebotch"
+    {
+      time 52.026676 53.377018
+      param "vienna.hobo3_nopebotch"
+      fixedlength
+    }
+    event speak "aintsilent"
+    {
+      time 58.800003 60.706375
+      param "vienna.hobo3_aintsilent"
+      fixedlength
+    }
+  }
+  channel "Looktarget"
+  {
+    event lookat "look at regis"
+    {
+      time 5.573333 18.953333
+      param "Regis"
+    }
+    event lookat "look at Petti"
+    {
+      time 0.160000 5.380001
+      param "Pettigrew"
+    }
+    event lookat "look at Petti"
+    {
+      time 20.306667 24.340002
+      param "Pettigrew"
+    }
+    event lookat "look at Regis"
+    {
+      time 24.426666 34.366669
+      param "Regis"
+    }
+    event lookat "look at Petti"
+    {
+      time 34.426666 36.553337
+      param "Pettigrew"
+    }
+    event lookat "look at Regis"
+    {
+      time 36.586670 44.166672
+      param "Regis"
+    }
+    event lookat "look at Petti"
+    {
+      time 44.239998 49.046669
+      param "Pettigrew"
+    }
+    event lookat "look at Regis"
+    {
+      time 49.066666 55.886662
+      param "Regis"
+    }
+    event lookat "look at Petti"
+    {
+      time 55.893333 61.166672
+      param "Pettigrew"
+    }
+    event lookat "look at Regis"
+    {
+      time 61.226669 68.873337
+      param "Regis"
+    }
+  }
+  channel "Animation"
+  {
+  }
+}
+
+actor "Pettigrew"
+{
+  channel "Audio"
+  {
+    event speak "whatsthatcan"
+    {
+      time 0.220000 2.862993
+      param "vienna.hobo1_whatsthatcan"
+      fixedlength
+    }
+    event speak "dingedin"
+    {
+      time 19.626667 22.848232
+      param "vienna.hobo1_dingedin"
+      fixedlength
+    }
+    event speak "figgers"
+    {
+      time 34.426666 36.491089
+      param "vienna.hobo1_figgers"
+      fixedlength
+    }
+    event speak "highblood"
+    {
+      time 44.026672 45.709778
+      param "vienna.hobo1_highblood"
+      fixedlength
+    }
+    event speak "hepc"
+    {
+      time 55.653332 58.809135
+      param "vienna.hobo1_hepc"
+      fixedlength
+    }
+    event speak "shutupeat"
+    {
+      time 61.893333 63.458096
+      param "vienna.hobo1_shutupeat"
+      fixedlength
+    }
+  }
+  channel "Looktarget"
+  {
+    event lookat "look at regis"
+    {
+      time 0.213333 9.166666
+      param "Regis"
+    }
+    event lookat "look at Fludd"
+    {
+      time 9.200001 16.313332
+      param "Fludd"
+    }
+    event lookat "look at Fludd"
+    {
+      time 19.520002 23.673332
+      param "Fludd"
+    }
+    event lookat "look at regis"
+    {
+      time 16.533333 19.353333
+      param "Regis"
+    }
+    event lookat "look at Regis"
+    {
+      time 24.373335 28.406670
+      param "Regis"
+    }
+    event lookat "look at Fludd"
+    {
+      time 28.426668 36.553329
+      param "Fludd"
+    }
+    event lookat "look at Regis"
+    {
+      time 36.573334 42.993336
+      param "Regis"
+    }
+    event lookat "look at Fludd"
+    {
+      time 43.093334 48.993324
+      param "Fludd"
+    }
+    event lookat "look at Regis"
+    {
+      time 49.053333 55.633339
+      param "Regis"
+    }
+    event lookat "look at Fludd"
+    {
+      time 55.693333 61.459984
+      param "Fludd"
+    }
+    event lookat "look at Regis"
+    {
+      time 61.520000 63.900002
+      param "Regis"
+    }
+    event lookat "look at Fludd"
+    {
+      time 63.933334 64.926651
+      param "Fludd"
+    }
+    event lookat "look at Regis"
+    {
+      time 64.973343 68.886673
+      param "Regis"
+    }
+  }
+  channel "Animation"
+  {
+  }
+}
+
+fps 60
+snap off

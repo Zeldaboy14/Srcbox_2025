@@ -1,0 +1,91 @@
+// Choreo version 1
+actor "kleiner"
+{
+  channel "audio"
+  {
+    event speak "20"
+    {
+      time 8.973332 11.818865
+      param "kraken_teleport.kleiner_20"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+  }
+  channel "move to"
+  {
+  }
+  channel "anims"
+  {
+  }
+  faceposermodel "D:\anon-hl2\hl2\models\Kleiner.mdl"
+}
+
+actor "barney"
+{
+  channel "audio"
+  {
+    event speak "18"
+    {
+      time 0.120000 4.847256
+      param "kraken_teleport.barney_18"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+    event firetrigger "break glass"
+    {
+      time 6.793333 -1.000000
+      param "1"
+    }
+    event lookat "look at gordon"
+    {
+      time 0.160000 4.960000
+      param "!player"
+    }
+  }
+  channel "move to"
+  {
+  }
+  channel "anims"
+  {
+  }
+  channel "animations"
+  {
+  }
+  faceposermodel "D:\anon-hl2\hl2\models\Barney.mdl"
+}
+
+actor "mossman"
+{
+  channel "audio"
+  {
+    event speak "19"
+    {
+      time 5.773333 8.802448
+      param "kraken_teleport.mossman_19"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+  }
+  channel "move to"
+  {
+  }
+  faceposermodel "D:\anon-hl2\hl2\models\mossman.mdl"
+}
+
+mapname "maps\d1_lab_01b.bsp"
+scalesettings
+{
+  "CChoreoView" "100"
+  "ExpressionTool" "100"
+  "GestureTool" "100"
+  "RampTool" "100"
+  "SceneRampTool" "100"
+}
+fps 60
+snap off

@@ -3,13 +3,23 @@ actor "Alyx"
 {
   channel "audio"
   {
-    event speak "streetwar.al_extshield"
+    event speak "that's it"
     {
-      time 0.026666 1.492607
-      param "streetwar.al_extshield"
+      time 0.219999 1.091609
+      param "streetwar.al_thatsit"
       fixedlength
-      cctype "cc_master"
-      cctoken ""
+    }
+    event speak "first bit's done"
+    {
+      time 2.473333 3.456893
+      param "streetwar.al_firstbit"
+      fixedlength
+    }
+    event speak "now for tricky bit"
+    {
+      time 4.339999 5.578616
+      param "streetwar.al_nowtricky"
+      fixedlength
     }
   }
   channel "look at"
@@ -21,13 +31,5 @@ actor "Alyx"
   faceposermodel "U:\HL2\hl2\models\alyx.mdl"
 }
 
-scalesettings
-{
-  "CChoreoView" "100"
-  "RampTool" "100"
-  "ExpressionTool" "100"
-  "GestureTool" "100"
-  "SceneRampTool" "100"
-}
 fps 60
 snap off

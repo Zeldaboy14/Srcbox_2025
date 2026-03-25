@@ -1,0 +1,33 @@
+// Choreo version 1
+actor "Eli"
+{
+  channel "audio"
+  {
+    event speak "whoa"
+    {
+      time 0.093334 0.889434
+      param "eli_lab.eli_whoa01"
+      fixedlength
+    }
+    event speak "careful"
+    {
+      time 1.220000 1.847030
+      param "eli_lab.eli_whoa02"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+  }
+  channel "face to"
+  {
+  }
+  channel "move to"
+  {
+  }
+  faceposermodel "U:\HL2\hl2\models\Eli.mdl"
+}
+
+mapname "maps\eli_lab.bsp"
+fps 60
+snap off

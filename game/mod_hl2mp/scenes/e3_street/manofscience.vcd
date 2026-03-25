@@ -1,0 +1,27 @@
+// Choreo version 1
+actor "!target1"
+{
+  channel "Audio"
+  {
+    event speak "manofscience"
+    {
+      time 0.026666 2.604081
+      ramp 1.00 1.00 1.00
+      param "E3_C17_01.BarneyManofScience"
+      param2 "75dB"
+      fixedlength
+    }
+  }
+  channel "Lookatplayer"
+  {
+    event lookat "lookatplayer"
+    {
+      time 0.006667 2.600000
+      ramp 1.00 1.00 1.00
+      param "!player"
+    }
+  }
+}
+
+fps 60
+snap off

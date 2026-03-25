@@ -1,0 +1,446 @@
+// Choreo version 1
+actor "Mossman"
+{
+  channel "audio"
+  {
+    event speak "you could make this easier"
+    {
+      time 28.306665 30.010113
+      param "citadel.mo_makeeasy"
+      fixedlength
+    }
+    event speak "Doctor - that's strictly not true..."
+    {
+      time 43.153336 49.381386
+      param "citadel.mo_veryhard"
+      fixedlength
+    }
+    event speak "Eli, the stars are in our grasp..."
+    {
+      time 72.673355 79.780411
+      param "citadel.mo_grasp"
+      fixedlength
+    }
+    event speak "Eli - everyone here on Earth..."
+    {
+      time 138.573318 146.366577
+      param "citadel.mo_chooselife"
+      fixedlength
+    }
+    event speak "it isn't necessary"
+    {
+      time 154.380005 155.948074
+      param "citadel.mo_necessary"
+      fixedlength
+    }
+    event speak "what?"
+    {
+      time 165.820007 166.728714
+      param "citadel.mo_what"
+      fixedlength
+    }
+    event speak "It's a waste of a valuable resource"
+    {
+      time 167.579971 169.816391
+      param "citadel.mo_treasure"
+      fixedlength
+    }
+    event speak "a treasure..."
+    {
+      time 169.893326 173.335510
+      param "citadel.mo_treasure02"
+      fixedlength
+    }
+    event speak "I am not an executioner..."
+    {
+      time 179.419998 183.213470
+      param "citadel.mo_executioner"
+      fixedlength
+    }
+    event speak "come out of there...."
+    {
+      time 199.326706 202.611328
+      param "citadel.mo_partofthis"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+  }
+  channel "face to"
+  {
+  }
+  channel "triggers"
+  {
+  }
+  channel "move to"
+  {
+  }
+}
+
+actor "Eli"
+{
+  channel "audio"
+  {
+    event speak "don't struggle honey..."
+    {
+      time 25.679998 28.140429
+      param "citadel.eli_dontstruggle"
+      fixedlength
+    }
+    event speak "don't talk to me"
+    {
+      time 30.073336 31.896986
+      param "citadel.eli_donttalk"
+      fixedlength
+    }
+    event speak "no..."
+    {
+      time 67.033356 68.016052
+      param "citadel.eli_notobreen"
+      fixedlength
+    }
+    event speak "their only goal for this technology..."
+    {
+      time 78.793350 82.662445
+      param "citadel.eli_enslave"
+      fixedlength
+    }
+    event speak "what I've seen is also beyond words..."
+    {
+      time 124.346634 127.531143
+      param "citadel.eli_genocide"
+      fixedlength
+    }
+    event speak "you picked a strange time for false hope, Judith..."
+    {
+      time 172.306671 176.217926
+      param "citadel.eli_falsehope"
+      fixedlength
+    }
+    event speak "genocide"
+    {
+      time 127.626640 128.637909
+      param "citadel.eli_genocide01"
+      fixedlength
+    }
+    event speak "indescribable evil"
+    {
+      time 128.739990 130.595993
+      param "citadel.eli_genocide02"
+      fixedlength
+    }
+    event speak "humanity forced into camps..."
+    {
+      time 130.679993 132.732605
+      param "citadel.eli_genocide03"
+      fixedlength
+    }
+    event speak "I know what you worship, Breen..."
+    {
+      time 88.360023 92.191612
+      param "citadel.eli_worship"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+  }
+  channel "face to"
+  {
+  }
+  channel "move to"
+  {
+  }
+}
+
+actor "Breen"
+{
+  channel "audio"
+  {
+    event speak "so this is Dr. Freeman"
+    {
+      time 0.073334 3.485216
+      param "citadel.br_freemanatlast01"
+      fixedlength
+    }
+    event speak "at last"
+    {
+      time 3.506667 4.921565
+      param "citadel.br_freemanatlast02"
+      fixedlength
+    }
+    event speak "I wish I could say..."
+    {
+      time 5.020002 11.811907
+      param "citadel.br_freemanatlast03"
+      fixedlength
+    }
+    event speak "and this must be "
+    {
+      time 12.460002 13.296669
+      param "citadel.br_missvance01"
+      fixedlength
+    }
+    event speak "Miss Vance"
+    {
+      time 13.380000 14.250816
+      param "citadel.br_missvance02"
+      fixedlength
+    }
+    event speak "Alyx"
+    {
+      time 14.826665 15.514715
+      param "citadel.br_missvance03"
+      fixedlength
+    }
+    event speak "the last time I saw you..."
+    {
+      time 15.933331 19.846052
+      param "citadel.br_missvance04"
+      fixedlength
+    }
+    event speak "you have your mother's eyes"
+    {
+      time 20.273333 22.497301
+      param "citadel.br_missvance05"
+      fixedlength
+    }
+    event speak "father's nature"
+    {
+      time 23.300001 25.200340
+      param "citadel.br_missvance06"
+      fixedlength
+    }
+    event speak "yes, "
+    {
+      time 32.299999 33.169975
+      param "citadel.br_intractable01"
+      fixedlength
+    }
+    event speak "save your energy"
+    {
+      time 33.493336 34.579845
+      param "citadel.br_intractable02"
+      fixedlength
+    }
+    event speak "I told you he would be intractable"
+    {
+      time 35.353325 37.079472
+      param "citadel.br_intractable03"
+      fixedlength
+    }
+    event speak "Don't worry, Eli..."
+    {
+      time 37.466667 38.734219
+      param "citadel.br_wontcompromise01"
+      fixedlength
+    }
+    event speak "Dr. Mossman has adequate experience..."
+    {
+      time 38.813332 43.052334
+      param "citadel.br_wontcompromise02"
+      fixedlength
+    }
+    event speak "Don't sell yourself short, Judith"
+    {
+      time 48.853344 51.953548
+      param "citadel.br_youlldofine01"
+      fixedlength
+    }
+    event speak "of course, I was hoping"
+    {
+      time 52.253349 56.329472
+      param "citadel.br_youlldofine02"
+      fixedlength
+    }
+    event speak "But it seems that Gordon has signed up "
+    {
+      time 56.373333 60.067028
+      param "citadel.br_youlldofine04"
+      fixedlength
+    }
+    event speak "As for young Miss Vance"
+    {
+      time 60.653332 62.784534
+      param "citadel.br_youlldofine05"
+      fixedlength
+    }
+    event speak "her talents will be put to practical use..."
+    {
+      time 62.873341 67.135971
+      param "citadel.br_youlldofine06"
+      fixedlength
+    }
+    event speak "well, if you'd like to reconsider..."
+    {
+      time 67.826691 72.851631
+      param "citadel.br_reconsider01"
+      fixedlength
+    }
+    event speak "Oh"
+    {
+      time 92.453308 93.302650
+      param "citadel.br_oheli01"
+      fixedlength
+    }
+    event speak "Eli..."
+    {
+      time 93.799973 94.323532
+      param "citadel.br_oheli02"
+      fixedlength
+    }
+    event speak "if only you could see "
+    {
+      time 94.766647 96.806961
+      param "citadel.br_oheli03"
+      fixedlength
+    }
+    event speak "you wouldn't be so short-sighted"
+    {
+      time 97.273331 98.992744
+      param "citadel.br_oheli04"
+      fixedlength
+    }
+    event speak "I have studied 36..."
+    {
+      time 99.626663 101.744873
+      param "citadel.br_oheli05"
+      fixedlength
+    }
+    event speak "zones beyond our own"
+    {
+      time 101.753319 103.331367
+      param "citadel.br_oheli06"
+      fixedlength
+    }
+    event speak "carbon stars with ancient satellites..."
+    {
+      time 103.746658 109.102486
+      param "citadel.br_oheli07"
+      fixedlength
+    }
+    event speak "gas giants inhabited"
+    {
+      time 109.499977 119.325333
+      param "citadel.br_oheli08"
+      fixedlength
+    }
+    event speak "intersect"
+    {
+      time 119.326622 124.082657
+      param "citadel.br_oheli09"
+      fixedlength
+    }
+    event speak "those unfortunate days..."
+    {
+      time 132.486649 138.464218
+      param "citadel.br_unfortunatedays01"
+      fixedlength
+    }
+    event speak "Eli has already made his choice..."
+    {
+      time 146.599991 149.013412
+      param "citadel.br_elichoice01"
+      fixedlength
+    }
+    event speak "He's decided to be one of the very last..."
+    {
+      time 149.133347 154.380081
+      param "citadel.br_elichoice02"
+      fixedlength
+    }
+    event speak "Judith, "
+    {
+      time 156.320007 157.078400
+      param "citadel.br_redemption01"
+      fixedlength
+    }
+    event speak "I'm sorry to see"
+    {
+      time 157.193329 161.886551
+      param "citadel.br_redemption02"
+      fixedlength
+    }
+    event speak "but there is redemption for you..."
+    {
+      time 162.153320 165.853790
+      param "citadel.br_redemption03"
+      fixedlength
+    }
+    event speak "Take it."
+    {
+      time 166.720001 167.169708
+      param "citadel.br_takeit"
+      fixedlength
+    }
+    event speak "There - you see? Stubborn as ever"
+    {
+      time 176.340012 179.077545
+      param "citadel.br_stubborn"
+      fixedlength
+    }
+    event speak "Very well, "
+    {
+      time 183.513351 184.328003
+      param "citadel.br_madepoint01"
+      fixedlength
+    }
+    event speak "you've made your point"
+    {
+      time 184.419998 185.593628
+      param "citadel.br_madepoint02"
+      fixedlength
+    }
+    event speak "I already knew you were capable of talk"
+    {
+      time 186.153427 190.404587
+      param "citadel.br_madepoint05"
+      fixedlength
+    }
+    event speak "show your true limitations"
+    {
+      time 190.433380 192.267303
+      param "citadel.br_madepoint06"
+      fixedlength
+    }
+    event speak "and lack of commitment"
+    {
+      time 192.740021 194.414917
+      param "citadel.br_madepoint07"
+      fixedlength
+    }
+    event speak "Now stand aside"
+    {
+      time 195.493347 196.905609
+      param "citadel.br_madepoint08"
+      fixedlength
+    }
+    event speak "You fool!"
+    {
+      time 198.053375 198.977844
+      param "citadel.br_youfool"
+      fixedlength
+    }
+    event speak "Once Eli has convinced himself..."
+    {
+      time 83.093376 88.044098
+      param "citadel.br_intractable04"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+  }
+  channel "face to"
+  {
+  }
+  channel "move to"
+  {
+  }
+  faceposermodel "U:\HL2\hl2\models\breen.mdl"
+}
+
+mapname "maps\eli_lab.bsp"
+fps 60
+snap off

@@ -1,0 +1,40 @@
+// Choreo version 1
+actor "Monk"
+{
+  channel "Audio"
+  {
+    event speak "Very good brother"
+    {
+      time 0.153334 2.835239
+      param "town.monk_balc07"
+      param2 "90dB"
+      fixedlength
+    }
+    event speak "get to the church"
+    {
+      time 4.579999 7.668253
+      param "town.monk_balc08"
+      param2 "90dB"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+    event lookat "look at player"
+    {
+      time 0.013334 8.040001
+      param "!player"
+    }
+  }
+}
+
+scalesettings
+{
+  "CChoreoView" "100"
+  "RampTool" "100"
+  "ExpressionTool" "100"
+  "GestureTool" "100"
+  "SceneRampTool" "100"
+}
+fps 60
+snap off

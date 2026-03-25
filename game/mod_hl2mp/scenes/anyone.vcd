@@ -1,0 +1,132 @@
+// Choreo version 1
+actor "!npc_citizen"
+{
+  channel "Audio"
+  {
+    event speak "JoeTalk"
+    {
+      time 0.500000 4.319637
+      ramp 1.00 1.00 1.00
+      param "npc\citizen\joe00.wav"
+      fixedlength
+    }
+  }
+  channel "Facial"
+  {
+    event flexanimation "JoeFace"
+    {
+      time 0.486667 4.340001
+      ramp 1.00 1.00 1.00
+      param ""
+      flexanimations samples_use_time
+      {
+        "lid_raiser"         combo        
+        {
+          0.0000 1.0000
+          2.1075 1.0000
+          3.8533 1.0000
+        }
+        {
+          0.0000 0.5000
+          2.1075 0.5000
+          3.8533 0.5000
+        }
+        "lid_tightener"         combo        
+        {
+          0.0000 0.0000
+          2.1075 1.0000
+          3.8533 0.0000
+        }
+        {
+          0.0000 0.5000
+          2.1075 0.5000
+          3.8533 0.5000
+        }
+        "lid_droop"         combo        
+        {
+          0.0000 0.0000
+          2.1075 0.9800
+          3.8533 0.0000
+        }
+        {
+          0.0000 0.5000
+          2.1075 0.5000
+          3.8533 0.5000
+        }
+        "inner_raiser"         combo        
+        {
+          0.0000 1.0000
+          2.1075 1.0000
+          3.8533 1.0000
+        }
+        {
+          0.0000 0.5000
+          2.1075 0.5000
+          3.8533 0.5000
+        }
+        "outer_raiser"         combo        
+        {
+          0.0000 1.0000
+          2.1075 1.0000
+          3.8533 1.0000
+        }
+        {
+          0.0000 0.5000
+          2.1075 0.5000
+          3.8533 0.5000
+        }
+        "lowerer"         combo        
+        {
+          2.1075 0.9000
+        }
+        {
+          2.1075 0.5000
+        }
+        "cheek_raiser"         combo        
+        {
+          2.1075 0.8400
+        }
+        {
+          2.1075 0.5000
+        }
+        "wrinkler"        
+        {
+          2.1075 0.0000
+        }
+        "dilator"        
+        {
+          2.1075 1.0000
+        }
+        "jaw_clencher"        
+        {
+          2.1075 0.0000
+        }
+        "jaw_drop"        
+        {
+          0.0000 0.4300
+          2.1075 0.4300
+          3.8533 0.4300
+        }
+        "wide_open"        
+        {
+          0.0000 0.0000
+          2.1075 0.0000
+          3.8533 0.0000
+        }
+      }
+    }
+  }
+  channel "Look"
+  {
+    event lookat "LookPlayer"
+    {
+      time 0.486667 4.340001
+      ramp 1.00 1.00 1.00
+      param "!player"
+    }
+  }
+  faceposermodel "C:\HL2\hl2\models\Humans\Male_01.mdl"
+}
+
+fps 60
+snap off

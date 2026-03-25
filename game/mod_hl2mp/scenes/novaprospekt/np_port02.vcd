@@ -1,0 +1,38 @@
+// Choreo version 1
+actor "Kleiner"
+{
+  channel "audio"
+  {
+  }
+  channel "look at"
+  {
+  }
+}
+
+actor "Alyx"
+{
+  channel "audio"
+  {
+    event speak "this is cozy"
+    {
+      time 0.519994 1.892897
+      param "novaprospekt.al_cozy"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+  }
+  channel "turn to"
+  {
+    event face "face player"
+    {
+      time 0.006667 0.506667
+      param "!player"
+    }
+  }
+}
+
+mapname "maps\d3_lab_01.bsp"
+fps 60
+snap off

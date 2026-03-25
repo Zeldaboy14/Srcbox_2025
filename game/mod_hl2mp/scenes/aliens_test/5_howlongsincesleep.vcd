@@ -1,0 +1,37 @@
+// Choreo version 1
+actor "Alyx"
+{
+  channel "audio"
+  {
+  }
+}
+
+actor "Barney"
+{
+  channel "audio"
+  {
+    event speak "Hicks10"
+    {
+      time 0.296960 2.174829
+      param "Aliens.A25-Hicks10"
+      fixedlength
+    }
+    event speak "Hicks11"
+    {
+      time 2.665231 3.773938
+      param "Aliens.A26-Hicks11"
+      fixedlength
+    }
+  }
+}
+
+scalesettings
+{
+  "CChoreoView" "100"
+  "SceneRampTool" "100"
+  "RampTool" "100"
+  "ExpressionTool" "100"
+  "GestureTool" "100"
+}
+fps 60
+snap off

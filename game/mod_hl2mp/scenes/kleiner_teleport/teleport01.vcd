@@ -1,0 +1,522 @@
+// Choreo version 1
+actor "kleiner"
+{
+  channel "audio"
+  {
+    event speak "01"
+    {
+      time 0.093334 1.791475
+      param "k_teleport.kleiner_01"
+      fixedlength
+    }
+    event speak "04"
+    {
+      time 9.346666 11.503764
+      param "k_teleport.kleiner_04"
+      fixedlength
+    }
+    event speak "06"
+    {
+      time 16.240002 23.629208
+      param "k_teleport.kleiner_06"
+      fixedlength
+    }
+    event speak "08"
+    {
+      time 27.806667 29.734287
+      param "k_teleport.kleiner_08"
+      fixedlength
+    }
+    event speak "10"
+    {
+      time 34.026669 36.505035
+      param "k_teleport.kleiner_10"
+      fixedlength
+    }
+    event speak "12"
+    {
+      time 39.093334 49.741135
+      param "k_teleport.kleiner_12"
+      fixedlength
+    }
+    event speak "15"
+    {
+      time 70.339996 73.001945
+      param "k_teleport.kleiner_15"
+      fixedlength
+    }
+    event speak "17"
+    {
+      time 85.646667 88.675781
+      param "k_teleport.kleiner_17"
+      fixedlength
+    }
+    event speak "20"
+    {
+      time 97.173332 106.857323
+      param "k_teleport.kleiner_20"
+      fixedlength
+    }
+    event speak "22"
+    {
+      time 108.720009 113.630844
+      param "k_teleport.kleiner_22"
+      fixedlength
+    }
+    event speak "24"
+    {
+      time 115.573341 124.247627
+      param "k_teleport.kleiner_24"
+      fixedlength
+    }
+    event speak "26"
+    {
+      time 126.526665 131.575195
+      param "k_teleport.kleiner_26"
+      fixedlength
+    }
+    event speak "28"
+    {
+      time 132.746658 133.802261
+      param "k_teleport.kleiner_28"
+      fixedlength
+    }
+    event speak "30"
+    {
+      time 137.240005 142.334427
+      param "k_teleport.kleiner_30"
+      fixedlength
+    }
+    event speak "32"
+    {
+      time 144.566666 152.873779
+      param "k_teleport.kleiner_32"
+      fixedlength
+    }
+    event speak "34"
+    {
+      time 158.766663 171.846939
+      param "k_teleport.kleiner_34"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+    event face "face monitor"
+    {
+      time 4.960000 5.460000
+      param "target_kleiner_monitor"
+    }
+    event lookat "look at monitor"
+    {
+      time 3.706667 20.360001
+      param "target_kleiner_monitor"
+    }
+    event lookat "look at player"
+    {
+      time 20.386669 24.380001
+      param "!player"
+    }
+    event lookat "look at Gordon"
+    {
+      time 158.753326 171.866638
+      param "!player"
+    }
+    event lookat "look at monitor"
+    {
+      time 24.420002 36.533337
+      param "target_kleiner_monitor"
+    }
+    event lookat "look at barney"
+    {
+      time 36.586666 39.053341
+      param "barney"
+    }
+    event lookat "look at monitor"
+    {
+      time 46.533337 70.533325
+      param "target_kleiner_monitor"
+    }
+    event lookat "look at gordon"
+    {
+      time 70.553329 73.166664
+      param "!player"
+    }
+    event lookat "look at monitor"
+    {
+      time 73.173332 109.273354
+      param "target_kleiner_monitor"
+    }
+    event lookat "look at monitor"
+    {
+      time 131.653320 134.093307
+      param "target_kleiner_monitor"
+    }
+    event lookat "look at barney"
+    {
+      time 109.280006 115.553337
+      param "barney"
+    }
+    event lookat "look at gordon"
+    {
+      time 115.593330 124.493332
+      param "!player"
+    }
+    event lookat "look at barney"
+    {
+      time 124.513336 131.606674
+      param "barney"
+    }
+    event lookat "look at barney"
+    {
+      time 134.093338 144.179993
+      param "barney"
+    }
+    event lookat "look at gordon"
+    {
+      time 144.213348 152.933350
+      param "!player"
+    }
+    event face "turn to gordon"
+    {
+      time 158.759995 159.259995
+      param "!player"
+    }
+    event face "turn to pc"
+    {
+      time 171.339996 171.839996
+      param "target_teleport_pc"
+    }
+    event lookat "look at gordon"
+    {
+      time 0.040000 1.800000
+      param "!player"
+    }
+    event lookat "look at barney"
+    {
+      time 1.806667 3.673334
+      param "barney"
+    }
+    event lookat "look at monitor"
+    {
+      time 39.106674 44.406673
+      param "target_kleiner_monitor"
+    }
+    event lookat "look at barney"
+    {
+      time 44.419998 46.526665
+      param "barney"
+    }
+    event face "turn to barney"
+    {
+      time 109.946678 110.446678
+      param "barney"
+    }
+    event face "turn to gordon"
+    {
+      time 145.266678 145.766678
+      param "!player"
+    }
+  }
+  channel "move to"
+  {
+  }
+  channel "anims"
+  {
+    event sequence "bentpose"
+    {
+      time 1.840000 3.499999
+      param "bentpose01"
+    }
+    event sequence "typegesture"
+    {
+      time 2.066667 3.493333
+      param "typegesture"
+    }
+    event firetrigger "move teleport"
+    {
+      time 161.613342 -1.000000
+      param "2"
+    }
+  }
+  faceposermodel "D:\anon-hl2\hl2\models\Kleiner.mdl"
+}
+
+actor "barney"
+{
+  channel "audio"
+  {
+    event speak "02"
+    {
+      time 1.946667 6.765715
+      param "k_teleport.barney_02"
+      fixedlength
+    }
+    event speak "11"
+    {
+      time 36.500004 39.024265
+      param "k_teleport.barney_11"
+      fixedlength
+    }
+    event speak "13"
+    {
+      time 46.326664 47.428162
+      param "k_teleport.barney_13"
+      fixedlength
+    }
+    event speak "18"
+    {
+      time 88.519997 89.024849
+      param "k_teleport.barney_18"
+      fixedlength
+    }
+    event speak "23"
+    {
+      time 113.833344 115.393799
+      param "k_teleport.barney_23"
+      fixedlength
+    }
+    event speak "25"
+    {
+      time 124.300003 126.640686
+      param "k_teleport.barney_25"
+      fixedlength
+    }
+    event speak "29"
+    {
+      time 134.266693 137.020432
+      param "k_teleport.barney_29"
+      fixedlength
+    }
+    event speak "31"
+    {
+      time 142.626663 144.554276
+      param "k_teleport.barney_31"
+      fixedlength
+    }
+    event speak "33"
+    {
+      time 153.093338 158.509033
+      param "k_teleport.barney_33"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+    event lookat "look at kleiner"
+    {
+      time 0.093333 6.806666
+      param "kleiner"
+    }
+    event lookat "look at monitor"
+    {
+      time 7.773334 34.760006
+      param "target_kleiner_monitor"
+    }
+    event lookat "look at kleiner"
+    {
+      time 34.853333 39.013332
+      param "kleiner"
+    }
+    event lookat "look at monitor"
+    {
+      time 39.053329 44.919994
+      param "target_kleiner_monitor"
+    }
+    event lookat "look at kleiner"
+    {
+      time 44.933338 47.720005
+      param "kleiner"
+    }
+    event lookat "look at gordon"
+    {
+      time 47.746670 49.900005
+      param "!player"
+    }
+    event lookat "look at monitor"
+    {
+      time 49.939999 66.533333
+      param "target_kleiner_monitor"
+    }
+    event lookat "look at gordon"
+    {
+      time 66.546661 70.293327
+      param "!player"
+    }
+    event lookat "look at kleiner"
+    {
+      time 70.306664 73.406670
+      param "kleiner"
+    }
+    event lookat "look at monitor"
+    {
+      time 73.433334 85.680008
+      param "target_kleiner_monitor"
+    }
+    event lookat "look at kleiner"
+    {
+      time 85.720001 87.820000
+      param "kleiner"
+    }
+    event lookat "look at gordon"
+    {
+      time 87.839996 89.806664
+      param "!player"
+    }
+    event lookat "look at monitor"
+    {
+      time 89.813332 108.586678
+      param "target_kleiner_monitor"
+    }
+    event lookat "look at kleiner"
+    {
+      time 108.646675 117.073349
+      param "kleiner"
+    }
+    event lookat "look at gordon"
+    {
+      time 117.093330 122.533333
+      param "!player"
+    }
+    event lookat "look at kleiner"
+    {
+      time 122.553337 131.566666
+      param "kleiner"
+    }
+    event lookat "look at monitor"
+    {
+      time 131.573334 134.259995
+      param "target_kleiner_monitor"
+    }
+    event lookat "look at kleiner"
+    {
+      time 134.280014 157.673340
+      param "kleiner"
+    }
+  }
+  channel "move to"
+  {
+    event firetrigger "move to lift"
+    {
+      time 156.066681 -1.000000
+      param "1"
+    }
+  }
+  channel "anims"
+  {
+  }
+  channel "animations"
+  {
+  }
+  faceposermodel "D:\anon-hl2\hl2\models\Barney.mdl"
+}
+
+actor "mossman"
+{
+  channel "audio"
+  {
+    event speak "03"
+    {
+      time 7.833333 9.164308
+      param "k_teleport.mossman_03"
+      fixedlength
+    }
+    event speak "05"
+    {
+      time 11.640000 16.137779
+      param "k_teleport.mossman_05"
+      fixedlength
+    }
+    event speak "07"
+    {
+      time 23.833336 27.550886
+      param "k_teleport.mossman_07"
+      fixedlength
+    }
+    event speak "09"
+    {
+      time 29.993334 33.986259
+      param "k_teleport.mossman_09"
+      fixedlength
+    }
+    event speak "14"
+    {
+      time 49.753334 70.085129
+      param "k_teleport.mossman_14"
+      fixedlength
+    }
+    event speak "16"
+    {
+      time 73.106667 85.498505
+      param "k_teleport.mossman_16"
+      fixedlength
+    }
+    event speak "19"
+    {
+      time 89.059998 96.999954
+      param "k_teleport.mossman_19"
+      fixedlength
+    }
+    event speak "21"
+    {
+      time 106.639992 108.475822
+      param "k_teleport.mossman_21"
+      fixedlength
+    }
+    event speak "27"
+    {
+      time 131.606659 132.708160
+      param "k_teleport.mossman_27"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+    event lookat "look at pc"
+    {
+      time 7.833333 97.006653
+      param "target_kraken_pc"
+    }
+    event lookat "look at pc"
+    {
+      time 130.446686 133.540009
+      param "target_kraken_pc"
+    }
+    event lookat "look at pc"
+    {
+      time 102.580002 108.599998
+      param "target_kraken_pc"
+    }
+  }
+  channel "move to"
+  {
+    event moveto "move to kraken floor"
+    {
+      time 7.613333 -1.000000
+      param "target_kraken_floor"
+    }
+    event sequence "table"
+    {
+      time 93.279999 148.653336
+      param "posture07"
+    }
+    event moveto "move to console"
+    {
+      time 149.413330 -1.000000
+      param "target_kraken_console"
+    }
+  }
+  faceposermodel "D:\anon-hl2\hl2\models\mossman.mdl"
+}
+
+mapname "maps\d1_lab_01b.bsp"
+scalesettings
+{
+  "CChoreoView" "100"
+  "ExpressionTool" "100"
+  "GestureTool" "100"
+  "RampTool" "100"
+  "SceneRampTool" "100"
+}
+fps 60
+snap off

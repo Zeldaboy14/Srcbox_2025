@@ -1,0 +1,122 @@
+// Choreo version 1
+actor "Kleiner"
+{
+  channel "audio"
+  {
+    event speak "38"
+    {
+      time 10.066665 14.334964
+      param "k_lab.kleiner_38"
+      fixedlength
+    }
+    event speak "39"
+    {
+      time 21.506664 30.548115
+      param "k_lab.kleiner_39"
+      fixedlength
+    }
+    event speak "40"
+    {
+      time 42.966663 45.031971
+      param "k_lab.kleiner_40"
+      fixedlength
+    }
+  }
+  channel "move to"
+  {
+  }
+  channel "look at"
+  {
+    event lookat "look at barney"
+    {
+      time 0.040000 3.026667
+      param "barney"
+    }
+    event lookat "look at gordon"
+    {
+      time 10.060000 16.346668
+      param "!player"
+    }
+    event lookat "look at gordon"
+    {
+      time 21.486670 30.586670
+      param "!player"
+    }
+    event lookat "look at gordon"
+    {
+      time 42.980000 45.033333
+      param "!player"
+    }
+  }
+  channel "animations"
+  {
+  }
+  faceposermodel "D:\anon-hl2\hl2\models\Kleiner.mdl"
+}
+
+actor "Barney"
+{
+  channel "audio"
+  {
+    event speak "41"
+    {
+      time 0.046662 1.377637
+      param "k_lab.barney_41"
+      fixedlength
+    }
+    event speak "42"
+    {
+      time 14.799998 16.360453
+      param "k_lab.barney_42"
+      fixedlength
+    }
+    event speak "43"
+    {
+      time 30.859997 34.990608
+      param "k_lab.barney_43"
+      fixedlength
+    }
+  }
+  channel "move to"
+  {
+  }
+  channel "look at"
+  {
+    event lookat "look at gordon"
+    {
+      time 0.080000 3.059996
+      param "!player"
+    }
+    event lookat "look at gordon"
+    {
+      time 10.053334 16.340000
+      param "!player"
+    }
+    event lookat "look at kleiner"
+    {
+      time 21.506668 28.226671
+      param "kleiner"
+    }
+    event lookat "look at gordon"
+    {
+      time 28.286665 34.980003
+      param "!player"
+    }
+  }
+  channel "animations"
+  {
+  }
+  faceposermodel "D:\anon-hl2\hl2\models\Barney.mdl"
+}
+
+mapname "maps\d1_lab_01a.bsp"
+scalesettings
+{
+  "CChoreoView" "100"
+  "SceneRampTool" "100"
+  "ExpressionTool" "100"
+  "GestureTool" "100"
+  "RampTool" "100"
+}
+fps 60
+snap off

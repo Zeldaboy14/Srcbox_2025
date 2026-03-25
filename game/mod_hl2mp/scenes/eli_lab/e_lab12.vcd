@@ -1,0 +1,51 @@
+// Choreo version 1
+actor "Eli"
+{
+  channel "audio"
+  {
+    event speak "the granddaddy of that device..."
+    {
+      time 0.093334 6.587756
+      param "eli_lab.eli_granddaddy01"
+      fixedlength
+    }
+    event speak "Extremely dangerous environments"
+    {
+      time 6.753334 9.758867
+      param "eli_lab.eli_granddaddy02"
+      fixedlength
+    }
+    event speak "there's a mockup of a portal core..."
+    {
+      time 10.933333 14.120590
+      param "eli_lab.eli_mockup01"
+      fixedlength
+    }
+    event speak "let me see how quickly..."
+    {
+      time 14.773335 17.859163
+      param "eli_lab.eli_mockup02"
+      fixedlength
+    }
+    event speak "this is something we figure..."
+    {
+      time 18.620003 22.095127
+      param "eli_lab.eli_mockup03"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+  }
+  channel "face to"
+  {
+  }
+  channel "move to"
+  {
+  }
+  faceposermodel "U:\HL2\hl2\models\Eli.mdl"
+}
+
+mapname "maps\eli_lab.bsp"
+fps 60
+snap off

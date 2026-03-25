@@ -1,0 +1,42 @@
+// Choreo version 1
+actor "Alyx"
+{
+  channel "Voice"
+  {
+    event speak "1"
+    {
+      time 0.086666 3.134285
+      param "Sky.al_temp1a"
+      fixedlength
+    }
+    event speak "2"
+    {
+      time 3.333333 5.771429
+      param "Sky.al_temp1b"
+      fixedlength
+    }
+    event speak "3"
+    {
+      time 5.973333 10.210976
+      param "Sky.al_temp1c"
+      fixedlength
+    }
+    event speak "4"
+    {
+      time 10.440001 12.344037
+      param "Sky.al_temp1d"
+      fixedlength
+    }
+  }
+  channel "Look at"
+  {
+    event lookat "look at gordon"
+    {
+      time 0.013333 12.000000
+      param "!player"
+    }
+  }
+}
+
+fps 60
+snap off

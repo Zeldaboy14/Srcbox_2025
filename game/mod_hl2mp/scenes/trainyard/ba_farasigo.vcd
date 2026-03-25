@@ -1,0 +1,19 @@
+// Choreo version 1
+actor "Barney"
+{
+  channel "Audio"
+  {
+    event speak "farasigo"
+    {
+      time 0.033334 1.381543
+      param "Trainyard.ba_farasigo"
+      fixedlength
+    }
+  }
+  channel "Look at"
+  {
+  }
+}
+
+fps 60
+snap off

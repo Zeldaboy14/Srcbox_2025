@@ -1,0 +1,86 @@
+// Choreo version 1
+actor "odell"
+{
+  channel "look at"
+  {
+    event lookat "player"
+    {
+      time 0.046666 77.053329
+      param "Player"
+      event_ramp
+      {
+        0.4400 0.8700
+        76.1454 0.8700
+        76.2795 0.8700
+      }
+    }
+  }
+  channel "audio"
+  {
+    event speak "0"
+    {
+      time 0.260000 3.288390
+      param "borealis.odell_old_odtest0"
+      fixedlength
+    }
+    event speak "1"
+    {
+      time 3.506666 11.531972
+      param "borealis.odell_old_odtest1"
+      fixedlength
+    }
+    event speak "2"
+    {
+      time 11.773334 24.492607
+      param "borealis.odell_old_odtest2"
+      fixedlength
+    }
+    event speak "3"
+    {
+      time 24.720001 34.562271
+      param "borealis.odell_old_odtest3"
+      fixedlength
+    }
+    event speak "4"
+    {
+      time 34.860001 44.248028
+      param "borealis.odell_old_odtest4"
+      fixedlength
+    }
+    event speak "5"
+    {
+      time 44.553333 54.395599
+      param "borealis.odell_old_odtest5"
+      fixedlength
+    }
+    event speak "6"
+    {
+      time 54.673336 61.638596
+      param "borealis.odell_old_odtest6"
+      fixedlength
+    }
+    event speak "7"
+    {
+      time 61.940002 65.574104
+      param "borealis.odell_old_odtest7"
+      fixedlength
+    }
+    event speak "8"
+    {
+      time 65.846672 77.051659
+      param "borealis.odell_old_odtest8"
+      fixedlength
+    }
+  }
+}
+
+scalesettings
+{
+  "CChoreoView" "100"
+  "SceneRampTool" "100"
+  "RampTool" "100"
+  "ExpressionTool" "100"
+  "GestureTool" "100"
+}
+fps 60
+snap off

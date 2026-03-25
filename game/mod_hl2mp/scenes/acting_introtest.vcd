@@ -1,0 +1,196 @@
+// Choreo version 1
+actor "Alyx"
+{
+  channel "audio"
+  {
+    event speak "alyx_areyousure"
+    {
+      time 6.920003 9.564901
+      ramp 1.00 1.00 1.00
+      param "vo\e3_lab\alyx_areyousure.wav"
+      param2 "70dB"
+      fixedlength
+      tags
+      {
+        "sure" 0.074861
+        "time" 0.872624
+        "this" 0.796250
+      }
+    }
+    event speak "alyx_snapout"
+    {
+      time 0.813334 3.515216
+      ramp 1.00 1.00 1.00
+      param "vo\e3_lab\snapout.wav"
+      param2 "70dB"
+      fixedlength
+      tags
+      {
+        "Gor1" 0.010363
+        "gordon2" 0.421928
+        "snap" 0.692110
+      }
+    }
+  }
+  channel "Lookat"
+  {
+    event lookat "look at kleiner"
+    {
+      time 5.106670 18.393339
+      ramp 1.00 1.00 1.00
+      param "kleiner"
+    }
+    event lookat "a_lookit_g1"
+    {
+      time 0.073332 5.073334
+      ramp 1.00 1.00 1.00
+      param "!player"
+    }
+  }
+  channel "Goto"
+  {
+  }
+  channel "face"
+  {
+  }
+  channel "idle"
+  {
+    event sequence "idle"
+    {
+      time 0.033334 18.420002
+      ramp 1.00 1.00 1.00
+      param "sexyidle"
+    }
+  }
+  channel "gesture"
+  {
+    event gesture "temp"
+    {
+      time 0.733333 2.373334
+      ramp 1.00 1.00 1.00
+      param "gesture1B"
+      absolutetags playback_time
+      {
+        "hold1" 0.061389
+        "mid" 0.184976
+        "endhold1" 0.632472
+        "apexstart" 0.712439
+        "apex" 0.750404
+        "down" 0.791599
+      }
+      absolutetags shifted_time
+      {
+        "hold1" 0.307754
+        "mid" 0.434166
+        "endhold1" 0.511309
+        "apexstart" 0.712439
+        "apex" 0.789984
+        "down" 0.817789
+      }
+      sequenceduration 1.433333
+    }
+    event gesture "temp2"
+    {
+      time 6.446667 7.613335
+      ramp 1.00 1.00 0.93
+      param "gesture3"
+      absolutetags playback_time
+      {
+        "raise" 0.542857
+        "up" 0.742857
+        "down" 0.885714
+      }
+      absolutetags shifted_time
+      {
+        "raise" 0.542857
+        "up" 0.742857
+        "down" 0.885714
+      }
+      sequenceduration 1.166667
+    }
+    event gesture "temp3"
+    {
+      time 8.366668 9.533335
+      ramp 0.95 1.00 0.93
+      param "gesture3"
+      absolutetags playback_time
+      {
+        "raise" 0.542857
+        "up" 0.742857
+        "down" 0.885714
+      }
+      absolutetags shifted_time
+      {
+        "raise" 0.542857
+        "up" 0.742857
+        "down" 0.885714
+      }
+      sequenceduration 1.166667
+    }
+  }
+  faceposermodel "U:\HL2\hl2\models\alyx.mdl"
+}
+
+actor "Kleiner"
+{
+  channel "audio"
+  {
+    event speak "kleiner_warming"
+    {
+      time 4.206671 6.271977
+      ramp 1.00 1.00 1.00
+      param "vo\e3_lab\kleiner_warming.wav"
+      param2 "70dB"
+      fixedlength
+    }
+    event speak "kleiner_moduli"
+    {
+      time 9.913337 18.128666
+      ramp 1.00 1.00 1.00
+      param "vo\e3_lab\kleiner_moduli.wav"
+      param2 "70dB"
+      fixedlength
+    }
+  }
+  channel "Lookat"
+  {
+    event lookat "look_alyx1"
+    {
+      time 8.533336 11.360005
+      ramp 1.00 1.00 1.00
+      param "alyx"
+    }
+    event lookat "lookatwork2"
+    {
+      time 11.420005 15.560004
+      ramp 1.00 1.00 1.00
+      param "kleiner_desk_work"
+    }
+    event lookat "lookatplayer1"
+    {
+      time 15.613336 18.406672
+      ramp 1.00 1.00 1.00
+      param "!player"
+    }
+    event face "look at work1"
+    {
+      time 3.486670 8.113336
+      ramp 1.00 1.00 1.00
+      param "kleiner_desk_work"
+    }
+    event lookat "k_lookit_g1"
+    {
+      time 0.046668 3.466668
+      ramp 1.00 1.00 1.00
+      param "!player"
+    }
+  }
+  channel "Goto"
+  {
+  }
+  faceposermodel "U:\HL2\hl2\models\Kleiner.mdl"
+}
+
+mapname "maps\e3_lab.bsp"
+fps 60
+snap off

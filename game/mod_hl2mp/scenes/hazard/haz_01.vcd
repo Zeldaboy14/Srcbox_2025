@@ -1,0 +1,40 @@
+// Choreo version 1
+actor "Kleiner"
+{
+  channel "audio"
+  {
+    event speak "1"
+    {
+      time 0.093334 4.912381
+      param "haz.haz_oc01"
+      fixedlength
+    }
+  }
+  channel "Lookat"
+  {
+    event lookat "look at player"
+    {
+      time 0.086666 5.026667
+      param "!player"
+      event_ramp
+      {
+        0.0733 0.1190
+        0.2633 0.3413
+        0.5733 0.6032
+        1.3140 1.0000
+        3.9800 1.0000
+        4.3333 0.7897
+        4.5667 0.5754
+        4.7933 0.2063
+      }
+    }
+  }
+  channel "Goto"
+  {
+  }
+  faceposermodel "E:\anon-hl2\hl2\models\Kleiner.mdl"
+}
+
+mapname "maps\hazard01.bsp"
+fps 60
+snap off

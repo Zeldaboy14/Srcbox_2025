@@ -1,0 +1,44 @@
+// Choreo version 1
+actor "Barney"
+{
+  channel "Audio"
+  {
+    event speak "this is as far as I go"
+    {
+      time 1.140000 3.360658
+      param "Trainyard.ba_farasigo"
+      fixedlength
+    }
+    event speak "goodluck"
+    {
+      time 5.526667 7.337143
+      param "Trainyard.ba_goodluck"
+      fixedlength
+    }
+  }
+  channel "Look at"
+  {
+    event lookat "look at player"
+    {
+      time 0.960000 7.306666
+      param "!player"
+    }
+  }
+  channel "move to"
+  {
+    event moveto "move to door"
+    {
+      time 0.120000 -1.000000
+      param "barney_station_exit_door_mark"
+    }
+    event face "face player"
+    {
+      time 3.046667 7.273333
+      param "!player"
+    }
+  }
+  faceposermodel "U:\dev\hl2\models\Barney.mdl"
+}
+
+fps 60
+snap off

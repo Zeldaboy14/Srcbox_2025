@@ -1,0 +1,43 @@
+// Choreo version 1
+actor "monk"
+{
+  channel "targets"
+  {
+    event lookat "look at player"
+    {
+      time 0.140000 3.140000
+      param "!player"
+    }
+  }
+  channel "audio"
+  {
+    event speak "audio1"
+    {
+      time 0.400000 1.514558
+      param "town.monk_takethis"
+      param2 "80dB"
+      fixedlength
+    }
+  }
+  channel "scripted"
+  {
+    event sequence "throw"
+    {
+      time 0.006666 1.939999
+      param "throwshotgun"
+      fixedlength
+    }
+  }
+}
+
+mapname "maps\balcony_large.bsp"
+scalesettings
+{
+  "CChoreoView" "100"
+  "SceneRampTool" "100"
+  "RampTool" "100"
+  "ExpressionTool" "100"
+  "GestureTool" "100"
+}
+fps 60
+snap off

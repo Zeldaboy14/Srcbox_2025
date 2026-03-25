@@ -1,0 +1,31 @@
+// Choreo version 1
+actor "Monk"
+{
+  channel "Audio"
+  {
+    event speak "bettergun"
+    {
+      time 0.153334 2.649479
+      param "town.monk_bettergun"
+      param2 "90dB"
+      fixedlength
+    }
+    event speak "catch"
+    {
+      time 3.193334 3.898640
+      param "town.monk_catch"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+    event lookat "look at player"
+    {
+      time 0.020000 3.960000
+      param "!player"
+    }
+  }
+}
+
+fps 60
+snap off

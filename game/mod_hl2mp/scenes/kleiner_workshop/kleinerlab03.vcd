@@ -1,0 +1,207 @@
+// Choreo version 1
+actor "Kleiner"
+{
+  channel "audio"
+  {
+    event speak "26"
+    {
+      time 2.966671 4.664812
+      param "k_lab.kleiner_26"
+      fixedlength
+    }
+    event speak "28"
+    {
+      time 6.899998 14.977640
+      param "k_lab.kleiner_28"
+      fixedlength
+    }
+    event speak "30"
+    {
+      time 19.173330 23.303944
+      param "k_lab.kleiner_30"
+      fixedlength
+    }
+    event speak "32"
+    {
+      time 24.493336 27.797825
+      param "k_lab.kleiner_32"
+      fixedlength
+    }
+    event speak "37"
+    {
+      time 42.146660 46.139584
+      param "k_lab.kleiner_37"
+      fixedlength
+    }
+    event speak "34"
+    {
+      time 29.153336 33.697010
+      param "k_lab.kleiner_34"
+      fixedlength
+    }
+    event speak "35"
+    {
+      time 34.599998 38.914192
+      param "k_lab.kleiner_35"
+      fixedlength
+    }
+  }
+  channel "move to"
+  {
+    event face "face lamarr"
+    {
+      time 2.446666 2.946666
+      param "lamarr"
+    }
+    event face "face gordon"
+    {
+      time 8.473333 8.973333
+      param "!player"
+    }
+  }
+  channel "look at"
+  {
+    event lookat "look at gordon1"
+    {
+      time 8.520000 12.246667
+      param "!player"
+    }
+    event lookat "look at lamarr2"
+    {
+      time 12.286666 14.939999
+      param ""
+    }
+    event lookat "look at barney1"
+    {
+      time 14.993335 21.660004
+      param "barney"
+    }
+    event lookat "look at lamarr3"
+    {
+      time 1.766667 5.213333
+      param "lamarr"
+    }
+    event lookat "look at barney2"
+    {
+      time 5.246667 8.493334
+      param "barney"
+    }
+  }
+  channel "animations"
+  {
+  }
+  faceposermodel "D:\anon-hl2\hl2\models\Kleiner.mdl"
+}
+
+actor "Barney"
+{
+  channel "audio"
+  {
+    event speak "25"
+    {
+      time 0.040001 3.115012
+      param "k_lab.barney_25"
+      fixedlength
+    }
+    event speak "27"
+    {
+      time 4.713330 6.732740
+      param "k_lab.barney_27"
+      fixedlength
+    }
+    event speak "29"
+    {
+      time 14.979997 19.294191
+      param "k_lab.barney_29"
+      fixedlength
+    }
+    event speak "31"
+    {
+      time 23.186665 24.150475
+      param "k_lab.barney_31"
+      fixedlength
+    }
+    event speak "33"
+    {
+      time 27.493334 28.961996
+      param "k_lab.barney_33"
+      fixedlength
+    }
+    event speak "36"
+    {
+      time 38.846668 40.911976
+      param "k_lab.barney_36"
+      fixedlength
+    }
+  }
+  channel "move to"
+  {
+    event firetrigger "lamarr anim"
+    {
+      time 5.066667 -1.000000
+      param "1"
+    }
+    event moveto "move to drill"
+    {
+      time 8.526667 -1.000000
+      param "target_drill"
+    }
+    event face "face lamarr"
+    {
+      time 3.299999 3.799999
+      param "lamarr"
+    }
+  }
+  channel "look at"
+  {
+    event lookat "look at lamarr"
+    {
+      time 3.173334 4.640001
+      param "lamarr"
+    }
+    event lookat "look at kleiner1"
+    {
+      time 4.713334 8.780002
+      param "kleiner"
+    }
+  }
+  channel "animations"
+  {
+    event sequence "fear"
+    {
+      time 0.840000 1.506667
+      param "Fear_Reaction"
+      fixedlength
+    }
+    event sequence "startle"
+    {
+      time 1.533333 3.200000
+      param "Startle_behind"
+      fixedlength
+    }
+    event sequence "fear"
+    {
+      time 27.433332 28.099998
+      param "Fear_Reaction"
+      fixedlength
+    }
+    event firetrigger "lammar move to"
+    {
+      time 24.279999 -1.000000
+      param "2"
+    }
+  }
+  faceposermodel "D:\anon-hl2\hl2\models\Barney.mdl"
+}
+
+mapname "maps\d1_lab_01a.bsp"
+scalesettings
+{
+  "CChoreoView" "100"
+  "SceneRampTool" "100"
+  "ExpressionTool" "100"
+  "GestureTool" "100"
+  "RampTool" "100"
+}
+fps 60
+snap off

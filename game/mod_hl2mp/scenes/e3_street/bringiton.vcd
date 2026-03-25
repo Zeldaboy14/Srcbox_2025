@@ -1,0 +1,26 @@
+// Choreo version 1
+actor "!target1"
+{
+  channel "Audio"
+  {
+    event speak "changeofplans"
+    {
+      time 0.093333 2.136689
+      ramp 1.00 1.00 1.00
+      param "E3_C17_01.BarneyChangeofPlans"
+      fixedlength
+    }
+  }
+  channel "lookatplayer"
+  {
+    event lookat "lookatplayer"
+    {
+      time 1.040000 2.020000
+      ramp 1.00 1.00 1.00
+      param "!player"
+    }
+  }
+}
+
+fps 60
+snap off

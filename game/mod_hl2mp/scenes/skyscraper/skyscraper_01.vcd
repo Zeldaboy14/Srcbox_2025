@@ -1,0 +1,29 @@
+// Choreo version 1
+actor "Alyx"
+{
+  channel "Voice"
+  {
+    event speak "alsky"
+    {
+      time 0.060000 15.594172
+      param "Sky.alsky"
+      fixedlength
+    }
+  }
+  channel "Look at"
+  {
+    event lookat "look at gordon"
+    {
+      time 0.013333 12.000000
+      param "!player"
+    }
+    event lookat "look at gordon"
+    {
+      time 14.486667 15.620001
+      param "!player"
+    }
+  }
+}
+
+fps 60
+snap off

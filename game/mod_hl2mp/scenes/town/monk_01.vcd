@@ -1,0 +1,38 @@
+// Choreo version 1
+actor "!target1"
+{
+  channel "speech"
+  {
+    event speak "monk01"
+    {
+      time 0.186667 5.326984
+      param "town.monk_01"
+      fixedlength
+    }
+  }
+  channel "facing"
+  {
+    event lookat "look at the player"
+    {
+      time -0.006666 5.546667
+      param "!player"
+      event_ramp
+      {
+        0.1666 1.0000
+        2.4990 1.0000
+        4.8314 1.0000
+      }
+    }
+  }
+}
+
+scalesettings
+{
+  "CChoreoView" "100"
+  "RampTool" "100"
+  "ExpressionTool" "100"
+  "GestureTool" "100"
+  "SceneRampTool" "100"
+}
+fps 60
+snap off

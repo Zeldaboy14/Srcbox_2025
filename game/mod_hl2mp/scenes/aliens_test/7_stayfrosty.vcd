@@ -1,0 +1,71 @@
+// Choreo version 1
+actor "Alyx"
+{
+  channel "audio"
+  {
+  }
+}
+
+actor "Barney"
+{
+  channel "audio"
+  {
+    event speak "Hicks05"
+    {
+      time 0.602797 1.364656
+      param "Aliens.A20-Hicks05"
+      fixedlength
+    }
+    event speak "Hicks06"
+    {
+      time 1.699997 3.084487
+      param "Aliens.A21-Hicks06"
+      fixedlength
+    }
+    event speak "Hicks07"
+    {
+      time 3.481812 4.799544
+      param "Aliens.A22-Hicks07"
+      fixedlength
+    }
+    event speak "Hicks08"
+    {
+      time 5.400002 6.273653
+      param "Aliens.A23-Hicks08"
+      fixedlength
+    }
+    event speak "Hicks09"
+    {
+      time 7.072731 9.420804
+      param "Aliens.A24-Hicks09"
+      fixedlength
+    }
+  }
+  channel "movement"
+  {
+    event moveto "find player"
+    {
+      time 0.217569 -1.000000
+      param "!player"
+    }
+  }
+  channel "focus"
+  {
+    event lookat "player"
+    {
+      time 0.400784 7.853411
+      param "!player"
+    }
+  }
+}
+
+scalesettings
+{
+  "CChoreoView" "100"
+  "RampTool" "100"
+  "ExpressionTool" "100"
+  "GestureTool" "100"
+  "SceneRampTool" "100"
+}
+fps 60
+snap off

@@ -1,0 +1,32 @@
+// Choreo version 1
+actor "Alyx"
+{
+  channel "audio"
+  {
+    event speak "k_lab.al_screechinghalt"
+    {
+      time 0.073333 5.431247
+      param "k_lab.al_screechinghalt"
+      fixedlength
+    }
+  }
+  channel "triggers"
+  {
+  }
+  channel "look at"
+  {
+    event lookat "look at player"
+    {
+      time 0.106667 5.426667
+      param "!player"
+    }
+  }
+  channel "face to"
+  {
+  }
+  faceposermodel "U:\HL2\hl2\models\alyx.mdl"
+}
+
+mapname "maps\d1_trainstation_05.bsp"
+fps 60
+snap off

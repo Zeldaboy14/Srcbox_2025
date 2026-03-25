@@ -1,0 +1,55 @@
+// Choreo version 1
+actor "!target1"
+{
+  channel "Lookaround"
+  {
+    event lookat "lookat lookee1"
+    {
+      time 2.860001 5.026668
+      param "lookee1"
+      event_ramp
+      {
+        0.3320 0.5170
+        1.8194 0.5284
+      }
+      pitch "1"
+      yaw "-6"
+    }
+  }
+  channel "look2"
+  {
+    event lookat "lookat lookee2"
+    {
+      time 4.433333 6.966667
+      param "lookee2"
+      event_ramp
+      {
+        0.5880 0.6420
+        2.1340 0.5739
+      }
+      pitch "-68"
+      yaw "-43"
+    }
+  }
+  channel "look3"
+  {
+    event lookat "lookat lookee3"
+    {
+      time 0.013332 3.379999
+      param "lookee3"
+      event_ramp
+      {
+        0.7680 0.9886
+        1.2400 0.9298
+        2.0060 0.9758
+        2.6153 0.9716
+      }
+      pitch "43"
+      yaw "70"
+    }
+  }
+}
+
+mapname "maps\c17_look.bsp"
+fps 60
+snap off

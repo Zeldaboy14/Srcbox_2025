@@ -1,0 +1,46 @@
+// Choreo version 1
+actor "Alyx"
+{
+  channel "Look at"
+  {
+    event lookat "look at player"
+    {
+      time 0.073333 1.813334
+      param "Player"
+      event_ramp
+      {
+        0.1218 1.0000
+        0.7656 1.0000
+        1.4094 1.0000
+      }
+    }
+  }
+  channel "Voice"
+  {
+    event speak "get moving"
+    {
+      time 0.186667 0.760635
+      param "alyx_test.misc8"
+      fixedlength
+    }
+  }
+  channel "Expressions"
+  {
+    event flexanimation "expressions"
+    {
+      time 0.186666 0.973333
+      param ""
+    }
+  }
+}
+
+scalesettings
+{
+  "CChoreoView" "100"
+  "SceneRampTool" "100"
+  "RampTool" "100"
+  "ExpressionTool" "100"
+  "GestureTool" "100"
+}
+fps 60
+snap off

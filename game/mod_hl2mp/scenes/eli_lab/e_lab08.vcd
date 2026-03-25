@@ -1,0 +1,59 @@
+// Choreo version 1
+actor "Eli"
+{
+  channel "audio"
+  {
+    event speak "you might recall at Black Mesa..."
+    {
+      time 0.060000 6.633832
+      param "eli_lab.eli_techlib02"
+      fixedlength
+    }
+    event speak "turns out the heavy lifting..."
+    {
+      time 7.173334 10.901157
+      param "eli_lab.eli_techlib03"
+      fixedlength
+    }
+    event speak "This is our zero point weapon..."
+    {
+      time 11.300002 14.784106
+      param "eli_lab.eli_techlib04"
+      fixedlength
+    }
+    event speak "go ahead and try it"
+    {
+      time 20.700001 21.533674
+      param "eli_lab.eli_techlib05"
+      fixedlength
+    }
+    event speak "built this around a little piece of tech..."
+    {
+      time 14.913337 20.600594
+      param "eli_lab.eli_techlib01"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+  }
+  channel "face to"
+  {
+  }
+  channel "move to"
+  {
+  }
+  channel "trigger"
+  {
+    event firetrigger "open gravgun door"
+    {
+      time 11.126667 -1.000000
+      param "1"
+    }
+  }
+  faceposermodel "U:\HL2\hl2\models\Eli.mdl"
+}
+
+mapname "maps\eli_lab.bsp"
+fps 60
+snap off

@@ -1,0 +1,183 @@
+// Choreo version 1
+actor "kleiner"
+{
+  channel "audio"
+  {
+    event speak "35"
+    {
+      time 0.060001 5.475692
+      param "k_teleport.kleiner_35"
+      fixedlength
+    }
+    event speak "41"
+    {
+      time 7.280000 11.869570
+      param "k_teleport.kleiner_41"
+      fixedlength
+    }
+    event speak "42"
+    {
+      time 29.320000 32.349113
+      param "k_teleport.kleiner_42"
+      fixedlength
+    }
+    event speak "43"
+    {
+      time 47.259998 50.839863
+      param "k_teleport.kleiner_43"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+    event lookat "look at gordon"
+    {
+      time 0.053334 5.493334
+      param "!player"
+    }
+    event lookat "look at barney"
+    {
+      time 5.526667 7.393333
+      param "barney"
+    }
+    event lookat "look at gordon"
+    {
+      time 7.420000 11.900001
+      param "!player"
+    }
+    event lookat "look at gordon"
+    {
+      time 29.326666 32.453335
+      param "!player"
+    }
+    event lookat "look at gordon"
+    {
+      time 47.253334 50.946667
+      param "!player"
+    }
+  }
+  channel "move to"
+  {
+  }
+  channel "anims"
+  {
+    event firetrigger "enable teleport"
+    {
+      time 10.006668 -1.000000
+      param "1"
+    }
+    event sequence "tableidle"
+    {
+      time 7.646667 9.900001
+      param "tableidle"
+    }
+    event sequence "typegesture"
+    {
+      time 7.826667 9.753333
+      param "typegesture"
+    }
+  }
+  faceposermodel "D:\anon-hl2\hl2\models\Kleiner.mdl"
+}
+
+actor "barney"
+{
+  channel "audio"
+  {
+    event speak "44"
+    {
+      time 23.579998 27.435236
+      param "k_teleport.barney_44"
+      fixedlength
+    }
+    event speak "45"
+    {
+      time 68.460007 69.745087
+      param "k_teleport.barney_45"
+      fixedlength
+    }
+    event speak "40"
+    {
+      time 5.520000 6.805079
+      param "k_teleport.barney_40"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+    event lookat "look at gordon"
+    {
+      time 5.333333 7.039999
+      param "!player"
+    }
+    event lookat "look at gordon"
+    {
+      time 23.586666 27.586666
+      param "!player"
+    }
+    event lookat "look at gordon"
+    {
+      time 68.306664 69.926666
+      param "!player"
+    }
+  }
+  channel "move to"
+  {
+    event face "turn to console"
+    {
+      time 7.726666 8.226666
+      param "target_console"
+    }
+  }
+  channel "anims"
+  {
+  }
+  channel "animations"
+  {
+  }
+  faceposermodel "D:\anon-hl2\hl2\models\Barney.mdl"
+}
+
+actor "mossman"
+{
+  channel "audio"
+  {
+    event speak "46"
+    {
+      time 38.286667 39.571747
+      param "k_teleport.mossman_46"
+      fixedlength
+    }
+    event speak "47"
+    {
+      time 58.859997 60.374554
+      param "k_teleport.mossman_47"
+      fixedlength
+    }
+    event speak "48"
+    {
+      time 79.033340 80.915062
+      param "k_teleport.mossman_48"
+      fixedlength
+    }
+  }
+  channel "look at"
+  {
+  }
+  channel "move to"
+  {
+  }
+  faceposermodel "D:\anon-hl2\hl2\models\mossman.mdl"
+}
+
+mapname "maps\d1_lab_01b.bsp"
+scalesettings
+{
+  "CChoreoView" "100"
+  "ExpressionTool" "100"
+  "GestureTool" "100"
+  "RampTool" "100"
+  "SceneRampTool" "100"
+}
+fps 60
+snap off

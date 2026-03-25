@@ -1,0 +1,32 @@
+// Choreo version 1
+actor "alyx"
+{
+  channel "vo"
+  {
+    event speak "1"
+    {
+      time 0.306667 2.509660
+      param "E3_strider.alyx_01"
+      fixedlength
+    }
+  }
+  channel "body\"
+  {
+  }
+  channel "flex"
+  {
+  }
+  channel "lookat"
+  {
+    event lookat "lookat"
+    {
+      time 0.093333 2.673333
+      param "!player"
+    }
+  }
+  faceposermodel "E:\anon-hl2\hl2\models\alyx.mdl"
+}
+
+mapname "maps\e3_strider.bsp"
+fps 60
+snap off

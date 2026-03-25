@@ -3,13 +3,11 @@ actor "Alyx"
 {
   channel "audio"
   {
-    event speak "streetwar.al_inshield"
+    event speak "almost done"
     {
-      time 0.020000 1.541293
-      param "streetwar.al_inshield"
+      time 0.186667 0.975873
+      param "streetwar.al_almostdone"
       fixedlength
-      cctype "cc_master"
-      cctoken ""
     }
   }
   channel "look at"
@@ -21,13 +19,5 @@ actor "Alyx"
   faceposermodel "U:\HL2\hl2\models\alyx.mdl"
 }
 
-scalesettings
-{
-  "CChoreoView" "100"
-  "RampTool" "100"
-  "ExpressionTool" "100"
-  "GestureTool" "100"
-  "SceneRampTool" "100"
-}
 fps 60
 snap off

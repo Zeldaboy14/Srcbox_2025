@@ -1,0 +1,28 @@
+// Choreo version 1
+actor "!Target1"
+{
+  channel "Audio"
+  {
+    event speak "scout_anyminute"
+    {
+      time 0.006667 1.167665
+      param "Trainyard.scout_anyminute"
+      param2 "75dB"
+      fixedlength
+    }
+  }
+  channel "Expression"
+  {
+  }
+  channel "Look"
+  {
+    event lookat "Lookatplayer"
+    {
+      time 0.000000 1.160000
+      param "!player"
+    }
+  }
+}
+
+fps 60
+snap off
