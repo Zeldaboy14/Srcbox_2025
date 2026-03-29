@@ -368,3 +368,18 @@
 		"wave"	"*vo/npc/$gender01/pain09.wav"
 	}
 }
+
+// Left 4 Dead 2 Melee stuff
+
+"Weapon.Swing"
+{
+	"channel"		"CHAN_ITEM"
+	"soundlevel"		"SNDLVL_NORM"
+	"volume"		"0.70"
+	"pitch"		"95,105"
+	"rndwave"
+	{
+		"wave"		")player/survivor/swing/Swish_WeaponSwing_Swipe5.wav"
+		"wave"		")player/survivor/swing/Swish_WeaponSwing_Swipe6.wav"
+	}
+}
