@@ -1,0 +1,77 @@
+// Pistol
+
+WeaponData
+{
+	// Weapon data is loaded by both the Game and Client DLLs.
+	
+	//"CharacterViewmodelAddon" "models/weapons/v_pistol.mdl"
+	
+	"printname"	"#Terror_Pistol"
+	"viewmodel"			"models/v_models/v_pistolA_srcbox.mdl"
+	"playermodel"		"models/w_models/weapons/w_pistol_A.mdl"
+	
+	"anim_prefix"		"pistol"
+	"bucket"			"1"
+	"bucket_position"	"2"
+	"bucket_360"			"2"
+	"bucket_position_360"	"2"
+
+	"clip_size"			"18"
+	"primary_ammo"		"Pistol"
+	"secondary_ammo"	"None"
+
+	"weight"			"2"
+	"rumble"		"1"
+	"item_flags"		"0"
+
+	// Sounds for the weapon. There is a max of 16 sounds per category (i.e. max 16 "single_shot" sounds)
+	SoundData
+	{
+		"single_shot"	"Pistol.Fire"
+		"double_shot"  	"Pistol.DualFire"
+	}
+
+	// Weapon Sprite data is loaded by the Client DLL.
+	TextureData
+	{
+		"weapon"
+		{
+				"file"		"vgui/hud/weapon_pistol_hud"
+				"x"			"0"
+				"y"			"0"
+				"width"		"128"
+				"height"	"128"
+		}
+		"weapon_s"
+		{
+				//"file"		"vgui/hud/weapon_pistol_hud"
+				//"x"			"0"
+				//"y"			"0"
+				//"width"		"128"
+				//"height"	"128"
+				"font"		"WeaponIconsSelected"
+				"character"	"d"
+		}
+		"ammo"
+		{
+				"font"		"DebugFixed"
+				"character"	"A"
+		}
+		"crosshair"
+		{
+				"file"		"sprites/crosshairs"
+				"x"			"0"
+				"y"			"48"
+				"width"		"24"
+				"height"	"24"
+		}
+		"autoaim"
+		{
+				"file"		"sprites/crosshairs"
+				"x"			"0"
+				"y"			"48"
+				"width"		"24"
+				"height"	"24"
+		}
+	}
+}

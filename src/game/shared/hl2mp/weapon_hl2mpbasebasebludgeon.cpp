@@ -335,6 +335,7 @@ void CBaseHL2MPBludgeonWeapon::Swing( int bIsSecondary )
 		}
 	}
 
+	if (!bIsSecondary)
 	WeaponSound( SINGLE );
 
 	// -------------------------

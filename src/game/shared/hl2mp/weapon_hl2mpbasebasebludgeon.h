@@ -60,7 +60,9 @@ protected:
 
 private:
 	bool			ImpactWater( const Vector &start, const Vector &end );
+public:
 	void			Swing( int bIsSecondary );
+private:
 	void			Hit( trace_t &traceHit, Activity nHitActivity );
 	Activity		ChooseIntersectionPointAndActivity( trace_t &hitTrace, const Vector &mins, const Vector &maxs, CBasePlayer *pOwner );
 };
