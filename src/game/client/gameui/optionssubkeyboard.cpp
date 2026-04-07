@@ -44,7 +44,7 @@ using namespace vgui;
 //-----------------------------------------------------------------------------
 // Purpose: Constructor
 //-----------------------------------------------------------------------------
-COptionsSubKeyboard::COptionsSubKeyboard(vgui::Panel *parent) : EditablePanel(parent, "OptionsSubKeyboard" )
+COptionsSubKeyboard::COptionsSubKeyboard(vgui::Panel *parent) : PropertyPage(parent, NULL)
 {
 	vgui::HScheme scheme = vgui::scheme()->LoadSchemeFromFile("resource/SourceScheme.res", "SwarmFrameScheme");
 	SetScheme(scheme);
@@ -580,20 +580,9 @@ void COptionsSubKeyboard::ApplyAllBindings( void )
 //-----------------------------------------------------------------------------
 void COptionsSubKeyboard::FillInDefaultBindings( void )
 {
-	FileHandle_t fh = g_pFullFileSystem->Open( "cfg/config_default.cfg", "rb" );
-	if (fh == FILESYSTEM_INVALID_HANDLE)
+	CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	if ( !g_pFullFileSystem->ReadFile( "cfg/config_default.cfg", NULL, buf ) )
 		return;
-
-	// L4D: also unbind other keys
-	engine->ClientCmd_Unrestricted( "unbindall\n" );
-
-	int size = g_pFullFileSystem->Size(fh) + 1;
-	CUtlBuffer buf( 0, size, CUtlBuffer::TEXT_BUFFER );
-	g_pFullFileSystem->Read( buf.Base(), size, fh );
-	g_pFullFileSystem->Close(fh);
-
-	// NULL terminate!
-	((char*)buf.Base())[ size - 1 ] = '\0';
 
 	// Clear out all current bindings
 	ClearBindItems();
@@ -605,20 +594,20 @@ void COptionsSubKeyboard::FillInDefaultBindings( void )
 	{
 		char cmd[64];
 		data = UTIL_Parse( data, cmd, sizeof(cmd) );
-		if ( cmd[ 0 ] == '\0' )
+		if ( strlen( cmd ) <= 0 )
 			break;
 
-		if ( !Q_stricmp(cmd, "bind") )
+		if ( !stricmp(cmd, "bind") )
 		{
 			// Key name
 			char szKeyName[256];
 			data = UTIL_Parse( data, szKeyName, sizeof(szKeyName) );
-			if ( szKeyName[ 0 ] == '\0' )
+			if ( strlen( szKeyName ) <= 0 )
 				break; // Error
 
 			char szBinding[256];
 			data = UTIL_Parse( data, szBinding, sizeof(szBinding) );
-			if ( szKeyName[ 0 ] == '\0' )  
+			if ( strlen( szKeyName ) <= 0 )  
 				break; // Error
 
 			// Find item
@@ -629,30 +618,19 @@ void COptionsSubKeyboard::FillInDefaultBindings( void )
 				AddBinding( item, szKeyName );
 			}
 		}
-		else
-		{
-			// L4D: Use Defaults also resets cvars listed in config_default.cfg
-			ConVarRef var( cmd );
-			if ( var.IsValid() )
-			{
-				char szValue[256] = "";
-				data = UTIL_Parse( data, szValue, sizeof(szValue) );
-				var.SetValue( szValue );
-			}
-		}
 	}
 	
 	PostActionSignal(new KeyValues("ApplyButtonEnable"));
 
 	// Make sure console and escape key are always valid
     KeyValues *item = GetItemForBinding( "toggleconsole" );
-    if ( item )
+    if (item)
     {
         // Bind it
         AddBinding( item, "`" );
     }
     item = GetItemForBinding( "cancelselect" );
-    if ( item )
+    if (item)
     {
         // Bind it
         AddBinding( item, "ESCAPE" );

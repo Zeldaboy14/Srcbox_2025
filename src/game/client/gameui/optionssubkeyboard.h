@@ -1,4 +1,4 @@
-//===== Copyright © 1996-2005, Valve Corporation, All rights reserved. ======//
+//===== Copyright ï¿½ 1996-2005, Valve Corporation, All rights reserved. ======//
 //
 // Purpose: 
 //
@@ -13,16 +13,16 @@
 
 #include "tier1/UtlVector.h"
 #include "tier1/UtlSymbol.h"
-
+#include "vgui_controls/PropertyPage.h"
 #include "vgui_controls/EditablePanel.h"
 class VControlsListPanel;
 
 //-----------------------------------------------------------------------------
 // Purpose: Keyboard Details, Part of OptionsDialog
 //-----------------------------------------------------------------------------
-class COptionsSubKeyboard : public vgui::EditablePanel
+class COptionsSubKeyboard : public vgui::PropertyPage
 {
-	DECLARE_CLASS_SIMPLE( COptionsSubKeyboard, vgui::EditablePanel );
+	DECLARE_CLASS_SIMPLE( COptionsSubKeyboard, vgui::PropertyPage );
 
 public:
 	COptionsSubKeyboard(vgui::Panel *parent);
@@ -60,6 +60,7 @@ private:
 
 	// Save/restore/cleanup engine's current bindings ( for handling cancel button )
 	void			SaveCurrentBindings( void );
+	void BindKey(const char * key,const char * binding);
 	void			DeleteSavedBindings( void );
 
 	// Get column 0 action descriptions for all keys
