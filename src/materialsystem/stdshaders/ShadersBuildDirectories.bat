@@ -1,7 +1,3 @@
-::===================== File of the LUX Shader Project =====================::
-::  - Initial D.  : 03.04.2025                                              ::
-::  - Last Change : 29.01.2026                                              ::
-::==========================================================================::
 @echo off
 
 rem sourcedir = Where to compile Shaders to ( shaders\ )
@@ -23,6 +19,6 @@ set PROCESS_LIST=%PROCESS_LIST% hl2.exe
 set PROCESS_LIST=%PROCESS_LIST% hl2_win64.exe
 
 rem Mod Projects using LUX
-set PROCESS_LIST=%PROCESS_LIST% tf2classified_win64.exe
+set PROCESS_LIST=%PROCESS_LIST% tf2classic_win64.exe
 set PROCESS_LIST=%PROCESS_LIST% fc_tfsdk_win64.exe
-set PROCESS_LIST=%PROCESS_LIST% mod_hl2mp.exe
+set PROCESS_LIST=%PROCESS_LIST% mod_hl2mp_win64.exe

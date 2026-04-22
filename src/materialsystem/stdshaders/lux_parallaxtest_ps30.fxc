@@ -1,0 +1,65 @@
+//===================== File of the LUX Shader Project =====================//
+//
+//	Initial D.	:	22.06.2024 DMY
+//	Last Change :	17.12.2025 DMY
+//
+//==========================================================================//
+
+//==========================================================================//
+//	Declare Static Combos
+//==========================================================================//
+
+//==========================================================================//
+//	Declare Dynamic Combos
+//==========================================================================//
+
+//==========================================================================//
+//	Skipping undesired Combos
+//	The Order of Static Combos and Skips has a drastic Impact on Compile Time!
+//==========================================================================//
+
+//==========================================================================//
+//	Common Definitions
+//==========================================================================//
+
+//#define TONEMAP_SCALE_NONE
+#define TONEMAP_SCALE_LINEAR
+//#define TONEMAP_SCALE_GAMMA
+
+//==========================================================================//
+//	Constants, Functions, Includes
+//==========================================================================//
+
+// Include for all Pixel Shaders
+#include "lux_common_ps_fxc.h"
+
+// Lightmapping related functions
+#include "lux_common_lightmapped.h"
+
+sampler Sampler_ParallaxTexture : register(s1);
+
+//==========================================================================//
+//	PS Input
+//==========================================================================//
+struct PS_INPUT
+{
+	// HACKHACK: For some reason Scell's compiler allows the use of SV_POSITION
+	// We can abuse this so we don't need to pass ProjPos separately!!
+	float2 ProjPos					:	SV_POSITION;
+	float4 WorldPos_ProjPosZ		:	TEXCOORD0;
+    float4 BaseDetailTexCoord		:	TEXCOORD1;
+//	float4 NormalEMMTexCoord		:	TEXCOORD2;
+	float3x3 TBN_Matrix				:	TEXCOORD3;
+	//									TEXCOORD4
+	//									TEXCOORD5
+	float4 LightmapTexCoord			:	TEXCOORD6; // Two more floats could be packed here
+	float4 LightmapTexCoord2And3	:	TEXCOORD7;
+};
+ 
+//==========================================================================//
+//	PS Entry Point
+//==========================================================================//
+float4 main(PS_INPUT i) : COLOR
+{
+    return 0.0f;
+}

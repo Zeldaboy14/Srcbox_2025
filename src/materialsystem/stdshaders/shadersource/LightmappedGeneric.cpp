@@ -1,7 +1,7 @@
 //===================== File of the LUX Shader Project =====================//
 //
 //	Initial D.	:	20.01.2023 DMY
-//	Last Change :	 30.01.2026 DMY
+//	Last Change :	06.02.2026 DMY
 //
 //==========================================================================//
 
@@ -108,7 +108,11 @@ void LMG_SetupEmissiveBlendVars(EmissiveBlend_Vars_t &EmissiveVars)
 	EmissiveVars.SelfIllum.InitVars(SelfIllumTexture, SelfIllumTextureFrame);
 
 	// DetailBlendMode 5 and 6 are handled here, since it simplifies our Shaders
-	EmissiveVars.Detail.InitVars(Detail, DetailFrame, DetailTextureTransform, DetailScale, DetailBlendMode, DetailTint, DetailBlendFactor);
+	EmissiveVars.Detail.InitVars(Detail, DetailFrame, DetailTextureTransform, DetailScale, DetailBlendMode, DetailBlendFactor);
+
+	// $DetailTint is linear on LightmappedGeneric
+	// It is GammaToLinear on VertexLitGeneric
+	EmissiveVars.Detail.m_f3DetailTint = GetFloat3(DetailTint);
 
 	// Minimum Light and Transform Fallbacks
 	EmissiveVars.Base.InitVars(BaseTexture, Frame, BaseTextureTransform);
@@ -207,7 +211,7 @@ SHADER_INIT_PARAMS()
 		// This is a new Feature to this Shader
 		// So I'm not hacking in Support for Valve created Shenanigans.
 		// Abide by these Rules and we won't have a Spaghetti.
-		if (!IsDefined(BumpMap) && CVarDeveloper.GetInt() > 0)
+		if (!IsDefined(BumpMap) && CVarDeveloper() > 0)
 		{
 			if (IsDefined(BaseMapAlphaPhongMask) && GetBool(BaseMapAlphaPhongMask))
 			{
@@ -1163,14 +1167,14 @@ SHADER_DRAW
 #endif
 
 #ifdef DEBUG_LUXELS
-		if (mat_luxels.GetBool())
+		if (mat_luxels())
 		{
 			BindTexture(SAMPLER_LIGHTMAP, TEXTURE_DEBUG_LUXELS);
 		}
 #endif
 
 #ifdef DEBUG_FULLBRIGHT2 
-		if (mat_fullbright.GetInt() == 2 && !HasFlag(MATERIAL_VAR_NO_DEBUG_OVERRIDE))
+		if (mat_fullbright() == 2 && !HasFlag(MATERIAL_VAR_NO_DEBUG_OVERRIDE))
 			BindTexture(SAMPLER_BASETEXTURE, TEXTURE_GREY);
 #endif
 	}

@@ -14,10 +14,5 @@
 //============================================
 
 lux_black_ps30.fxc
+lux_parallaxtest_ps30.fxc
 lux_depthtodestalpha_ps30.fxc
-lux_eyes_vs30.fxc
-lux_eyes_ps30.fxc
-lux_debug_luxels_vs30.fxc
-lux_debug_luxels_ps30.fxc
-lux_debug_textureview_vs30.fxc
-lux_debug_textureview_ps30.fxc

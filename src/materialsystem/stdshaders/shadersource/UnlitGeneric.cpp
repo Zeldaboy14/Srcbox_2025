@@ -1,7 +1,7 @@
 //===================== File of the LUX Shader Project =====================//
 //
 //	Initial D.	:	20.01.2023 DMY
-//	Last Change :	 30.01.2026 DMY
+//	Last Change :	01.02.2026 DMY
 //
 //==========================================================================//
 
@@ -138,7 +138,7 @@ SHADER_INIT_PARAMS()
 	DefaultFloat(EdgeSoftnessEnd, 0.5);
 	DefaultFloat(OutlineAlpha, 1.0);
 
-	if (CVarDeveloper.GetInt() > 0)
+	if (CVarDeveloper() > 0)
 	{
 		if (GetBool(DistanceAlpha) && !IsDefined(BaseTexture) && !GetBool(DistanceAlphaFromDetail))
 		{
@@ -170,6 +170,10 @@ SHADER_INIT_PARAMS()
 	DefaultFloat(TreeSwaySpeedLerpStart, 3.0f);
 	DefaultFloat(TreeSwaySpeedLerpEnd, 6.0f);
 	DefaultFloat2(TreeSwayStaticValues, 0.5f, 0.5f);
+
+	// There are some Materials that set $SelfIllum on UnlitGeneric
+	// We need to clear this Flag at all Times, to ensure ComputeBlendType works correctly.
+	ClearFlag(MATERIAL_VAR_SELFILLUM);
 }
 
 SHADER_FALLBACK

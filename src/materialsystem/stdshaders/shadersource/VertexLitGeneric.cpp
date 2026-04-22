@@ -1,7 +1,7 @@
 //===================== File of the LUX Shader Project =====================//
 //
 //	Initial D.	:	20.01.2023 DMY
-//	Last Change :	 30.01.2026 DMY
+//	Last Change :	06.02.2026 DMY
 //
 //==========================================================================//
 
@@ -199,7 +199,11 @@ void VLG_SetupEmissiveBlendVars(EmissiveBlend_Vars_t& EmissiveVars)
 	EmissiveVars.SelfIllum.InitVars(SelfIllumTexture, SelfIllumTextureFrame);
 
 	// DetailBlendMode 5 and 6 are handled here, since it simplifies our Shaders
-	EmissiveVars.Detail.InitVars(Detail, DetailFrame, DetailTextureTransform, DetailScale, DetailBlendMode, DetailTint, DetailBlendFactor);
+	EmissiveVars.Detail.InitVars(Detail, DetailFrame, DetailTextureTransform, DetailScale, DetailBlendMode, DetailBlendFactor);
+	
+	// $DetailTint is linear on LightmappedGeneric
+	// It is GammaToLinear on VertexLitGeneric
+	EmissiveVars.Detail.m_f3DetailTint = GammaToLinearTint(GetFloat3(DetailTint));
 
 	// Minimum Light and Transform Fallbacks
 	EmissiveVars.Base.InitVars(BaseTexture, Frame, BaseTextureTransform);
@@ -252,7 +256,7 @@ void LuxVertexLitGeneric_ParamsDebugger()
 
 	// All Textures
 	bool bHasBaseTexture = IsDefined(BaseTexture);
-	bool bHasNormalTexture = IsDefined(NormalTexture);
+	bool bHasNormalTexture = IsDefined(BumpMap) || IsDefined(NormalTexture);
 	bool bHasDetailTexture = IsDefined(Detail);
 	bool bHasLightWarpTexture = IsDefined(LightWarpTexture);
 	bool bHasLightWarpNoBump = GetBool(LightWarpNoBump);
@@ -505,7 +509,7 @@ SHADER_INIT_PARAMS()
 {
 	// Let Developers know about potential Issues
 	// This needs to happen first since we initialise Values afterwards and that makes them count as "defined"
-	if (CVarDeveloper.GetInt() > 0)
+	if (CVarDeveloper() > 0)
 		LuxVertexLitGeneric_ParamsDebugger();
 
 	Cloak_Vars_t CloakVars;
@@ -1907,7 +1911,7 @@ void LuxVertexLitGeneric_Shader_Draw(IShaderShadow* pShaderShadow, IShaderDynami
 	if(IsDynamicState())
 	{
 #ifdef DEBUG_FULLBRIGHT2 
-		if (mat_fullbright.GetInt() == 2 && !HasFlag(MATERIAL_VAR_NO_DEBUG_OVERRIDE))
+		if (mat_fullbright() == 2 && !HasFlag(MATERIAL_VAR_NO_DEBUG_OVERRIDE))
 			BindTexture(SAMPLER_BASETEXTURE, TEXTURE_GREY);
 #endif
 

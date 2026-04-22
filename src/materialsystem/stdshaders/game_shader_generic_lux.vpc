@@ -235,6 +235,7 @@ $Project
 			{
 				$File "$SHADERSOURCE/recreations/Black.cpp"
 				$File "$SHADERSOURCE/recreations/Infected.cpp"
+				$File "$SHADERSOURCE/recreations/g_sky.cpp"
 			}
 
 			$File "$SHADERSOURCE/LightmappedGeneric.cpp"
