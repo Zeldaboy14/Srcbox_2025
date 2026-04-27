@@ -1,50 +1,80 @@
-// ----------------------------------------------------------------------------
-// MYSHADER.CPP
+//===================== File of the Srcbox Shader Project (Under LUX) =====================//
 //
-// This file defines the C++ component of the example shader.
-// ----------------------------------------------------------------------------
-
-//#define SCRNSPACE 1
+//	Initial D.	:	23.4.2026 DMY
+//	Last Change :	24.4.2026 DMY
+//
+//=========================================================================================//
 
 // ----------------------------------------------------------------------------
 // Includes
 // ----------------------------------------------------------------------------
 
-// Must include this. Contains a bunch of macro definitions along with the
-// declaration of CBaseShader.
-//#include "BaseVSShader.h"
 #include "../cpp_lux_shared.h"
 
-// We're going to be making a screenspace effect. Therefore, we need the
-// screenspace vertex shader.
-#ifdef SCRNSPACE
-#include "SDK_screenspaceeffect_vs20.inc"
-#endif
-
-// We also need to include the pixel shader for our own shader.
-// Note that the shader compiler generates both 2.0 and 2.0b versions.
-// Need to include both.
+// Includes for Shaderfiles...
 #include "notlux_g_sky_vs30.inc"
 #include "notlux_g_sky_ps30.inc"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-#ifndef VERTEX_TEXCOORD0
-#define VERTEX_TEXCOORD0 (1 << 2)
-#endif
+Vars_Detail_t Stars;
 
-// ----------------------------------------------------------------------------
-// This macro defines the start of the shader. Effectively, every shader is
-// 
-// ----------------------------------------------------------------------------
-BEGIN_SHADER(g_sky, "")
+//==========================================================================//
+// CommandBuffer Setup
+//==========================================================================//
+class g_skyGenericContext : public LUXPerMaterialContextData
+{
+public:
+	ShrinkableCommandBuilder_t<5000> m_StaticCmds;
+	CommandBuilder_t<1000> m_SemiStaticCmds;
+
+	// Snapshot / Dynamic State
+	BlendType_t m_nBlendType = BT_NONE;
+	bool m_bIsFullyOpaque = false;
+
+	// Everything related to constants
+
+	g_skyGenericContext(CBaseShader* pShader)
+		: m_SemiStaticCmds(pShader),
+		m_StaticCmds(pShader)
+	{
+	}
+};
+
+//==========================================================================//
+// Shader Start
+//==========================================================================//
+BEGIN_VS_SHADER(g_sky, "Sky Shader native to Garry's Mod. Allows for customization that the normal shader lacks")
+SHADER_INFO_GEOMETRY("Brushes.")
+SHADER_INFO_USAGE("Apply to Geometry.")
+SHADER_INFO_LIMITATIONS("TBD")
+SHADER_INFO_PERFORMANCE("Very Cheap.")
+SHADER_INFO_FALLBACK("A DXLevel below 90 will cause a Fallback to the Wireframe Shader.")
+SHADER_INFO_WEBLINKS(WEBLINK_VDC
+	"VDC env_skypaint entity Page (hand in hand with this): https://developer.valvesoftware.com/wiki/Env_skypaint")
+	SHADER_INFO_D3D(LUX_SHADERINFO_SM30)
 
 // ----------------------------------------------------------------------------
 // This block is where you'd define inputs that users can feed to your
 // shader.
 // ----------------------------------------------------------------------------
 BEGIN_SHADER_PARAMS
+//params[STARLAYERS]->GetIntValue()
+	SHADER_PARAM(TopColor,		SHADER_PARAM_TYPE_COLOR,	"[0 1 1]", "The colour of the top of the sky.")
+	SHADER_PARAM(BottomColor,	SHADER_PARAM_TYPE_COLOR,	"", "The colour of the bottom of the sky.")
+	SHADER_PARAM(FadeBias,		SHADER_PARAM_TYPE_FLOAT,	"", "Controls the bias of the fade between top/bottom. (1.0 is even)")
+	SHADER_PARAM(HDRScale,		SHADER_PARAM_TYPE_FLOAT,	"[0 1 0.5]", "When rendering your skybox in HDR mode, output will be scaled by this amount.")
+	SHADER_PARAM(SunNormal,		SHADER_PARAM_TYPE_INTEGER,	"[1 0.4 0]", "The position of the sun, expressed as a normal from the center of the world.")
+	SHADER_PARAM(DuskColor,		SHADER_PARAM_TYPE_COLOR,	"", "The color of the dusk effect.")
+	SHADER_PARAM(DuskScale,		SHADER_PARAM_TYPE_FLOAT,	"", "The size of the dusk effect. (colouring of the horizon)")
+	SHADER_PARAM(DuskIntensity,	SHADER_PARAM_TYPE_FLOAT,	"[1 1 1]", "How powerful the dusk effect is.")
+	SHADER_PARAM(SunColor,		SHADER_PARAM_TYPE_COLOR,	"", "The color of the sun glow. (this is additive)")
+	SHADER_PARAM(SunSize,		SHADER_PARAM_TYPE_FLOAT,	"", "Controls the size of the sun glow.")
+	SHADER_PARAM(StarTexture,	SHADER_PARAM_TYPE_TEXTURE,	"skybox/stars", "[RGBA] Star/Clouds texture.")
+	SHADER_PARAM(StarScale,		SHADER_PARAM_TYPE_FLOAT,	"", "Sets how big the star texture should be.")
+	SHADER_PARAM(StarPos,		SHADER_PARAM_TYPE_INTEGER,	"", "Where the stars are") // Unused????
+	SHADER_PARAM(StarLayers,	SHADER_PARAM_TYPE_INTEGER,	"0", "From 1 to 3, how many layers should the star texture be repeated over.")
 END_SHADER_PARAMS
 
 // ----------------------------------------------------------------------------
@@ -53,20 +83,8 @@ END_SHADER_PARAMS
 // ----------------------------------------------------------------------------
 SHADER_INIT
 {
-
-}
-
-// ----------------------------------------------------------------------------
-// We want this shader to operate on the frame buffer itself. Therefore,
-// we need to set this to true.
-// ----------------------------------------------------------------------------
-bool NeedsFullFrameBufferTexture(IMaterialVar **params, bool bCheckSpecificToThisFrame /* = true */) const
-{
-#ifdef SCRNSPACE
-	return true;
-#else
-	return false;
-#endif
+	LoadTexture(BaseTexture, TEXTUREFLAGS_SRGB);
+	LoadTexture(StarTexture, TEXTUREFLAGS_SRGB);
 }
 
 // ----------------------------------------------------------------------------
@@ -89,79 +107,99 @@ SHADER_FALLBACK
 // ----------------------------------------------------------------------------
 SHADER_DRAW
 {
-	// ----------------------------------------------------------------------------
-	// This section is called when the shader is bound for the first time.
-	// You should setup any static state variables here.
-	// ----------------------------------------------------------------------------
-	SHADOW_STATE
+
+	// Always needed!
+	bool bHasBaseTexture = IsTextureLoaded(BaseTexture);
+	bool bHasStarTexture = IsTextureLoaded(StarTexture);
+
+	//==========================================================================//
+	// Static Snapshot of Shader Setup
+	//==========================================================================//
+	if (IsSnapshotting())
 	{
-		// Setup the vertex format.
-		#ifdef SCRNSPACE
-		int fmt = VERTEX_POSITION;
-		pShaderShadow->VertexShaderVertexFormat(fmt, 1, 0, 0);
-		#else
+		//==========================================================================//
+		// General Rendering Setup
+		//==========================================================================//
 
-		int flags = VERTEX_FORMAT_COMPRESSED | VERTEX_POSITION;
+		// This handles : $IgnoreZ, $Decal, $Nocull, $Znearer, $Wireframe, $AllowAlphaToCoverage
+		SetInitialShadowState();
 
-		pShaderShadow->VertexShaderVertexFormat(flags, 1, 0, 0);
+		// Always write Alpha, used for Depth Values
+		pShaderShadow->EnableAlphaWrites(true);
 
-		#endif
+		// Weird name, what it actually means : We output linear values
+		pShaderShadow->EnableSRGBWrite(true);
+
+		//==========================================================================//
+		// Vertex Shader - Vertex Format
+		//==========================================================================//
+		// Just always ask for Normal... You pretty much need it 99% of the time
+		// Pretty simple, one TexCoord and vPos for ProjPos
+		unsigned int nFlags = VERTEX_POSITION;
+		int nTexCoords = 1;
+		int nUserDataSize = 0;
+
+		pShaderShadow->VertexShaderVertexFormat(nFlags, nTexCoords, NULL, nUserDataSize);
+
+		//==========================================================================//
+		// Sampler Setup
+		//==========================================================================//
+
+		// s0 - $BaseTexture.
+		EnableSampler(SHADER_SAMPLER0, true);
+
+		// s4 - $StarTexture.
+		EnableSampler(SHADER_SAMPLER1, true);
 
 		// We don't need to write to the depth buffer.
 		pShaderShadow->EnableDepthWrites(false);
 
-		// Precache and set the screenspace shader.
-		#ifdef SCRNSPACE
-		DECLARE_STATIC_VERTEX_SHADER(sdk_screenspaceeffect_vs20);
-		SET_STATIC_VERTEX_SHADER(sdk_screenspaceeffect_vs20);
-		#endif
-
 		DECLARE_STATIC_VERTEX_SHADER(notlux_g_sky_vs30);
 		SET_STATIC_VERTEX_SHADER(notlux_g_sky_vs30);
 
-		// Precache and set the example shader.
-		if (g_pHardwareConfig->SupportsPixelShaders_2_b())
-		{
-			DECLARE_STATIC_PIXEL_SHADER(notlux_g_sky_ps30);
-			SET_STATIC_PIXEL_SHADER(notlux_g_sky_ps30);
-		}
-		else
-		{
-			DECLARE_STATIC_PIXEL_SHADER(notlux_g_sky_ps30);
-			SET_STATIC_PIXEL_SHADER(notlux_g_sky_ps30);
-		}
+		DECLARE_STATIC_PIXEL_SHADER(notlux_g_sky_ps30);
+		SET_STATIC_PIXEL_SHADER(notlux_g_sky_ps30);
 	}
 
-		// ----------------------------------------------------------------------------
-		// This section is called every frame.
-		// ----------------------------------------------------------------------------
-		DYNAMIC_STATE
+	// ----------------------------------------------------------------------------
+	// This section is called every frame.
+	// ----------------------------------------------------------------------------
+	if (IsDynamicState())
 	{
-		// Use the sdk_screenspaceeffect_vs20 vertex shader.
-		#ifdef SCRNSPACE
-		DECLARE_DYNAMIC_VERTEX_SHADER(sdk_screenspaceeffect_vs20);
-		SET_DYNAMIC_VERTEX_SHADER(sdk_screenspaceeffect_vs20);
-		#endif
+		//==========================================================================//
+		// Bind Textures
+		//==========================================================================//
+
+		// ShiroDkxtro2:
+		// Some of the default Textures have an invalid ShaderAPI Texture Handle. Great!
+		// This was never an Issue on Stock Shaders because they use the Command Buffer
+		// The Command Buffer ensures you only ever stuff VALID Texture Handles into it
+		// Since we don't use the Command Buffer here ( due to Reasons ),
+		// using BindTexture will crash Hammer on some default White Engine Texture.
+		// For Some it doesn't have a valid ShaderAPI Texture Handle..
+		if (bHasBaseTexture)
+		{
+			ITexture* pTexture = GetTexture(BaseTexture);
+			if (pTexture)
+			{
+				ShaderAPITextureHandle_t hHandle = GetShaderAPITextureBindHandle(BaseTexture, Frame);
+				if (hHandle != INVALID_SHADERAPI_TEXTURE_HANDLE)
+					BindTexture(SAMPLER_BASETEXTURE, BaseTexture, Frame);
+			}
+			else
+				BindTexture(SAMPLER_BASETEXTURE, TEXTURE_BLACK);
+		}
+
+		if (bHasStarTexture)
+			BindTexture(SAMPLER_DETAILTEXTURE, StarTexture, Frame);
 
 		DECLARE_DYNAMIC_VERTEX_SHADER(notlux_g_sky_vs30);
 		SET_DYNAMIC_VERTEX_SHADER(notlux_g_sky_vs30);
 
-		// Use our custom pixel shader.
-		if (g_pHardwareConfig->SupportsPixelShaders_2_b())
-		{
-			DECLARE_DYNAMIC_PIXEL_SHADER(notlux_g_sky_ps30);
-			SET_DYNAMIC_PIXEL_SHADER(notlux_g_sky_ps30);
-		}
-		else
-		{
-			DECLARE_DYNAMIC_PIXEL_SHADER(notlux_g_sky_ps30);
-			SET_DYNAMIC_PIXEL_SHADER(notlux_g_sky_ps30);
-		}
+		DECLARE_DYNAMIC_PIXEL_SHADER(notlux_g_sky_ps30);
+		SET_DYNAMIC_PIXEL_SHADER(notlux_g_sky_ps30);
 	}
 
-		// NEVER FORGET THIS CALL! This is what actually
-		// draws your shader!
-		// ALWAYS make this last, or else things will happen.
 	Draw();
 }
 

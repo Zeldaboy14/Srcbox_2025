@@ -5,13 +5,37 @@
 // the Source Engine.
 // ------------------------------------------------------------
 
-// ------------------------------------------------------------
-// Includes
-// ------------------------------------------------------------
+//==========================================================================//
+//	Declare Static Combos
+//==========================================================================//
+// NONE
 
-// This is the standard include file that all pixel shaders
-// should have.
+//==========================================================================//
+//	Declare Dynamic Combos
+//==========================================================================//
+// NONE
+
+//==========================================================================//
+//	Skipping undesired Combos
+//	The Order of Static Combos and Skips has a drastic Impact on Compile Time!
+//==========================================================================//
+// NONE
+
+//==========================================================================//
+//	Common Definitions
+//==========================================================================//
+
+// Fog is handled somewhere else
+#define NO_FOG
+
+// Consistent with Stock
+//#define TONEMAP_SCALE_NONE
+#define TONEMAP_SCALE_LINEAR
+//#define TONEMAP_SCALE_GAMMA
+
 #include "lux_common_ps_fxc.h"
+#include "lux_common_detailtexture.h"
+#include "lux_common_lightmapped.h"
 
 float4 cFogColor : register(c0); // Now explicitly declared
 
@@ -25,9 +49,10 @@ float4 cFogColor : register(c0); // Now explicitly declared
 // ------------------------------------------------------------
 struct PS_INPUT
 {
-    float3 position : POSITION;
-    float3 normal   : NORMAL;
-	float2 texCoord	: TEXCOORD0;
+	float4 WorldPos_ProjPosZ	: TEXCOORD0;
+    float4 TexCoords1			: TEXCOORD1;
+	float4 TexCoords2			: TEXCOORD2;
+    float3 Normal   : NORMAL;
 };
 
 // ------------------------------------------------------------
@@ -36,7 +61,36 @@ struct PS_INPUT
 // ------------------------------------------------------------
 float4 main( PS_INPUT i ) : COLOR
 {
-	return float4(0.22f, 0.51f, 1.0f, 1.0f);
+
+	// TEXCOORD0
+	float3 f3WorldPos = i.WorldPos_ProjPosZ.xyz;
+	float  f1Depth = i.WorldPos_ProjPosZ.w;
+	
+	// TEXCOORD1, TEXCOORD2
+	float2 f2BaseUV = i.TexCoords1.xy;
+	float2 f2DetailTextureUV = i.TexCoords2.xy;
+	
+	//==========================================================================//
+	//	..
+	//==========================================================================//
+	float4 f4BaseTexture = tex2D(Sampler_BaseTexture, f2BaseUV);
+	
+	//==========================================================================//
+	//	Detail Texture. Blendmodes 0 to 9
+	//==========================================================================//
+	
+	// Integer Constants are for use with loops only...
+	int nDetailBlendMode = trunc(2);
+
+	float4 f4DetailTexture = tex2D(Sampler_DetailTexture, f2DetailTextureUV);
+	f4DetailTexture.xyz *= g_f3DetailTextureTint;
+	
+	float3 f3Result = f4BaseTexture.rgb;
+	//float3 f3Result = f4BaseTexture = TextureCombine(f4BaseTexture, f4DetailTexture, 2);
+	
+    return LUX_Finalise(float4(f3Result, 1.0f), f3WorldPos, f1Depth, 1.0f);
+	
+	//return float4(0.0f, 0.0f, 0.0f, 1.0f);
 	//return 0;
 	//return cFogColor;
 }
