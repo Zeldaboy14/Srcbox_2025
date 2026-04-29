@@ -47,6 +47,10 @@ public:
 	void	PrimaryAttack( void );
 	void	AddViewKick( void );
 	void	DryFire( void );
+#ifndef CLIENT_DLL
+	void	Operator_HandleAnimEvent(animevent_t* pEvent, CBaseCombatCharacter* pOperator);
+	int		CapabilitiesGet(void) { return bits_CAP_WEAPON_RANGE_ATTACK1; }
+#endif
 
 	void	UpdatePenaltyTime( void );
 
@@ -169,6 +173,40 @@ void CWeaponPistol::Precache( void )
 	BaseClass::Precache();
 }
 
+#ifndef CLIENT_DLL
+//-----------------------------------------------------------------------------
+// Purpose:
+// Input  :
+// Output :
+//-----------------------------------------------------------------------------
+void CWeaponPistol::Operator_HandleAnimEvent(animevent_t* pEvent, CBaseCombatCharacter* pOperator)
+{
+	switch (pEvent->event)
+	{
+	case EVENT_WEAPON_PISTOL_FIRE:
+	{
+		Vector vecShootOrigin, vecShootDir;
+		vecShootOrigin = pOperator->Weapon_ShootPosition();
+
+		CAI_BaseNPC* npc = pOperator->MyNPCPointer();
+		ASSERT(npc != NULL);
+
+		vecShootDir = npc->GetActualShootTrajectory(vecShootOrigin);
+
+		CSoundEnt::InsertSound(SOUND_COMBAT | SOUND_CONTEXT_GUNFIRE, pOperator->GetAbsOrigin(), SOUNDENT_VOLUME_PISTOL, 0.2, pOperator, SOUNDENT_CHANNEL_WEAPON, pOperator->GetEnemy());
+
+		WeaponSound(SINGLE_NPC);
+		pOperator->FireBullets(1, vecShootOrigin, vecShootDir, VECTOR_CONE_PRECALCULATED, MAX_TRACE_LENGTH, m_iPrimaryAmmoType, 2);
+		pOperator->DoMuzzleFlash();
+		m_iClip1 = m_iClip1 - 1;
+	}
+	break;
+	default:
+		BaseClass::Operator_HandleAnimEvent(pEvent, pOperator);
+		break;
+	}
+}
+#endif
 
 //-----------------------------------------------------------------------------
 // Purpose:
@@ -181,6 +219,19 @@ void CWeaponPistol::DryFire( void )
 	m_flSoonestPrimaryAttack	= gpGlobals->curtime + PISTOL_FASTEST_DRY_REFIRE_TIME;
 	m_flNextPrimaryAttack		= gpGlobals->curtime + SequenceDuration();
 }
+
+//-----------------------------------------------------------------------------
+// Purpose: Draw the weapon
+//-----------------------------------------------------------------------------
+/*void CWeaponPistol::ViewModelDrawn(C_BaseViewModel* pBaseViewModel)
+{
+
+	// Render our effects
+	DrawEffects();
+
+	// Pass this back up
+	BaseClass::ViewModelDrawn(pBaseViewModel);
+}*/
 
 //-----------------------------------------------------------------------------
 // Purpose:

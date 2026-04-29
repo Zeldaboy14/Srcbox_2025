@@ -52,6 +52,9 @@ public:
 	CWeaponFrag();
 
 	void	Precache( void );
+#ifndef CLIENT_DLL
+	void	Operator_HandleAnimEvent(animevent_t* pEvent, CBaseCombatCharacter* pOperator);
+#endif
 	void	PrimaryAttack( void );
 	void	SecondaryAttack( void );
 	void	DecrementAmmo( CBaseCombatCharacter *pOwner );
@@ -59,12 +62,12 @@ public:
 
 	bool	Deploy( void );
 	bool	Holster( CBaseCombatWeapon *pSwitchingTo = NULL );
-	
-	bool	Reload( void );
 
 #ifndef CLIENT_DLL
-	void Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatCharacter *pOperator );
+	int		CapabilitiesGet(void) { return bits_CAP_WEAPON_RANGE_ATTACK1; }
 #endif
+	
+	bool	Reload( void );
 
 	void	ThrowGrenade( CBasePlayer *pPlayer );
 	bool	IsPrimed( bool ) { return ( m_AttackPaused != 0 );	}

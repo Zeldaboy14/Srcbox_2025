@@ -153,7 +153,7 @@ PRECACHE_WEAPON_REGISTER( weapon_stunstick );
 
 #ifndef CLIENT_DLL
 
-acttable_t	CWeaponStunStick::m_acttable[] = 
+/*acttable_t	CWeaponStunStick::m_acttable[] =
 {
 	{ ACT_RANGE_ATTACK1,				ACT_RANGE_ATTACK_SLAM, true },
 	{ ACT_HL2MP_IDLE,					ACT_HL2MP_IDLE_MELEE,					false },
@@ -163,6 +163,12 @@ acttable_t	CWeaponStunStick::m_acttable[] =
 	{ ACT_HL2MP_GESTURE_RANGE_ATTACK,	ACT_HL2MP_GESTURE_RANGE_ATTACK_MELEE,	false },
 	{ ACT_HL2MP_GESTURE_RELOAD,			ACT_HL2MP_GESTURE_RELOAD_MELEE,			false },
 	{ ACT_HL2MP_JUMP,					ACT_HL2MP_JUMP_MELEE,					false },
+};*/
+
+acttable_t CWeaponStunStick::m_acttable[] =
+{
+	{ ACT_MELEE_ATTACK1,	ACT_MELEE_ATTACK_SWING,	true },
+	{ ACT_IDLE_ANGRY,		ACT_IDLE_ANGRY_MELEE,	true },
 };
 
 IMPLEMENT_ACTTABLE(CWeaponStunStick);
@@ -359,7 +365,33 @@ void CWeaponStunStick::Operator_HandleAnimEvent( animevent_t *pEvent, CBaseComba
 
 				CBasePlayer *pPlayer = ToBasePlayer( pHurt );
 
+				CNPC_MetroPolice *pCop = dynamic_cast<CNPC_MetroPolice *>(pOperator);
 				bool bFlashed = false;
+
+				if ( pCop != NULL && pPlayer != NULL )
+				{
+					// See if we need to knock out this target
+					if ( pCop->ShouldKnockOutTarget( pHurt ) )
+					{
+						float yawKick = random->RandomFloat( -48, -24 );
+
+						//Kick the player angles
+						pPlayer->ViewPunch( QAngle( -16, yawKick, 2 ) );
+
+						color32 white = {255,255,255,255};
+						UTIL_ScreenFade( pPlayer, white, 0.2f, 1.0f, FFADE_OUT|FFADE_PURGE|FFADE_STAYOUT );
+						bFlashed = true;
+						
+						pCop->KnockOutTarget( pHurt );
+
+						break;
+					}
+					else
+					{
+						// Notify that we've stunned a target
+						pCop->StunnedTarget( pHurt );
+					}
+				}
 				
 				// Punch angles
 				if ( pPlayer != NULL && !(pPlayer->GetFlags() & FL_GODMODE) )
