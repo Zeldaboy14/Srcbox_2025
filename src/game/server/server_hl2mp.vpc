@@ -29,8 +29,23 @@ $Project "Server (HL2MP)"
 {
 	$Folder	"Source Files"
 	{
+		$Folder	"HL2 DLL"
+		{
+			$File	"hl2\weapon_citizenpackage.cpp"
+			$File	"hl2\weapon_citizenpackage.h"
+		}
+		$Folder "Srcbox"
+		{
+			$File	"$SRCDIR\game\server\srcbox\tf\entity_ammopack.cpp"
+			$File	"$SRCDIR\game\server\srcbox\tf\entity_healthkit.cpp"
+			$File	"$SRCDIR\game\server\srcbox\tf\tf_powerup.cpp"
+		}
 		$Folder "terror"
 		{
+			$Folder "Weapons"
+			{
+				$File	"$SRCDIR\game\shared\terror\weapon_pistol_terror.cpp"
+			}
 			$File	"terror\prop_car_alarm.cpp"
 		}
 		

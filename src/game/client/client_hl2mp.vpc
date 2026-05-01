@@ -55,6 +55,14 @@ $Project "Client (HL2MP)"
 			$File	"NextBot\C_NextBot.cpp"
 			$File	"NextBot\C_NextBot.h"
 		}
+		
+		$Folder "terror"
+		{
+			$Folder "Weapons"
+			{
+				$File	"$SRCDIR\game\shared\terror\weapon_pistol_terror.cpp"
+			}
+		}
 
 		$Folder	"HL2 DLL"
 		{
