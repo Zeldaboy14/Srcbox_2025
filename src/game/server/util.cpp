@@ -587,6 +587,34 @@ CBasePlayer	*UTIL_PlayerByIndex( int playerIndex )
 	return pPlayer;
 }
 
+CBasePlayer* UTIL_GetNearestPlayer(const Vector& origin, int iTeam /*= TEAM_ANY*/)
+{
+	float distToNearest = FLT_MAX;
+	CBasePlayer* pNearest = NULL;
+
+	for (int i = 1; i <= gpGlobals->maxClients; i++)
+	{
+		CBasePlayer* pPlayer = UTIL_PlayerByIndex(i);
+		if (!pPlayer)
+			continue;
+
+		if (pPlayer->GetTeamNumber() <= TEAM_SPECTATOR)
+			continue;
+
+		if (pPlayer->IsHLTV() || pPlayer->IsReplay())
+			continue;
+
+		float flDist = (pPlayer->GetAbsOrigin() - origin).LengthSqr();
+		if (flDist < distToNearest)
+		{
+			pNearest = pPlayer;
+			distToNearest = flDist;
+		}
+	}
+
+	return pNearest;
+}
+
 //
 // Return the local player.
 // If this is a multiplayer game, return NULL.
@@ -1499,7 +1527,7 @@ void UTIL_ClipPunchAngleOffset( QAngle &in, const QAngle &punch, const QAngle &c
 	}
 }
 
-float UTIL_WaterLevel( const Vector &position, float minz, float maxz )
+/*float UTIL_WaterLevel(const Vector& position, float minz, float maxz)
 {
 	Vector midUp = position;
 	midUp.z = minz;
@@ -1527,7 +1555,7 @@ float UTIL_WaterLevel( const Vector &position, float minz, float maxz )
 	}
 
 	return midUp.z;
-}
+}*/
 
 
 //-----------------------------------------------------------------------------
@@ -2486,7 +2514,7 @@ void UTIL_MuzzleFlash( const Vector &origin, const QAngle &angles, int scale, in
 //			clampEnds - clamps returned points to being on the line segment specified
 // Output : Vector - nearest point on the specified line
 //-----------------------------------------------------------------------------
-Vector UTIL_PointOnLineNearestPoint(const Vector& vStartPos, const Vector& vEndPos, const Vector& vPoint, bool clampEnds )
+/*Vector UTIL_PointOnLineNearestPoint(const Vector& vStartPos, const Vector& vEndPos, const Vector& vPoint, bool clampEnds)
 {
 	Vector	vEndToStart		= (vEndPos - vStartPos);
 	Vector	vOrgToStart		= (vPoint  - vStartPos);
@@ -2503,7 +2531,7 @@ Vector UTIL_PointOnLineNearestPoint(const Vector& vStartPos, const Vector& vEndP
 	Vector	vIntersectPos	= vStartPos + vEndToStart * fIntersectDist;
 
 	return vIntersectPos;
-}
+}*/
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------

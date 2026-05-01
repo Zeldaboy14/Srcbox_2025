@@ -90,6 +90,60 @@ bool UseHWMorphVCDs()
 }
 
 //-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+bool C_SceneEntity::GetHWMorphSceneFileName( const char *pFilename, char *pHWMFilename )
+{
+	// Are we even using hardware morph?
+	if ( !UseHWMorphVCDs() )
+		return false;
+
+	// Multi-player only!
+	if ( !m_bMultiplayer )
+		return false;
+
+	// Do we have a valid filename?
+	if ( !( pFilename && pFilename[0] ) )
+		return false;
+
+	// Check to see if we already have an player/hwm/* filename.
+	if ( ( V_strstr( pFilename, "/high" ) != NULL ) || ( V_strstr( pFilename, "\\high" ) != NULL ) )
+	{
+		V_strcpy( pHWMFilename, pFilename );
+		return true;
+	}
+
+	// Find the hardware morph scene name and pass that along as well.
+	char szScene[MAX_PATH];
+	V_strcpy( szScene, pFilename );
+
+	char szSceneHWM[MAX_PATH];
+	szSceneHWM[0] = '\0';
+
+	char *pszToken = strtok( szScene, "/\\" );
+	while ( pszToken != NULL )
+	{
+		if ( !V_stricmp( pszToken, "low" ) )
+		{
+			V_strcat( szSceneHWM, "high", sizeof( szSceneHWM ) );
+		}
+		else
+		{
+			V_strcat( szSceneHWM, pszToken, sizeof( szSceneHWM ) );
+		}
+
+		pszToken = strtok( NULL, "/\\" );
+		if ( pszToken != NULL )
+		{
+			V_strcat( szSceneHWM, "\\", sizeof( szSceneHWM ) );
+		}
+	}
+
+	V_strcpy( pHWMFilename, szSceneHWM );
+	return true;
+}
+
+//-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
 void C_SceneEntity::ResetActorFlexesForScene()
@@ -150,22 +204,22 @@ void C_SceneEntity::SetupClientOnlyScene( const char *pszFilename, C_BaseFlex *p
 	m_hOwner = pOwner;
 	m_bClientOnly = true;
 
-	char szFilename[MAX_PATH];
-	Assert( V_strlen( pszFilename ) < MAX_PATH );
-	V_strcpy_safe( szFilename, pszFilename );
+	char szFilename[128];
+	Assert( V_strlen( pszFilename ) < 128 );
+	V_strcpy( szFilename, pszFilename );
 
-	char szSceneHWM[ MAX_PATH ];
+	char szSceneHWM[128];
 	if ( GetHWMorphSceneFileName( szFilename, szSceneHWM ) )
 	{
-		V_strcpy_safe( szFilename, szSceneHWM );
+		V_strcpy( szFilename, szSceneHWM );
 	}
 
-	Assert(  szFilename[ 0 ] );
-	if ( szFilename[ 0 ] )
+	Assert( szFilename && szFilename[ 0 ] );
+	if (  szFilename && szFilename[ 0 ] )
 	{
 		LoadSceneFromFile( szFilename );
-
-		if ( !HushAsserts() )
+		
+		if (!CommandLine()->FindParm("-hushasserts"))
 		{
 			Assert( m_pScene );
 		}
@@ -203,7 +257,7 @@ void C_SceneEntity::SetupClientOnlyScene( const char *pszFilename, C_BaseFlex *p
 
 	if ( m_hOwner.Get() )
 	{
-		if ( !HushAsserts() )
+		if (!CommandLine()->FindParm("-hushasserts"))
 		{
 			Assert( m_pScene );
 		}
@@ -266,7 +320,7 @@ void C_SceneEntity::PostDataUpdate( DataUpdateType_t updateType )
 	if ( str )
 	{
 		Assert( V_strlen( str ) < MAX_PATH );
-		V_strcpy_safe( szFilename, str );
+		V_strcpy( szFilename, str );
 	}
 	else
 	{
@@ -276,13 +330,13 @@ void C_SceneEntity::PostDataUpdate( DataUpdateType_t updateType )
 	char szSceneHWM[MAX_PATH];
 	if ( GetHWMorphSceneFileName( szFilename, szSceneHWM ) )
 	{
-		V_strcpy_safe( szFilename, szSceneHWM );
+		V_strcpy( szFilename, szSceneHWM );
 	}
 
 	if ( updateType == DATA_UPDATE_CREATED )
 	{
-		Assert( szFilename[ 0 ] );
-		if ( szFilename[ 0 ] )
+		Assert( szFilename && szFilename[ 0 ] );
+		if (  szFilename && szFilename[ 0 ] )
 		{
 			LoadSceneFromFile( szFilename );
 
@@ -319,8 +373,6 @@ void C_SceneEntity::PostDataUpdate( DataUpdateType_t updateType )
 
 			SetNextClientThink( CLIENT_THINK_ALWAYS );
 		}
-
-		m_bWasPlaying = !m_bIsPlayingBack; // force it to be "changed"
 	}
 
 	// Playback state changed...
@@ -622,7 +674,7 @@ void C_SceneEntity::DispatchStartSpeak( CChoreoScene *scene, C_BaseFlex *actor, 
 		es.m_pSoundName = event->GetParameters();
 
 		EmitSound( filter, actor->entindex(), es );
-		actor->AddSceneEvent( scene, event, NULL, IsClientOnly() );
+		actor->AddSceneEvent( scene, event, NULL, IsClientOnly(), this );
 
 		// Close captioning only on master token no matter what...
 		if ( event->GetCloseCaptionType() == CChoreoEvent::CC_MASTER )
@@ -752,20 +804,72 @@ CChoreoStringPool g_ChoreoStringPool;
 
 CChoreoScene *C_SceneEntity::LoadScene( const char *filename )
 {
+#ifdef MAPBASE
+	char loadfile[MAX_PATH];
+#else
 	char loadfile[ 512 ];
+#endif
 	Q_strncpy( loadfile, filename, sizeof( loadfile ) );
 	Q_SetExtension( loadfile, ".vcd", sizeof( loadfile ) );
 	Q_FixSlashes( loadfile );
 
+#ifdef MAPBASE
+	// 
+	// Raw scene file support
+	// 
+	void *pBuffer = 0;
+	size_t bufsize = scenefilecache->GetSceneBufferSize( loadfile );
+	CChoreoScene *pScene = NULL;
+	if ( bufsize > 0 )
+	{
+		// Definitely in scenes.image
+		pBuffer = malloc( bufsize );
+		if ( !scenefilecache->GetSceneData( filename, (byte *)pBuffer, bufsize ) )
+		{
+			free( pBuffer );
+			return NULL;
+		}
+
+	
+		if ( IsBufferBinaryVCD( (char*)pBuffer, bufsize ) )
+		{
+			pScene = new CChoreoScene( this );
+			CUtlBuffer buf( pBuffer, bufsize, CUtlBuffer::READ_ONLY );
+			if ( !pScene->RestoreFromBinaryBuffer( buf, loadfile, &g_ChoreoStringPool ) )
+			{
+				Warning( "Unable to restore scene '%s'\n", loadfile );
+				delete pScene;
+				pScene = NULL;
+			}
+		}
+	}
+	else if (filesystem->ReadFileEx( loadfile, "MOD", &pBuffer, true ))
+	{
+		// Not in scenes.image, but it's a raw file
+		g_TokenProcessor.SetBuffer((char*)pBuffer);
+		pScene = ChoreoLoadScene( loadfile, this, &g_TokenProcessor, Scene_Printf );
+	}
+	else
+	{
+		// Abandon ship
+		return NULL;
+	}
+
+	if(pScene)
+	{
+		pScene->SetPrintFunc( Scene_Printf );
+		pScene->SetEventCallbackInterface( this );
+	}
+#else
 	char *pBuffer = NULL;
 	size_t bufsize = scenefilecache->GetSceneBufferSize( loadfile );
 	if ( bufsize <= 0 )
 		return NULL;
 
-	pBuffer = new char[ bufsize ];
+	pBuffer = malloc( bufsize );
 	if ( !scenefilecache->GetSceneData( filename, (byte *)pBuffer, bufsize ) )
 	{
-		delete[] pBuffer;
+		free( pBuffer );
 		return NULL;
 	}
 
@@ -791,8 +895,9 @@ CChoreoScene *C_SceneEntity::LoadScene( const char *filename )
 		g_TokenProcessor.SetBuffer( pBuffer );
 		pScene = ChoreoLoadScene( loadfile, this, &g_TokenProcessor, Scene_Printf );
 	}
+#endif
 
-	delete[] pBuffer;
+	free( pBuffer );
 	return pScene;
 }
 
@@ -859,7 +964,7 @@ void C_SceneEntity::UnloadScene( void )
 //-----------------------------------------------------------------------------
 void C_SceneEntity::DispatchStartFlexAnimation( CChoreoScene *scene, C_BaseFlex *actor, CChoreoEvent *event )
 {
-	actor->AddSceneEvent( scene, event, NULL, IsClientOnly() );
+	actor->AddSceneEvent( scene, event, NULL, IsClientOnly(), this );
 }
 
 //-----------------------------------------------------------------------------
@@ -879,7 +984,7 @@ void C_SceneEntity::DispatchEndFlexAnimation( CChoreoScene *scene, C_BaseFlex *a
 //-----------------------------------------------------------------------------
 void C_SceneEntity::DispatchStartExpression( CChoreoScene *scene, C_BaseFlex *actor, CChoreoEvent *event )
 {
-	actor->AddSceneEvent( scene, event, NULL, IsClientOnly() );
+	actor->AddSceneEvent( scene, event, NULL, IsClientOnly(), this );
 }
 
 //-----------------------------------------------------------------------------
@@ -903,7 +1008,7 @@ void C_SceneEntity::DispatchStartGesture( CChoreoScene *scene, C_BaseFlex *actor
 	if ( !Q_stricmp( event->GetName(), "NULL" ) )
 		return;
 
-	actor->AddSceneEvent( scene, event, NULL, IsClientOnly() ); 
+	actor->AddSceneEvent( scene, event, NULL, IsClientOnly(), this ); 
 }
 
 //-----------------------------------------------------------------------------
@@ -918,7 +1023,7 @@ void C_SceneEntity::DispatchProcessGesture( CChoreoScene *scene, C_BaseFlex *act
 		return;
 
 	actor->RemoveSceneEvent( scene, event, false );
-	actor->AddSceneEvent( scene, event, NULL, IsClientOnly() ); 
+	actor->AddSceneEvent( scene, event, NULL, IsClientOnly(), this ); 
 }
 
 //-----------------------------------------------------------------------------
@@ -941,7 +1046,7 @@ void C_SceneEntity::DispatchEndGesture( CChoreoScene *scene, C_BaseFlex *actor, 
 //-----------------------------------------------------------------------------
 void C_SceneEntity::DispatchStartSequence( CChoreoScene *scene, CBaseFlex *actor, CChoreoEvent *event )
 {
-	actor->AddSceneEvent( scene, event, NULL, IsClientOnly() );
+	actor->AddSceneEvent( scene, event, NULL, IsClientOnly(), this );
 }
 
 //-----------------------------------------------------------------------------
@@ -951,7 +1056,7 @@ void C_SceneEntity::DispatchStartSequence( CChoreoScene *scene, CBaseFlex *actor
 void C_SceneEntity::DispatchProcessSequence( CChoreoScene *scene, CBaseFlex *actor, CChoreoEvent *event )
 {
 	actor->RemoveSceneEvent( scene, event, false );
-	actor->AddSceneEvent( scene, event, NULL, IsClientOnly() );
+	actor->AddSceneEvent( scene, event, NULL, IsClientOnly(), this );
 }
 
 //-----------------------------------------------------------------------------
@@ -1054,7 +1159,7 @@ void C_SceneEntity::SetCurrentTime( float t, bool forceClientSync )
 //-----------------------------------------------------------------------------
 void C_SceneEntity::PrefetchAnimBlocks( CChoreoScene *pScene )
 {
-	if ( !HushAsserts() )
+	if (!CommandLine()->FindParm("-hushasserts"))
 	{
 		Assert( pScene && m_bMultiplayer );
 	}
@@ -1108,11 +1213,11 @@ void C_SceneEntity::PrefetchAnimBlocks( CChoreoScene *pScene )
 							{
 								// Now look up the animblock
 								mstudioseqdesc_t &seqdesc = pStudioHdr->pSeqdesc( iSequence );
-								for ( int iGroup = 0 ; iGroup < seqdesc.groupsize[ 0 ] ; ++iGroup )
+								for ( int i = 0 ; i < seqdesc.groupsize[ 0 ] ; ++i )
 								{
 									for ( int j = 0; j < seqdesc.groupsize[ 1 ]; ++j )
 									{
-										int iAnimation = seqdesc.anim( iGroup, j );
+										int iAnimation = seqdesc.anim( i, j );
 										int iBaseAnimation = pStudioHdr->iRelativeAnim( iSequence, iAnimation );
 										mstudioanimdesc_t &animdesc = pStudioHdr->pAnimdesc( iBaseAnimation );
 
@@ -1131,14 +1236,14 @@ void C_SceneEntity::PrefetchAnimBlocks( CChoreoScene *pScene )
 											++nResident;
 											if ( nSpew > 1 )
 											{
-												Msg( "%s:%s[%i:%i] was resident\n", pStudioHdr->pszName(), animdesc.pszName(), iGroup, j );
+												Msg( "%s:%s[%i:%i] was resident\n", pStudioHdr->pszName(), animdesc.pszName(), i, j );
 											}
 										}
 										else
 										{
 											if ( nSpew != 0 )
 											{
-												Msg( "%s:%s[%i:%i] async load\n", pStudioHdr->pszName(), animdesc.pszName(), iGroup, j );
+												Msg( "%s:%s[%i:%i] async load\n", pStudioHdr->pszName(), animdesc.pszName(), i, j );
 											}
 										}
 									}

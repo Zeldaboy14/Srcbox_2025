@@ -34,6 +34,7 @@
 #include "scripted.h"
 #include "env_debughistory.h"
 #include "team.h"
+#include "util.h"
 
 #ifdef HL2_EPISODIC
 #include "npc_alyx_episodic.h"
@@ -952,6 +953,70 @@ float CSceneEntity::GetSoundSystemLatency( void )
 	// Assume 100 msec sound system latency
 	return SOUND_SYSTEM_LATENCY_DEFAULT;
 }
+
+
+#if defined( MAPBASE )
+//-----------------------------------------------------------------------------
+// I copied CSceneEntity's PrecacheScene to a unique static function so PrecacheInstancedScene()
+// can precache loose scene files without having to use a CSceneEntity.
+//-----------------------------------------------------------------------------
+void PrecacheChoreoScene(CChoreoScene* scene)
+{
+	Assert(scene);
+
+	// Iterate events and precache necessary resources
+	for (int i = 0; i < scene->GetNumEvents(); i++)
+	{
+		CChoreoEvent* event = scene->GetEvent(i);
+		if (!event)
+			continue;
+
+		// load any necessary data
+		switch (event->GetType())
+		{
+		default:
+			break;
+
+		case CChoreoEvent::SPEAK:
+		{
+			// Defined in SoundEmitterSystem.cpp
+			// NOTE:  The script entries associated with .vcds are forced to preload to avoid
+			//  loading hitches during triggering
+			CBaseEntity::PrecacheScriptSound(event->GetParameters());
+
+			if (event->GetCloseCaptionType() == CChoreoEvent::CC_MASTER && event->GetNumSlaves() > 0)
+			{
+				char tok[CChoreoEvent::MAX_CCTOKEN_STRING];
+				if (event->GetPlaybackCloseCaptionToken(tok, sizeof(tok)))
+				{
+					CBaseEntity::PrecacheScriptSound(tok);
+				}
+			}
+		}
+		break;
+
+		case CChoreoEvent::SUBSCENE:
+		{
+			// Only allow a single level of subscenes for now
+			if (!scene->IsSubScene())
+			{
+				CChoreoScene* subscene = event->GetSubScene();
+				if (!subscene)
+				{
+					subscene = ChoreoLoadScene(event->GetParameters(), NULL, &g_TokenProcessor, LocalScene_Printf);
+					subscene->SetSubScene(true);
+					event->SetSubScene(subscene);
+
+					// Now precache it's resources, if any
+					PrecacheChoreoScene(subscene);
+				}
+			}
+		}
+		break;
+		}
+	}
+}
+#endif // MAPBASE
 		
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -3423,6 +3488,49 @@ CChoreoScene *CSceneEntity::LoadScene( const char *filename, IChoreoEventCallbac
 
 	// binary compiled vcd
 	void *pBuffer;
+#if defined( MAPBASE )
+	//
+	// Raw scene file support
+	//
+	CChoreoScene* pScene;
+	int fileSize;
+
+	// First, check if it's in scenes.image...
+	if (CopySceneFileIntoMemory(loadfile, &pBuffer, &fileSize))
+	{
+		ConDColorMsg(Color(179, 235, 242, 255), "[SERVER] [SceneEntity] Loading scene %s from scenes.image\n", loadfile);
+
+		pScene = new CChoreoScene(NULL);
+		CUtlBuffer buf(pBuffer, fileSize, CUtlBuffer::READ_ONLY);
+		if (!pScene->RestoreFromBinaryBuffer(buf, loadfile, &g_ChoreoStringPool))
+		{
+			Warning("CSceneEntity::LoadScene: Unable to load binary scene '%s'\n", loadfile);
+			delete pScene;
+			pScene = NULL;
+		}
+	}
+	// Next, check if it's a loose file...
+	else if (filesystem->ReadFileEx(loadfile, "MOD", &pBuffer, true))
+	{
+		ConDColorMsg(Color(173, 235, 179, 255), "[SERVER] [SceneEntity] Loading scene %s from local path\n", loadfile);
+
+		g_TokenProcessor.SetBuffer((char*)pBuffer);
+		pScene = ChoreoLoadScene(loadfile, NULL, &g_TokenProcessor, LocalScene_Printf);
+		g_TokenProcessor.SetBuffer(NULL);
+	}
+	// Okay, it's definitely missing.
+	else
+	{
+		MissingSceneWarning(loadfile);
+		pScene = NULL;
+	}
+
+	if (pScene)
+	{
+		pScene->SetPrintFunc(LocalScene_Printf);
+		pScene->SetEventCallbackInterface(pCallback);
+	}
+#else
 	int fileSize;
 	if ( !CopySceneFileIntoMemory( loadfile, &pBuffer, &fileSize ) )
 	{
@@ -3443,6 +3551,7 @@ CChoreoScene *CSceneEntity::LoadScene( const char *filename, IChoreoEventCallbac
 		pScene->SetPrintFunc( LocalScene_Printf );
 		pScene->SetEventCallbackInterface( pCallback );
 	}
+#endif // MAPBASE
 
 	FreeSceneFileMemory( pBuffer );
 	return pScene;
@@ -3862,7 +3971,13 @@ CBaseEntity *CSceneEntity::FindNamedEntity( const char *name, CBaseEntity *pActo
 
 	if ( !stricmp( name, "Player" ) || !stricmp( name, "!player" ))
 	{
-		entity = ( gpGlobals->maxClients == 1 ) ? ( CBaseEntity * )UTIL_GetLocalPlayer() : NULL;
+
+		entity =
+#if defined( SRCBOX )
+			UTIL_GetNearestPlayer(GetAbsOrigin());
+#else
+			( gpGlobals->maxClients == 1 ) ? ( CBaseEntity * )UTIL_GetLocalPlayer() : NULL;
+#endif
 	}
 	else if ( !stricmp( name, "!target1" ) )
 	{
@@ -3989,7 +4104,12 @@ CBaseEntity *CSceneEntity::FindNamedEntityClosest( const char *name, CBaseEntity
 	} 
 	else if ( !stricmp( name, "Player" ) || !stricmp( name, "!player" ))
 	{
-		entity = ( gpGlobals->maxClients == 1 ) ? ( CBaseEntity * )UTIL_GetLocalPlayer() : NULL;
+		entity = 
+#if defined( SRCBOX )
+			UTIL_GetNearestPlayer(GetAbsOrigin());
+#else
+			( gpGlobals->maxClients == 1 ) ? ( CBaseEntity * )UTIL_GetLocalPlayer() : NULL;
+#endif
 		return entity;
 	}
 	else if ( !stricmp( name, "!target1" ) )
@@ -4796,12 +4916,35 @@ void PrecacheInstancedScene( char const *pszScene )
 	SceneCachedData_t sceneData;
 	if ( !scenefilecache->GetSceneCachedData( pszScene, &sceneData ) )
 	{
+#if defined( MAPBASE )
+		char loadfile[MAX_PATH];
+		Q_strncpy(loadfile, pszScene, sizeof(loadfile));
+		Q_SetExtension(loadfile, ".vcd", sizeof(loadfile));
+		Q_FixSlashes(loadfile);
+
+		// Attempt to precache manually
+		void* pBuffer = NULL;
+		if (filesystem->ReadFileEx(loadfile, "MOD", &pBuffer, true))
+		{
+			g_TokenProcessor.SetBuffer((char*)pBuffer);
+
+			CChoreoScene* pScene = ChoreoLoadScene(loadfile, NULL, &g_TokenProcessor, LocalScene_Printf);
+			if (pScene)
+			{
+				PrecacheChoreoScene(pScene);
+			}
+
+			g_TokenProcessor.SetBuffer(NULL);
+		}
+		FreeSceneFileMemory(pBuffer);
+#else
 		// Scenes are sloppy and don't always exist.
 		// A scene that is not in the pre-built cache image, but on disk, is a true error.
 		if ( developer.GetInt() && ( IsX360() && ( g_pFullFileSystem->GetDVDMode() != DVDMODE_STRICT ) && g_pFullFileSystem->FileExists( pszScene, "GAME" ) ) )
 		{
 			Warning( "PrecacheInstancedScene: Missing scene '%s' from scene image cache.\nRebuild scene image cache!\n", pszScene );
 		}
+#endif
 	}
 	else
 	{

@@ -228,7 +228,7 @@ int			UTIL_PrecacheDecal		( const char *name, bool preload = false );
 //-----------------------------------------------------------------------------
 
 float		UTIL_GetSimulationInterval();
-
+CBasePlayer* UTIL_GetNearestPlayer(const Vector& origin, int iTeam = TEAM_ANY);
 //-----------------------------------------------------------------------------
 // Purpose: Gets a player pointer by 1-based index
 //			If player is not yet spawned or connected, returns NULL
@@ -375,7 +375,7 @@ void		UTIL_ShowMessageAll		( const char *pString );
 void		UTIL_ScreenFadeAll		( const color32 &color, float fadeTime, float holdTime, int flags );
 void		UTIL_ScreenFade			( CBaseEntity *pEntity, const color32 &color, float fadeTime, float fadeHold, int flags );
 void		UTIL_MuzzleFlash		( const Vector &origin, const QAngle &angles, int scale, int type );
-Vector		UTIL_PointOnLineNearestPoint(const Vector& vStartPos, const Vector& vEndPos, const Vector& vPoint, bool clampEnds = false );
+//Vector		UTIL_PointOnLineNearestPoint(const Vector& vStartPos, const Vector& vEndPos, const Vector& vPoint, bool clampEnds = false );
 
 int			UTIL_EntityInSolid( CBaseEntity *ent );
 
