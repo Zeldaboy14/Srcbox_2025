@@ -1100,6 +1100,31 @@ KeyValues *KeyValues::CreateNewKey()
 	return CreateKeyUsingKnownLastChild( buf, pLastChild );
 }
 
+//-----------------------------------------------------------------------------
+// Get the name of the next key
+//-----------------------------------------------------------------------------
+KeyValues* KeyValues::GetNextKeyName(char* newKeyName, int newKeyNameBufferSize)
+{
+	KeyValues* pLastChild = NULL;
+	int newID = 1;
+
+	// search for any key with higher values
+	for (KeyValues* dat = m_pSub; dat != NULL; dat = dat->m_pPeer)
+	{
+		// case-insensitive string compare
+		int val = atoi(dat->GetName());
+		if (newID <= val)
+		{
+			newID = val + 1;
+		}
+
+		pLastChild = dat;
+	}
+
+	Q_snprintf(newKeyName, newKeyNameBufferSize, "%d", newID);
+
+	return pLastChild;
+}
 
 //-----------------------------------------------------------------------------
 // Create a key
