@@ -15,11 +15,6 @@
 #include "iclientmode.h"
 #include "GameEventListener.h"
 #include <baseviewport.h>
-#ifdef LUA_SDK
-#include <scripted_controls/scriptedhudviewport.h>
-#include <scripted_controls/scriptedclientluapanel.h>
-#endif
-
 
 class CBaseHudChat;
 class CBaseHudWeaponSelection;
@@ -91,12 +86,6 @@ public:
 
 	// Input
 	virtual int		KeyInput( int down, ButtonCode_t keynum, const char *pszCurrentBinding );
-//#ifdef ARGG
-	// adnan
-	// does this weapon need to override the view angles?
-	virtual bool OverrideViewAngles(void);
-	// end adnan
-//#endif
 	virtual int		HudElementKeyInput( int down, ButtonCode_t keynum, const char *pszCurrentBinding );
 	virtual void	OverrideMouseInput( float *x, float *y );
 	virtual void	StartMessageMode( int iMessageModeType );
@@ -152,16 +141,7 @@ public:
 	virtual void			OnDemoRecordStop() OVERRIDE {}
 
 protected:
-#ifdef LUA_SDK
-	CScriptedHudViewport* m_pScriptedViewport;
-#endif
-
 	CBaseViewport			*m_pViewport;
-
-#ifdef LUA_SDK
-public:
-	CScriptedClientLuaPanel* m_pClientLuaPanel;
-#endif
 
 	void			DisplayReplayReminder();
 
@@ -183,13 +163,6 @@ private:
 	vgui::HCursor			m_CursorNone;
 	CBaseHudWeaponSelection *m_pWeaponSelection;
 	int						m_nRootSize[2];
-
-	void UpdatePostProcessingEffects();
-
-	const C_PostProcessController* m_pCurrentPostProcessController;
-	PostProcessParameters_t m_CurrentPostProcessParameters;
-	PostProcessParameters_t m_LerpStartPostProcessParameters, m_LerpEndPostProcessParameters;
-	CountdownTimer m_PostProcessLerpTimer;
 };
 
 #endif // CLIENTMODE_NORMAL_H
