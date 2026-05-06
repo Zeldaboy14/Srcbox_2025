@@ -55,6 +55,8 @@ float		UTIL_VecToYaw			(const matrix3x4_t& matrix, const Vector &vec);
 float		UTIL_VecToPitch			(const matrix3x4_t& matrix, const Vector &vec);
 Vector		UTIL_YawToVector		( float yaw );
 
+Vector		UTIL_PointOnLineNearestPoint( const Vector &vStartPos, const Vector &vEndPos, const Vector &vPoint, bool clampEnds = false );
+
 //-----------------------------------------------------------------------------
 // Shared random number generators for shared/predicted code:
 // whenever generating random numbers in shared/predicted code, these functions

@@ -1476,7 +1476,11 @@ bool C_BaseFlex::ClearSceneEvent( CSceneEventInfo *info, bool fastKill, bool can
 //			expression - 
 //			duration - 
 //-----------------------------------------------------------------------------
+#ifdef MAPBASE
+void C_BaseFlex::AddSceneEvent(CChoreoScene* scene, CChoreoEvent* event, CBaseEntity* pTarget, bool bClientSide, C_SceneEntity* pSceneEntity)
+#else
 void C_BaseFlex::AddSceneEvent( CChoreoScene *scene, CChoreoEvent *event, CBaseEntity *pTarget, bool bClientSide )
+#endif
 {
 	if ( !scene || !event )
 	{
