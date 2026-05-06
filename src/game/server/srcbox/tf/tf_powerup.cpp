@@ -5,14 +5,14 @@
 //=============================================================================//
 #include "cbase.h"
 #include "items.h"
-#include "tf_gamerules.h"
-#include "tf_shareddefs.h"
-#include "tf_player.h"
+#include "gamerules.h"
+#include "shareddefs.h"
+//#include "tf_player.h"
+#include "player.h"
 #include "tf_team.h"
 #include "engine/IEngineSound.h"
 #include "filesystem.h"
 #include "tf_powerup.h"
-#include "bot/tf_bot.h"
 
 //=============================================================================
 float PackRatios[POWERUP_SIZES] =
@@ -168,10 +168,10 @@ bool CTFPowerup::ValidTouch( CBasePlayer *pPlayer )
 	}
 
 	// enemies in mann vs machine can't pick up any powerups
-	if ( TFGameRules()->IsMannVsMachineMode() && pPlayer->GetTeamNumber() == TF_TEAM_PVE_INVADERS )
+	/*if (TFGameRules()->IsMannVsMachineMode() && pPlayer->GetTeamNumber() == TF_TEAM_PVE_INVADERS)
 	{
 		return false;
-	}
+	}*/
 
 	return true;
 }
