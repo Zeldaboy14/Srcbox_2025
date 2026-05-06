@@ -133,6 +133,33 @@ Vector UTIL_YawToVector( float yaw )
 }
 
 //-----------------------------------------------------------------------------
+// Purpose:
+// Input  : vStartPos - start of the line
+//			vEndPos - end of the line
+//			vPoint - point to find nearest point to on specified line
+//			clampEnds - clamps returned points to being on the line segment specified
+// Output : Vector - nearest point on the specified line
+//-----------------------------------------------------------------------------
+Vector UTIL_PointOnLineNearestPoint(const Vector& vStartPos, const Vector& vEndPos, const Vector& vPoint, bool clampEnds)
+{
+	Vector vEndToStart = (vEndPos - vStartPos);
+	Vector vOrgToStart = (vPoint - vStartPos);
+	float fNumerator = DotProduct(vEndToStart, vOrgToStart);
+	float fDenominator = vEndToStart.Length() * vOrgToStart.Length();
+	float fIntersectDist = vOrgToStart.Length() * (fNumerator / fDenominator);
+	float flLineLength = VectorNormalize(vEndToStart);
+
+	if (clampEnds)
+	{
+		fIntersectDist = clamp(fIntersectDist, 0.0f, flLineLength);
+	}
+
+	Vector vIntersectPos = vStartPos + vEndToStart * fIntersectDist;
+
+	return vIntersectPos;
+}
+
+//-----------------------------------------------------------------------------
 // Purpose: Helper function get get determinisitc random values for shared/prediction code
 // Input  : seedvalue - 
 //			*module - 
@@ -1031,6 +1058,35 @@ float CountdownTimer::Now( void ) const
 	return gpGlobals->curtime;
 }
 
+float UTIL_WaterLevel(const Vector& position, float minz, float maxz)
+{
+	Vector midUp = position;
+	midUp.z = minz;
+
+	if (!(UTIL_PointContents(midUp) & MASK_WATER))
+		return minz;
+
+	midUp.z = maxz;
+	if (UTIL_PointContents(midUp) & MASK_WATER)
+		return maxz;
+
+	float diff = maxz - minz;
+	while (diff > 1.0)
+	{
+		midUp.z = minz + diff / 2.0;
+		if (UTIL_PointContents(midUp) & MASK_WATER)
+		{
+			minz = midUp.z;
+		}
+		else
+		{
+			maxz = midUp.z;
+		}
+		diff = maxz - minz;
+	}
+
+	return midUp.z;
+}
 
 #ifdef CLIENT_DLL
 	CBasePlayer *UTIL_PlayerByIndex( int entindex )

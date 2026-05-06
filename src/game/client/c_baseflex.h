@@ -213,7 +213,11 @@ public:
 	virtual	bool		ClearSceneEvent( CSceneEventInfo *info, bool fastKill, bool canceled );
 
 	// Add the event to the queue for this actor
+#ifdef MAPBASE
+	void				AddSceneEvent(CChoreoScene* scene, CChoreoEvent* event, C_BaseEntity* pTarget = NULL, bool bClientSide = false, C_SceneEntity* pSceneEntity = NULL);
+#else
 	void				AddSceneEvent( CChoreoScene *scene, CChoreoEvent *event, C_BaseEntity *pTarget = NULL, bool bClientSide = false );
+#endif
 
 	// Remove the event from the queue for this actor
 	void				RemoveSceneEvent( CChoreoScene *scene, CChoreoEvent *event, bool fastKill );
