@@ -36,16 +36,9 @@
 #include <vgui/ILocalize.h>
 #include "hud_vote.h"
 #include "ienginevgui.h"
-#include "viewpostprocess.h"
 #include "sourcevr/isourcevirtualreality.h"
 #if defined( _X360 )
 #include "xbox/xbox_console.h"
-#endif
-
-#ifdef LUA_SDK
-#include "luamanager.h"
-#include "lbaseentity_shared.h"
-#include "lbaseplayer_shared.h"
 #endif
 
 #if defined( REPLAY_ENABLED )
@@ -295,19 +288,10 @@ static void __MsgFunc_VGUIMenu( bf_read &msg )
 //-----------------------------------------------------------------------------
 ClientModeShared::ClientModeShared()
 {
-#ifdef LUA_SDK
-	m_pScriptedViewport = NULL;
-#endif
 	m_pViewport = NULL;
-#ifdef LUA_SDK
-	m_pClientLuaPanel = NULL;
-#endif
 	m_pChatElement = NULL;
 	m_pWeaponSelection = NULL;
 	m_nRootSize[ 0 ] = m_nRootSize[ 1 ] = -1;
-
-	m_pCurrentPostProcessController = NULL;
-	m_PostProcessLerpTimer.Invalidate();
 
 #if defined( REPLAY_ENABLED )
 	m_pReplayReminderPanel = NULL;
@@ -321,15 +305,7 @@ ClientModeShared::ClientModeShared()
 //-----------------------------------------------------------------------------
 ClientModeShared::~ClientModeShared()
 {
-#ifdef LUA_SDK
-	// NOTE: Due to the behavior of many crashes, if you end up here from a
-	// .mdmp or debug attach, you might as well ignore this call stack.
-	delete m_pScriptedViewport;
-#endif
-	delete m_pViewport;
-#ifdef LUA_SDK
-	delete m_pClientLuaPanel;
-#endif 
+	delete m_pViewport; 
 }
 
 void ClientModeShared::ReloadScheme( bool flushLowLevel )
@@ -423,16 +399,8 @@ void ClientModeShared::InitViewport()
 
 void ClientModeShared::VGui_Shutdown()
 {
-#ifdef LUA_SDK
-	delete m_pScriptedViewport;
-	m_pScriptedViewport = NULL;
-#endif
 	delete m_pViewport;
 	m_pViewport = NULL;
-#ifdef LUA_SDK
-	delete m_pClientLuaPanel;
-	m_pClientLuaPanel = NULL;
-#endif
 }
 
 
@@ -522,14 +490,6 @@ void ClientModeShared::OverrideView( CViewSetup *pSetup )
 //-----------------------------------------------------------------------------
 bool ClientModeShared::ShouldDrawEntity(C_BaseEntity *pEnt)
 {
-#ifdef LUA_SDK
-	BEGIN_LUA_CALL_HOOK("ShouldDrawEntity");
-	lua_pushentity(L, pEnt);
-	END_LUA_CALL_HOOK(1, 1);
-
-	RETURN_LUA_BOOLEAN();
-#endif
-
 	return true;
 }
 
@@ -538,13 +498,6 @@ bool ClientModeShared::ShouldDrawEntity(C_BaseEntity *pEnt)
 //-----------------------------------------------------------------------------
 bool ClientModeShared::ShouldDrawParticles( )
 {
-#ifdef LUA_SDK
-	BEGIN_LUA_CALL_HOOK("ShouldDrawParticles");
-	END_LUA_CALL_HOOK(0, 1);
-
-	RETURN_LUA_BOOLEAN();
-#endif
-
 #ifdef TF_CLIENT_DLL
 	C_TFPlayer *pTFPlayer = C_TFPlayer::GetLocalTFPlayer();
 	if ( pTFPlayer && !pTFPlayer->ShouldPlayerDrawParticles() )
@@ -553,26 +506,6 @@ bool ClientModeShared::ShouldDrawParticles( )
 
 	return true;
 }
-
-//#ifdef ARGG
-//-----------------------------------------------------------------------------
-// Purpose: Allow weapons to override mouse input to view angles (for orbiting)
-//-----------------------------------------------------------------------------
-// adnan
-// control the mouse input in the grav gun through this
-bool ClientModeShared::OverrideViewAngles(void)
-{
-	C_BaseCombatWeapon* pWeapon = GetActiveWeapon();
-	if (pWeapon)
-	{
-		// adnan
-		return pWeapon->OverrideViewAngles();
-	}
-
-	return false;
-}
-// end adnan
-//#endif
 
 //-----------------------------------------------------------------------------
 // Purpose: Allow weapons to override mouse input (for binoculars)
@@ -591,25 +524,11 @@ void ClientModeShared::OverrideMouseInput( float *x, float *y )
 //-----------------------------------------------------------------------------
 bool ClientModeShared::ShouldDrawViewModel()
 {
-#ifdef LUA_SDK
-	BEGIN_LUA_CALL_HOOK("ShouldDrawViewModel");
-	END_LUA_CALL_HOOK(0, 1);
-
-	RETURN_LUA_BOOLEAN();
-#endif
-
 	return true;
 }
 
 bool ClientModeShared::ShouldDrawDetailObjects( )
 {
-#ifdef LUA_SDK
-	BEGIN_LUA_CALL_HOOK("ShouldDrawDetailObjects");
-	END_LUA_CALL_HOOK(0, 1);
-
-	RETURN_LUA_BOOLEAN();
-#endif
-
 	return true;
 }
 
@@ -647,14 +566,6 @@ bool ClientModeShared::ShouldDrawCrosshair( void )
 //-----------------------------------------------------------------------------
 bool ClientModeShared::ShouldDrawLocalPlayer( C_BasePlayer *pPlayer )
 {
-#ifdef LUA_SDK
-	BEGIN_LUA_CALL_HOOK("ShouldDrawLocalPlayer");
-	lua_pushplayer(L, pPlayer);
-	END_LUA_CALL_HOOK(1, 1);
-
-	RETURN_LUA_BOOLEAN();
-#endif
-
 	if ( ( pPlayer->index == render->GetViewEntity() ) && !C_BasePlayer::ShouldDrawLocalPlayer() )
 		return false;
 
@@ -667,13 +578,6 @@ bool ClientModeShared::ShouldDrawLocalPlayer( C_BasePlayer *pPlayer )
 //-----------------------------------------------------------------------------
 bool ClientModeShared::ShouldDrawFog( void )
 {
-#ifdef LUA_SDK
-	BEGIN_LUA_CALL_HOOK("ShouldDrawFog");
-	END_LUA_CALL_HOOK(0, 1);
-
-	RETURN_LUA_BOOLEAN();
-#endif
-
 	return true;
 }
 
@@ -682,25 +586,6 @@ bool ClientModeShared::ShouldDrawFog( void )
 //-----------------------------------------------------------------------------
 void ClientModeShared::AdjustEngineViewport( int& x, int& y, int& width, int& height )
 {
-#ifdef LUA_SDK
-	BEGIN_LUA_CALL_HOOK("AdjustEngineViewport");
-	lua_pushinteger(L, x);
-	lua_pushinteger(L, y);
-	lua_pushinteger(L, width);
-	lua_pushinteger(L, height);
-	END_LUA_CALL_HOOK(4, 4);
-
-	if (lua_isnumber(L, -4))
-		x = luaL_checkint(L, -4);
-	if (lua_isnumber(L, -3))
-		y = luaL_checkint(L, -3);
-	if (lua_isnumber(L, -2))
-		width = luaL_checkint(L, -2);
-	if (lua_isnumber(L, -1))
-		height = luaL_checkint(L, -1);
-
-	lua_pop(L, 4);
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -732,19 +617,11 @@ void ClientModeShared::Update()
 	UpdateReplayMessages();
 #endif
 
-#if defined( LUA_SDK )
-	if (m_pScriptedViewport->IsVisible() != cl_drawhud.GetBool())
-	{
-		m_pScriptedViewport->SetVisible(cl_drawhud.GetBool());
-	}
-#endif
-
 	if ( m_pViewport->IsVisible() != cl_drawhud.GetBool() )
 	{
 		m_pViewport->SetVisible( cl_drawhud.GetBool() );
 	}
 
-	UpdatePostProcessingEffects();
 	UpdateRumbleEffects();
 
 	if ( cl_show_num_particle_systems.GetBool() )
@@ -784,19 +661,6 @@ void ClientModeShared::ProcessInput(bool bActive)
 //-----------------------------------------------------------------------------
 int	ClientModeShared::KeyInput( int down, ButtonCode_t keynum, const char *pszCurrentBinding )
 {
-#ifdef LUA_SDK
-	if (g_bLuaInitialized)
-	{
-		BEGIN_LUA_CALL_HOOK("KeyInput");
-		lua_pushinteger(L, down);
-		lua_pushinteger(L, keynum);
-		lua_pushstring(L, pszCurrentBinding);
-		END_LUA_CALL_HOOK(3, 1);
-
-		RETURN_LUA_INTEGER();
-	}
-#endif
-
 	if ( engine->Con_IsVisible() )
 		return 1;
 	
@@ -973,23 +837,26 @@ void ClientModeShared::StartMessageMode( int iMessageModeType )
 	}
 	
 #if defined( TF_CLIENT_DLL )
-	bool bSuspensionInMatch = GTFGCClientSystem() && GTFGCClientSystem()->BHaveChatSuspensionInCurrentMatch();
-	if ( !cl_enable_text_chat.GetBool() || bSuspensionInMatch )
+	if ( iMessageModeType == MM_SAY || iMessageModeType == MM_SAY_TEAM )
 	{
-		CBaseHudChat *pHUDChat = ( CBaseHudChat * ) GET_HUDELEMENT( CHudChat );
-		if ( pHUDChat )
+		bool bSuspensionInMatch = GTFGCClientSystem() && GTFGCClientSystem()->BHaveChatSuspensionInCurrentMatch();
+		if ( !cl_enable_text_chat.GetBool() || bSuspensionInMatch )
 		{
-			const char *pszReason = "#TF_Chat_Disabled";
-			if ( bSuspensionInMatch )
+			CBaseHudChat *pHUDChat = ( CBaseHudChat * ) GET_HUDELEMENT( CHudChat );
+			if ( pHUDChat )
 			{
-				pszReason = "#TF_Chat_Unavailable";
-			}
+				const char *pszReason = "#TF_Chat_Disabled";
+				if ( bSuspensionInMatch )
+				{
+					pszReason = "#TF_Chat_Unavailable";
+				}
 
-			char szLocalized[100];
-			g_pVGuiLocalize->ConvertUnicodeToANSI( g_pVGuiLocalize->Find( pszReason ), szLocalized, sizeof( szLocalized ) );
-			pHUDChat->ChatPrintf( 0, CHAT_FILTER_NONE, "%s ", szLocalized );
+				char szLocalized[100];
+				g_pVGuiLocalize->ConvertUnicodeToANSI( g_pVGuiLocalize->Find( pszReason ), szLocalized, sizeof( szLocalized ) );
+				pHUDChat->ChatPrintf( 0, CHAT_FILTER_NONE, "%s ", szLocalized );
+			}
+			return;
 		}
-		return;
 	}
 #endif // TF_CLIENT_DLL
 
@@ -1063,57 +930,21 @@ void ClientModeShared::Enable()
 	// Add our viewport to the root panel.
 	if( pRoot != 0 )
 	{
-#ifdef LUA_SDK
-		m_pScriptedViewport->SetParent(pRoot);
-#endif
-		m_pViewport->SetParent(pRoot);
-#ifdef LUA_SDK
-		m_pClientLuaPanel->SetParent(pRoot);
-#endif
+		m_pViewport->SetParent( pRoot );
 	}
 
 	// All hud elements should be proportional
 	// This sets that flag on the viewport and all child panels
-#ifdef LUA_SDK
-	m_pScriptedViewport->SetProportional(true);
-#endif
-	m_pViewport->SetProportional(true);
-#ifdef LUA_SDK
-	m_pClientLuaPanel->SetProportional(false);
-#endif
+	m_pViewport->SetProportional( true );
 
-#ifdef LUA_SDK
-	m_pScriptedViewport->SetCursor(m_CursorNone);
-#endif
-	m_pViewport->SetCursor(m_CursorNone);
-#ifdef LUA_SDK
-	m_pClientLuaPanel->SetCursor(m_CursorNone);
-#endif
-	vgui::surface()->SetCursor(m_CursorNone);
+	m_pViewport->SetCursor( m_CursorNone );
+	vgui::surface()->SetCursor( m_CursorNone );
 
-#ifdef LUA_SDK
-	m_pScriptedViewport->SetVisible(true);
-#endif
-	m_pViewport->SetVisible(true);
-#ifdef LUA_SDK
-	m_pClientLuaPanel->SetVisible(true);
-#endif
-#ifdef LUA_SDK
-	if (m_pScriptedViewport->IsKeyBoardInputEnabled())
-	{
-		m_pScriptedViewport->RequestFocus();
-	}
-#endif
-	if (m_pViewport->IsKeyBoardInputEnabled())
+	m_pViewport->SetVisible( true );
+	if ( m_pViewport->IsKeyBoardInputEnabled() )
 	{
 		m_pViewport->RequestFocus();
 	}
-#ifdef LUA_SDK
-	if (m_pClientLuaPanel->IsKeyBoardInputEnabled())
-	{
-		m_pClientLuaPanel->RequestFocus();
-	}
-#endif
 
 	Layout();
 }
@@ -1124,24 +955,12 @@ void ClientModeShared::Disable()
 	vgui::VPANEL pRoot = VGui_GetClientDLLRootPanel();
 
 	// Remove our viewport from the root panel.
-	if (pRoot != 0)
+	if( pRoot != 0 )
 	{
-#ifdef LUA_SDK
-		m_pScriptedViewport->SetParent((vgui::VPANEL)NULL);
-#endif
-		m_pViewport->SetParent((vgui::VPANEL)NULL);
-#ifdef LUA_SDK
-		m_pClientLuaPanel->SetParent((vgui::VPANEL)NULL);
-#endif
+		m_pViewport->SetParent( (vgui::VPANEL)NULL );
 	}
 
-#ifdef LUA_SDK
-	m_pScriptedViewport->SetVisible(false);
-#endif
-	m_pViewport->SetVisible(false);
-#ifdef LUA_SDK
-	m_pClientLuaPanel->SetVisible(false);
-#endif
+	m_pViewport->SetVisible( false );
 }
 
 
@@ -1159,13 +978,7 @@ void ClientModeShared::Layout()
 		m_nRootSize[ 0 ] = wide;
 		m_nRootSize[ 1 ] = tall;
 
-#ifdef LUA_SDK
-		m_pScriptedViewport->SetBounds(0, 0, wide, tall);
-#endif
 		m_pViewport->SetBounds(0, 0, wide, tall);
-#ifdef LUA_SDK
-		m_pClientLuaPanel->SetBounds(0, 0, wide, tall);
-#endif
 		if ( changed )
 		{
 			ReloadScheme(false);
@@ -1176,54 +989,6 @@ void ClientModeShared::Layout()
 float ClientModeShared::GetViewModelFOV( void )
 {
 	return v_viewmodel_fov.GetFloat();
-}
-
-void ClientModeShared::UpdatePostProcessingEffects()
-{
-	C_PostProcessController* pNewPostProcessController = NULL;
-	C_BasePlayer* pPlayer = C_BasePlayer::GetLocalPlayer();
-
-	if (pPlayer)
-		pNewPostProcessController = pPlayer->GetActivePostProcessController();
-
-	if (!pNewPostProcessController)
-	{
-		m_CurrentPostProcessParameters = PostProcessParameters_t();
-		m_pCurrentPostProcessController = NULL;
-		SetPostProcessParams(&m_CurrentPostProcessParameters);
-		return;
-	}
-
-	if (pNewPostProcessController != m_pCurrentPostProcessController)
-		m_pCurrentPostProcessController = pNewPostProcessController;
-
-	// Start a lerp timer if the parameters changed, regardless of whether the controller changed
-	if (m_LerpEndPostProcessParameters != pNewPostProcessController->m_PostProcessParameters)
-	{
-		m_LerpStartPostProcessParameters = m_CurrentPostProcessParameters;
-		m_LerpEndPostProcessParameters = pNewPostProcessController ? pNewPostProcessController->m_PostProcessParameters : m_CurrentPostProcessParameters;
-
-		float flFadeTime = pNewPostProcessController ? pNewPostProcessController->m_PostProcessParameters.m_flParameters[PPPN_FADE_TIME] : 0.0f;
-		if (flFadeTime <= 0.0f)
-		{
-			flFadeTime = 0.001f;
-		}
-
-		m_PostProcessLerpTimer.Start(flFadeTime);
-	}
-
-	// Lerp between old and new parameters
-	float flLerpFactor = 1.0f - m_PostProcessLerpTimer.GetRemainingRatio();
-	for (int nParameter = 0; nParameter < POST_PROCESS_PARAMETER_COUNT; ++nParameter)
-	{
-		m_CurrentPostProcessParameters.m_flParameters[nParameter] =
-			Lerp(
-				flLerpFactor,
-				m_LerpStartPostProcessParameters.m_flParameters[nParameter],
-				m_LerpEndPostProcessParameters.m_flParameters[nParameter]);
-	}
-
-	SetPostProcessParams(&m_CurrentPostProcessParameters);
 }
 
 class CHudChat;

@@ -471,31 +471,28 @@ bool C_BaseCombatWeapon::ShouldDrawPickup( void )
 //-----------------------------------------------------------------------------
 int C_BaseCombatWeapon::DrawModel( int flags )
 {
-	VPROF_BUDGET("C_BaseCombatWeapon::DrawModel", VPROF_BUDGETGROUP_MODEL_RENDERING);
-	if (!m_bReadyToDraw)
+	VPROF_BUDGET( "C_BaseCombatWeapon::DrawModel", VPROF_BUDGETGROUP_MODEL_RENDERING );
+	if ( !m_bReadyToDraw )
 		return 0;
 
-	if (!IsVisible())
+	if ( !IsVisible() )
 		return 0;
 
 	// check if local player chases owner of this weapon in first person
-	C_BasePlayer* localplayer = C_BasePlayer::GetLocalPlayer();
+	C_BasePlayer *localplayer = C_BasePlayer::GetLocalPlayer();
 
-	if (localplayer && localplayer->IsObserver() && GetOwner())
+	if ( localplayer && localplayer->IsObserver() && GetOwner() )
 	{
 		// don't draw weapon if chasing this guy as spectator
 		// we don't check that in ShouldDraw() since this may change
 		// without notification 
-
-		if (localplayer->GetObserverMode() == OBS_MODE_IN_EYE &&
-			localplayer->GetObserverTarget() == GetOwner())
+		
+		if ( localplayer->GetObserverMode() == OBS_MODE_IN_EYE &&
+			 localplayer->GetObserverTarget() == GetOwner() ) 
 			return false;
 	}
 
-	// See comment below
-	EnsureCorrectRenderingModel();
-
-	return BaseClass::DrawModel(flags);
+	return BaseClass::DrawModel( flags );
 }
 
 
@@ -517,34 +514,6 @@ int C_BaseCombatWeapon::CalcOverrideModelIndex()
 	else
 	{
 		return GetWorldModelIndex();
-	}
-}
-
-// If the local player is visible (thirdperson mode, tf2 taunts, etc., then make sure that we are using the 
-//  w_ (world) model not the v_ (view) model or else the model can flicker, etc.
-// Otherwise, if we're not the local player, always use the world model
-void C_BaseCombatWeapon::EnsureCorrectRenderingModel()
-{
-	C_BasePlayer* localplayer = C_BasePlayer::GetLocalPlayer();
-	if (localplayer &&
-		localplayer == GetOwner() &&
-		!ShouldDrawLocalPlayerViewModel())
-	{
-		return;
-	}
-
-	// BRJ 10/14/02
-	// FIXME: Remove when Yahn's client-side prediction is done
-	// It's a hacky workaround for the model indices fighting
-	// (GetRenderBounds uses the model index, which is for the view model)
-	SetModelIndex(GetWorldModelIndex());
-
-	// Validate our current sequence just in case ( in theory the view and weapon models should have the same sequences for sequences that overlap at least )
-	CStudioHdr* pStudioHdr = GetModelPtr();
-	if (pStudioHdr &&
-		GetSequence() >= pStudioHdr->GetNumSeq())
-	{
-		SetSequence(0);
 	}
 }
 
