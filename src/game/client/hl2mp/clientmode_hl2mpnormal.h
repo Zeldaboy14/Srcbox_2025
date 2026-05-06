@@ -32,6 +32,7 @@ public:
 
 	virtual void	Init();
 	virtual int		GetDeathMessageStartHeight( void );
+	virtual bool    OverrideViewAngles(void) { return false; }
 };
 
 extern IClientMode *GetClientModeNormal();
