@@ -381,6 +381,24 @@ static void PatchLocalBackdoor()
 		mem::protect write({ ptr_ChangeLevel2, 6 });
 		write.fill(0x90);
 	}
+	
+	// aSoundCache
+	// Use a new name for sound.cache files.
+	mem::pointer ptr_aSoundCache = mem::scan(mem::pattern("73 6F 75 6E 64 2E 63 61 63 68 65"), executable_engine);
+
+	if (ptr_aSoundCache)
+	{
+		//mem::protect write({ ptr_aSoundCache, 7 });
+		//write.fill(0x666373);
+		byte payload[] = { 0x66, 0x63, 0x73 };
+		mem::region rgn_aSoundCache = { ptr_aSoundCache, 0x4A2 };
+		std::vector< mem::pointer > vec_Sequences = mem::scan_all(mem::pattern("73 6F 75 6E 64 2E 63 61 63 68 65"), rgn_aSoundCache);
+		for (mem::pointer ptr : vec_Sequences)
+		{
+			mem::protect write({ ptr, sizeof(payload) });
+			memcpy(ptr.as<void*>(), payload, sizeof(payload));
+		}
+	}
 }
 
 #endif
