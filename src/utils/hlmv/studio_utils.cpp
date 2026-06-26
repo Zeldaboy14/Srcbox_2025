@@ -1138,8 +1138,8 @@ char *StudioModel::Physics_DumpQC( void )
 	return m_pPhysics->DumpQC();
 }
 
-// Ozxy: This already has a body?
-#if 0
+#ifdef USE_EP1_CALLS
+// stuff from ep1
 const mstudio_modelvertexdata_t *mstudiomodel_t::GetVertexData(void* pModelData)
 {
 	Assert( g_pActiveModel );
@@ -1151,77 +1151,20 @@ const mstudio_modelvertexdata_t *mstudiomodel_t::GetVertexData(void* pModelData)
 
 	return &vertexdata;
 }
-#endif
-
+#else
 const vertexFileHeader_t* mstudiomodel_t::CacheVertexData(void* pModelData)
 {
-	studiohdr_t* pActiveStudioHdr = static_cast<studiohdr_t*>(pModelData);
-	Assert(pActiveStudioHdr);
+	Assert(g_pActiveModel);
 
-	if (pActiveStudioHdr->pVertexBase)
-	{
-		return (vertexFileHeader_t*)pActiveStudioHdr->pVertexBase;
-	}
+	vertexFileHeader_t *pVertexHdr = g_pStudioDataCache->CacheVertexData(g_pActiveModel->GetStudioRenderHdr());
 
-	// mandatory callback to make requested data resident
-	// load and persist the vertex file
-	char fileName[MAX_PATH];
-	strcpy(fileName, "models/");
-	strcat(fileName, pActiveStudioHdr->pszName());
-	Q_StripExtension(fileName, fileName, sizeof(fileName));
-	strcat(fileName, ".vvd");
+	vertexdata.pVertexData = (byte*)pVertexHdr + pVertexHdr->vertexDataStart;
+	vertexdata.pTangentData = (byte*)pVertexHdr + pVertexHdr->tangentDataStart;
 
-	// load the model
-	FileHandle_t fileHandle = g_pFileSystem->Open(fileName, "rb");
-	if (!fileHandle)
-	{
-		Error("Unable to load vertex data \"%s\"\n", fileName);
-	}
 
-	// Get the file size
-	int vvdSize = g_pFileSystem->Size(fileHandle);
-	if (vvdSize == 0)
-	{
-		g_pFileSystem->Close(fileHandle);
-		Error("Bad size for vertex data \"%s\"\n", fileName);
-	}
-
-	vertexFileHeader_t* pVvdHdr = (vertexFileHeader_t*)malloc(vvdSize);
-	g_pFileSystem->Read(pVvdHdr, vvdSize, fileHandle);
-	g_pFileSystem->Close(fileHandle);
-
-	// check header
-	if (pVvdHdr->id != MODEL_VERTEX_FILE_ID)
-	{
-		Error("Error Vertex File %s id %d should be %d\n", fileName, pVvdHdr->id, MODEL_VERTEX_FILE_ID);
-	}
-	if (pVvdHdr->version != MODEL_VERTEX_FILE_VERSION)
-	{
-		Error("Error Vertex File %s version %d should be %d\n", fileName, pVvdHdr->version, MODEL_VERTEX_FILE_VERSION);
-	}
-	if (pVvdHdr->checksum != pActiveStudioHdr->checksum)
-	{
-		Error("Error Vertex File %s checksum %d should be %d\n", fileName, pVvdHdr->checksum, pActiveStudioHdr->checksum);
-	}
-
-	// need to perform mesh relocation fixups
-	// allocate a new copy
-	vertexFileHeader_t* pNewVvdHdr = (vertexFileHeader_t*)malloc(vvdSize);
-	if (!pNewVvdHdr)
-	{
-		Error("Error allocating %d bytes for Vertex File '%s'\n", vvdSize, fileName);
-	}
-
-	// load vertexes and run fixups
-	Studio_LoadVertexes(pVvdHdr, pNewVvdHdr, 0, true);
-
-	// discard original
-	free(pVvdHdr);
-	pVvdHdr = pNewVvdHdr;
-
-	pActiveStudioHdr->pVertexBase = (void*)pVvdHdr;
-	return pVvdHdr;
+	return g_pStudioDataCache->CacheVertexData(g_pActiveModel->GetStudioRenderHdr());
 }
+#endif
 
 //-----------------------------------------------------------------------------
 // FIXME: This trashy glue code is really not acceptable. Figure out a way of making it unnecessary.
@@ -1235,20 +1178,36 @@ const studiohdr_t *studiohdr_t::FindModel( void **cache, char const *pModelName 
 
 virtualmodel_t *studiohdr_t::GetVirtualModel( void ) const
 {
+#ifdef USE_LEGACY_VERTEXHEADERS
 	return g_pMDLCache->GetVirtualModel( (MDLHandle_t)virtualModel );
+#else
+	return g_pMDLCache->GetVirtualModel(VoidPtrToMDLHandle(VirtualModel()));
+#endif
 }
 
 byte *studiohdr_t::GetAnimBlock( int i ) const
 {
+#ifdef USE_LEGACY_VERTEXHEADERS
 	return g_pMDLCache->GetAnimBlock( (MDLHandle_t)virtualModel, i );
+#else
+	return g_pMDLCache->GetAnimBlock(VoidPtrToMDLHandle(VirtualModel()), i);
+#endif
 }
 
 int studiohdr_t::GetAutoplayList( unsigned short **pOut ) const
 {
+#ifdef USE_LEGACY_VERTEXHEADERS
 	return g_pMDLCache->GetAutoplayList( (MDLHandle_t)virtualModel, pOut );
+#else
+	return g_pMDLCache->GetAutoplayList(VoidPtrToMDLHandle(VirtualModel()), pOut);
+#endif
 }
 
 const studiohdr_t *virtualgroup_t::GetStudioHdr( void ) const
 {
+#ifdef USE_LEGACY_VERTEXHEADERS
 	return g_pMDLCache->GetStudioHdr( (MDLHandle_t)cache );
+#else
+	return g_pMDLCache->GetStudioHdr(VoidPtrToMDLHandle(cache));
+#endif
 }

@@ -1,6 +1,6 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 //
-// Purpose:
+// Purpose: 
 //
 //=============================================================================
 
@@ -85,7 +85,7 @@ public:
 #else
 		// LINUX BUG: see above
 		pValue = getenv( pVarName );
-#endif
+#endif 
 
 		if ( pValue )
 		{
@@ -124,7 +124,7 @@ public:
 	{
 		if ( !pszBuf || ( nBufSize <= 0 ) )
 			return 0;
-
+	
 #ifdef _WIN32
 		// Use GetEnvironmentVariable instead of getenv because getenv doesn't pick up changes
 		// to the process environment after the DLL was loaded.
@@ -138,7 +138,7 @@ public:
 			return 0;
 		}
 
-		Q_strncpy( pszBuf, pszOut, nBufSize );
+		Q_strncpy( pszBuf, pszOut, nBufSize );		
 		return Q_strlen( pszBuf );
 #endif
 	}
@@ -189,7 +189,7 @@ public:
 		m_Path( "path" )
 	{
 	}
-
+	
 	void SetRestoreOriginalValue_ALL( bool bRestore )
 	{
 		m_SteamAppId.SetRestoreOriginalValue( bRestore );
@@ -284,7 +284,7 @@ KeyValues* ReadKeyValuesFile( const char *pFilename )
 		kv->deleteThis();
 		return NULL;
 	}
-
+	
 	return kv;
 }
 
@@ -392,7 +392,7 @@ bool FileSystem_GetExecutableDir( char *exedir, int exeDirLen )
 		Q_strncat( exedir, PLATFORM_BIN_DIR, exeDirLen, COPY_ALL_CHARACTERS );
 		Q_FixSlashes( exedir );
 	}
-
+	
 	return true;
 }
 
@@ -405,7 +405,7 @@ static bool FileSystem_GetBaseDir( char *baseDir, int baseDirLen )
 			Q_StripFilename( baseDir );
 		return true;
 	}
-
+	
 	return false;
 }
 
@@ -455,14 +455,14 @@ FSReturnCode_t SetupFileSystemError( bool bRunVConfig, FSReturnCode_t retVal, co
 	{
 		Error( "%s\n", g_FileSystemError );
 	}
-
+	
 	return retVal;
 }
 
-FSReturnCode_t LoadGameInfoFile(
-	const char *pDirectoryName,
-	KeyValues *&pMainFile,
-	KeyValues *&pFileSystemInfo,
+FSReturnCode_t LoadGameInfoFile( 
+	const char *pDirectoryName, 
+	KeyValues *&pMainFile, 
+	KeyValues *&pFileSystemInfo, 
 	KeyValues *&pSearchPaths )
 {
 	// If GameInfo.txt exists under pBaseDir, then this is their game directory.
@@ -505,10 +505,10 @@ FSReturnCode_t LoadGameInfoFile(
 }
 
 
-static void FileSystem_AddLoadedSearchPath(
-	CFSSearchPathsInit &initInfo,
-	const char *pPathID,
-	const char *fullLocationPath,
+static void FileSystem_AddLoadedSearchPath( 
+	CFSSearchPathsInit &initInfo, 
+	const char *pPathID, 
+	const char *fullLocationPath, 
 	bool bLowViolence )
 {
 
@@ -548,19 +548,19 @@ static void FileSystem_AddLoadedSearchPath(
 		}
 	}
 
-
+	
 	if ( initInfo.m_pLanguage &&
 	     Q_stricmp( initInfo.m_pLanguage, "english" ) &&
 	     V_strstr( fullLocationPath, "_english" ) != NULL )
 	{
 		char szPath[MAX_PATH];
-		char szLangString[MAX_PATH];
-
+		char szLangString[MAX_PATH];		
+		
 		// Need to add a language version of this path first
 
 		Q_snprintf( szLangString, sizeof(szLangString), "_%s", initInfo.m_pLanguage);
 		V_StrSubst( fullLocationPath, "_english", szLangString, szPath, sizeof( szPath ), true );
-		initInfo.m_pFileSystem->AddSearchPath( szPath, pPathID, PATH_ADD_TO_TAIL );
+		initInfo.m_pFileSystem->AddSearchPath( szPath, pPathID, PATH_ADD_TO_TAIL );		
 	}
 
 	initInfo.m_pFileSystem->AddSearchPath( fullLocationPath, pPathID, PATH_ADD_TO_TAIL );
@@ -640,8 +640,74 @@ const Source1AppidInfo_t *GetKnownAppidInfo( uint32 nAppid )
 	return nullptr;
 }
 
+#if defined( HLMV ) // || defined (OTHER SHIT) // Specific impl for hlmv - may work for other tools if you follow what i did
+static const AppId_t k_unSDK2013MPAppId = 243750;
+static bool s_bInittedSteam = false;
+static HMODULE s_SteamModule;
+
+static void UnloadSteam()
+{
+	if (s_SteamModule)
+	{
+		decltype(SteamAPI_Shutdown)* pfnSAPIShutdown = (decltype(SteamAPI_Shutdown)*)GetProcAddress(s_SteamModule, "SteamAPI_Shutdown");
+		if (pfnSAPIShutdown)
+		{
+			pfnSAPIShutdown();
+			s_bInittedSteam = false;
+		}
+
+		FreeLibrary(s_SteamModule);
+	}
+
+}
+
+static bool LoadSteam()
+{
+	s_SteamModule = LoadLibraryEx("steam_api64.dll", NULL, LOAD_WITH_ALTERED_SEARCH_PATH);
+	if (!s_SteamModule)
+	{
+		MessageBox(0, "Not able to load Steam API. Is steam_api64.dll missing?", "Error", MB_OK);
+		return false;
+	}
+
+	// Make a steam_appid.txt now, of just eg. Source SDK 2013 MP for this.
+	/*
+	FILE *pFile = fopen( "steam_appid.txt", "w" );
+	if (pFile)
+	{
+		fprintf( pFile, "%u\n", k_unSDK2013MPAppId );
+		fclose( pFile );
+	}
+	*/
+	decltype(SteamAPI_Init)* pfnSAPIInit = (decltype(SteamAPI_Init)*)GetProcAddress(s_SteamModule, "SteamAPI_Init");
+	if (!pfnSAPIInit)
+	{
+		MessageBox(0, "SteamAPI_Init was not available!", "Error", MB_OK);
+		UnloadSteam();
+		return false;
+	}
+
+	if (!pfnSAPIInit())
+	{
+		MessageBox(0, "SteamAPI_Init failed!", "Error", MB_OK);
+		UnloadSteam();
+		return false;
+	}
+
+	s_bInittedSteam = true;
+	return true;
+}
+#endif
+
+const char* m_stGameInfoPath;
+
 FSReturnCode_t FileSystem_LoadSearchPaths( CFSSearchPathsInit &initInfo )
 {
+	// TODO: fuck this somehwere else
+#if defined( HLMV ) // || defined (OTHER SHIT)
+	LoadSteam();
+#endif
+
 	if ( !initInfo.m_pFileSystem || !initInfo.m_pDirectoryName )
 		return SetupFileSystemError( false, FS_INVALID_PARAMETERS, "FileSystem_LoadSearchPaths: Invalid parameters specified." );
 
@@ -649,7 +715,7 @@ FSReturnCode_t FileSystem_LoadSearchPaths( CFSSearchPathsInit &initInfo )
 	FSReturnCode_t retVal = LoadGameInfoFile( initInfo.m_pDirectoryName, pMainFile, pFileSystemInfo, pSearchPaths );
 	if ( retVal != FS_OK )
 		return retVal;
-
+	
 	// All paths except those marked with |gameinfo_path| are relative to the base dir.
 	char baseDir[MAX_PATH];
 	if ( !FileSystem_GetBaseDir( baseDir, sizeof( baseDir ) ) )
@@ -687,30 +753,85 @@ FSReturnCode_t FileSystem_LoadSearchPaths( CFSSearchPathsInit &initInfo )
 		const char *pszPathID = pCur->GetName();
 		const char *pLocation = pCur->GetString();
 		const char *pszBaseDir = baseDir;
-#ifdef ENGINE_DLL
+#if defined( ENGINE_DLL ) || defined( HLMV )
 		char szAppInstallDir[ 1024 ];
 #endif
-			// Initially, a check was written here that is really pointless. It locked
-			// out use of HLMV, and probably other tools that rely on appid
-			//from mods. Restored the code from the old 2013 Branch
 
-			if ( Q_stristr( pLocation, GAMEINFOPATH_TOKEN ) == pLocation )
+		if ( !FileSystem_AllowedSearchPath( pLocation ) )
+			continue;
+
+		if ( Q_stristr( pLocation, APPID_PREFIX_TOKEN ) == pLocation )
+		{
+#if defined( ENGINE_DLL ) || defined( HLMV )
+			pLocation += strlen( APPID_PREFIX_TOKEN );
+			const char *pNumberLoc = pLocation;
+			int nAppId = V_atoi( pNumberLoc );
+			pLocation = Q_stristr( pLocation, "|" );
+			if ( !pLocation )
 			{
-				pLocation += strlen( GAMEINFOPATH_TOKEN );
-				pszBaseDir = initInfo.m_pDirectoryName;
+				Error( "Malformed gameinfo.txt" );
 			}
-			else if ( Q_stristr( pLocation, BASESOURCEPATHS_TOKEN ) == pLocation )
+			pLocation += strlen( "|" );
+
+			if ( !nAppId )
 			{
-				// This is a special identifier that tells it to add the specified path for all source engine versions equal to or prior to this version.
-				// So in Orange Box, if they specified:
-				//		|all_source_engine_paths|hl2
-				// it would add the ep2\hl2 folder and the base (ep1-era) hl2 folder.
-				//
-				// We need a special identifier in the gameinfo.txt here because the base hl2 folder exists in different places.
-				// In the case of a game or a Steam-launched dedicated server, all the necessary prior engine content is mapped in with the Steam depots,
-				// so we can just use the path as-is.
-				pLocation += strlen( BASESOURCEPATHS_TOKEN );
+				Error( "Can't mount content from invalid appid." );
 			}
+
+			if ( !SteamApps() )
+			{
+				Error( "No SteamApps connection." );
+			}
+
+			const Source1AppidInfo_t *pKnownAppid = GetKnownAppidInfo( nAppId );
+
+			const char *pszAppName = pKnownAppid ? pKnownAppid->pszName : "Unknown";
+
+			if ( !SteamApps()->BIsSubscribedApp( nAppId ) )
+			{
+				char szStoreCommand[4096];
+				V_sprintf_safe( szStoreCommand, "steam://store/%d", nAppId );
+				Plat_OpenURL( szStoreCommand );
+
+				Error( "This mod requires that you own %s (%d). Please purchase it, and install it to play this mod.", pszAppName, nAppId );
+			}
+
+			if ( !SteamApps()->BIsAppInstalled( nAppId ) )
+			{
+				char szInstallCommand[4096];
+				V_sprintf_safe( szInstallCommand, "steam://install/%d", nAppId );
+				Plat_OpenURL( szInstallCommand );
+
+				Error( "This mod requires %s (%d) to be installed. Please install it to play this mod.", pszAppName, nAppId );
+			}
+
+			uint32 unLength = SteamApps()->GetAppInstallDir( nAppId, szAppInstallDir, sizeof( szAppInstallDir ) );
+			if ( !unLength )
+			{
+				Error( "Couldn't get install dir for appid: %d", nAppId );
+			}
+			pszBaseDir = szAppInstallDir;
+//#else
+//			Error( "Appid based mounting is not supported on non-engine DLL projects." );
+#endif
+		}
+		else if ( Q_stristr( pLocation, GAMEINFOPATH_TOKEN ) == pLocation )
+		{
+			pLocation += strlen( GAMEINFOPATH_TOKEN );
+			pszBaseDir = initInfo.m_pDirectoryName;
+		}
+		else if ( Q_stristr( pLocation, BASESOURCEPATHS_TOKEN ) == pLocation )
+		{
+			// This is a special identifier that tells it to add the specified path for all source engine versions equal to or prior to this version.
+			// So in Orange Box, if they specified:
+			//		|all_source_engine_paths|hl2
+			// it would add the ep2\hl2 folder and the base (ep1-era) hl2 folder.
+			//
+			// We need a special identifier in the gameinfo.txt here because the base hl2 folder exists in different places.
+			// In the case of a game or a Steam-launched dedicated server, all the necessary prior engine content is mapped in with the Steam depots,
+			// so we can just use the path as-is.
+			pLocation += strlen( BASESOURCEPATHS_TOKEN );
+		}
 
 		char szBinLocation[MAX_PATH];
 		if ( Q_stricmp( pszPathID, "GAMEBIN" ) == 0 )
@@ -741,7 +862,7 @@ FSReturnCode_t FileSystem_LoadSearchPaths( CFSSearchPathsInit &initInfo )
 			const char *pszFoundShortName = initInfo.m_pFileSystem->FindFirst( szAbsSearchPath, &findHandle );
 			if ( pszFoundShortName )
 			{
-				do
+				do 
 				{
 
 					// We only know how to mount VPK's and directories
@@ -841,8 +962,16 @@ FSReturnCode_t FileSystem_LoadSearchPaths( CFSSearchPathsInit &initInfo )
 	initInfo.m_pFileSystem->MarkPathIDByRequestOnly( "game_write", true );
 	initInfo.m_pFileSystem->MarkPathIDByRequestOnly( "mod_write", true );
 
-#ifdef _DEBUG
+#ifdef _DEBUG	
 	// initInfo.m_pFileSystem->PrintSearchPaths();
+#endif
+
+#ifdef HLMV
+
+	//steam is done
+	UnloadSteam();
+
+	m_stGameInfoPath = initInfo.m_pDirectoryName;
 #endif
 
 	return FS_OK;
@@ -903,11 +1032,11 @@ static FSReturnCode_t TryLocateGameInfoFile( char *pOutDir, int outDirLen, bool 
 		{
 			return FS_OK;
 		}
-		if ( IsX360() && DoesFileExistIn( pOutDir, GAMEINFO_FILENAME_ALTERNATE ) )
+		if ( IsX360() && DoesFileExistIn( pOutDir, GAMEINFO_FILENAME_ALTERNATE ) ) 
 		{
 			return FS_OK;
 		}
-	}
+	} 
 	while ( bBubbleDir && Q_StripLastDir( pOutDir, outDirLen ) );
 
 	// Make an attempt to resolve from "content -> game" directory
@@ -929,7 +1058,7 @@ static FSReturnCode_t TryLocateGameInfoFile( char *pOutDir, int outDirLen, bool 
 			{
 				return FS_OK;
 			}
-		}
+		} 
 		while ( bBubbleDir && Q_StripLastDir( pOutDir, outDirLen ) );
 	}
 
@@ -987,7 +1116,7 @@ FSReturnCode_t LocateGameInfoFile( const CFSSteamSetupInfo &fsInfo, char *pOutDi
 			Q_MakeAbsolutePath( pOutDir, outDirLen, pProject );
 			return FS_OK;
 		}
-		if ( IsX360() && DoesFileExistIn( pProject, GAMEINFO_FILENAME_ALTERNATE ) )
+		if ( IsX360() && DoesFileExistIn( pProject, GAMEINFO_FILENAME_ALTERNATE ) )	
 		{
 			Q_MakeAbsolutePath( pOutDir, outDirLen, pProject );
 			return FS_OK;
@@ -1010,7 +1139,7 @@ FSReturnCode_t LocateGameInfoFile( const CFSSteamSetupInfo &fsInfo, char *pOutDi
 				return FS_OK;
 			}
 		}
-
+		
 		if ( fsInfo.m_bNoGameInfo )
 		{
 			// fsInfo.m_bNoGameInfo is set by the Steam dedicated server, before it knows which mod to use.
@@ -1042,7 +1171,7 @@ FSReturnCode_t LocateGameInfoFile( const CFSSteamSetupInfo &fsInfo, char *pOutDi
 			FS_OK == TryLocateGameInfoFile( pOutDir, outDirLen, bBubbleDir ) )
 			return FS_OK;
 	}
-
+#ifndef HLMV
 	// Try to use the environment variable / registry
 	if ( ( pProject = getenv( GAMEDIR_TOKEN ) ) != NULL &&
 		 ( Q_MakeAbsolutePath( pOutDir, outDirLen, pProject ), 1 ) &&
@@ -1052,7 +1181,7 @@ FSReturnCode_t LocateGameInfoFile( const CFSSteamSetupInfo &fsInfo, char *pOutDi
 	if ( IsPC() )
 	{
 		Warning( "Warning: falling back to auto detection of vproject directory.\n" );
-
+		
 		// Now look for it in the directory they passed in.
 		if ( fsInfo.m_pDirectoryName )
 			Q_MakeAbsolutePath( pOutDir, outDirLen, fsInfo.m_pDirectoryName );
@@ -1067,9 +1196,39 @@ FSReturnCode_t LocateGameInfoFile( const CFSSteamSetupInfo &fsInfo, char *pOutDi
 		if ( FS_OK == TryLocateGameInfoFile( pOutDir, outDirLen, true ) )
 			return FS_OK;
 	}
-
+#endif
 ShowError:
-	return SetupFileSystemError( true, FS_MISSING_GAMEINFO_FILE,
+	//HACK!!!
+#ifdef HLMV
+	if (MessageBoxA(NULL, "Would you like to pick a gameinfo directory?", "Missing gameinfo", MB_YESNO) == IDYES)
+	{
+		OPENFILENAME ofn;
+		memset(&ofn, 0, sizeof(ofn));
+		ofn.lStructSize = sizeof(ofn);
+		ofn.hInstance = (HINSTANCE)GetModuleHandle(NULL);
+		ofn.lpstrFilter = "Game Info\0gameinfo.txt\0";
+		ofn.lpstrFile = pOutDir;
+		ofn.nMaxFile = _MAX_PATH;
+		ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+
+		if (GetOpenFileName(&ofn))
+		{
+			Q_StripFilename(pOutDir);
+			return FS_OK;
+		}
+	}
+	// pass in a default gameinfo
+	char baseDir[MAX_PATH];
+	if (FileSystem_GetBaseDir(baseDir, sizeof(baseDir)))
+	{
+		char gameinfoDir[MAX_PATH];
+		V_sprintf_safe(gameinfoDir, "%s\\hl2", baseDir);
+		Q_strncpy(pOutDir, gameinfoDir, outDirLen);
+		return FS_OK;
+	}
+
+#endif
+	return SetupFileSystemError( true, FS_MISSING_GAMEINFO_FILE, 
 		"Unable to find %s. Solutions:\n\n"
 		"1. Read https://developer.valvesoftware.com/wiki/Gameinfo.txt\n"
 		"2. Run vconfig to specify which game you're working on.\n"
@@ -1103,7 +1262,7 @@ bool DoesPathExistAlready( const char *pPathEnvVar, const char *pTestPath )
 		pTestPos += strlen( pTestPath );
 		if ( pTestPos[0] == 0 || pTestPos[0] == ';' || (PATHSEPARATOR( pTestPos[0] ) && pTestPos[1] == ';') )
 			return true;
-
+	
 		// Advance our marker..
 		pCurPos = pTestPos;
 	}
@@ -1123,12 +1282,12 @@ FSReturnCode_t GetSteamCfgPath( char *steamCfgPath, int steamCfgPathLen )
 	{
 		if ( DoesFileExistIn( steamCfgPath, "steam.cfg" ) )
 			break;
-
+	
 		if ( !Q_StripLastDir( steamCfgPath, steamCfgPathLen) )
 		{
 			// the file isnt found, thats ok, its not mandatory
 			return FS_OK;
-		}
+		}			
 	}
 	Q_AppendSlash( steamCfgPath, steamCfgPathLen );
 	Q_strncat( steamCfgPath, "steam.cfg", steamCfgPathLen, COPY_ALL_CHARACTERS );
@@ -1163,8 +1322,8 @@ void SetSteamAppUser( KeyValues *pSteamInfo, const char *steamInstallPath, CStea
 		{
 			Error( "Can't find steam app user info." );
 		}
-		Q_strncpy( appUser, pTempAppUser, sizeof( appUser ) );
-
+		Q_strncpy( appUser, pTempAppUser, sizeof( appUser ) ); 
+		
 		pSteamAppData->deleteThis();
 	}
 
@@ -1334,7 +1493,7 @@ FSReturnCode_t FileSystem_MountContent( CFSMountContentInfo &mountContentInfo )
 //
 //		// Filesystem_tools needs to add dependencies in here beforehand.
 //		FilesystemMountRetval_t retVal = mountContentInfo.m_pFileSystem->MountSteamContent( nExtraAppId );
-//
+//		
 //		_chdir( oldWorkingDir );
 //
 //		if ( retVal != FILESYSTEM_MOUNT_OK )
@@ -1357,7 +1516,7 @@ void FileSystem_ClearSteamEnvVars()
 	envVars.m_SteamAppId.SetValue( "" );
 	envVars.m_SteamUserPassphrase.SetValue( "" );
 	envVars.m_SteamAppUser.SetValue( "" );
-
+	
 	envVars.SetRestoreOriginalValue_ALL( false );
 }
 

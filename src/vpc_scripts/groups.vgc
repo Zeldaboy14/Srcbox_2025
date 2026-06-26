@@ -22,6 +22,7 @@ $Group "game"
 {
 	"client"
 	"gameui_stub"
+	"hlmv"
 	"launcher_main"
 	"mathlib"
 	"matsys_controls"
