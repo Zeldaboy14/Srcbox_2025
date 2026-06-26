@@ -41,6 +41,7 @@
 #include <mx/mxPcx.h>
 #include <mx/mxBmp.h>
 #include <mx/mxMatSysWindow.h>
+#include <mx/mxevent.h>
 // #include "gl.h"
 // #include <GL/glu.h>
 #include <stdio.h>
@@ -62,7 +63,7 @@
 #include "tier0/dbg.h"
 #include "istudiorender.h"
 #include "tier0/icommandline.h"
-#include "vmatrix.h"
+#include <mathlib/vmatrix.h>
 #include "studio_render.h"
 #include "vstdlib/cvar.h"
 #include "SoundEmitterSystem/isoundemittersystembase.h"
@@ -285,7 +286,10 @@ MatSysWindow::handleEvent (mxEvent *event)
 
 	case mxEvent::MouseWheeled:
 	{
-		g_cam.m_orbit.zoom -= event->wheeldelta;
+		if (g_cam.m_orbit.zoom == 0)
+			g_cam.m_orbit.zoom = 0.5;
+		g_cam.m_orbit.zoom -= (float)(event->height) / 10.0f * (g_cam.m_orbit.zoom / 120);
+		return 1;
 	}
 	break;
 
