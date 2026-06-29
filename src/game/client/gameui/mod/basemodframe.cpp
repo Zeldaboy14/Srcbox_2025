@@ -7,7 +7,7 @@
 #include <ctype.h>
 #include "basemodframe.h"
 #include "basemodpanel.h"
-#include "EngineInterface.h"
+#include "../EngineInterface.h"
 
 #include "VFooterPanel.h"
 #include "VGenericConfirmation.h"

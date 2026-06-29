@@ -145,11 +145,9 @@ CBaseEntity *CreateInfoCameraLink( CBaseEntity *pTarget, CPointCamera *pCamera )
 //-----------------------------------------------------------------------------
 void PointCameraSetupVisibility( CBaseEntity *pPlayer, int area, unsigned char *pvs, int pvssize )
 {
-	int nPlayerIndex = pPlayer->entindex();
-
 	for ( CPointCamera *pCameraEnt = GetPointCameraList(); pCameraEnt != NULL; pCameraEnt = pCameraEnt->m_pNext )
 	{
-		pCameraEnt->TransmitToPlayer( nPlayerIndex, false );
+		pCameraEnt->SetActive( false );
 	}
 	
 	intp nNext;
@@ -177,7 +175,7 @@ void PointCameraSetupVisibility( CBaseEntity *pPlayer, int area, unsigned char *
 			if ( pCameraEnt )
 			{
 				engine->AddOriginToPVS( pCameraEnt->GetAbsOrigin() );
-				pCameraEnt->TransmitToPlayer( nPlayerIndex, true );
+				pCameraEnt->SetActive( true );
 			}
 		}
 	}

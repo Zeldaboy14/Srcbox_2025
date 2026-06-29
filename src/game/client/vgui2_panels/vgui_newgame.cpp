@@ -6,6 +6,8 @@
 #include <vgui_controls/Button.h>
 #include <vgui_controls/PropertySheet.h>
 #include <vgui_controls/ListPanel.h>
+#include <vgui_controls/ComboBox.h>
+#include <vgui/ISurface.h>
 #include <filesystem.h>
 #include <KeyValues.h>
 #include "ienginevgui.h"
@@ -88,6 +90,14 @@ CNewGameDialog::CNewGameDialog(vgui::VPANEL parent)
 	SetScheme(vgui::scheme()->LoadSchemeFromFile("resource/SourceScheme.res", "SourceScheme"));
 
 	LoadControlSettings("resource/newgamedialog.res");
+
+	int w, h;
+	GetSize(w, h);
+
+	int sw, sh;
+	vgui::surface()->GetScreenSize(sw, sh);
+
+	SetPos((sw - w) / 2, (sh - h) / 2);
 	//ImagePanel();
 
 	SetVisible(false);

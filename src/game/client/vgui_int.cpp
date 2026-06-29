@@ -23,9 +23,15 @@
 #include <KeyValues.h>
 #include "filesystem.h"
 #include "matsys_controls/matsyscontrols.h"
+//#include "MyPanel.h"
 #include "vgui2_panels/vgui_singeplayer.h"
+#include "vgui2_panels/vgui_friends.h"
 #include "vgui2_panels/vgui_newgame.h"
 #include "vgui2_panels/vgui_savenquit.h"
+#include "vgui2_panels/overrides/OverrideUI_RootPanel.h"
+#include "vgui2_panels/overrides/IOverrideInterface.h"
+//#include "vgui2_panels/vgui_spawn.h"
+#include "MountGames.h"
 
 //IGameMountPanel* gamemountpanel;
 
@@ -41,6 +47,7 @@ using namespace vgui;
 
 void MP3Player_Create( vgui::VPANEL parent );
 void MP3Player_Destroy();
+void OverrideGameUI();
 
 #include <vgui/IInputInternal.h>
 vgui::IInputInternal *g_InputInternal = NULL;
@@ -182,8 +189,9 @@ bool VGui_Startup( CreateInterfaceFn appSystemFactory )
 	}
 
 #if defined( LUA_SDK )
+	// Experiment; Commented because it got in the way of our menu
 	// Create the root panel for our scripted GameUI state
-	VGUI_CreateGameUIRootPanel();
+	// VGUI_CreateGameUIRootPanel();
 #endif
 
 	VGui_OneTimeInit();
@@ -210,13 +218,19 @@ void VGui_CreateGlobalPanels( void )
 	// Srcbox Panels
 	//VPANEL gameParent = enginevgui->GetPanel(PANEL_CLIENTDLL);
 	//VPANEL gameParent2 = enginevgui->GetPanel(PANEL_CLIENTDLL);
-	VPANEL GameUiDll = enginevgui->GetPanel( PANEL_GAMEUIDLL);
+	VPANEL GameUiDll = enginevgui->GetPanel( PANEL_GAMEUIDLL );
+	VPANEL InGameScreens = enginevgui->GetPanel( PANEL_INGAMESCREENS );
 	// End
+	//OverrideUI->Create(NULL);
+	//OverrideGameUI();
 	mypanel->Create(GameUiDll);
 	newgamedialog->Create(GameUiDll);
 	returntomainmenudialog->Create(GameUiDll);
 	savebeforequitdialog->Create(GameUiDll);
 	quitqueryboxdialog->Create(GameUiDll);
+#ifdef HL2MP
+	//spawnmenudialog->Create(InGameScreens);
+#endif
 	//gamemountpanel->Create(GameUiDll);
 #if defined( TRACK_BLOCKING_IO )
 	VPANEL gameDLLPanel = enginevgui->GetPanel( PANEL_GAMEDLL );
@@ -270,7 +284,7 @@ void VGui_Shutdown()
 	}
 
 #if defined( LUA_SDK )
-	VGUI_DestroyGameUIRootPanel();
+	// VGUI_DestroyGameUIRootPanel();
 #endif
 
 	// Make sure anything "marked for deletion"
@@ -281,6 +295,9 @@ void VGui_Shutdown()
 	returntomainmenudialog->Destroy();
 	savebeforequitdialog->Destroy();
 	quitqueryboxdialog->Destroy();
+#ifdef HL2MP
+	//spawnmenudialog->Destroy();
+#endif
 	//gamemountpanel->Destroy();
 }
 

@@ -6,22 +6,28 @@
 #include <vgui_controls/Button.h>
 #include <vgui_controls/PropertySheet.h>
 #include <vgui_controls/ListPanel.h>
+#include <vgui_controls/ComboBox.h>
+#include <vgui/ISurface.h>
 #include <filesystem.h>
 #include <KeyValues.h>
 #include "ienginevgui.h"
+#include "gamestats.h"
 #include <vgui_controls/PanelListPanel.h>
 #include <vgui_controls/ImagePanel.h>
+#include "hl2mp_gamerules.h"
 
 //Swarm wants YOU!
 #include "vgui_controls/Menu.h"
 
 #include <stdlib.h>
 
+extern const char* GetGameTypeID;
+
+extern ConVar srcbox_gamemode_sandbox;
+extern ConVar srcbox_gamemode_hl2;
+
 using namespace vgui;
 
-//-----------------------------------------------------------------------------
-// Used by the autocompletion system
-//-----------------------------------------------------------------------------
 class CNonFocusableMenu : public Menu
 {
 	DECLARE_CLASS_SIMPLE(CNonFocusableMenu, Menu);
@@ -64,7 +70,9 @@ protected:
 
 private:
 	PropertySheet* m_pTabPanel;
+	Panel* m_pBox;
 	ListPanel* m_pBrowseAllList;
+	ComboBox* m_pGamemode;
 	Button* m_pPlayButton;
 	PanelListPanel* m_pBrowseAllPanel; // For "Browse All" tab
 	PanelListPanel* m_pGameMapPanel;  // For "Game" tab to hold icons
@@ -84,72 +92,96 @@ CMyPanel::CMyPanel(vgui::VPANEL parent)
 
 	SetKeyBoardInputEnabled(true);
 	SetMouseInputEnabled(true);
-
 	SetProportional(false);
 	SetTitleBarVisible(true);
+	SetMinimizeButtonVisible(false);
+	SetMaximizeButtonVisible(false);
+	SetCloseButtonVisible(true);
 	SetSizeable(false);
 	SetMoveable(true);
 	SetTitle("Play Singleplayer", false);
 
+	SetWide(472);
+	SetTall(980);
+
 	SetScheme(vgui::scheme()->LoadSchemeFromFile("resource/SourceScheme.res", "SourceScheme"));
 
-	LoadControlSettings("resource/UI/singleplayer_srcbox.res");
+	//LoadControlSettings("resource/UI/singleplayer_srcbox.res");
 
-	// Create PropertySheet (Tab Panel)
+	int w, h;
+	GetSize(w, h);
+
+	int sw, sh;
+	vgui::surface()->GetScreenSize(sw, sh);
+
+	SetPos((sw - w) / 2, (sh - h) / 2);
+
 	m_pTabPanel = new PropertySheet(this, "TabPanel");
-	m_pTabPanel->SetBounds(10, 40, 456, 714); // Adjust to fit your window dimensions
+	m_pTabPanel->SetBounds(10, 40, 456, 894);
+	m_pTabPanel->SetRoundedCorners(15);
+	m_pTabPanel->ShouldDrawTopLeftCornerRounded();
+	m_pTabPanel->ShouldDrawTopRightCornerRounded();
+	m_pTabPanel->ShouldDrawBottomLeftCornerRounded();
+	m_pTabPanel->ShouldDrawBottomRightCornerRounded();
 
-	// Placeholder for "Game" Tab
 	Panel* pGamePanel = new Panel(m_pTabPanel, "GamePanel");
 	pGamePanel->SetPaintBackgroundEnabled(true);
-	pGamePanel->SetBgColor(Color(50, 50, 50, 255)); // Background color for the "Game" tab
-
-	// Container for map icons in the Game tab
+	pGamePanel->SetBgColor(Color(50, 50, 50, 255));
 	m_pGameMapPanel = new PanelListPanel(pGamePanel, "GameMapPanel");
-	m_pGameMapPanel->SetBounds(10, 10, 430, 700); // Adjust to fit your window dimensions
-	m_pGameMapPanel->SetFirstColumnWidth(200); // Layout adjustments
+	m_pGameMapPanel->SetBounds(10, 10, 430, 700);
+	m_pGameMapPanel->SetFirstColumnWidth(200);
+	m_pGameMapPanel->SetRoundedCorners(15);
+	m_pGameMapPanel->GetRoundedCorners();
+	m_pGameMapPanel->ShouldDrawTopLeftCornerRounded();
+	m_pGameMapPanel->ShouldDrawTopRightCornerRounded();
+	m_pGameMapPanel->ShouldDrawBottomLeftCornerRounded();
+	m_pGameMapPanel->ShouldDrawBottomRightCornerRounded();
 
-	// Add the Game tab to the PropertySheet
-	//m_pTabPanel->AddPage(pGamePanel, "Game");
-
-	// "Game" Tab
 	PopulateGameTab();
-	m_pTabPanel->AddPage(m_pGameMapPanel, "Game");
+	m_pTabPanel->AddPage(m_pGameMapPanel, "Gallery");
+	m_pTabPanel->SetRoundedCorners(15);
 
-	// "Browse All" Tab
 	m_pBrowseAllList = new ListPanel(m_pTabPanel, "BrowseAllList");
 	m_pBrowseAllList->SetPaintBackgroundEnabled(true);
 	m_pBrowseAllList->SetBgColor(Color(50, 50, 50, 255));
+	m_pTabPanel->SetRoundedCorners(15);
 
-	// Define the columns for the table
 	m_pBrowseAllList->AddColumnHeader(0, "MapName", "Map Name", 350, ListPanel::COLUMN_FIXEDSIZE);
 	m_pBrowseAllList->AddColumnHeader(1, "Game", "Game", 100, ListPanel::COLUMN_FIXEDSIZE);
 
 	m_pTabPanel->AddPage(m_pBrowseAllList, "Browse All");
 
-	// Populate "Browse All" Tab
 	PopulateBrowseAll();
 
+	m_pGamemode = new ComboBox(this, "Gamemode", 5, false);
+	m_pGamemode->SetBounds(125, 938, 171, 24);
+	m_pGamemode->SetVisible(true);
+	m_pGamemode->ActivateItem(0);
 
-	// Add the Play button
-	m_pPlayButton = new Button(this, "PlayButton", "Play");
+	if (m_pGamemode)
+	{
+		m_pGamemode->AddItem("Sandbox", new KeyValues("Gamemodes", "sandbox", "sandbox"));
+		m_pGamemode->AddItem("Half-Life 2", new KeyValues("Gamemodes", "hl2", "hl2"));
+	}
+
+	m_pPlayButton = new Button(this, "PlayButton", "Start Game");
 	m_pPlayButton->SetCommand("play_selected_map");
-	m_pPlayButton->SetBounds(300, 760, 64, 24); // Adjust position and size
+	m_pPlayButton->SetBounds(332, 938, 98, 24);
 	m_pPlayButton->SetVisible(true);
 
-	// can disable for now.
+	//m_pGamemodeText = new Button(this, "PlayButton", "Start Game");
+
 	SetVisible(false);
 }
 
 void CMyPanel::PopulateBrowseAll()
 {
-	m_pBrowseAllList->RemoveAll(); // Clear any existing entries
+	m_pBrowseAllList->RemoveAll();
 
-	// Define prefix categories
 	struct GameCategory
 	{
 		const char* gameName;
-		const char* prefixes[30]; // Up to 10 prefixes per category (adjust as needed)
+		const char* prefixes[30];
 	};
 
 	GameCategory categories[] = {
@@ -160,12 +192,12 @@ void CMyPanel::PopulateBrowseAll()
 		{ "HL:S", { "t0", nullptr } },
 		{ "HL2", { "d1_trainstation", "d2_", "c17_", "ep1_", "ep1_", nullptr } },
 		{ "HL2:DM", { "dm_", nullptr } },
+		{ "NH2", { "nh2", nullptr } },
 		{ "L4D", { "l4d_", nullptr } },
 		{ "L4D2", { "c1m1_hotel", "c1m2_streets", "c1m3_mall", "c2m1_highway", nullptr } },
-		{ "Unknown Game", { nullptr } } // Default fallback
+		{ "Unknown Game", { nullptr } } 
 	};
 
-	// Scan maps directory
 	const char* mapsDir = "maps/*.bsp";
 	FileFindHandle_t findHandle;
 	const char* fileName = g_pFullFileSystem->FindFirst(mapsDir, &findHandle);
@@ -174,12 +206,10 @@ void CMyPanel::PopulateBrowseAll()
 	{
 		if (strstr(fileName, ".bsp"))
 		{
-			// Remove the ".bsp" extension
 			char mapName[MAX_PATH];
 			Q_strncpy(mapName, fileName, sizeof(mapName));
 			mapName[strlen(mapName) - 4] = '\0';
 
-			// Determine the game category based on prefixes
 			const char* detectedGame = "Srcbox";
 			for (const auto& category : categories)
 			{
@@ -191,17 +221,14 @@ void CMyPanel::PopulateBrowseAll()
 						break;
 					}
 				}
-				//if (strcmp(detectedGame, "Unknown Game") != 0)
-					//break; // Stop searching if we found a match
 			}
 
-			// Create a row for the ListPanel
 			KeyValues* kv = new KeyValues("MapData");
 			kv->SetString("MapName", mapName);
 			kv->SetString("Game", detectedGame);
 
-			m_pBrowseAllList->AddItem(kv, 0, false, false); // Add the map as a new row
-			kv->deleteThis(); // Clean up
+			m_pBrowseAllList->AddItem(kv, 0, false, false);
+			kv->deleteThis();
 		}
 
 		fileName = g_pFullFileSystem->FindNext(findHandle);
@@ -218,17 +245,15 @@ void CMyPanel::PopulateGameTab()
 		m_pGameMapPanel->DeleteAllItems();
 	}
 
-	// Define layout settings
-	const int itemWidth = 150;    // Width of each map container
-	const int itemHeight = 200;   // Height of each map container (to fit image + labels)
-	const int columns = 3;        // Number of columns per row
-	const int spacing = 1;       // Spacing between containers
+	const int itemWidth = 150;
+	const int itemHeight = 200;
+	const int columns = 3;
+	const int spacing = 1;
 
-	int x = 10;  // Initial X position
-	int y = 10;  // Initial Y position
+	int x = 10;
+	int y = 10;
 	int columnIndex = 0;
 
-	// Scan maps directory for ".bsp" files
 	const char* mapsDir = "maps/*.bsp";
 	FileFindHandle_t findHandle;
 	const char* fileName = g_pFullFileSystem->FindFirst(mapsDir, &findHandle);
@@ -237,51 +262,35 @@ void CMyPanel::PopulateGameTab()
 	{
 		if (strstr(fileName, ".bsp"))
 		{
-			// Remove the ".bsp" extension
 			char mapName[MAX_PATH];
 			Q_strncpy(mapName, fileName, sizeof(mapName));
 			mapName[strlen(mapName) - 4] = '\0';
 
-			// Create a container panel for the map entry
 			Panel* pMapContainer = new Panel(m_pGameMapPanel, mapName);
 			pMapContainer->SetBounds(x, y, itemWidth, itemHeight);
 			pMapContainer->SetPaintBackgroundEnabled(true);
-			pMapContainer->SetBgColor(Color(60, 60, 60, 255)); // Background for the container
+			pMapContainer->SetBgColor(Color(60, 60, 60, 255));
 
-			// Add a clickable ImagePanel for the map thumbnail
-			ImagePanel* pImagePanel = new ImagePanel(pMapContainer, "MapThumbnail");
-			pImagePanel->SetBounds(-50 , 5, itemWidth - 10, 150); // Thumbnail size
-			pImagePanel->SetImage("../maps/no_ico");              // Use a default thumbnail
-			pImagePanel->AddActionSignalTarget(this);
+			//ImagePanel* pImagePanel = new ImagePanel(pMapContainer, "MapThumbnail");
+			//pImagePanel->SetBounds(-50 , 5, itemWidth - 10, 150);
+			//pImagePanel->SetImage("../maps/no_ico");
+			//pImagePanel->AddActionSignalTarget(this);
 
-			// Add a label for the map name (top)
-			//Label* pMapLabel = new Label(pMapContainer, "MapNameLabel", mapName);
-			//pMapLabel->SetBounds(5, 130, itemWidth - 10, 20);
-			//pMapLabel->SetContentAlignment(Label::a_center);
-			//pMapLabel->SetFgColor(Color(255, 255, 255, 255));
-
-			// Add a secondary label for the author (bottom)
-			//Label* pAuthorLabel = new Label(pMapContainer, "AuthorLabel", "Garry Newman");
-			//pAuthorLabel->SetBounds(5, 150, itemWidth - 10, 20); // Adjust position for author label pAuthorLabel->SetContentAlignment(Label::a_center); pAuthorLabel->SetFgColor(Color(200, 200, 200, 255));
-
-			// Add the map container to the GameMapPanel
 			m_pGameMapPanel->AddItem(nullptr, pMapContainer);
 
-			// Adjust X and Y positions for the next map container
 			columnIndex++;
 			if (columnIndex >= columns)
 			{
 				columnIndex = 0;
-				x = 10;                      // Reset to initial X position
-				y += itemHeight + spacing;   // Move down to the next row
+				x = 10;                     
+				y += itemHeight + spacing; 
 			}
 			else
 			{
-				x += itemWidth + spacing;    // Move to the next column
+				x += itemWidth + spacing;
 			}
 		}
 
-		// Get the next map file
 		fileName = g_pFullFileSystem->FindNext(findHandle);
 	}
 
@@ -289,45 +298,22 @@ void CMyPanel::PopulateGameTab()
 }
 
 
-// Start Game icon stuff
-
-void CMyPanel::CreateGameIcon(const char* mapName, const char* imagePath, const char* command)
-{
-	// Create a Button that acts as the clickable area
-	vgui::Button* pImageButton = new vgui::Button(m_pGameMapPanel, mapName, "");
-	//pImageButton->SetSize(160, 90); // Set the size of the button
-	pImageButton->SetCommand(command);
-	pImageButton->AddActionSignalTarget(this);
-
-	// Add an ImagePanel inside the button to display the image
-	vgui::ImagePanel* pImage = new vgui::ImagePanel(pImageButton, "GameImage");
-	pImage->SetImage(imagePath);
-	pImage->SetShouldScaleImage(true);
-	//pImage->SetSize(160, 90); // Set the image size same as button
-}
-
-
 
 void CMyPanel::PlaySelectedMap()
 {
-	// Get the selected item from the list
-	int selectedItemID = m_pBrowseAllList->GetSelectedItem(0); // Get the first selected item
+	int selectedItemID = m_pBrowseAllList->GetSelectedItem(0);
 	if (selectedItemID == -1)
 	{
-		// No map selected
 		Msg("No map selected.\n");
 		return;
 	}
 
-	// Retrieve the map name from the selected item
 	KeyValues* kv = m_pBrowseAllList->GetItem(selectedItemID);
 	const char* mapName = kv->GetString("MapName");
 
-	// Construct the map load command
 	char command[256];
 	Q_snprintf(command, sizeof(command), "map %s\n", mapName);
 
-	// Execute the command to load the map
 	engine->ClientCmd(command);
 }
 
@@ -335,13 +321,29 @@ void CMyPanel::OnCommand(const char* pcCommand)
 {
 	BaseClass::OnCommand(pcCommand);
 
+	int activeItem = m_pGamemode->GetActiveItem();
+
+	KeyValues* kv = m_pGamemode->GetItemUserData(activeItem);
+	const char* mode = kv ? kv->GetString("mode", "") : "";
+
 	if (FStrEq(pcCommand, "play_selected_map"))
 	{
-		PlaySelectedMap(); // Handle the Play button command
+		//if (m_pGamemode == "Sandbox")
+		if (!Q_stricmp(mode, "Sandbox"))
+		{
+			srcbox_gamemode_sandbox.SetValue(1);
+			srcbox_gamemode_hl2.SetValue(0);
+		}
+		else if (!Q_stricmp(mode, "Half-Life 2"))
+		{
+			srcbox_gamemode_sandbox.SetValue(0);
+			srcbox_gamemode_hl2.SetValue(1);
+		};
+		PlaySelectedMap();
+		//IsTeamplay() == true;
 	}
 }
 
-// Class for managing panel instance
 class CMyPanelInterface : public IMyPanel
 {
 private:

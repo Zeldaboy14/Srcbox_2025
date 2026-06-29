@@ -18,6 +18,7 @@
 #include "baseviewmodel_shared.h"
 #include "weapon_proficiency.h"
 #include "utlmap.h"
+#include "hl2mp_weapon_parse.h"
 
 #if defined( CLIENT_DLL )
 #define CBaseCombatWeapon C_BaseCombatWeapon
@@ -257,6 +258,8 @@ public:
 	virtual bool			CanPerformSecondaryAttack() const;
 
 	virtual bool			ShouldBlockPrimaryFire() { return false; }
+	// terror
+	CHL2MPSWeaponInfo* GetTerrorWeaponData(void) const;
 
 #ifdef CLIENT_DLL
 	virtual void			CreateMove( float flInputSampleTime, CUserCmd *pCmd, const QAngle &vecOldViewAngles ) {}
@@ -347,9 +350,14 @@ public:
 public:
 
 	// Weapon info accessors for data in the weapon's data file
-	const FileWeaponInfo_t	&GetWpnData( void ) const;
+#ifndef LUA_SDK
+    const FileWeaponInfo_t &GetWpnData( void ) const;
+#else
+    virtual const FileWeaponInfo_t &GetWpnData( void ) const;
+#endif
 	virtual const char		*GetViewModel( int viewmodelindex = 0 ) const;
 	virtual const char		*GetWorldModel( void ) const;
+	virtual const char		*GetCharacterViewmodelAddon( void ) const;
 	virtual const char		*GetAnimPrefix( void ) const;
 	virtual int				GetMaxClip1( void ) const;
 	virtual int				GetMaxClip2( void ) const;

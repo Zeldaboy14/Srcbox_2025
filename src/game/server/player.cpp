@@ -935,14 +935,14 @@ void CBasePlayer::TraceAttack( const CTakeDamageInfo &inputInfo, const Vector &v
 	CTakeDamageInfo linputInfo = inputInfo;
 	Vector lvecDir = vecDir;
 
-	BEGIN_LUA_CALL_HOOK("PlayerTraceAttack");
-	lua_pushplayer(L, this);
+	LUA_CALL_HOOK_BEGIN("PlayerTraceAttack");
+	CBasePlayer::PushLuaInstanceSafe(L, this);
 	lua_pushdamageinfo(L, linputInfo);
 	lua_pushvector(L, lvecDir);
 	lua_pushtrace(L, *ptr);
-	END_LUA_CALL_HOOK(4, 1);
+	LUA_CALL_HOOK_END(4, 1);
 
-	RETURN_LUA_NONE();
+	LUA_RETURN_NONE_IF_TRUE();
 #endif
 
 	if ( m_takedamage )
@@ -2845,13 +2845,13 @@ bool CBasePlayer::IsUseableEntity( CBaseEntity *pEntity, unsigned int requiredCa
 bool CBasePlayer::CanPickupObject( CBaseEntity *pObject, float massLimit, float sizeLimit )
 {
 #ifdef LUA_SDK
-	BEGIN_LUA_CALL_HOOK("PlayerCanPickupObject");
-	lua_pushentity(L, pObject);
-	lua_pushnumber(L, massLimit);
-	lua_pushnumber(L, sizeLimit);
-	END_LUA_CALL_HOOK(3, 1);
+    LUA_CALL_HOOK_BEGIN( "PlayersCanPickupObject", "Checks if any player can pickup this type of object." );
+    CBaseEntity::PushLuaInstanceSafe( L, pObject );  // doc: entity (The entity that is being checked.)
+    lua_pushnumber( L, massLimit );                  // doc: massLimit (The mass limit of the object.)
+    lua_pushnumber( L, sizeLimit );                  // doc: sizeLimit (The size limit of the object.)
+    LUA_CALL_HOOK_END( 3, 1 );                       // doc: boolean (Whether or not the object can be picked up.)
 
-	RETURN_LUA_BOOLEAN();
+    LUA_RETURN_BOOLEAN();
 #endif
 
 	// UNDONE: Make this virtual and move to HL2 player
@@ -2931,6 +2931,12 @@ float CBasePlayer::GetHeldObjectMass( IPhysicsObject *pHeldObject )
 	return 0;
 }
 
+#ifdef LUA_SDK
+CBaseEntity* CBasePlayer::GetHeldObject(void)
+{
+	return PhysCannonGetHeldEntity(GetActiveWeapon());
+}
+#endif
 
 //-----------------------------------------------------------------------------
 // Purpose:	Server side of jumping rules.  Most jumping logic is already
@@ -4981,9 +4987,6 @@ CBaseEntity *CBasePlayer::EntSelectSpawnPoint()
 		if ( pSpot )
 			goto ReturnSpot;
 		pSpot = gEntList.FindEntityByClassname( g_pLastSpawn, "info_player_start");
-		if ( pSpot ) 
-			goto ReturnSpot;
-		pSpot = gEntList.FindEntityByClassname(g_pLastSpawn, "info_survivor_position");
 		if (pSpot)
 			goto ReturnSpot;
 	}
@@ -4995,11 +4998,6 @@ CBaseEntity *CBasePlayer::EntSelectSpawnPoint()
 			pSpot = gEntList.FindEntityByClassname( pSpot, "info_player_deathmatch" );
 		if ( !pSpot )  // skip over the null point
 			pSpot = gEntList.FindEntityByClassname( pSpot, "info_player_deathmatch" );
-
-		for (int i = random->RandomInt(1, 5); i > 0; i--)
-			pSpot = gEntList.FindEntityByClassname(pSpot, "info_survivor_position");
-		if (!pSpot)  // skip over the null point
-			pSpot = gEntList.FindEntityByClassname(pSpot, "info_survivor_position");
 
 		CBaseEntity *pFirstSpot = pSpot;
 
@@ -5078,9 +5076,9 @@ ReturnSpot:
 void CBasePlayer::InitialSpawn( void )
 {
 #if defined ( LUA_SDK )
-	BEGIN_LUA_CALL_HOOK("PlayerInitialSpawn");
-	lua_pushplayer(L, this);
-	END_LUA_CALL_HOOK(1, 0);
+	LUA_CALL_HOOK_BEGIN("PlayerInitialSpawn");
+	CBasePlayer::PushLuaInstanceSafe( L, this );
+	LUA_CALL_HOOK_END(1, 0);
 #endif
 
 	m_iConnected = PlayerConnected;
@@ -5551,6 +5549,126 @@ void CBasePlayer::CommitSuicide( const Vector &vecForce, bool bExplode /*= false
 	TakeDamage( info );
 }
 
+// Experiment; TODO: Figure out how to make this silent without duplicating the code inside CommitSuicide into KillSilent
+#ifdef LUA_SDK
+void CBasePlayer::KillSilent()
+{
+	MDLCACHE_CRITICAL_SECTION();
+
+	if (!IsAlive())
+		return;
+
+	// don't let them suicide for 5 seconds after suiciding
+	m_fNextSuicideTime = gpGlobals->curtime + 5;
+
+	int fDamage = DMG_PREVENT_PHYSICS_FORCE | DMG_NEVERGIB;
+
+	m_iHealth = 0;
+	CTakeDamageInfo info(this, this, 0, fDamage, m_iSuicideCustomKillFlags);
+
+	// This next section is copied from Event_Killed
+
+	CSound* pSound;
+
+	if (Hints())
+	{
+		Hints()->ResetHintTimers();
+	}
+
+	// g_pGameRules->PlayerKilled( this, info );
+
+	// gamestats->Event_PlayerKilled( this, info );
+
+	RumbleEffect(RUMBLE_STOP_ALL, 0, RUMBLE_FLAGS_NONE);
+
+#if defined( WIN32 ) && !defined( _X360 )
+	// NVNT set the drag to zero in the case of underwater death.
+	HapticSetDrag(this, 0);
+#endif
+	ClearUseEntity();
+
+	// this client isn't going to be thinking for a while, so reset the sound until they respawn
+	pSound = CSoundEnt::SoundPointerForIndex(CSoundEnt::ClientSoundIndex(edict()));
+	{
+		if (pSound)
+		{
+			pSound->Reset();
+		}
+	}
+
+	// don't let the status bar glitch for players with <0 health.
+	if (m_iHealth < -99)
+	{
+		m_iHealth = 0;
+	}
+
+	// holster the current weapon
+	if (GetActiveWeapon())
+	{
+		GetActiveWeapon()->Holster();
+	}
+
+	SetAnimation(PLAYER_DIE);
+
+	if (!IsObserver())
+	{
+		SetViewOffset(VEC_DEAD_VIEWHEIGHT_SCALED(this));
+	}
+	m_lifeState = LIFE_DYING;
+
+	pl.deadflag = true;
+	AddSolidFlags(FSOLID_NOT_SOLID);
+	// force contact points to get flushed if no longer valid
+	// UNDONE: Always do this on RecheckCollisionFilter() ?
+	IPhysicsObject* pObject = VPhysicsGetObject();
+	if (pObject)
+	{
+		pObject->RecheckContactPoints();
+	}
+
+	SetMoveType(MOVETYPE_FLYGRAVITY);
+	SetGroundEntity(NULL);
+
+	// clear out the suit message cache so we don't keep chattering
+	SetSuitUpdate(NULL, false, 0);
+
+	// reset FOV
+	SetFOV(this, 0);
+
+	if (FlashlightIsOn())
+	{
+		FlashlightTurnOff();
+	}
+
+	m_flDeathTime = gpGlobals->curtime;
+
+	ClearLastKnownArea();
+
+	// This next section is copied from Event_Dying
+
+	// DeathSound( info );
+
+	// The dead body rolls out of the vehicle.
+	if (IsInAVehicle())
+	{
+		LeaveVehicle();
+	}
+
+	QAngle angles = GetLocalAngles();
+
+	angles.x = 0;
+	angles.z = 0;
+
+	SetLocalAngles(angles);
+
+	SetThink(&CBasePlayer::PlayerDeathThink);
+	SetNextThink(gpGlobals->curtime + 0.1f);
+	// BaseClass::Event_Dying( info );
+
+	m_iSuicideCustomKillFlags = 0;
+}
+#endif
+
 //==============================================
 // HasWeapons - do I have any weapons at all?
 //==============================================
@@ -5592,14 +5710,14 @@ void CBasePlayer::VelocityPunch( const Vector &vecForce )
 bool CBasePlayer::CanEnterVehicle( IServerVehicle *pVehicle, int nRole )
 {
 #ifdef LUA_SDK
-	BEGIN_LUA_CALL_HOOK("CanEnterVehicle");
-	lua_pushplayer(L, this);
-	// FIXME: implement lua_pushvehicle()!
-	lua_pushentity(L, pVehicle->GetVehicleEnt());
-	lua_pushinteger(L, nRole);
-	END_LUA_CALL_HOOK(3, 1);
+    LUA_CALL_HOOK_BEGIN( "CanEnterVehicle" );
+    CBasePlayer::PushLuaInstanceSafe( L, this );
+    // FIXME: implement lua_pushvehicle()!
+    CBaseEntity::PushLuaInstanceSafe( L, pVehicle->GetVehicleEnt() );
+    lua_pushinteger( L, nRole );
+    LUA_CALL_HOOK_END( 3, 1 );
 
-	RETURN_LUA_BOOLEAN();
+    LUA_RETURN_BOOLEAN();
 #endif
 
 	// Must not have a passenger there already
@@ -7597,7 +7715,11 @@ void CBasePlayer::Weapon_DropSlot( int weaponSlot )
 //-----------------------------------------------------------------------------
 // Purpose: Override to add weapon to the hud
 //-----------------------------------------------------------------------------
-void CBasePlayer::Weapon_Equip( CBaseCombatWeapon *pWeapon )
+#ifdef LUA_SDK
+void CBasePlayer::Weapon_Equip( CBaseCombatWeapon *pWeapon, bool bGiveAmmo /*= true*/ )
+#else
+void CBasePlayer::Weapon_Equip( CBaseCombatWeapon *pWeapon)
+#endif
 {
 	BaseClass::Weapon_Equip( pWeapon );
 

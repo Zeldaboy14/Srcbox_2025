@@ -1,22 +1,12 @@
-//========= Copyright © 1996-2008, Valve Corporation, All rights reserved. ============//
-//
-// Purpose: 
-//
-//=============================================================================//
-
-#ifndef HL2MP_PLAYERANIMSTATE_H
-#define HL2MP_PLAYERANIMSTATE_H
+//========= Copyright Valve Corporation, All rights reserved. ============//
+#ifndef Experiment_PLAYERANIMSTATE_H
+#define Experiment_PLAYERANIMSTATE_H
 #ifdef _WIN32
 #pragma once
 #endif
 
-
 #include "convar.h"
 #include "../Multiplayer/multiplayer_animstate.h"
-
-#if defined( HL2SB )
-#include "base_playeranimstate.h"
-#endif
 
 #if defined( CLIENT_DLL )
 class C_HL2MP_Player;
@@ -30,55 +20,33 @@ class CHL2MP_Player;
 // ------------------------------------------------------------------------------------------------ //
 class CHL2MPPlayerAnimState : public CMultiPlayerAnimState
 {
-public:
-	
-	DECLARE_CLASS( CHL2MPPlayerAnimState, CMultiPlayerAnimState );
+   public:
+    DECLARE_CLASS( CHL2MPPlayerAnimState, CMultiPlayerAnimState );
 
-	CHL2MPPlayerAnimState();
-	CHL2MPPlayerAnimState( CBasePlayer *pPlayer, MultiPlayerMovementData_t &movementData );
-	~CHL2MPPlayerAnimState();
+    CHL2MPPlayerAnimState();
+    CHL2MPPlayerAnimState( CBasePlayer *pPlayer, MultiPlayerMovementData_t &movementData );
+    ~CHL2MPPlayerAnimState();
 
-	void InitHL2MPAnimState( CHL2MP_Player *pPlayer );
-	CHL2MP_Player *GetHL2MPPlayer( void )							{ return m_pHL2MPPlayer; }
+    void InitExperimentAnimState( CHL2MP_Player *pPlayer );
+    CHL2MP_Player *GetExperimentPlayer( void )
+    {
+        return m_pExperimentPlayer;
+    }
 
-	virtual void ClearAnimationState();
-	virtual Activity TranslateActivity( Activity actDesired );
-	virtual void Update( float eyeYaw, float eyePitch );
+    virtual void ClearAnimationState();
+    virtual Activity TranslateActivity( Activity actDesired );
+    virtual void Update( float eyeYaw, float eyePitch );
 
-	void	DoAnimationEvent( PlayerAnimEvent_t event, int nData = 0 );
+    void DoAnimationEvent( PlayerAnimEvent_t event, int nData = 0 );
+    virtual Activity CalcMainActivity();
 
-	bool	HandleMoving( Activity &idealActivity );
-	bool	HandleJumping( Activity &idealActivity );
-	bool	HandleDucking( Activity &idealActivity );
-	bool	HandleSwimming( Activity &idealActivity );
+   private:
+    CHL2MP_Player *m_pExperimentPlayer;
 
-	virtual float GetCurrentMaxGroundSpeed();
-#ifdef HL2SB
-protected:
-	
-	CModAnimConfig		m_AnimConfig;
-
-#endif
-
-private:
-	//Tony; temp till 9way!
-	bool						SetupPoseParameters( CStudioHdr *pStudioHdr );
-	virtual void				EstimateYaw( void );
-	virtual void				ComputePoseParam_MoveYaw( CStudioHdr *pStudioHdr );
-	virtual void				ComputePoseParam_AimPitch( CStudioHdr *pStudioHdr );
-	virtual void				ComputePoseParam_AimYaw( CStudioHdr *pStudioHdr );
-
-#ifdef HL2SB
-	void						ComputePlaybackRate();
-#endif
-	
-	CHL2MP_Player   *m_pHL2MPPlayer;
-	bool		m_bInAirWalk;
-	float		m_flHoldDeployedPoseUntilTime;
+    bool m_bFreshJump;
+    bool m_bWasJumping;
 };
 
-CHL2MPPlayerAnimState *CreateHL2MPPlayerAnimState( CHL2MP_Player *pPlayer );
+CHL2MPPlayerAnimState *CreateExperimentPlayerAnimState( CHL2MP_Player *pPlayer );
 
-
-
-#endif // HL2MP_PLAYERANIMSTATE_H
+#endif  // Experiment_PLAYERANIMSTATE_H

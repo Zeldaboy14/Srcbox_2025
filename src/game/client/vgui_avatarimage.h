@@ -193,7 +193,11 @@ class CAvatarImagePanel : public vgui::Panel
 public:
 	DECLARE_CLASS_SIMPLE( CAvatarImagePanel, vgui::Panel );
 
-	CAvatarImagePanel( vgui::Panel *parent, const char *name );
+#ifdef LUA_SDK
+    CAvatarImagePanel( Panel *parent, const char *panelName, lua_State *L /* = nullptr */ );
+#else
+    CAvatarImagePanel( vgui::Panel *parent, const char *name );
+#endif
 
 	// Set the player that this Avatar should display for
 	//=============================================================================

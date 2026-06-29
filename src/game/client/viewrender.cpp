@@ -125,6 +125,10 @@ static ConVar r_threaded_renderables( "r_threaded_renderables", "0" );
 ConVar r_DrawDetailProps( "r_DrawDetailProps", "1", FCVAR_NONE, "0=Off, 1=Normal, 2=Wireframe" );
 
 ConVar r_worldlistcache( "r_worldlistcache", "1" );
+#ifdef SSAO
+//Crossroads devtest
+ConVar cr_ssao_enable( "cr_ssao_enable", "1", FCVAR_ARCHIVE );
+#endif
 
 //-----------------------------------------------------------------------------
 // Convars related to fog color
@@ -798,6 +802,13 @@ CLIENTEFFECT_REGISTER_BEGIN( PrecachePostProcessingEffects )
 	CLIENTEFFECT_MATERIAL( "dev/engine_post" )
 	CLIENTEFFECT_MATERIAL( "dev/motion_blur" )
 	CLIENTEFFECT_MATERIAL( "dev/upscale" )
+	
+#ifdef SSAO
+//crossroads devtest
+CLIENTEFFECT_MATERIAL( "dev/ssao" )
+CLIENTEFFECT_MATERIAL( "dev/ssaoblur" )
+CLIENTEFFECT_MATERIAL( "dev/ssao_combine" )
+#endif
 
 #ifdef TF_CLIENT_DLL
 	CLIENTEFFECT_MATERIAL( "dev/pyro_blur_filter_y" )
@@ -2259,6 +2270,14 @@ void CViewRender::RenderView( const CViewSetup &viewRender, int nClearFlags, int
 		}
 
 	}
+
+#ifdef SSAO
+	// Crossroads devtest SSAO
+	if( cr_ssao_enable.GetBool() )
+	{
+		DoSSAO(viewRender);
+	}
+#endif
 
 	if ( mat_viewportupscale.GetBool() && mat_viewportscale.GetFloat() < 1.0f ) 
 	{
@@ -5118,6 +5137,10 @@ void CShadowDepthView::Draw()
 		render->Push3DView( (*this), VIEW_CLEAR_DEPTH, m_pRenderTarget, GetFrustum() );
 	}
 
+	pRenderContext.GetFrom(materials);
+	pRenderContext->PushRenderTargetAndViewport(m_pRenderTarget, m_pDepthTexture, 0, 0, m_pDepthTexture->GetMappingWidth(), m_pDepthTexture->GetMappingWidth());
+	pRenderContext.SafeRelease();
+
 	SetupCurrentView( origin, angles, VIEW_SHADOW_DEPTH_TEXTURE );
 
 	MDLCACHE_CRITICAL_SECTION();
@@ -5162,6 +5185,7 @@ void CShadowDepthView::Draw()
 		pRenderContext->CopyRenderTargetToTextureEx( m_pDepthTexture, -1, NULL, NULL );
 	}
 
+	pRenderContext->PopRenderTargetAndViewport();
 	render->PopView( GetFrustum() );
 
 #if defined( _X360 )
@@ -5525,6 +5549,8 @@ void CBaseWorldView::DrawExecute( float waterHeight, view_id_t viewID, float wat
 	{
 		DrawWorld( waterZAdjust );
 		DrawOpaqueRenderables( DepthMode );
+
+		SSAO_DepthPass();
 
 #ifdef TF_CLIENT_DLL
 		bool bVisionOverride = ( localplayer_visionflags.GetInt() & ( 0x01 ) ); // Pyro-vision Goggles

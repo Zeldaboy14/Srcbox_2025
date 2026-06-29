@@ -202,6 +202,7 @@ public:
 	CGrabController( void );
 	~CGrabController( void );
 	void AttachEntity( CBasePlayer *pPlayer, CBaseEntity *pEntity, IPhysicsObject *pPhys, bool bIsMegaPhysCannon, const Vector &vGrabPosition, bool bUseGrabPosition );
+	void AttachEntityOld( CBaseEntity* pEntity, IPhysicsObject* pPhys, const Vector& position );
 	void DetachEntity( bool bClearVelocity );
 	void OnRestore();
 

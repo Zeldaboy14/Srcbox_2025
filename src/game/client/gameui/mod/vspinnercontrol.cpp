@@ -11,7 +11,7 @@
 #include "vgui_controls/Label.h"
 #include "tier1/KeyValues.h"
 #include "vgui_controls/Tooltip.h"
-#include "EngineInterface.h"
+#include "../EngineInterface.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

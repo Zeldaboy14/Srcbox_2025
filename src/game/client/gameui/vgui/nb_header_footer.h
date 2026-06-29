@@ -30,6 +30,7 @@ enum NB_Background_Style
 	NB_BACKGROUND_NONE,
 };
 
+#ifdef PLATFORM_64BITS
 class IVideoMaterial;
 
 class CBackgroundMovie
@@ -56,6 +57,7 @@ private:
 };
 
 CBackgroundMovie* BackgroundMovie();
+#endif
 
 class CNB_Header_Footer : public vgui::EditablePanel
 {

@@ -399,6 +399,9 @@ public:
 	void				SetNextAttack( float flWait ) { m_flNextAttack = flWait; }
 
 	bool				m_bForceServerRagdoll;
+#ifdef LUA_SDK
+	bool				m_bDropActiveWeaponOnDeath;
+#endif
 
 	// Pickup prevention
 	bool				IsAllowedToPickupWeapons( void ) { return !m_bPreventWeaponPickup; }

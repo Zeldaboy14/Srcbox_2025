@@ -449,7 +449,7 @@ void CNPC_Alyx::SelectModel()
 	const char *szModel = STRING( GetModelName() );
 	if (!szModel || !*szModel)
 	{
-		SetModelName( AllocPooledString("models/alyx.mdl") );
+		SetModelName( AllocPooledString("models/alyx_ep2.mdl") );
 	}
 }
 

@@ -108,10 +108,9 @@ public:
 
 		return BaseClass::ShouldDrawHeadLabels();
 	}
+
 #ifdef CLIENT_DLL
-//#ifdef LUA_SDK
 	virtual void Think(void);
-//#endif
 #endif
 #ifndef CLIENT_DLL
 	virtual void FrameUpdatePostEntityThink();

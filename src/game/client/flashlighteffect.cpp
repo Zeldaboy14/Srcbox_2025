@@ -496,6 +496,8 @@ void CFlashlightEffect::UpdateLightOld(const Vector &vecPos, const Vector &vecDi
 	LightOffNew();
 }
 
+#define MOLOTOV_ATTACHMENT_POINT "muzzle_flashlight"
+
 //-----------------------------------------------------------------------------
 // Purpose: Do the headlight
 //-----------------------------------------------------------------------------
@@ -513,6 +515,13 @@ void CFlashlightEffect::UpdateLight(const Vector &vecPos, const Vector &vecDir, 
 	pEnt->SetLocalAngles(QAngle(0, 0, 0));
 	pEnt->SetSolid(SOLID_NONE);
 	pEnt->RemoveEFlags(EFL_USE_PARTITION_WHEN_NOT_SOLID);
+
+	/*extern C_BaseAnimating* GetBaseAnimating();
+
+	if (GetBaseAnimating()->LookupAttachment(MOLOTOV_ATTACHMENT_POINT) != INVALID_PARTICLE_ATTACHMENT)
+	{
+		UpdateLightNew(vecPos, vecDir, vecRight, vecUp);
+	}*/
 
 
 	if ( !m_bIsOn )

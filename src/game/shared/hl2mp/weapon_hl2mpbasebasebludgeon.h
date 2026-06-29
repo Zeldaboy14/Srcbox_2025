@@ -46,6 +46,9 @@ public:
 	//Functions to select animation sequences 
 	virtual Activity	GetPrimaryAttackActivity( void )	{	return	ACT_VM_HITCENTER;	}
 	virtual Activity	GetSecondaryAttackActivity( void )	{	return	ACT_VM_HITCENTER2;	}
+#ifndef CLIENT_DLL
+	virtual int		CapabilitiesGet(void);
+#endif
 
 	virtual	float	GetFireRate( void )								{	return	0.2f;	}
 	virtual float	GetRange( void )								{	return	32.0f;	}

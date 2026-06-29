@@ -497,32 +497,6 @@ void Host_Say( edict_t *pEdict, const CCommand &args, bool teamonly )
 		pPlayer = ((CBasePlayer *)CBaseEntity::Instance( pEdict ));
 		Assert( pPlayer );
 
-#if defined ( LUA_SDK )
-		BEGIN_LUA_CALL_HOOK("Host_Say");
-		lua_pushplayer(L, pPlayer);
-		lua_pushstring(L, p);
-		lua_pushboolean(L, teamonly);
-		END_LUA_CALL_HOOK(3, 1);
-
-		// Andrew; this is just a continuation of RETURN_LUA_NONE().
-		if (lua_isboolean(L, -1))
-		{
-			bool res = (bool)luaL_checkboolean(L, -1);
-			lua_pop(L, 1);
-			if (!res)
-				return;
-		}
-		else if (lua_isstring(L, -1))
-		{
-			p = (char*)luaL_checkstring(L, -1);
-			lua_pop(L, 1);
-		}
-		else
-		{
-			lua_pop(L, 1);
-		}
-#endif
-
 		// make sure the text has valid content
 		p = CheckChatText( pPlayer, p );
 	}
@@ -1226,6 +1200,17 @@ CON_COMMAND( give, "Give item to player.\n\tArguments: <item_name>" )
 	}
 }
 
+#ifdef PORTAL_DLL
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+CON_COMMAND(give_portalgun, "Equips the player with a single portal portalgun") 
+{
+	if (args.ArgC() < 2) {
+		return;
+	}
+	engine->ServerCommand("give weapon_portalgun");
+}
+#endif
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------

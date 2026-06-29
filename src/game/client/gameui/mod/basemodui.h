@@ -9,7 +9,7 @@
 
 #include "basemodpanel.h"
 #include "basemodframe.h"
-#include "GameUI_Interface.h"
+//#include "../GameUI_Interface.h"
 #include "const.h"
 
 #ifndef _CERT

@@ -5,7 +5,7 @@
 //=====================================================================================//
 
 #include "VGenericWaitScreen.h"
-#include "EngineInterface.h"
+#include "../EngineInterface.h"
 #include "tier1/KeyValues.h"
 
 #include "vgui_controls/Label.h"

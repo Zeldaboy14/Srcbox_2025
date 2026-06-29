@@ -33,6 +33,8 @@ class CBaseViewModel : public CBaseAnimating, public IHasOwner
 	DECLARE_CLASS( CBaseViewModel, CBaseAnimating );
 public:
 
+	bool InitializeAsClientEntityL4D(const char* pszModelName, bool bRenderWithViewModels);
+
 	DECLARE_NETWORKCLASS();
 	DECLARE_PREDICTABLE();
 
@@ -87,6 +89,10 @@ public:
 	}
 
 	Vector					m_vecLastFacing;
+
+	// Terror
+	CHandle<CBaseViewModel> m_viewmodelAddon; // ( this + 650 )
+	char					m_viewmodelAddonName[64]; // ( this + 2604 )
 
 	// Only support prediction in TF2 for now
 #if defined( INVASION_DLL ) || defined( INVASION_CLIENT_DLL )
@@ -171,6 +177,7 @@ public:
 	virtual bool			GetAttachment( int number, Vector &origin );
 	virtual	bool			GetAttachment( int number, Vector &origin, QAngle &angles );
 	virtual bool			GetAttachmentVelocity( int number, Vector &originVel, Quaternion &angleVel );
+	bool			UpdateViewModelAddon(void);
 #endif
 
 private:

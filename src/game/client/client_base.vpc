@@ -49,12 +49,13 @@ $Configuration
 	{
 		$OutputDirectory			".\$GAMENAME" [$OSXALL]
 		$IntermediateDirectory		".\$GAMENAME" [$OSXALL]
+		//$AdditionalProjectDependencies	"luasocket;lua54;libpng"
 	}
 
 	$Compiler
 	{
 		$AdditionalIncludeDirectories	".\;$BASE;$SRCDIR\vgui2\include;$SRCDIR\vgui2\controls;$SRCDIR\game\shared;.\game_controls;$SRCDIR\thirdparty\sixensesdk\include"
-		$PreprocessorDefinitions		"$BASE;NO_STRING_T;CLIENT_DLL;VECTOR;VERSION_SAFE_STEAM_API_INTERFACES;PROTECTED_THINGS_ENABLE;strncpy=use_Q_strncpy_instead;_snprintf=use_Q_snprintf_instead;GAMEPADUI;SSAO;SRCBOX;SWARM_INTERFACE;MAPBASE" 
+		$PreprocessorDefinitions		"$BASE;NO_STRING_T;CLIENT_DLL;VECTOR;VERSION_SAFE_STEAM_API_INTERFACES;PROTECTED_THINGS_ENABLE;strncpy=use_Q_strncpy_instead;_snprintf=use_Q_snprintf_instead;GAMEPADUI;SSAO;SRCBOX;SWARM_INTERFACE" 
 		$PreprocessorDefinitions		"$BASE;INCLUDED_STEAM2_USERID_STRUCTS" 
 		$PreprocessorDefinitions		"$BASE;fopen=dont_use_fopen" [$WIN32]
 		$PreprocessorDefinitions		"$BASE;USE_WEBM_FOR_REPLAY;" [$LINUXALL]
@@ -185,6 +186,8 @@ $Project
 		$File	"history_resource.cpp"
 		$File	"hud_weapon.cpp"
 		$File	"train.cpp"
+        //$File	"$SRCDIR\game\shared\cpng.cpp"
+        //$File	"$SRCDIR\game\shared\cpng.h"
 		$File	"$SRCDIR\game\shared\weapon_parse_default.cpp"
 		$File	"$SRCDIR\game\shared\achievement_saverestore.cpp"
 		$File	"$SRCDIR\game\shared\achievement_saverestore.h"
@@ -341,6 +344,7 @@ $Project
 		$File	"$SRCDIR\game\shared\eventlist.cpp"
 		$File	"flashlighteffect.cpp"
 		$File	"$SRCDIR\game\shared\func_ladder.cpp"
+		$File	"$SRCDIR\game\shared\func_simpleladder.cpp"
 		$File	"functionproxy.cpp"
 		$File	"fx_blood.cpp"
 		$File	"fx_cube.cpp"
@@ -537,6 +541,8 @@ $Project
             $File "$SRCDIR\game\client\vgui2_panels\vgui_singeplayer.cpp"
             $File "$SRCDIR\game\client\vgui2_panels\vgui_newgame.cpp"
             $File "$SRCDIR\game\client\vgui2_panels\vgui_savenquit.cpp"
+            $File "$SRCDIR\game\client\vgui2_panels\overrides\OverrideInterface.cpp"
+            $File "$SRCDIR\game\client\vgui2_panels\overrides\OverrideUI_RootPanel.cpp"
         }
 		
 		// Files not using precompiled header cbase.h
@@ -1129,6 +1135,25 @@ $Project
 		//Haptics
 		$File   "$SRCDIR\public\haptics\ihaptics.h"	[$WIN32]
 		$File   "$SRCDIR\public\haptics\haptic_utils.h"	[$WIN32]
+		
+        // Lua
+        //$File "$SRCDIR\public\mathlib\langle.h"
+        //$File "$SRCDIR\public\mathlib\lvector.h"
+        //$File "$SRCDIR\public\lcmodel.h"
+        //$File "$SRCDIR\public\lColor.h"
+        //$File "$SRCDIR\public\tier1\lconvar.h"
+        //$File "$SRCDIR\public\tier1\lconcommand.h"
+        //$File "$SRCDIR\public\lfilesystem.h"
+        //$File "$SRCDIR\public\lgametrace.h"
+        //$File "$SRCDIR\public\licvar.h"
+        //$File "$SRCDIR\public\materialsystem\limaterial.h"
+        //$File "$SRCDIR\public\vgui\LIScheme.h"
+        //$File "$SRCDIR\public\SoundEmitterSystem\lisoundemittersystembase.h"
+        //$File "$SRCDIR\public\tier1\LKeyValues.h"
+        //$File "$SRCDIR\public\lnetworkstringtabledefs.h"
+        //$File "$SRCDIR\public\mathlib\lvector.h"
+        //$File "$SRCDIR\public\vgui\LVGUI.h"
+        //$File "$SRCDIR\public\mathlib\lvmatrix.h"
 	}
 
 	$Folder	"Game Shared Header Files"
@@ -1247,6 +1272,14 @@ $Project
 		$File	"$SRCDIR\game\shared\weapon_proficiency.h"
 		$File	"$SRCDIR\game\shared\weapon_ifmsteadycam.h"
 		$File	"$SRCDIR\game\shared\mp_shareddefs.h"
+		
+        // Lua
+        //$File "$SRCDIR\game\shared\lbaseplayer_shared.h"
+        //$File "$SRCDIR\game\shared\leffect_dispatch_data.h"
+        //$File "$SRCDIR\game\shared\limovehelper.h"
+        //$File "$SRCDIR\game\shared\lshareddefs.h"
+        //$File "$SRCDIR\game\shared\ltakedamageinfo.h"
+        //$File "$SRCDIR\game\shared\luasrclib.h"
 	}
 
 	$Folder	"game_controls Header Files"
@@ -1263,6 +1296,8 @@ $Project
 		$File	"game_controls\teammenu.h"
 		$File	"game_controls\vguitextwindow.h"
 		$File	"game_controls\IconPanel.h"
+        $File	"game_controls\cvartogglecheckbutton.h"
+        $File	"game_controls\scriptobject.h"
 	}
 	
 	$Folder	"Link Libraries"
@@ -1278,10 +1313,7 @@ $Project
 		$Lib		tier3
 		$Lib		vgui_controls
 		$Lib		vtf
-		$Lib		lua5.1
 		$Lib		raytrace
-		$Lib		d3d9
-		$Lib		d3dx9
 
 		$ImpLibexternal steam_api	[!$WIN64]
 		$ImpLibexternal steam_api64	[$WIN64]
@@ -1291,6 +1323,14 @@ $Project
 		$Lib   "libz" [$WINDOWS]
 
 		//$Libexternal	libz [$LINUXALL]
+		
+        // $Lib	"$LIBCOMMON\libcurl" [$WINDOWS]
+        $Lib    "$LIBCOMMON/lzma"
+		
+        //$Lib	"lua54"
+        //$Lib	"luasocket"
+        //$Lib    "libpng"
+        //$Lib    "bass"
  	}
 
 }

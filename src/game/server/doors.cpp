@@ -544,6 +544,11 @@ void CBaseDoor::Precache( void )
 		UTIL_ValidateSoundName( m_NoiseArrived,		"RotDoorSound.DefaultArrive" );
 		UTIL_ValidateSoundName( m_ls.sLockedSound,	"RotDoorSound.DefaultLocked" );
 		UTIL_ValidateSoundName( m_ls.sUnlockedSound,"DoorSound.Null" );
+		if (CBaseEntity::IsPrecacheAllowed())
+		{
+			PrecacheScriptSound("WoodenDoor.Pound");
+			PrecacheScriptSound("CheckpointDoor.Pound");
+		}
 	}
 	else
 	{

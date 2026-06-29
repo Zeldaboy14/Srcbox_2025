@@ -57,12 +57,13 @@ $Configuration
 	{
 		$OutputDirectory			".\$GAMENAME" [$OSXALL]
 		$IntermediateDirectory		".\$GAMENAME" [$OSXALL]
+		//$AdditionalProjectDependencies	"luasocket;lua54;libpng;lzma"
 	}
 
 	$Compiler
 	{
 		$AdditionalIncludeDirectories	"$BASE;.\;$SRCDIR\game\shared;$SRCDIR\utils\common;$SRCDIR\game\shared\econ;$SRCDIR\game\server\NextBot"
-		$PreprocessorDefinitions		"$BASE;GAME_DLL;VECTOR;VERSION_SAFE_STEAM_API_INTERFACES;PROTECTED_THINGS_ENABLE;sprintf=use_Q_snprintf_instead_of_sprintf;strncpy=use_Q_strncpy_instead;_snprintf=use_Q_snprintf_instead;SRCBOX;SWARM_INTERFACE;MAPBASE"
+		$PreprocessorDefinitions		"$BASE;GAME_DLL;VECTOR;VERSION_SAFE_STEAM_API_INTERFACES;PROTECTED_THINGS_ENABLE;sprintf=use_Q_snprintf_instead_of_sprintf;strncpy=use_Q_strncpy_instead;_snprintf=use_Q_snprintf_instead;SRCBOX;SWARM_INTERFACE;MAPBASE;MAPBASE_VSCRIPT"
 		$PreprocessorDefinitions		"$BASE;INCLUDED_STEAM2_USERID_STRUCTS" 
 		$PreprocessorDefinitions		"$BASE;SWDS" [$POSIX]
 		$PreprocessorDefinitions		"$BASE;fopen=dont_use_fopen" [$WINDOWS||$X360]
@@ -211,8 +212,11 @@ $Project
 		$File	"ai_senses.h"
 		$File	"ai_sentence.cpp"
 		$File	"ai_sentence.h"
-		$File	"ai_speech.cpp"
+		$File	"ai_speech.cpp" [!$NEW_RESPONSE_SYSTEM]
 		$File	"ai_speech.h"
+		$File	"ai_speech_new.cpp" [$NEW_RESPONSE_SYSTEM]
+		$File	"ai_speech_new.h" [$NEW_RESPONSE_SYSTEM]
+
 		$File	"ai_speechfilter.cpp"
 		$File	"ai_speechfilter.h"
 		$File	"ai_squad.cpp"
@@ -390,6 +394,7 @@ $Project
 		$File	"func_dust.cpp"
 		$File	"$SRCDIR\game\shared\func_dust_shared.h"
 		$File	"$SRCDIR\game\shared\func_ladder.cpp"
+		$File	"$SRCDIR\game\shared\func_simpleladder.cpp"
 		$File	"func_ladder_endpoint.cpp"
 		$File	"func_lod.cpp"
 		$File	"func_movelinear.cpp"
@@ -1052,7 +1057,11 @@ $Project
 		$Lib	particles
 		$Lib	tier2
 		$Lib	tier3
-		$Lib	lua5.1
+		
+		$Lib    "$LIBCOMMON/lzma"
+        $Lib	"lua54"
+        $Lib	"luasocket"
+        $Lib    "libpng"
 
 		$ImpLibexternal steam_api	[!$WIN64]
 		$ImpLibexternal steam_api64	[$WIN64]

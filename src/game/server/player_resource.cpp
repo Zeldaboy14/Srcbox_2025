@@ -183,3 +183,35 @@ int CPlayerResource::GetTeam( int iIndex )
 		return m_iTeam[iIndex];
 	}
 }
+
+#ifdef LUA_SDK
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+bool CPlayerResource::IsConnected(int iIndex)
+{
+	if (iIndex < 1 || iIndex > MAX_PLAYERS)
+		return false;
+	else
+		return m_bConnected[iIndex];
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+bool CPlayerResource::IsAlive(int iIndex)
+{
+	return m_bAlive[iIndex];
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+int CPlayerResource::GetPing(int index)
+{
+	if (!IsConnected(index))
+		return 0;
+
+	return m_iPing[index];
+}
+#endif

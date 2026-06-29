@@ -355,4 +355,11 @@ IEntitySaveUtils *GetEntitySaveUtils();
 
 //=============================================================================
 
+#ifdef LUA_SDK
+void PushLuaDataMap( lua_State *L, void *pObject, datamap_t *pMap, bool showAll );
+void PushLuaSaveTable( lua_State *L, void *pObject, datamap_t *pMap, bool showAll );
+bool PushLuaSaveTableField( lua_State *L, void *pObject, datamap_t *pMap, const char *pszFieldName );
+bool SetLuaSaveTableField( lua_State *L, void *pObject, datamap_t *pMap, const char *pszFieldName );
+#endif
+
 #endif // SAVERESTORE_H

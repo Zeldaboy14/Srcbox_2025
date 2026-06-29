@@ -9,9 +9,9 @@
 #include "./GameUI/IGameUI.h"
 #include "ienginevgui.h"
 #include "engine/ienginesound.h"
-#include "EngineInterface.h"
+#include "../EngineInterface.h"
 #include "tier0/dbg.h"
-#include "GameUI_Interface.h"
+#include "../GameUI_Interface.h"
 #include "game/client/IGameClientExports.h"
 #include "gameui/igameconsole.h"
 #include "inputsystem/iinputsystem.h"
@@ -37,21 +37,22 @@
 #include "VFooterPanel.h"
 #include "VPasswordEntry.h"
 #include "VVideo.h"
-#include "gameconsole.h"
+#include "../gameconsole.h"
 #include "vgui/ISystem.h"
 #include "vgui/ISurface.h"
 #include "vgui/ILocalize.h"
 #include "vgui_controls/AnimationController.h"
-#include "gameui_util.h"
+#include "../gameui_util.h"
 #include "vguimatsurface/imatsystemsurface.h"
 #include "materialsystem/imaterialsystem.h"
 #include "materialsystem/imesh.h"
 #include "tier0/icommandline.h"
 #include "fmtstr.h"
 #include "smartptr.h"
-#include "nb_header_footer.h"
+#include "../vgui/nb_header_footer.h"
 #include "cdll_client_int.h"
 #include "steam/steam_api.h"
+#include "vgamesettings.h"
 //Originally in vgui_int. Moved for vgui swarm!!!!
 //#include "IMyPanel.h"
 
@@ -267,7 +268,11 @@ CBaseModFrame* CBaseModPanel::OpenWindow(const WINDOW_TYPE & wt, CBaseModFrame *
 			break;
 
 		case WT_MAINMENU:
-			m_Frames[wt] = new MainMenu(this, "MainMenu");
+			//if (CommandLine()->FindParm("-gamepadui")) {
+				// Nothing to do here...
+			//} else {
+				m_Frames[wt] = new MainMenu(this, "MainMenu");
+			//}
 			break;
 
 		case WT_MULTIPLAYER:
@@ -294,6 +299,9 @@ CBaseModFrame* CBaseModPanel::OpenWindow(const WINDOW_TYPE & wt, CBaseModFrame *
 			m_Frames[wt] = new Video(this, "Video");
 			break;
 
+		case WT_GAMESETTINGS:
+			m_Frames[wt] = new GameSettings(this, "GameSettings");
+			break;
 
 		default:
 			Assert( false );	// unknown window type
@@ -1187,6 +1195,7 @@ void CBaseModPanel::DrawCopyStats()
 //=============================================================================
 void CBaseModPanel::PaintBackground()
 {
+#ifndef PLATFORM_64BITS
 	if ( !m_LevelLoading &&
 		!GameUI().IsInLevel() &&
 		!GameUI().IsInBackgroundLevel() )
@@ -1234,6 +1243,7 @@ void CBaseModPanel::PaintBackground()
 			}
 		}
 	}
+#endif
 }
 
 IVTFTexture *LoadVTF( CUtlBuffer &temp, const char *szFileName )

@@ -99,7 +99,18 @@ ConVar r_flashlightdepthres( "r_flashlightdepthres", "512" );
 ConVar r_flashlightdepthres( "r_flashlightdepthres", "1024" );
 #endif
 
-ConVar r_threaded_client_shadow_manager( "r_threaded_client_shadow_manager", "0" );
+#ifdef ASW_PROJECTED_TEXTURES
+ConVar r_threaded_client_shadow_manager("r_threaded_client_shadow_manager", "1");
+#else
+ConVar r_threaded_client_shadow_manager("r_threaded_client_shadow_manager", "0");
+#endif
+
+#ifdef ASW_PROJECTED_TEXTURES
+static ConVar r_shadow_lightpos_lerptime("r_shadow_lightpos_lerptime", "0.5");
+static ConVar r_shadowfromworldlights_debug("r_shadowfromworldlights_debug", "0", FCVAR_CHEAT);
+static ConVar r_shadow_shortenfactor("r_shadow_shortenfactor", "2", 0, "Makes shadows cast from local lights shorter");
+static ConVar r_shadow_mincastintensity("r_shadow_mincastintensity", "0.3", FCVAR_CHEAT, "Minimum brightness of a light to be classed as shadow casting", true, 0, false, 0);
+#endif
 
 #ifdef _WIN32
 #pragma warning( disable: 4701 )
@@ -842,6 +853,10 @@ private:
 
 	void BuildPerspectiveWorldToFlashlightMatrix( VMatrix& matWorldToShadow, const FlashlightState_t &flashlightState );
 
+#ifdef ASW_PROJECTED_TEXTURES
+	void BuildOrthoWorldToFlashlightMatrix(VMatrix& matWorldToShadow, const FlashlightState_t& flashlightState);
+#endif
+
 	// Update a shadow
 	void UpdateProjectedTextureInternal( ClientShadowHandle_t handle, bool force );
 
@@ -933,6 +948,11 @@ private:
 	// Set and clear flashlight target renderable
 	void	SetFlashlightTarget( ClientShadowHandle_t shadowHandle, EHANDLE targetEntity );
 
+#ifdef ASW_PROJECTED_TEXTURES
+	// Get current frustum extents
+	void GetFrustumExtents(ClientShadowHandle_t handle, Vector& vecMin, Vector& vecMax);
+#endif
+
 	// Set flashlight light world flag
 	void	SetFlashlightLightWorld( ClientShadowHandle_t shadowHandle, bool bLightWorld );
 
@@ -940,6 +960,11 @@ private:
 
 	// Builds a list of active shadows requiring shadow depth renders
 	int		BuildActiveShadowDepthList( const CViewSetup &viewSetup, int nMaxDepthShadows, ClientShadowHandle_t *pActiveDepthShadows );
+
+#ifdef ASW_PROJECTED_TEXTURES
+	// Builds a list of active flashlights
+	int BuildActiveFlashlightList(const CViewSetup& viewSetup, int nMaxFlashlights, ClientShadowHandle_t* pActiveFlashlights);
+#endif
 
 	// Sets the view's active flashlight render state
 	void	SetViewFlashlightState( int nActiveFlashlightCount, ClientShadowHandle_t* pActiveFlashlights );
@@ -962,6 +987,10 @@ private:
 	float m_flMinShadowArea;
 	CUtlRBTree< ClientShadowHandle_t, unsigned short >	m_DirtyShadows;
 	CUtlVector< ClientShadowHandle_t > m_TransparentShadows;
+
+#ifdef ASW_PROJECTED_TEXTURES
+	int m_nPrevFrameCount;
+#endif
 
 	// These members maintain current state of depth texturing (size and global active state)
 	// If either changes in a frame, PreRender() will catch it and do the appropriate allocation, deallocation or reallocation
@@ -1063,6 +1092,12 @@ void CVisibleShadowList::EnumShadow( unsigned short clientShadowHandle )
 	// Don't bother if we rendered it this frame, no matter which view it was rendered for
 	if ( shadow.m_nRenderFrame == gpGlobals->framecount )
 		return;
+
+#ifdef ASW_PROJECTED_TEXTURES
+	// Don't bother with flashlights
+	if ((shadow.m_Flags & SHADOW_FLAGS_FLASHLIGHT) != 0)
+		return;
+#endif
 
 	// We don't need to bother with it if it's not render-to-texture
 	if ( s_ClientShadowMgr.GetActualShadowCastType( clientShadowHandle ) != SHADOWS_RENDER_TO_TEXTURE )
@@ -1167,6 +1202,9 @@ int CVisibleShadowList::FindShadows( const CViewSetup *pView, int nLeafCount, Le
 //-----------------------------------------------------------------------------
 CClientShadowMgr::CClientShadowMgr() :
 	m_DirtyShadows( 0, 0, ShadowHandleCompareFunc ),
+#ifdef ASW_PROJECTED_TEXTURES
+	m_nPrevFrameCount(-1),
+#endif
 	m_RenderToTextureActive( false ),
 	m_bDepthTextureActive( false )
 {
@@ -1852,12 +1890,21 @@ ClientShadowHandle_t CClientShadowMgr::CreateProjectedTexture( ClientEntityHandl
 		pShadowProxyData = (void*)(uintp)h;
 	}
 
-	if( flags & SHADOW_FLAGS_USE_DEPTH_TEXTURE )
+#ifdef ASW_PROJECTED_TEXTURES
+	if ((flags & SHADOW_FLAGS_USE_DEPTH_TEXTURE) || (flags & (SHADOW_FLAGS_FLASHLIGHT)))
+	{
+		pShadowMaterial = NULL;  // these materials aren't used for shadow depth texture shadows.
+		pShadowModelMaterial = NULL;
+		pShadowProxyData = (void*)(uintp)h;
+	}
+#else
+	if (flags & SHADOW_FLAGS_USE_DEPTH_TEXTURE)
 	{
 		pShadowMaterial = m_RenderShadow;
 		pShadowModelMaterial = m_RenderModelShadow;
 		pShadowProxyData = (void*)(uintp)h;
 	}
+#endif
 
 	int createShadowFlags;
 	if( flags & SHADOW_FLAGS_FLASHLIGHT )
@@ -1920,9 +1967,29 @@ void CClientShadowMgr::UpdateFlashlightState( ClientShadowHandle_t shadowHandle,
 {
 	VPROF_BUDGET( "CClientShadowMgr::UpdateFlashlightState", VPROF_BUDGETGROUP_SHADOW_DEPTH_TEXTURING );
 
-	BuildPerspectiveWorldToFlashlightMatrix( m_Shadows[shadowHandle].m_WorldToShadow, flashlightState );
-											
-	shadowmgr->UpdateFlashlightState( m_Shadows[shadowHandle].m_ShadowHandle, flashlightState );
+#ifdef ASW_PROJECTED_TEXTURES
+	if (flashlightState.m_bEnableShadows && r_flashlightdepthtexture.GetBool())
+	{
+		m_Shadows[shadowHandle].m_Flags |= SHADOW_FLAGS_USE_DEPTH_TEXTURE;
+	}
+	else
+	{
+		m_Shadows[shadowHandle].m_Flags &= ~SHADOW_FLAGS_USE_DEPTH_TEXTURE;
+	}
+
+	if (flashlightState.m_bOrtho)
+	{
+		BuildOrthoWorldToFlashlightMatrix(m_Shadows[shadowHandle].m_WorldToShadow, flashlightState);
+	}
+	else
+	{
+		BuildPerspectiveWorldToFlashlightMatrix(m_Shadows[shadowHandle].m_WorldToShadow, flashlightState);
+	}
+#else
+	BuildPerspectiveWorldToFlashlightMatrix(m_Shadows[shadowHandle].m_WorldToShadow, flashlightState);
+#endif
+
+	shadowmgr->UpdateFlashlightState(m_Shadows[shadowHandle].m_ShadowHandle, flashlightState);
 }
 
 void CClientShadowMgr::DestroyFlashlight( ClientShadowHandle_t shadowHandle )
@@ -2030,6 +2097,43 @@ void CClientShadowMgr::BuildPerspectiveWorldToFlashlightMatrix( VMatrix& matWorl
 
 	MatrixMultiply( matPerspective, matWorldToShadowView, matWorldToShadow );
 }
+
+#ifdef ASW_PROJECTED_TEXTURES
+void CClientShadowMgr::BuildOrthoWorldToFlashlightMatrix(VMatrix& matWorldToShadow, const FlashlightState_t& flashlightState)
+{
+	VPROF_BUDGET("CClientShadowMgr::BuildPerspectiveWorldToFlashlightMatrix", VPROF_BUDGETGROUP_SHADOW_DEPTH_TEXTURING);
+
+	// Buildworld to shadow matrix, then perspective projection and concatenate
+	VMatrix matWorldToShadowView, matPerspective;
+	BuildWorldToShadowMatrix(matWorldToShadowView, flashlightState.m_vecLightOrigin, flashlightState.m_quatOrientation);
+
+	MatrixBuildOrtho(matPerspective,
+		flashlightState.m_fOrthoLeft,
+		flashlightState.m_fOrthoTop,
+		flashlightState.m_fOrthoRight,
+		flashlightState.m_fOrthoBottom,
+		flashlightState.m_NearZ,
+		flashlightState.m_FarZ);
+
+	// Shift it z/y to 0 to -2 space
+	VMatrix addW;
+	addW.Identity();
+	addW[0][3] = -1.0f;
+	addW[1][3] = -1.0f;
+	addW[2][3] = 0.0f;
+	MatrixMultiply(addW, matPerspective, matPerspective);
+
+	// Flip x/y to positive 0 to 1... flip z to negative
+	VMatrix scaleHalf;
+	scaleHalf.Identity();
+	scaleHalf[0][0] = -0.5f;
+	scaleHalf[1][1] = -0.5f;
+	scaleHalf[2][2] = -1.0f;
+	MatrixMultiply(scaleHalf, matPerspective, matPerspective);
+
+	MatrixMultiply(matPerspective, matWorldToShadowView, matWorldToShadow);
+}
+#endif
 
 //-----------------------------------------------------------------------------
 // Compute the shadow origin and attenuation start distance
@@ -2390,7 +2494,11 @@ void CClientShadowMgr::BuildOrthoShadow( IClientRenderable* pRenderable,
 
 	// Compute extra clip planes to prevent poke-thru
 // FIXME!!!!!!!!!!!!!!  Removing this for now since it seems to mess up the blobby shadows.
+#ifdef ASW_PROJECTED_TEXTURES
+	ComputeExtraClipPlanes(pRenderable, handle, vec, mins, maxs, localShadowDir);
+#else
 //	ComputeExtraClipPlanes( pEnt, handle, vec, mins, maxs, localShadowDir );
+#endif
 
 	// Add the shadow to the client leaf system so it correctly marks 
 	// leafs as being affected by a particular shadow
@@ -2893,6 +3001,14 @@ bool CClientShadowMgr::ShouldUseParentShadow( IClientRenderable *pRenderable )
 void CClientShadowMgr::PreRender()
 {
 	VPROF_BUDGET( "CClientShadowMgr::PreRender", VPROF_BUDGETGROUP_SHADOW_RENDERING );
+
+#ifdef ASW_PROJECTED_TEXTURES
+	// only update shadows once per frame
+	if (gpGlobals->framecount == m_nPrevFrameCount)
+		return;
+	m_nPrevFrameCount = gpGlobals->framecount;
+#endif
+
 	MDLCACHE_CRITICAL_SECTION();
 
 	//
@@ -3863,6 +3979,11 @@ void CClientShadowMgr::AdvanceFrame()
 //-----------------------------------------------------------------------------
 int CClientShadowMgr::BuildActiveShadowDepthList( const CViewSetup &viewSetup, int nMaxDepthShadows, ClientShadowHandle_t *pActiveDepthShadows )
 {
+#ifdef ASW_PROJECTED_TEXTURES
+	Frustum_t viewFrustum;
+	GeneratePerspectiveFrustum(viewSetup.origin, viewSetup.angles, viewSetup.zNear, viewSetup.zFar, viewSetup.fov, viewSetup.m_flAspectRatio, viewFrustum);
+#endif
+
 	int nActiveDepthShadowCount = 0;
 	for ( ClientShadowHandle_t i = m_Shadows.Head(); i != m_Shadows.InvalidIndex(); i = m_Shadows.Next(i) )
 	{
@@ -3879,19 +4000,27 @@ int CClientShadowMgr::BuildActiveShadowDepthList( const CViewSetup &viewSetup, i
 			continue;
 
 		// Calculate an AABB around the shadow frustum
-		/*Vector vecAbsMins, vecAbsMaxs;
-		CalculateAABBFromProjectionMatrix( shadow.m_WorldToShadow, &vecAbsMins, &vecAbsMaxs );
+#if ASW_PROJECTED_TEXTURES
+		Vector vecAbsMins, vecAbsMaxs;
+#else
+		//Vector vecAbsMins, vecAbsMaxs;
+#endif
+		/*CalculateAABBFromProjectionMatrix( shadow.m_WorldToShadow, &vecAbsMins, &vecAbsMaxs );
 
 		Frustum_t viewFrustum;
 		GeneratePerspectiveFrustum( viewSetup.origin, viewSetup.angles, viewSetup.zNear, viewSetup.zFar, viewSetup.fov, viewSetup.m_flAspectRatio, viewFrustum );
 
 		// FIXME: Could do other sorts of culling here, such as frustum-frustum test, distance etc.
-		// If it's not in the view frustum, move on
-		if ( R_CullBox( vecAbsMins, vecAbsMaxs, viewFrustum ) )
+		// If it's not in the view frustum, move on*/
+#if ASW_PROJECTED_TEXTURES
+		if (!flashlightState.m_bOrtho && R_CullBox(vecAbsMins, vecAbsMaxs, viewFrustum))
+#else
+		//if (R_CullBox(vecAbsMins, vecAbsMaxs, viewFrustum))
+#endif
 		{
 			shadowmgr->SetFlashlightDepthTexture( shadow.m_ShadowHandle, NULL, 0 );
 			continue;
-		}*/
+		}
 
 		if ( nActiveDepthShadowCount >= nMaxDepthShadows )
 		{
@@ -3911,6 +4040,52 @@ int CClientShadowMgr::BuildActiveShadowDepthList( const CViewSetup &viewSetup, i
 	return nActiveDepthShadowCount;
 }
 
+#ifdef ASW_PROJECTED_TEXTURES
+//-----------------------------------------------------------------------------
+// Re-render shadow depth textures that lie in the leaf list
+//-----------------------------------------------------------------------------
+int CClientShadowMgr::BuildActiveFlashlightList(const CViewSetup& viewSetup, int nMaxFlashlights, ClientShadowHandle_t* pActiveFlashlights)
+{
+	int nActiveFlashlightCount = 0;
+	for (ClientShadowHandle_t i = m_Shadows.Head(); i != m_Shadows.InvalidIndex(); i = m_Shadows.Next(i))
+	{
+		ClientShadow_t& shadow = m_Shadows[i];
+
+		if ((shadow.m_Flags & SHADOW_FLAGS_FLASHLIGHT) == 0)
+			continue;
+
+		// Calculate an AABB around the shadow frustum
+		Vector vecAbsMins, vecAbsMaxs;
+		CalculateAABBFromProjectionMatrix(shadow.m_WorldToShadow, &vecAbsMins, &vecAbsMaxs);
+
+		Frustum_t viewFrustum;
+		GeneratePerspectiveFrustum(viewSetup.origin, viewSetup.angles, viewSetup.zNear, viewSetup.zFar, viewSetup.fov, viewSetup.m_flAspectRatio, viewFrustum);
+
+		// FIXME: Could do other sorts of culling here, such as frustum-frustum test, distance etc.
+		// If it's not in the view frustum, move on
+		if (R_CullBox(vecAbsMins, vecAbsMaxs, viewFrustum))
+		{
+			continue;
+		}
+
+		if (nActiveFlashlightCount >= nMaxFlashlights)
+		{
+			static bool s_bOverflowWarning = false;
+			if (!s_bOverflowWarning)
+			{
+				Warning("Too many flashlights rendered in a single view!\n");
+				Assert(0);
+				s_bOverflowWarning = true;
+			}
+			// shadowmgr->SetFlashlightDepthTexture( shadow.m_ShadowHandle, NULL, 0 );
+			continue;
+		}
+
+		pActiveFlashlights[nActiveFlashlightCount++] = i;
+	}
+	return nActiveFlashlightCount;
+}
+#endif
 
 //-----------------------------------------------------------------------------
 // Sets the view's active flashlight render state
@@ -3935,6 +4110,38 @@ void CClientShadowMgr::SetViewFlashlightState( int nActiveFlashlightCount, Clien
 	}
 }
 
+#ifdef ASW_PROJECTED_TEXTURES
+void AddPointToExtentsHelper(const VMatrix& flashlightToWorld, const Vector& vecPos, Vector& vecMin, Vector& vecMax)
+{
+	Vector worldSpacePos;
+
+	Vector3DMultiplyPositionProjective(flashlightToWorld, vecPos, worldSpacePos);
+	VectorMin(vecMin, worldSpacePos, vecMin);
+	VectorMax(vecMax, worldSpacePos, vecMax);
+}
+
+void CClientShadowMgr::GetFrustumExtents(ClientShadowHandle_t handle, Vector& vecMin, Vector& vecMax)
+{
+	Assert(m_Shadows.IsValidIndex(handle));
+
+	CClientShadowMgr::ClientShadow_t& shadow = m_Shadows[handle];
+
+	VMatrix flashlightToWorld;
+	MatrixInverseGeneral(shadow.m_WorldToShadow, flashlightToWorld);
+
+	vecMin = Vector(FLT_MAX, FLT_MAX, FLT_MAX);
+	vecMax = Vector(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+
+	AddPointToExtentsHelper(flashlightToWorld, Vector(0.0f, 0.0f, 0.0f), vecMin, vecMax);
+	AddPointToExtentsHelper(flashlightToWorld, Vector(0.0f, 0.0f, 1.0f), vecMin, vecMax);
+	AddPointToExtentsHelper(flashlightToWorld, Vector(0.0f, 1.0f, 0.0f), vecMin, vecMax);
+	AddPointToExtentsHelper(flashlightToWorld, Vector(1.0f, 0.0f, 0.0f), vecMin, vecMax);
+	AddPointToExtentsHelper(flashlightToWorld, Vector(0.0f, 1.0f, 1.0f), vecMin, vecMax);
+	AddPointToExtentsHelper(flashlightToWorld, Vector(1.0f, 0.0f, 1.0f), vecMin, vecMax);
+	AddPointToExtentsHelper(flashlightToWorld, Vector(1.0f, 1.0f, 0.0f), vecMin, vecMax);
+	AddPointToExtentsHelper(flashlightToWorld, Vector(1.0f, 1.0f, 1.0f), vecMin, vecMax);
+}
+#endif
 
 //-----------------------------------------------------------------------------
 // Re-render shadow depth textures that lie in the leaf list
@@ -3942,6 +4149,17 @@ void CClientShadowMgr::SetViewFlashlightState( int nActiveFlashlightCount, Clien
 void CClientShadowMgr::ComputeShadowDepthTextures( const CViewSetup &viewSetup )
 {
 	VPROF_BUDGET( "CClientShadowMgr::ComputeShadowDepthTextures", VPROF_BUDGETGROUP_SHADOW_DEPTH_TEXTURING );
+
+#ifdef ASW_PROJECTED_TEXTURES
+	if (!r_flashlightdepthtexture.GetBool())
+	{
+		// Build list of active flashlights
+		ClientShadowHandle_t pActiveFlashlights[16];
+		int nActiveFlashlights = BuildActiveFlashlightList(viewSetup, ARRAYSIZE(pActiveFlashlights), pActiveFlashlights);
+		SetViewFlashlightState(nActiveFlashlights, pActiveFlashlights);
+		return;
+	}
+#endif
 
 	CMatRenderContextPtr pRenderContext( materials );
 	PIXEVENT( pRenderContext, "Shadow Depth Textures" );
@@ -3955,6 +4173,10 @@ void CClientShadowMgr::ComputeShadowDepthTextures( const CViewSetup &viewSetup )
 	for ( int j = 0; j < nActiveDepthShadowCount; ++j )
 	{
 		ClientShadow_t& shadow = m_Shadows[ pActiveDepthShadows[j] ];
+
+#ifdef ASW_PROJECTED_TEXTURES
+		FlashlightState_t& flashlightState = const_cast<FlashlightState_t&>(shadowmgr->GetFlashlightState(shadow.m_ShadowHandle));
+#endif
 
 		CTextureReference shadowDepthTexture;
 		bool bGotShadowDepthTexture = LockShadowDepthTexture( &shadowDepthTexture );
@@ -3980,11 +4202,30 @@ void CClientShadowMgr::ComputeShadowDepthTextures( const CViewSetup &viewSetup )
 		shadowView.x = shadowView.y = 0;
 		shadowView.width = shadowDepthTexture->GetActualWidth();
 		shadowView.height = shadowDepthTexture->GetActualHeight();
+#ifndef ASW_PROJECTED_TEXTURES
 		shadowView.m_bOrtho = false;
 		shadowView.m_bDoBloomAndToneMapping = false;
+#endif
 
 		// Copy flashlight parameters
-		const FlashlightState_t& flashlightState = shadowmgr->GetFlashlightState( shadow.m_ShadowHandle );
+#ifdef ASW_PROJECTED_TEXTURES
+		if (!flashlightState.m_bOrtho)
+		{
+			shadowView.m_bOrtho = false;
+		}
+		else
+		{
+			shadowView.m_bOrtho = true;
+			shadowView.m_OrthoLeft = flashlightState.m_fOrthoLeft;
+			shadowView.m_OrthoTop = flashlightState.m_fOrthoTop;
+			shadowView.m_OrthoRight = flashlightState.m_fOrthoRight;
+			shadowView.m_OrthoBottom = flashlightState.m_fOrthoBottom;
+		}
+
+		shadowView.m_bDoBloomAndToneMapping = false;
+#else
+		const FlashlightState_t& flashlightState = shadowmgr->GetFlashlightState(shadow.m_ShadowHandle);
+#endif
 		shadowView.fov = shadowView.fovViewmodel = flashlightState.m_fHorizontalFOVDegrees;
 		shadowView.origin = flashlightState.m_vecLightOrigin;
 		QuaternionAngles( flashlightState.m_quatOrientation, shadowView.angles ); // Convert from Quaternion to QAngle
@@ -4029,7 +4270,11 @@ void CClientShadowMgr::ComputeShadowTextures( const CViewSetup &viewShadow, int 
 	if ( !m_RenderToTextureActive || (r_shadows.GetInt() == 0) || r_shadows_gamecontrol.GetInt() == 0 )
 		return;
 
-	m_bThreaded = false;//( r_threaded_client_shadow_manager.GetBool() && g_pThreadPool->NumIdleThreads() );
+#ifdef ASW_PROJECTED_TEXTURES
+	m_bThreaded = (r_threaded_client_shadow_manager.GetBool() && g_pThreadPool->NumIdleThreads());
+#else
+	m_bThreaded = false;  //( r_threaded_client_shadow_manager.GetBool() && g_pThreadPool->NumIdleThreads() );
+#endif
 
 	MDLCACHE_CRITICAL_SECTION();
 	// First grab all shadow textures we may want to render

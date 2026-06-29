@@ -1184,6 +1184,10 @@ void CHL2_Player::Spawn(void)
 #endif
 #endif
 
+#ifdef PORTAL_DLL
+	SetModel("models/player/chell.mdl");
+#endif
+
 	BaseClass::Spawn();
 
 	//
@@ -2266,6 +2270,16 @@ void CHL2_Player::SetFlashlightEnabled( bool bState )
 	m_bFlashlightDisabled = !bState;
 }
 
+#ifdef LUA_SDK
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+bool CHL2_Player::GetFlashlightEnabled()
+{
+	return m_bFlashlightDisabled;
+}
+#endif
+
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void CHL2_Player::InputDisableFlashlight( inputdata_t &inputdata )
@@ -2732,10 +2746,10 @@ bool CHL2_Player::Weapon_CanUse( CBaseCombatWeapon *pWeapon )
 void CHL2_Player::Weapon_Equip( CBaseCombatWeapon *pWeapon )
 {
 #if LUA_SDK
-	BEGIN_LUA_CALL_HOOK("Weapon_Equip");
-	lua_pushplayer(L, this);
-	lua_pushweapon(L, pWeapon);
-	END_LUA_CALL_HOOK(2, 0);
+    LUA_CALL_HOOK_BEGIN( "Weapon_Equip" );
+    CBasePlayer::PushLuaInstanceSafe( L, this );
+    CBaseCombatWeapon::PushLuaInstanceSafe( L, pWeapon );
+    LUA_CALL_HOOK_END( 2, 0 );
 #endif
 
 #if	HL2_SINGLE_PRIMARY_WEAPON_MODE

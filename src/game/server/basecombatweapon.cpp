@@ -82,10 +82,14 @@ BEGIN_ENT_SCRIPTDESC( CBaseCombatWeapon, BASECOMBATWEAPON_DERIVED_FROM, "Base Co
 	DEFINE_SCRIPTFUNC( Clip1, "Current ammo in clip1" )
 	DEFINE_SCRIPTFUNC( Clip2, "Current ammo in clip2" )
 	DEFINE_SCRIPTFUNC( SetClip1, "Set current ammo in clip1" )
+	//DEFINE_SCRIPTFUNC( ScriptSetClip1, "[Vscript] Set current ammo in clip1" )
 	DEFINE_SCRIPTFUNC( SetClip2, "Set current ammo in clip2" )
+	//DEFINE_SCRIPTFUNC( ScriptSetClip2, "[Vscript] Set current ammo in clip2" )
 	DEFINE_SCRIPTFUNC( GetPrimaryAmmoCount, "Current primary ammo count if no clip is used or to give a player if they pick up this weapon legacy style (not TF)" )
 	DEFINE_SCRIPTFUNC( GetSecondaryAmmoCount, "Current secondary ammo count if no clip is used or to give a player if they pick up this weapon legacy style (not TF)" )
 END_SCRIPTDESC();
+
+#define GetDefaultAmmo GetPrimaryAmmoType
 
 ConVar weapon_showproficiency( "weapon_showproficiency", "0" );
 extern ConVar ai_debug_shoot_positions;
@@ -605,7 +609,8 @@ void CBaseCombatWeapon::Materialize( void )
 	{
 		// changing from invisible state to visible.
 #ifdef HL2MP
-		EmitSound( "AlyxEmp.Charge" );
+		//EmitSound( "AlyxEmp.Charge" );
+		EmitSound( "BaseCombatWeapon.WeaponMaterialize" );
 #else
 		EmitSound( "BaseCombatWeapon.WeaponMaterialize" );
 #endif

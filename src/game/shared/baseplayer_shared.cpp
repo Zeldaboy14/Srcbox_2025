@@ -56,7 +56,9 @@
 
 #ifdef LUA_SDK
 #include "luamanager.h"
+#include "luasrclib.h"
 #include "lbaseplayer_shared.h"
+#include "lbaseentity_shared.h"
 #include "mathlib/lvector.h"
 #endif
 
@@ -142,6 +144,21 @@ void CopySoundNameWithModifierToken( char *pchDest, const char *pchSource, int n
 
 	pchDest[ nDest ] = '\0';
 }
+
+#ifndef NO_STEAM
+uint CBasePlayer::GetUniqueID()
+{
+/*	CSteamID steamID = GetSteamIDForPlayerIndex(entindex());
+	const char* pszSteamID = steamID.Render();
+
+	char uniqueID[64];
+	Q_snprintf(uniqueID, sizeof(uniqueID), "gm_%s_gm", pszSteamID);
+
+	return CRC32_ProcessSingleBuffer(uniqueID, Q_strlen(uniqueID));
+	*/
+	return 0;
+}
+#endif
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -866,6 +883,16 @@ bool CBasePlayer::Weapon_Switch( CBaseCombatWeapon *pWeapon, int viewmodelindex 
 	return false;
 }
 
+CBaseAnimating* CBasePlayer::GetHands()
+{
+	return dynamic_cast<CBaseAnimating*>(m_hHandsEntity.Get());
+}
+
+void CBasePlayer::SetHands(CBaseAnimating* pHandsEntity)
+{
+	m_hHandsEntity = pHandsEntity;
+}
+
 void CBasePlayer::SelectLastItem(void)
 {
 	if ( m_hLastWeapon.Get() == NULL )
@@ -1280,13 +1307,6 @@ CBaseEntity *CBasePlayer::FindUseEntity()
 //-----------------------------------------------------------------------------
 void CBasePlayer::PlayerUse ( void )
 {
-#if defined ( LUA_SDK )
-	BEGIN_LUA_CALL_HOOK("PlayerUse");
-	lua_pushplayer(L, this);
-	END_LUA_CALL_HOOK(1, 0);
-#endif
-
-
 #ifdef GAME_DLL
 	// Was use pressed or released?
 	if ( ! ((m_nButtons | m_afButtonPressed | m_afButtonReleased) & IN_USE) )
@@ -1544,39 +1564,52 @@ void CBasePlayer::ResetObserverMode()
 //			zFar - 
 //			fov - 
 //-----------------------------------------------------------------------------
-void CBasePlayer::CalcView( Vector &eyeOrigin, QAngle &eyeAngles, float &zNear, float &zFar, float &fov )
+void CBasePlayer::CalcView( CViewSetup &viewSetup )
 {
 #if defined( CLIENT_DLL )
-	IClientVehicle *pVehicle; 
+    IClientVehicle *pVehicle;
 #else
-	IServerVehicle *pVehicle;
+    IServerVehicle *pVehicle;
 #endif
-	pVehicle = GetVehicle();
+    pVehicle = GetVehicle();
 
-	if ( !pVehicle )
-	{
-#if defined( CLIENT_DLL )
-		if( UseVR() )
-			g_ClientVirtualReality.CancelTorsoTransformOverride();
+#ifdef CLIENT_DLL
+    bool bOldForceDrawLocalPlayer = m_bCalcViewForceDrawPlayer;
 #endif
 
-		if ( IsObserver() )
-		{
-			CalcObserverView( eyeOrigin, eyeAngles, fov );
-		}
-		else
-		{
-			CalcPlayerView( eyeOrigin, eyeAngles, fov );
-		}
-	}
-	else
-	{
-		CalcVehicleView( pVehicle, eyeOrigin, eyeAngles, zNear, zFar, fov );
-	}
-	// NVNT update fov on the haptics dll for input scaling.
+    m_bCalcViewForceDrawPlayer = false;
+
+    if ( !pVehicle )
+    {
 #if defined( CLIENT_DLL )
-	if(IsLocalPlayer() && haptics)
-		haptics->UpdatePlayerFOV(fov);
+        if ( UseVR() )
+            g_ClientVirtualReality.CancelTorsoTransformOverride();
+#endif
+
+        if ( IsObserver() )
+        {
+            CalcObserverView( viewSetup.origin, viewSetup.angles, viewSetup.fov );
+        }
+        else
+        {
+            CalcPlayerView( viewSetup, m_bCalcViewForceDrawPlayer );
+        }
+    }
+    else
+    {
+        CalcVehicleView( pVehicle, viewSetup, m_bCalcViewForceDrawPlayer );
+    }
+    // NVNT update fov on the haptics dll for input scaling.
+#if defined( CLIENT_DLL )
+    if ( IsLocalPlayer() && haptics )
+        haptics->UpdatePlayerFOV( viewSetup.fov );
+#endif
+
+#ifdef CLIENT_DLL
+    if ( m_bCalcViewForceDrawPlayer && bOldForceDrawLocalPlayer != m_bCalcViewForceDrawPlayer )
+    {
+        ThirdPersonSwitch( m_bCalcViewForceDrawPlayer );
+    }
 #endif
 }
 
@@ -1593,7 +1626,94 @@ void CBasePlayer::CalcViewModelView( const Vector& eyeOrigin, const QAngle& eyeA
 	}
 }
 
-void CBasePlayer::CalcPlayerView( Vector& eyeOrigin, QAngle& eyeAngles, float& fov )
+#ifdef LUA_SDK
+void PopCalcViewFromLuaTable( lua_State *L, CViewSetup &viewSetup, bool &bForceDrawLocalPlayer )
+{
+    if ( lua_istable( L, -1 ) )
+    {
+        lua_getfield( L, -1, "origin" );
+        if ( lua_isvector( L, -1 ) )
+        {
+            viewSetup.origin = lua_tovector( L, -1 );
+        }
+        lua_pop( L, 1 );  // pop origin
+
+        lua_getfield( L, -1, "angles" );
+        if ( lua_isangle( L, -1 ) )
+        {
+            viewSetup.angles = lua_toangle( L, -1 );
+        }
+        lua_pop( L, 1 );  // pop angles
+
+        lua_getfield( L, -1, "fov" );
+        if ( lua_isnumber( L, -1 ) )
+        {
+            viewSetup.fov = lua_tonumber( L, -1 );
+        }
+        lua_pop( L, 1 );  // pop fov
+
+        lua_getfield( L, -1, "znear" );
+        if ( lua_isnumber( L, -1 ) )
+        {
+            viewSetup.zNear = lua_tonumber( L, -1 );
+        }
+        lua_pop( L, 1 );  // pop znear
+
+        lua_getfield( L, -1, "zfar" );
+        if ( lua_isnumber( L, -1 ) )
+        {
+            viewSetup.zFar = lua_tonumber( L, -1 );
+        }
+        lua_pop( L, 1 );  // pop zfar
+
+        lua_getfield( L, -1, "drawviewer" );
+        if ( lua_isboolean( L, -1 ) )
+        {
+            bForceDrawLocalPlayer = lua_toboolean( L, -1 );
+        }
+        lua_pop( L, 1 );  // pop drawviewer
+
+        lua_getfield( L, -1, "ortho" );  // table with left, right, top, bottom
+        if ( lua_istable( L, -1 ) )
+        {
+            viewSetup.m_bOrtho = true;
+
+            lua_getfield( L, -1, "left" );
+            if ( lua_isnumber( L, -1 ) )
+            {
+                viewSetup.m_OrthoLeft = lua_tonumber( L, -1 );
+            }
+            lua_pop( L, 1 );  // pop left
+
+            lua_getfield( L, -1, "right" );
+            if ( lua_isnumber( L, -1 ) )
+            {
+                viewSetup.m_OrthoRight = lua_tonumber( L, -1 );
+            }
+            lua_pop( L, 1 );  // pop right
+
+            lua_getfield( L, -1, "top" );
+            if ( lua_isnumber( L, -1 ) )
+            {
+                viewSetup.m_OrthoTop = lua_tonumber( L, -1 );
+            }
+            lua_pop( L, 1 );  // pop top
+
+            lua_getfield( L, -1, "bottom" );
+            if ( lua_isnumber( L, -1 ) )
+            {
+                viewSetup.m_OrthoBottom = lua_tonumber( L, -1 );
+            }
+            lua_pop( L, 1 );  // pop bottom
+        }
+        lua_pop( L, 1 );  // pop ortho
+    }
+
+    lua_pop( L, 1 );  // pop return value
+}
+#endif
+
+void CBasePlayer::CalcPlayerView(CViewSetup& viewSetup, bool& bForceDrawLocalPlayer)
 {
 #if defined( CLIENT_DLL )
 	if ( !prediction->InPrediction() )
@@ -1603,7 +1723,7 @@ void CBasePlayer::CalcPlayerView( Vector& eyeOrigin, QAngle& eyeAngles, float& f
 	}
 #endif
 
-	VectorCopy( EyePosition(), eyeOrigin );
+	VectorCopy( EyePosition(), viewSetup.origin);
 #ifdef SIXENSE
 	if ( g_pSixenseInput->IsEnabled() )
 	{
@@ -1614,30 +1734,30 @@ void CBasePlayer::CalcPlayerView( Vector& eyeOrigin, QAngle& eyeAngles, float& f
 		VectorCopy( EyeAngles(), eyeAngles );
 	}
 #else
-	VectorCopy( EyeAngles(), eyeAngles );
+	VectorCopy( EyeAngles(), viewSetup.angles);
 #endif
 
 #if defined( CLIENT_DLL )
 	if ( !prediction->InPrediction() )
 #endif
 	{
-		SmoothViewOnStairs( eyeOrigin );
+		SmoothViewOnStairs(viewSetup.origin);
 	}
 
 	// Snack off the origin before bob + water offset are applied
-	Vector vecBaseEyePosition = eyeOrigin;
+	Vector vecBaseEyePosition = viewSetup.origin;
 
-	CalcViewRoll( eyeAngles );
+	CalcViewRoll( viewSetup.angles );
 
 	// Apply punch angle
-	VectorAdd( eyeAngles, m_Local.m_vecPunchAngle, eyeAngles );
+	VectorAdd( viewSetup.angles, m_Local.m_vecPunchAngle, viewSetup.angles );
 
 #if defined( CLIENT_DLL )
 	if ( !prediction->InPrediction() )
 	{
 		// Shake it up baby!
 		vieweffects->CalcShake();
-		vieweffects->ApplyShake( eyeOrigin, eyeAngles, 1.0 );
+		vieweffects->ApplyShake( viewSetup.origin, viewSetup.angles, 1.0 );
 	}
 #endif
 
@@ -1645,29 +1765,24 @@ void CBasePlayer::CalcPlayerView( Vector& eyeOrigin, QAngle& eyeAngles, float& f
 	// Apply a smoothing offset to smooth out prediction errors.
 	Vector vSmoothOffset;
 	GetPredictionErrorSmoothingVector( vSmoothOffset );
-	eyeOrigin += vSmoothOffset;
+	viewSetup.origin += vSmoothOffset;
 	m_flObserverChaseDistance = 0.0;
 #endif
 
 	// calc current FOV
-	fov = GetFOV();
+	viewSetup.fov = GetFOV();
 
-#if defined( LUA_SDK )
-	BEGIN_LUA_CALL_HOOK("CalcPlayerView");
-	lua_pushplayer(L, this);
-	lua_pushvector(L, eyeOrigin);
-	lua_pushangle(L, eyeAngles);
-	lua_pushnumber(L, fov);
-	END_LUA_CALL_HOOK(4, 3);
+#ifdef LUA_SDK
+	LUA_CALL_HOOK_BEGIN("CalcView");
+	CBasePlayer::PushLuaInstanceSafe(L, this);
+	lua_pushvector(L, viewSetup.origin);
+	lua_pushangle(L, viewSetup.angles);
+	lua_pushnumber(L, viewSetup.fov);
+	lua_pushnumber(L, viewSetup.zNear);
+	lua_pushnumber(L, viewSetup.zFar);
+	LUA_CALL_HOOK_END(6, 1);
 
-	if (lua_isuserdata(L, -3) && luaL_checkudata(L, -3, "Vector"))
-		VectorCopy(luaL_checkvector(L, -3), eyeOrigin);
-	if (lua_isuserdata(L, -2) && luaL_checkudata(L, -2, "QAngle"))
-		VectorCopy(luaL_checkangle(L, -2), eyeAngles);
-	if (lua_isnumber(L, -1))
-		fov = luaL_checknumber(L, -1);
-
-	lua_pop(L, 3);
+	PopCalcViewFromLuaTable(L, viewSetup, bForceDrawLocalPlayer);
 #endif
 }
 
@@ -1680,38 +1795,38 @@ void CBasePlayer::CalcVehicleView(
 #else
 	IServerVehicle *pVehicle,
 #endif
-	Vector& eyeOrigin, QAngle& eyeAngles,
-	float& zNear, float& zFar, float& fov )
+    CViewSetup &viewSetup,
+    bool &bForceDrawLocalPlayer )
 {
 	Assert( pVehicle );
 
 	// Start with our base origin and angles
 	CacheVehicleView();
-	eyeOrigin = m_vecVehicleViewOrigin;
-	eyeAngles = m_vecVehicleViewAngles;
+    viewSetup.origin = m_vecVehicleViewOrigin;
+    viewSetup.angles = m_vecVehicleViewAngles;
 
 #if defined( CLIENT_DLL )
 
-	fov = GetFOV();
+    viewSetup.fov = GetFOV();
 
 	// Allows the vehicle to change the clip planes
-	pVehicle->GetVehicleClipPlanes( zNear, zFar );
+    pVehicle->GetVehicleClipPlanes( viewSetup.zNear, viewSetup.zFar );
 #endif
 
 	// Snack off the origin before bob + water offset are applied
-	Vector vecBaseEyePosition = eyeOrigin;
+    Vector vecBaseEyePosition = viewSetup.origin;
 
-	CalcViewRoll( eyeAngles );
+    CalcViewRoll( viewSetup.angles );
 
 	// Apply punch angle
-	VectorAdd( eyeAngles, m_Local.m_vecPunchAngle, eyeAngles );
+    VectorAdd( viewSetup.angles, m_Local.m_vecPunchAngle, viewSetup.angles );
 
 #if defined( CLIENT_DLL )
 	if ( !prediction->InPrediction() )
 	{
 		// Shake it up baby!
 		vieweffects->CalcShake();
-		vieweffects->ApplyShake( eyeOrigin, eyeAngles, 1.0 );
+        vieweffects->ApplyShake( viewSetup.origin, viewSetup.angles, 1.0 );
 	}
 #endif
 
@@ -2126,5 +2241,26 @@ bool fogparams_t::operator !=( const fogparams_t& other ) const
 		return true;
 
 	return false;
+}
+
+//terror
+
+//const char* SurvivorCharacterName(SurvivorCharacterType survivorCharacter)
+const char* SurvivorCharacterName(SurvivorCharacterType survivorCharacter)
+{
+	if (survivorCharacter == SURVIVOR_TEENGIRL)
+		return "TeenGirl";
+
+	if (survivorCharacter == SURVIVOR_NAMVET)
+		return "NamVet";
+
+	if (survivorCharacter == SURVIVOR_BIKER)
+		return "Biker";
+
+	if (survivorCharacter == SURVIVOR_MANAGER)
+		return "Manager";
+
+	//return "Unknown";
+	return "Coach";
 }
 

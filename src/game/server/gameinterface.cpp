@@ -119,12 +119,13 @@ extern ConVar tf_mm_servermode;
 #ifdef LUA_SDK
 #include "luamanager.h"
 #include "luacachefile.h"
-//#include "mountaddons.h"
+#include "mountaddons.h"
+#include <mountsteamcontent.h>
+#include <util/networkmanager.h>
 #endif
 
-#ifdef HL2SB
-#include "mountsteamcontent.h"
-#include "ticketfix.h"
+#ifdef WITH_ENGINE_PATCHES
+#include <../engine/engine_patches.h>
 #endif
 
 #ifdef CSTRIKE_DLL // BOTPORT: TODO: move these ifdefs out
@@ -231,6 +232,10 @@ INetworkStringTable *g_pStringTableMaterials = NULL;
 INetworkStringTable *g_pStringTableInfoPanel = NULL;
 INetworkStringTable *g_pStringTableClientSideChoreoScenes = NULL;
 INetworkStringTable *g_pStringTableServerMapCycle = NULL;
+
+#ifdef LUA_SDK
+INetworkStringTable* g_pStringTableLuaNetworkStrings = NULL;
+#endif
 
 #ifdef TF_DLL
 INetworkStringTable *g_pStringTableServerPopFiles = NULL;
@@ -587,7 +592,7 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 #ifdef SWARM_INTERFACE
 	if (CommandLine()->FindParm("-oldgameui")) {
 		// nothings here. we don't want to load a gameui like this. required for tools and such
-	} else if (CommandLine()->FindParm("-gamepadui")) {
+	//} else if (CommandLine()->FindParm("-gamepadui")) {
 		// don't load client for this either. load the newer gamepadui
 	} else {
 		static class DllOverride {
@@ -720,7 +725,7 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 	g_pGameSaveRestoreBlockSet->AddBlockHandler( GetEventQueueSaveRestoreBlockHandler() );
 	g_pGameSaveRestoreBlockSet->AddBlockHandler( GetAchievementSaveRestoreBlockHandler() );
 
-#ifdef HL2MP
+#if defined HL2MP
 	MountExtraContent();
 #endif
 
@@ -1005,31 +1010,9 @@ bool CServerGameDLL::LevelInit( const char *pMapName, char const *pMapEntities, 
 #endif // USES_ECON_ITEMS
 
 #ifdef LUA_SDK
-	lcf_recursivedeletefile(LUA_PATH_CACHE);
+    lcf_recursivedeletefile( LUA_PATH_CACHE );
 
-	// Add Lua environment
-	luasrc_init();
-
-	luasrc_dofolder(L, LUA_PATH_EXTENSIONS);
-	luasrc_dofolder(L, LUA_PATH_MODULES);
-	luasrc_dofolder(L, LUA_PATH_GAME_SHARED);
-	luasrc_dofolder(L, LUA_PATH_GAME_SERVER);
-
-	luasrc_LoadWeapons();
-	luasrc_LoadEntities();
-	// luasrc_LoadEffects();
-
-	//Andrew; loadup base gamemode.
-	luasrc_LoadGamemode(LUA_BASE_GAMEMODE);
-
-	luasrc_LoadGamemode(gamemode.GetString());
-	luasrc_SetGamemode(gamemode.GetString());
-
-	if (gpGlobals->maxClients > 1)
-	{
-		// load LCF into stringtable
-		lcf_preparecachefile();
-	}
+    luasrc_init();
 #endif
 
 	ResetWindspeed();
@@ -1141,14 +1124,14 @@ bool CServerGameDLL::LevelInit( const char *pMapName, char const *pMapEntities, 
 	m_fAutoSaveDangerousMinHealthToCommit = 0.0f;
 
 #if defined ( LUA_SDK )
-	BEGIN_LUA_CALL_HOOK("LevelInit");
+	LUA_CALL_HOOK_BEGIN("LevelInit");
 	lua_pushstring(L, pMapName);
 	lua_pushstring(L, pMapEntities);
 	lua_pushstring(L, pOldLevel);
 	lua_pushstring(L, pLandmarkName);
 	lua_pushboolean(L, loadGame);
 	lua_pushboolean(L, background);
-	END_LUA_CALL_HOOK(6, 0);
+	LUA_CALL_HOOK_END(6, 0);
 #endif
 	return true;
 }
@@ -1228,10 +1211,10 @@ void CServerGameDLL::ServerActivate( edict_t *pEdictList, int edictCount, int cl
 
 //Andrew; call activate on the gamemode
 #if defined ( LUA_SDK )
-	BEGIN_LUA_CALL_HOOK("ServerActivate");
+	LUA_CALL_HOOK_BEGIN("ServerActivate");
 	lua_pushinteger(L, edictCount);
 	lua_pushinteger(L, clientMax);
-	END_LUA_CALL_HOOK(2, 0);
+	LUA_CALL_HOOK_END(2, 0);
 #endif
 }
 
@@ -1372,6 +1355,11 @@ void CServerGameDLL::GameFrame( bool simulating )
 	g_NetworkPropertyEventMgr.FireEvents();
 
 	gpGlobals->frametime = oldframetime;
+
+#ifdef LUA_SDK
+    LUA_CALL_HOOK_BEGIN( "Tick" );
+    LUA_CALL_HOOK_END( 0, 0 );
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -1463,8 +1451,8 @@ void CServerGameDLL::LevelShutdown( void )
 #if defined ( LUA_SDK )
 	if (g_bLuaInitialized)
 	{
-		BEGIN_LUA_CALL_HOOK("LevelShutdown");
-		END_LUA_CALL_HOOK(0, 0);
+		LUA_CALL_HOOK_BEGIN("LevelShutdown");
+		LUA_CALL_HOOK_END(0, 0);
 	}
 #endif
 
@@ -1573,6 +1561,11 @@ void CServerGameDLL::CreateNetworkStringTables( void )
 	Assert( GetParticleSystemIndex( "error" ) == 0 );
 
 	CreateNetworkStringTables_GameRules();
+
+#ifdef LUA_SDK
+	g_pStringTableLuaNetworkStrings =
+		networkstringtable->CreateStringTable("LuaNetworkStrings", 4096);
+#endif
 
 	// Set up save/load utilities for string tables
 	g_VguiScreenStringOps.Init( g_pStringTableVguiScreen );
@@ -1941,10 +1934,10 @@ bool CServerGameDLL::ShouldHideServer( void )
 #if defined ( LUA_SDK )
 	if (g_bLuaInitialized)
 	{
-		BEGIN_LUA_CALL_HOOK("ShouldHideServer");
-		END_LUA_CALL_HOOK(0, 1);
+		LUA_CALL_HOOK_BEGIN("ShouldHideServer");
+		LUA_CALL_HOOK_END(0, 1);
 
-		RETURN_LUA_BOOLEAN();
+		LUA_RETURN_BOOLEAN();
 	}
 #endif
 
@@ -2797,6 +2790,15 @@ bool CServerGameClients::ClientConnect( edict_t *pEdict, const char *pszName, co
 {	
 	if ( !g_pGameRules )
 		return false;
+
+#ifdef LUA_SDK
+	// If an invalid gamemode was selected, don't allow the host player to connect
+	if (!g_bGamemodeLoaded)
+	{
+		Q_strncpy(reject, "Invalid gamemode selected", maxrejectlen);
+		return false;
+	}
+#endif
 	
 	return g_pGameRules->ClientConnected( pEdict, pszName, pszAddress, reject, maxrejectlen );
 }
@@ -3324,10 +3326,10 @@ void CServerGameClients::ClientVoice( edict_t *pEdict )
 void CServerGameClients::NetworkIDValidated( const char *pszUserName, const char *pszNetworkID )
 {
 #if defined ( LUA_SDK )
-	BEGIN_LUA_CALL_HOOK("NetworkIDValidated");
+	LUA_CALL_HOOK_BEGIN("NetworkIDValidated");
 	lua_pushstring(L, pszUserName);
 	lua_pushstring(L, pszNetworkID);
-	END_LUA_CALL_HOOK(2, 0);
+	LUA_CALL_HOOK_END(2, 0);
 #endif
 }
 

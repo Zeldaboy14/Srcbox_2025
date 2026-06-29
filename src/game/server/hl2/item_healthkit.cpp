@@ -34,6 +34,7 @@ public:
 };
 
 LINK_ENTITY_TO_CLASS( item_healthkit, CHealthKit );
+//LINK_ENTITY_TO_CLASS(item_healthkit_medium, CHealthKit );
 PRECACHE_REGISTER(item_healthkit);
 
 

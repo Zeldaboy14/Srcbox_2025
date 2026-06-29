@@ -507,7 +507,7 @@ void C_HLTVCamera::FixupMovmentParents()
 	}
 }
 
-void C_HLTVCamera::CalcView(Vector& origin, QAngle& angles, float& fov)
+void C_HLTVCamera::CalcView( CViewSetup &setupView )
 {
 	if ( m_bEntityPacketReceived )
 	{
@@ -516,32 +516,36 @@ void C_HLTVCamera::CalcView(Vector& origin, QAngle& angles, float& fov)
 		m_bEntityPacketReceived = false;
 	}
 
-	if ( m_iCameraMan > 0 )
+	if (m_iCameraMan > 0)
 	{
 		C_BasePlayer *pCameraMan = UTIL_PlayerByIndex( m_iCameraMan );
 		if ( pCameraMan )
 		{
 			float zNear,zFar;
-			pCameraMan->CalcView( origin, angles, zNear, zFar, fov );
-			pCameraMan->CalcViewModelView( origin, angles );
+			pCameraMan->CalcView( setupView );
+            //pCameraMan->CalcViewModelView( setupView.origin, setupView.angles );
 			return;
 		}
 	}
 
-	switch ( m_nCameraMode )
+	/*switch ( m_nCameraMode )
 	{
-		case OBS_MODE_ROAMING	:	CalcRoamingView( origin, angles, fov );
-									break;
+        case OBS_MODE_ROAMING:
+            CalcRoamingView( setupView.origin, setupView.angles, setupView.fov );
+            break;
 
-		case OBS_MODE_FIXED		:	CalcFixedView( origin, angles, fov );
-									break;
+        case OBS_MODE_FIXED:
+            CalcFixedView( setupView.origin, setupView.angles, setupView.fov );
+            break;
 
-		case OBS_MODE_IN_EYE	:	CalcInEyeCamView( origin, angles, fov );
-									break;
+        case OBS_MODE_IN_EYE:
+            CalcInEyeCamView( setupView.origin, setupView.angles, setupView.fov );
+            break;
 
-		case OBS_MODE_CHASE		:	CalcChaseCamView( origin, angles, fov  );
-									break;
-	}
+        case OBS_MODE_CHASE:
+            CalcChaseCamView( setupView.origin, setupView.angles, setupView.fov );
+            break;
+	}*/
 }
 
 void C_HLTVCamera::SetMode(int iMode)

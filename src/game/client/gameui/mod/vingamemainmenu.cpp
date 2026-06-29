@@ -10,12 +10,12 @@
 #include "VFooterPanel.h"
 #include "VFlyoutMenu.h"
 #include "VHybridButton.h"
-#include "EngineInterface.h"
+#include "../EngineInterface.h"
 
 #include "fmtstr.h"
 
 #include "game/client/IGameClientExports.h"
-#include "GameUI_Interface.h"
+#include "../GameUI_Interface.h"
 
 #include "vgui/ILocalize.h"
 #include "vgui_controls/Button.h"
@@ -24,7 +24,7 @@
 
 #include "materialsystem/materialsystem_config.h"
 
-#include "gameui_util.h"
+#include "../gameui_util.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -76,6 +76,13 @@ static void LeaveGameOkCallback()
 
 	CBaseModPanel::GetSingleton().CloseAllWindows();
 	CBaseModPanel::GetSingleton().OpenFrontScreen();
+}
+
+static void OpenInGameMainMenuCancelCallback()
+{
+	CBaseModPanel::GetSingleton().CloseAllWindows();
+	CBaseModPanel::GetSingleton().OpenInGameFrontScreen();
+
 }
 
 void ShowPlayerList();
@@ -206,19 +213,25 @@ void InGameMainMenu::OnCommand( const char *command )
 	}
 	else if( !Q_strcmp( command, "ExitToMainMenu" ) )
 	{
-		/*GenericConfirmation* confirmation =
-			static_cast< GenericConfirmation* >( CBaseModPanel::GetSingleton().OpenWindow( WT_GENERICCONFIRMATION, this, true ) );
+		if (ui_old_menus.GetBool())
+		{
+			engine->ClientCmd("OpenReturnToMainMenuDialog");
+		} else {
+			GenericConfirmation* confirmation =
+				static_cast< GenericConfirmation* >( CBaseModPanel::GetSingleton().OpenWindow( WT_GENERICCONFIRMATION, this, true ) );
 
-		GenericConfirmation::Data_t data;
+			GenericConfirmation::Data_t data;
 
-		data.pWindowTitle = "#L4D360UI_LeaveMultiplayerConf";
-		data.pMessageText = "#L4D360UI_LeaveMultiplayerConfMsg";
-		data.bOkButtonEnabled = true;
-		data.pfnOkCallback = &LeaveGameOkCallback;
-		data.bCancelButtonEnabled = true;
+			data.pWindowTitle = "#L4D360UI_LeaveMultiplayerConf";
+			data.pMessageText = "#L4D360UI_LeaveMultiplayerConfMsg";
+			data.bOkButtonEnabled = true;
+			data.pfnOkCallback = &LeaveGameOkCallback;
+			data.bCancelButtonEnabled = true;
+			data.pfnCancelCallback = &OpenInGameMainMenuCancelCallback;
 
-		confirmation->SetUsageData(data);
-		*/
+			confirmation->SetUsageData(data);
+			
+		}
 
 		InGameMainMenu* self =
 			static_cast<InGameMainMenu*>(CBaseModPanel::GetSingleton().GetWindow(WT_INGAMEMAINMENU));
@@ -227,8 +240,6 @@ void InGameMainMenu::OnCommand( const char *command )
 		{
 			self->Close();
 		}
-
-		engine->ClientCmd("OpenReturnToMainMenuDialog");
 	}
 	else if (!Q_strcmp(command, "OpenLegacyOptions"))
 	{

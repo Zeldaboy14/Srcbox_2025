@@ -12,15 +12,20 @@ $Include "$SRCDIR\game\server\server_base.vpc"
 $Include "$SRCDIR\game\server\nav_mesh.vpc"
 
 //-----------------------------------------
-// LUA from Half-Life 2: Sandbox (server)
+// Engine Patchs (Experiment)
 //-----------------------------------------
-//$Include "$SRCDIR\game\server\server_lua.vpc"
+$Include "$SRCDIR\engine\engine_patches_server.vpc"
+
+//-----------------------------------------
+// LUA from EXPERIMENT (server)
+//-----------------------------------------
+$Include "$SRCDIR\game\server\server_lua.vpc"
 
 $Configuration
 {
 	$Compiler
 	{
-		$AdditionalIncludeDirectories	"$BASE;$SRCDIR\game\shared\hl2,.\hl2,.\hl2mp,.\episodic,$SRCDIR\game\shared\hl2mp;$SRCDIR\game\shared\srcbox"
+		$AdditionalIncludeDirectories	"$BASE;$SRCDIR\game\shared\hl2,.\hl2,.\hl2mp,.\episodic,$SRCDIR\game\shared\hl2mp,$SRCDIR\game\shared\srcbox;"
 		$PreprocessorDefinitions		"$BASE;HL2MP;HL2_DLL;HL2_EPISODIC;NEXT_BOT;ASW_PROJECTED_TEXTURES;USES_SAVERESTORE"
 	}
 }
@@ -34,8 +39,13 @@ $Project "Server (HL2MP)"
 			$File	"hl2\weapon_citizenpackage.cpp"
 			$File	"hl2\weapon_citizenpackage.h"
 		}
+		$Folder "Gmod"
+		{
+			$File	"$SRCDIR\game\shared\gmod\env_skypaint.cpp"
+		}
 		$Folder "Srcbox"
 		{
+			$File	"$SRCDIR\game\shared\srcbox\srcbox_gamerules.cpp"
 			$File	"$SRCDIR\game\server\srcbox\tf\entity_ammopack.cpp"
 			$File	"$SRCDIR\game\server\srcbox\tf\entity_healthkit.cpp"
 			$File	"$SRCDIR\game\server\srcbox\tf\tf_powerup.cpp"
@@ -48,11 +58,9 @@ $Project "Server (HL2MP)"
 			}
 			$File	"terror\prop_car_alarm.cpp"
 		}
-		
-		$Folder	"HL2 DLL"
+		$Folder "Portal"
 		{
-			$File	"hl2\weapon_citizenpackage.cpp"
-			$File	"hl2\weapon_citizenpackage.h"
+			$File	"$SRCDIR\game\shared\portal\weapon_portalgun.cpp"
 		}
 		
 		$File	"ai_relationship.cpp"
@@ -170,6 +178,7 @@ $Project "Server (HL2MP)"
 
 		$Folder	"HL2 DLL"
 		{
+			$File	"$SRCDIR\game\shared\hl2\achievements_hl2.cpp"
 			$File	"$SRCDIR\game\shared\episodic\achievements_ep1.cpp"
 			$File	"$SRCDIR\game\shared\episodic\achievements_ep2.cpp"
 			$File	"$SRCDIR\game\shared\episodic\achievements_epx.cpp"
@@ -485,7 +494,6 @@ $Project "Server (HL2MP)"
 				$File	"$SRCDIR\game\shared\hl2mp\weapon_physcannon.cpp"
 				$File	"$SRCDIR\game\shared\hl2mp\weapon_physcannon.h"
 				$File	"$SRCDIR\game\shared\hl2mp\weapon_pistol.cpp"
-				$File	"$SRCDIR\game\shared\terror\weapon_pistol_terror.cpp"
 				$File	"$SRCDIR\game\shared\hl2mp\weapon_rpg.cpp"
 				$File	"$SRCDIR\game\shared\hl2mp\weapon_rpg.h"
 				$File	"$SRCDIR\game\shared\hl2mp\weapon_shotgun.cpp"

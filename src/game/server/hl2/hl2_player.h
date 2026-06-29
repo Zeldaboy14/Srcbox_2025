@@ -139,6 +139,9 @@ public:
 	float SuitPower_GetCurrentPercentage( void ) { return m_HL2Local.m_flSuitPower; }
 	
 	void SetFlashlightEnabled( bool bState );
+#ifdef LUA_SDK
+	bool GetFlashlightEnabled();
+#endif
 
 	// Apply a battery
 	bool ApplyBattery( float powerMultiplier = 1.0 );

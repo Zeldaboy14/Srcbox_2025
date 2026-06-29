@@ -11,7 +11,7 @@
 #include "vgui_controls/Controls.h"
 #include "FileSystem.h"
 #include "EngineInterface.h"
-#include "../mod/basemodpanel.h"
+#include "mod/basemodpanel.h"
 #include "basepanel.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

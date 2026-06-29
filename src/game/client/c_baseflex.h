@@ -177,6 +177,7 @@ public:
 	// indexed by model local flexcontroller
 	float			m_flexWeight[MAXSTUDIOFLEXCTRL];
 	CInterpolatedVarArray< float, MAXSTUDIOFLEXCTRL >	m_iv_flexWeight;
+	RenderGroup_t m_RenderGroup;
 
 	int				m_blinktoggle;
 
@@ -213,7 +214,7 @@ public:
 	virtual	bool		ClearSceneEvent( CSceneEventInfo *info, bool fastKill, bool canceled );
 
 	// Add the event to the queue for this actor
-#ifdef MAPBASE
+#ifdef SRCBOX
 	void				AddSceneEvent(CChoreoScene* scene, CChoreoEvent* event, C_BaseEntity* pTarget = NULL, bool bClientSide = false, C_SceneEntity* pSceneEntity = NULL);
 #else
 	void				AddSceneEvent( CChoreoScene *scene, CChoreoEvent *event, C_BaseEntity *pTarget = NULL, bool bClientSide = false );

@@ -22,6 +22,10 @@
 #include "gamestats.h"
 #include "ammodef.h"
 #include "NextBot.h"
+#include "bone_setup.h"
+#include "../Multiplayer/multiplayer_animstate.h"
+#include "hl2mp_playeranimstate.h"
+
 #ifdef LUA_SDK
 #include "luamanager.h"
 #include "lbaseentity_shared.h"
@@ -33,6 +37,9 @@
 #include "SoundEmitterSystem/isoundemittersystembase.h"
 
 #include "ilagcompensationmanager.h"
+
+extern ConVar srcbox_gamemode_sandbox;
+extern ConVar srcbox_gamemode_hl2;
 
 int g_iLastCitizenModel = 0;
 int g_iLastCombineModel = 0;
@@ -147,7 +154,11 @@ const char *g_ppszRandomCombineModels[] =
 
 #pragma warning( disable : 4355 )
 
-CHL2MP_Player::CHL2MP_Player() : m_PlayerAnimState()
+#ifdef LUA_SDK
+CHL2MP_Player::CHL2MP_Player()
+#else
+CHL2MP_Player::CHL2MP_Player() : m_PlayerAnimState( this )
+#endif
 {
 	m_angEyeAngles.Init();
 
@@ -215,52 +226,60 @@ void CHL2MP_Player::Precache( void )
 	PrecacheScriptSound( "NPC_Citizen.die" );
 }
 
-void CHL2MP_Player::GiveAllItems( void )
+void CHL2MP_Player::GiveAllItems(void)
 {
 	EquipSuit();
 
 	CBasePlayer::GiveAmmo(255, "Pistol");
-	CBasePlayer::GiveAmmo( 255,	"AR2" );
-	CBasePlayer::GiveAmmo( 5,	"AR2AltFire" );
-	CBasePlayer::GiveAmmo( 255,	"SMG1");
-	CBasePlayer::GiveAmmo( 1,	"smg1_grenade");
-	CBasePlayer::GiveAmmo( 255,	"Buckshot");
-	CBasePlayer::GiveAmmo( 32,	"357" );
-	CBasePlayer::GiveAmmo( 3,	"rpg_round");
-	CBasePlayer::GiveAmmo( 16,	"XBowBolt");
+	CBasePlayer::GiveAmmo(-1, "Pistol_Terror");
+	CBasePlayer::GiveAmmo(255, "AR2");
+	CBasePlayer::GiveAmmo(5, "AR2AltFire");
+	CBasePlayer::GiveAmmo(255, "SMG1");
+	CBasePlayer::GiveAmmo(1, "smg1_grenade");
+	CBasePlayer::GiveAmmo(255, "Buckshot");
+	CBasePlayer::GiveAmmo(32, "357");
+	CBasePlayer::GiveAmmo(3, "rpg_round");
+	CBasePlayer::GiveAmmo(16, "XBowBolt");
 
-	CBasePlayer::GiveAmmo( 1,	"grenade" );
-	CBasePlayer::GiveAmmo( 2,	"slam" );
+	CBasePlayer::GiveAmmo(1, "grenade");
+	CBasePlayer::GiveAmmo(2, "slam");
 
-	GiveNamedItem( "weapon_crowbar" );
-	GiveNamedItem( "weapon_stunstick" );
-	GiveNamedItem( "weapon_pistol" );
-	GiveNamedItem( "weapon_357" );
+	GiveNamedItem("weapon_crowbar");
+	GiveNamedItem("weapon_stunstick");
+	GiveNamedItem("weapon_pistol");
+	GiveNamedItem("weapon_357");
+	GiveNamedItem("weapon_pistol_terror");
 
-	GiveNamedItem( "weapon_smg1" );
-	GiveNamedItem( "weapon_ar2" );
-	
-	GiveNamedItem( "weapon_shotgun" );
-	GiveNamedItem( "weapon_frag" );
-	
-	GiveNamedItem( "weapon_crossbow" );
-	
-	GiveNamedItem( "weapon_rpg" );
+	GiveNamedItem("weapon_smg1");
+	GiveNamedItem("weapon_ar2");
 
-	GiveNamedItem( "weapon_slam" );
+	GiveNamedItem("weapon_shotgun");
+	GiveNamedItem("weapon_frag");
 
-	GiveNamedItem( "weapon_physcannon" );
-	GiveNamedItem( "weapon_physgun");
-	
+	GiveNamedItem("weapon_crossbow");
+
+	GiveNamedItem("weapon_rpg");
+
+	GiveNamedItem("weapon_slam");
+
+	GiveNamedItem("weapon_physcannon");
+	GiveNamedItem("weapon_physgun");
+	GiveNamedItem("weapon_portalgun");
 }
 
 void CHL2MP_Player::GiveDefaultItems( void )
 {
 #if defined ( LUA_SDK )
-	BEGIN_LUA_CALL_HOOK("GiveDefaultItems");
-	lua_pushhl2mpplayer(L, this);
-	END_LUA_CALL_HOOK(1, 0);
+    LUA_CALL_HOOK_BEGIN( "GiveDefaultItems" );
+    CHL2MP_Player::PushLuaInstanceSafe( L, this );
+    LUA_CALL_HOOK_END( 1, 0 );
 #else
+	if (srcbox_gamemode_sandbox.GetInt() == 1) {
+
+	const char* szDefaultWeaponName = engine->GetClientConVarValue(engine->IndexOfEdict(edict()), "cl_defaultweapon");
+
+	CBaseCombatWeapon* pDefaultWeapon = Weapon_OwnsThisType(szDefaultWeaponName);
+
 	EquipSuit();
 
 	/*CBasePlayer::GiveAmmo(255, "Pistol");
@@ -300,6 +319,7 @@ void CHL2MP_Player::GiveDefaultItems( void )
 	GiveNamedItem("weapon_frag");
 	GiveNamedItem("weapon_crowbar");
 	GiveNamedItem("weapon_pistol");
+	GiveNamedItem("weapon_pistol_terror");
 	GiveNamedItem("weapon_ar2");
 	GiveNamedItem("weapon_shotgun");
 	GiveNamedItem("weapon_physcannon");
@@ -310,10 +330,6 @@ void CHL2MP_Player::GiveDefaultItems( void )
 	GiveNamedItem("weapon_crossbow");
 	GiveNamedItem("weapon_physgun");
 
-	const char *szDefaultWeaponName = engine->GetClientConVarValue( engine->IndexOfEdict( edict() ), "cl_defaultweapon" );
-
-	CBaseCombatWeapon *pDefaultWeapon = Weapon_OwnsThisType( szDefaultWeaponName );
-
 	if ( pDefaultWeapon )
 	{
 		//Weapon_Switch( pDefaultWeapon );
@@ -323,6 +339,8 @@ void CHL2MP_Player::GiveDefaultItems( void )
 	{
 		Weapon_Switch( Weapon_OwnsThisType( "weapon_physgun" ) );
 	}
+	}
+	else {}
 #endif
 }
 
@@ -381,6 +399,7 @@ void CHL2MP_Player::PickDefaultSpawnTeam( void )
 //-----------------------------------------------------------------------------
 void CHL2MP_Player::Spawn(void)
 {
+	const char* command;
 	RemoveFlag(FL_FROZEN);
 
 	m_flNextModelChangeTime = 0.0f;
@@ -390,7 +409,7 @@ void CHL2MP_Player::Spawn(void)
 
 	BaseClass::Spawn();
 	
-	if ( !IsObserver() )
+	if (!IsObserver())
 	{
 		pl.deadflag = false;
 		RemoveSolidFlags( FSOLID_NOT_SOLID );
@@ -411,7 +430,7 @@ void CHL2MP_Player::Spawn(void)
 
 	m_impactEnergyScale = HL2MPPLAYER_PHYSDAMAGE_SCALE;
 
-	if ( HL2MPRules()->IsIntermission() )
+	if (HL2MPRules()->IsIntermission())
 	{
 		AddFlag( FL_FROZEN );
 	}
@@ -455,18 +474,18 @@ bool CHL2MP_Player::ValidatePlayerModel( const char *pModel )
 	return false;
 }
 
-ConVar hl2mp_allow_pickup( "hl2mp_allow_pickup", "0", FCVAR_GAMEDLL );
+ConVar hl2mp_allow_pickup( "hl2mp_allow_pickup", "1", FCVAR_GAMEDLL );
 
 void CHL2MP_Player::PickupObject( CBaseEntity* pObject, bool bLimitMassAndSize )
 {
 #ifdef LUA_SDK
-	BEGIN_LUA_CALL_HOOK("PlayerPickupObject");
-	lua_pushhl2mpplayer(L, this);
-	lua_pushentity(L, pObject);
+	LUA_CALL_HOOK_BEGIN("AllowPlayerPickup");
+	CHL2MP_Player::PushLuaInstanceSafe(L, this);
+	CBaseEntity::PushLuaInstanceSafe(L, pObject);
 	lua_pushboolean(L, bLimitMassAndSize);
-	END_LUA_CALL_HOOK(3, 1);
+	LUA_CALL_HOOK_END(3, 1);
 
-	RETURN_LUA_NONE();
+	LUA_RETURN_NONE_IF_FALSE();
 #endif
 
 	if ( !hl2mp_allow_pickup.GetBool() )
@@ -694,9 +713,9 @@ void CHL2MP_Player::PostThink( void )
 void CHL2MP_Player::PlayerDeathThink()
 {
 #if defined ( LUA_SDK )
-	BEGIN_LUA_CALL_HOOK("PlayerDeathThink");
-	lua_pushhl2mpplayer(L, this);
-	END_LUA_CALL_HOOK(1, 0);
+    LUA_CALL_HOOK_BEGIN( "PlayerDeathThink" );
+    CHL2MP_Player::PushLuaInstanceSafe( L, this );
+    LUA_CALL_HOOK_END( 1, 0 );
 #endif
 
 	if( !IsObserver() )
@@ -1155,12 +1174,12 @@ bool CHL2MP_Player::ClientCommand( const CCommand &args )
 void CHL2MP_Player::CheatImpulseCommands( int iImpulse )
 {
 #if defined ( LUA_SDK )
-	BEGIN_LUA_CALL_HOOK("CheatImpulseCommands");
-	lua_pushhl2mpplayer(L, this);
-	lua_pushinteger(L, iImpulse);
-	END_LUA_CALL_HOOK(2, 1);
+    LUA_CALL_HOOK_BEGIN( "CheatImpulseCommands" );
+    CHL2MP_Player::PushLuaInstanceSafe( L, this );
+    lua_pushinteger( L, iImpulse );
+    LUA_CALL_HOOK_END( 2, 1 );
 
-	RETURN_LUA_NONE();
+    LUA_RETURN_NONE_IF_FALSE();
 #endif
 
 	switch ( iImpulse )
@@ -1227,6 +1246,7 @@ bool CHL2MP_Player::BecomeRagdollOnClient( const Vector &force )
 // Ragdoll entities.
 // -------------------------------------------------------------------------------- //
 
+#ifndef LUA_SDK
 class CHL2MPRagdoll : public CBaseAnimatingOverlay
 {
 public:
@@ -1247,6 +1267,7 @@ public:
 	CNetworkVector( m_vecRagdollVelocity );
 	CNetworkVector( m_vecRagdollOrigin );
 };
+#endif
 
 LINK_ENTITY_TO_CLASS( hl2mp_ragdoll, CHL2MPRagdoll );
 
@@ -1467,14 +1488,14 @@ int CHL2MP_Player::OnTakeDamage( const CTakeDamageInfo &inputInfo )
 void CHL2MP_Player::DeathSound( const CTakeDamageInfo &info )
 {
 #if defined ( LUA_SDK )
-	CTakeDamageInfo lInfo = info;
+    CTakeDamageInfo lInfo = info;
 
-	BEGIN_LUA_CALL_HOOK("PlayerDeathSound");
-	lua_pushhl2mpplayer(L, this);
-	lua_pushdamageinfo(L, lInfo);
-	END_LUA_CALL_HOOK(2, 1);
+    LUA_CALL_HOOK_BEGIN( "PlayerDeathSound" );
+    CHL2MP_Player::PushLuaInstanceSafe( L, this );
+    lua_pushdamageinfo( L, lInfo );
+    LUA_CALL_HOOK_END( 2, 1 );
 
-	RETURN_LUA_NONE();
+    LUA_RETURN_NONE_IF_TRUE();
 #endif
 
 	if ( m_hRagdoll && m_hRagdoll->GetBaseAnimating()->IsDissolving() )
@@ -1510,15 +1531,24 @@ void CHL2MP_Player::DeathSound( const CTakeDamageInfo &info )
 CBaseEntity* CHL2MP_Player::EntSelectSpawnPoint( void )
 {
 #ifdef LUA_SDK
-	BEGIN_LUA_CALL_HOOK("PlayerEntSelectSpawnPoint");
-	lua_pushhl2mpplayer(L, this);
-	END_LUA_CALL_HOOK(1, 1);
+    LUA_CALL_HOOK_BEGIN( "PlayerEntSelectSpawnPoint" );
+    CHL2MP_Player::PushLuaInstanceSafe( L, this );
+    LUA_CALL_HOOK_END( 1, 1 );
 
-	RETURN_LUA_ENTITY();
+    LUA_RETURN_ENTITY();
+
+    // Experiment; Note that HL2SB has a bunch more code below that we
+    // didn't copy over. It handled choosing a spawn point based on the
+    // spawn point entities from CS:S, DoD:S, etc.
+	// Srcbox; Note that we need to copy that back over!
 #endif
 
 	CBaseEntity *pSpot = NULL;
 	CBaseEntity *pSpot2 = NULL;
+	CBaseEntity *pSpot3 = NULL;
+	CBaseEntity *pSpot4 = NULL;
+	CBaseEntity *pSpot5 = NULL;
+	CBaseEntity *pSpot6 = NULL;
 	CBaseEntity *pLastSpawnPoint = g_pLastSpawn;
 	edict_t		*player = edict();
 	const char *pSpawnpointName = "info_player_deathmatch";
@@ -1590,12 +1620,18 @@ CBaseEntity* CHL2MP_Player::EntSelectSpawnPoint( void )
 	{
 		pSpot = gEntList.FindEntityByClassname( pSpot, "info_player_start" );
 		pSpot2 = gEntList.FindEntityByClassname( pSpot2, "info_survivor_position" );
+		pSpot3 = gEntList.FindEntityByClassname( pSpot3, "info_survivor_rescue" );
+		pSpot4 = gEntList.FindEntityByClassname( pSpot4, "info_gamemode" );
+		pSpot5 = gEntList.FindEntityByClassname(pSpot5, "info_player_terrorist");
+		pSpot6 = gEntList.FindEntityByClassname(pSpot6, "info_player_counterterrorist");
 
 
 		if (pSpot)
 			goto ReturnSpot;
-		else if (!pSpot)
+		if (!pSpot)
 			return pSpot2;
+		//if (!pSpot && !pSpot2)
+			//return pSpot3;
 	}
 
 ReturnSpot:
@@ -1884,14 +1920,14 @@ bool CHL2MP_Player::IsThreatFiringAtMe( CBaseEntity* threat ) const
 // -------------------------------------------------------------------------------- //
 // Player animation event. Sent to the client when a player fires, jumps, reloads, etc..
 // -------------------------------------------------------------------------------- //
-
-/*class CTEPlayerAnimEvent : public CBaseTempEntity
+class CTEPlayerAnimEvent : public CBaseTempEntity
 {
 public:
 	DECLARE_CLASS(CTEPlayerAnimEvent, CBaseTempEntity);
 	DECLARE_SERVERCLASS();
 
-	CTEPlayerAnimEvent(const char* name) : CBaseTempEntity(name)
+	CTEPlayerAnimEvent(const char* name)
+		: CBaseTempEntity(name)
 	{
 	}
 
@@ -1900,6 +1936,7 @@ public:
 	CNetworkVar(int, m_nData);
 };
 
+#ifdef LUA_SDK
 IMPLEMENT_SERVERCLASS_ST_NOBASE(CTEPlayerAnimEvent, DT_TEPlayerAnimEvent)
 SendPropEHandle(SENDINFO(m_hPlayer)),
 SendPropInt(SENDINFO(m_iEvent), Q_log2(PLAYERANIMEVENT_COUNT) + 1, SPROP_UNSIGNED),
@@ -1912,7 +1949,7 @@ void TE_PlayerAnimEvent(CBasePlayer* pPlayer, PlayerAnimEvent_t event, int nData
 {
 	CPVSFilter filter((const Vector&)pPlayer->EyePosition());
 
-	//Tony; use prediction rules.
+	// Tony; use prediction rules.
 	filter.UsePredictionRules();
 
 	g_TEPlayerAnimEvent.m_hPlayer = pPlayer;
@@ -1921,27 +1958,34 @@ void TE_PlayerAnimEvent(CBasePlayer* pPlayer, PlayerAnimEvent_t event, int nData
 	g_TEPlayerAnimEvent.Create(filter, 0);
 }
 
-
 void CHL2MP_Player::DoAnimationEvent(PlayerAnimEvent_t event, int nData)
 {
+#ifdef LUA_SDK
 	m_PlayerAnimState->DoAnimationEvent(event, nData);
-	TE_PlayerAnimEvent(this, event, nData);	// Send to any clients who can see this guy.
+#endif
+	TE_PlayerAnimEvent(this, event, nData);  // Send to any clients who can see this guy.
 }
+
+#ifdef LUA_SDK
+bool CHL2MP_Player::KeyDown(int buttonCode)
+{
+	return m_nButtons & buttonCode;
+}
+#endif
 
 //-----------------------------------------------------------------------------
 // Purpose: Override setup bones so that is uses the render angles from
-//			the HL2MP animation state to setup the hitboxes.
+//			the Experiment animation state to setup the hitboxes.
 //-----------------------------------------------------------------------------
 void CHL2MP_Player::SetupBones(matrix3x4_t* pBoneToWorld, int boneMask)
 {
 	VPROF_BUDGET("CHL2MP_Player::SetupBones", VPROF_BUDGETGROUP_SERVER_ANIM);
 
-	// Set the mdl cache semaphore.
-	MDLCACHE_CRITICAL_SECTION();
-
 	// Get the studio header.
 	Assert(GetModelPtr());
 	CStudioHdr* pStudioHdr = GetModelPtr();
+	if (!pStudioHdr)
+		return;
 
 	Vector pos[MAXSTUDIOBONES];
 	Quaternion q[MAXSTUDIOBONES];
@@ -1994,9 +2038,10 @@ void CHL2MP_Player::SetupBones(matrix3x4_t* pBoneToWorld, int boneMask)
 		pos,
 		q,
 		-1,
-		1.0f,          // flScale (use 1.0f for no scaling, matches old behavior)
+		GetModelScale(),  // Scaling
 		pBoneToWorld,
-		boneMask
-	);
+		boneMask);
 }
-*/
+#endif
+
+

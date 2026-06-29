@@ -21,7 +21,7 @@ public:
 	void Init();
 	void Reset();
 
-	void CalcView(Vector& origin, QAngle& angles, float& fov);
+	void CalcView( CViewSetup& setupView );
 	void FireGameEvent( IGameEvent *event );
 
 	void SetMode(int iMode);

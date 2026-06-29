@@ -17,6 +17,8 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+#define LUA_SDK 1
+
 // Global Savedata for base trigger
 BEGIN_DATADESC( CBaseScriptedTrigger )
 
@@ -87,7 +89,8 @@ CBaseScriptedTrigger::CBaseScriptedTrigger( void )
 CBaseScriptedTrigger::~CBaseScriptedTrigger( void )
 {
 #ifdef LUA_SDK
-	lua_unref( L, m_nTableReference );
+    if ( L )
+        lua_unref( L, m_nTableReference );
 #endif
 }
 
@@ -116,11 +119,11 @@ void CBaseScriptedTrigger::LoadScriptedTrigger( void )
 
 void CBaseScriptedTrigger::InitScriptedTrigger( void )
 {
-#if defined ( LUA_SDK )
+#ifdef LUA_SDK
 #if 0
-	// Let the instance reinitialize itself for the client.
-	if ( m_nTableReference != LUA_NOREF )
-		return;
+    // Let the instance reinitialize itself for the client.
+    if (lua_isrefvalid(L, m_nTableReference))
+        return;
 #endif
 
 	SetThink( &CBaseScriptedTrigger::Think );
@@ -182,8 +185,8 @@ void CBaseScriptedTrigger::InitScriptedTrigger( void )
 		}
 	}
 
-	BEGIN_LUA_CALL_TRIGGER_METHOD( "Initialize" );
-	END_LUA_CALL_TRIGGER_METHOD( 0, 0 );
+    LUA_CALL_TRIGGER_METHOD_BEGIN( "Initialize" );
+    LUA_CALL_TRIGGER_METHOD_END( 0, 0 );
 #endif
 }
 
@@ -204,11 +207,11 @@ void CBaseScriptedTrigger::Spawn()
 bool CBaseScriptedTrigger::PassesTriggerFilters(CBaseEntity *pOther)
 {
 #ifdef LUA_SDK
-	BEGIN_LUA_CALL_TRIGGER_METHOD( "PassesTriggerFilters" );
-		lua_pushentity( L, pOther );
-	END_LUA_CALL_TRIGGER_METHOD( 1, 1 );
+    LUA_CALL_TRIGGER_METHOD_BEGIN( "PassesTriggerFilters" );
+    CBaseEntity::PushLuaInstanceSafe( L, pOther );
+    LUA_CALL_TRIGGER_METHOD_END( 1, 1 );
 
-	RETURN_LUA_BOOLEAN();
+    LUA_RETURN_BOOLEAN();
 #endif
 
 	return BaseClass::PassesTriggerFilters( pOther );
@@ -217,8 +220,8 @@ bool CBaseScriptedTrigger::PassesTriggerFilters(CBaseEntity *pOther)
 void CBaseScriptedTrigger::Think()
 {
 #ifdef LUA_SDK
-	BEGIN_LUA_CALL_TRIGGER_METHOD( "Think" );
-	END_LUA_CALL_TRIGGER_METHOD( 0, 0 );
+    LUA_CALL_TRIGGER_METHOD_BEGIN( "Think" );
+    LUA_CALL_TRIGGER_METHOD_END( 0, 0 );
 #endif
 }
 
@@ -229,9 +232,9 @@ void CBaseScriptedTrigger::Think()
 void CBaseScriptedTrigger::StartTouch(CBaseEntity *pOther)
 {
 #ifdef LUA_SDK
-	BEGIN_LUA_CALL_TRIGGER_METHOD( "StartTouch" );
-		lua_pushentity( L, pOther );
-	END_LUA_CALL_TRIGGER_METHOD( 1, 0 );
+    LUA_CALL_TRIGGER_METHOD_BEGIN( "StartTouch" );
+    CBaseEntity::PushLuaInstanceSafe( L, pOther );
+    LUA_CALL_TRIGGER_METHOD_END( 1, 0 );
 #endif
 }
 
@@ -239,9 +242,9 @@ void CBaseScriptedTrigger::StartTouch(CBaseEntity *pOther)
 void CBaseScriptedTrigger::Touch(CBaseEntity *pOther)
 {
 #ifdef LUA_SDK
-	BEGIN_LUA_CALL_TRIGGER_METHOD( "Touch" );
-		lua_pushentity( L, pOther );
-	END_LUA_CALL_TRIGGER_METHOD( 1, 0 );
+    LUA_CALL_TRIGGER_METHOD_BEGIN( "Touch" );
+    CBaseEntity::PushLuaInstanceSafe( L, pOther );
+    LUA_CALL_TRIGGER_METHOD_END( 1, 0 );
 #endif
 }
 
@@ -252,9 +255,9 @@ void CBaseScriptedTrigger::Touch(CBaseEntity *pOther)
 void CBaseScriptedTrigger::EndTouch(CBaseEntity *pOther)
 {
 #ifdef LUA_SDK
-	BEGIN_LUA_CALL_TRIGGER_METHOD( "EndTouch" );
-		lua_pushentity( L, pOther );
-	END_LUA_CALL_TRIGGER_METHOD( 1, 0 );
+    LUA_CALL_TRIGGER_METHOD_BEGIN( "EndTouch" );
+    CBaseEntity::PushLuaInstanceSafe( L, pOther );
+    LUA_CALL_TRIGGER_METHOD_END( 1, 0 );
 #endif
 }
 

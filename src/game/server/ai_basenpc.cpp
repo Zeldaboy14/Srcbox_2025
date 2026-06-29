@@ -87,9 +87,9 @@
 #include "datacache/imdlcache.h"
 #include "vstdlib/jobthread.h"
 
-#ifdef HL2_EPISODIC
+//#ifdef HL2_EPISODIC
 #include "npc_alyx_episodic.h"
-#endif
+//#endif
 
 #ifdef PORTAL
 	#include "prop_portal_shared.h"
@@ -10785,7 +10785,7 @@ BEGIN_SIMPLE_DATADESC( AIScheduleState_t )
 	DEFINE_FIELD( fTaskStatus,			FIELD_INTEGER ),
 	DEFINE_FIELD( timeStarted,			FIELD_TIME ),
 	DEFINE_FIELD( timeCurTaskStarted,	FIELD_TIME ),
-	DEFINE_FIELD( taskFailureCode,		FIELD_INTEGER ),
+	DEFINE_FIELD( taskFailureCode,		FIELD_INTEGER64 ),
 	DEFINE_FIELD( iTaskInterrupt,		FIELD_INTEGER ),
 	DEFINE_FIELD( bTaskRanAutomovement,	FIELD_BOOLEAN ),
 	DEFINE_FIELD( bTaskUpdatedYaw,		FIELD_BOOLEAN ),

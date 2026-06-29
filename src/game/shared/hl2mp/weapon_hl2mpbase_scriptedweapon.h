@@ -29,6 +29,37 @@ public:
 	CHL2MPScriptedWeapon();
 	~CHL2MPScriptedWeapon();
 
+#ifdef LUA_SDK
+	virtual void SetupRefTable(lua_State* L);
+	bool m_bInitialized;
+
+	bool IsValid(void) const
+	{
+		return m_bInitialized;
+	}
+
+	/// <summary>
+	/// We usually want the scripted weapon to be fully initialized before we can call any of its methods.
+	/// Especially NetworkVar methods need to have been installed before they're used.
+	/// </summary>
+	/// <param name="pWeapon"></param>
+	/// <returns></returns>
+	static bool IsValidWeapon(CBaseCombatWeapon* pWeapon)
+	{
+		CHL2MPScriptedWeapon* pScriptedWeapon = dynamic_cast<CHL2MPScriptedWeapon*>(pWeapon);
+
+		if (pScriptedWeapon)
+		{
+			return pScriptedWeapon->IsValid();
+		}
+
+		return pWeapon != NULL;
+	}
+
+	//virtual void Remove() OVERRIDE;
+	virtual void Remove();
+#endif
+
 	bool			IsScripted( void ) const { return true; }
 	
 	DECLARE_NETWORKCLASS(); 

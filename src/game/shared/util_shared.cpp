@@ -38,11 +38,62 @@ bool NPC_CheckBrushExclude( CBaseEntity *pEntity, CBaseEntity *pBrush );
 
 #include "steam/steam_api.h"
 
+#ifdef _WIN32
+#include <winlite.h>
+#endif
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
 ConVar r_visualizetraces( "r_visualizetraces", "0", FCVAR_CHEAT );
 ConVar developer("developer", "0", 0, "Set developer message level" ); // developer mode
+
+#ifdef _WIN32
+// Source: https://stackoverflow.com/a/21767578/3086369
+struct handle_data
+{
+	unsigned long process_id;
+	HWND window_handle;
+};
+
+static BOOL IsMainWindow(HWND handle)
+{
+	return GetWindow(handle, GW_OWNER) == (HWND)0 && IsWindowVisible(handle);
+}
+
+static BOOL CALLBACK EnumWindowsCallback(HWND handle, LPARAM lParam)
+{
+	handle_data& data = *(handle_data*)lParam;
+	unsigned long process_id = 0;
+	GetWindowThreadProcessId(handle, &process_id);
+	if (data.process_id != process_id || !IsMainWindow(handle))
+		return TRUE;
+	data.window_handle = handle;
+	return FALSE;
+}
+
+static HWND FindMainWindow(unsigned long process_id)
+{
+	handle_data data;
+	data.process_id = process_id;
+	data.window_handle = 0;
+	EnumWindows(EnumWindowsCallback, (LPARAM)&data);
+	return data.window_handle;
+}
+
+void* GetAppWindow()
+{
+	HWND hWnd = FindMainWindow(GetCurrentProcessId());
+	return hWnd;
+}
+#else
+void* GetAppWindow()
+{
+	// TODO: Implement this for other platforms
+	Assert(false);
+	return nullptr;
+}
+#endif
 
 float UTIL_VecToYaw( const Vector &vec )
 {
@@ -805,6 +856,7 @@ void UTIL_Tracer( const Vector &vecStart, const Vector &vecEnd, int iEntIndex,
 
 void UTIL_BloodDrips( const Vector &origin, const Vector &direction, int color, int amount )
 {
+	IPredictionSystem::SuppressHostEvents(NULL);
 	if ( !UTIL_ShouldShowBlood( color ) )
 		return;
 
@@ -1058,34 +1110,34 @@ float CountdownTimer::Now( void ) const
 	return gpGlobals->curtime;
 }
 
-float UTIL_WaterLevel(const Vector& position, float minz, float maxz)
+float UTIL_WaterLevel( const Vector &position, float minz, float maxz )
 {
-	Vector midUp = position;
-	midUp.z = minz;
+    Vector midUp = position;
+    midUp.z = minz;
 
-	if (!(UTIL_PointContents(midUp) & MASK_WATER))
-		return minz;
+    if ( !( UTIL_PointContents( midUp ) & MASK_WATER ) )
+        return minz;
 
-	midUp.z = maxz;
-	if (UTIL_PointContents(midUp) & MASK_WATER)
-		return maxz;
+    midUp.z = maxz;
+    if ( UTIL_PointContents( midUp ) & MASK_WATER )
+        return maxz;
 
-	float diff = maxz - minz;
-	while (diff > 1.0)
-	{
-		midUp.z = minz + diff / 2.0;
-		if (UTIL_PointContents(midUp) & MASK_WATER)
-		{
-			minz = midUp.z;
-		}
-		else
-		{
-			maxz = midUp.z;
-		}
-		diff = maxz - minz;
-	}
+    float diff = maxz - minz;
+    while ( diff > 1.0 )
+    {
+        midUp.z = minz + diff / 2.0;
+        if ( UTIL_PointContents( midUp ) & MASK_WATER )
+        {
+            minz = midUp.z;
+        }
+        else
+        {
+            maxz = midUp.z;
+        }
+        diff = maxz - minz;
+    }
 
-	return midUp.z;
+    return midUp.z;
 }
 
 #ifdef CLIENT_DLL

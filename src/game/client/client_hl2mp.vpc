@@ -16,21 +16,26 @@ $Include "$SRCDIR\game\client\client_base.vpc"
 $Include "$SRCDIR\game\client\client_gameui_hl2mp.vpc"
 
 //-----------------------------------------
+// Engine Patchs (Experiment)
+//-----------------------------------------
+$Include "$SRCDIR\engine\engine_patches_client.vpc"
+
+//-----------------------------------------
 // LUA 5.4 from EXPERIMENT. Compatible with Garry's Mod
 //-----------------------------------------
-//$Include "$SRCDIR\game\client\client_lua.vpc"
+$Include "$SRCDIR\game\client\client_lua.vpc"
 
 //-----------------------------------------
 // EXPERIMENT Lua Weapons setups
 //-----------------------------------------
-//$Include "$SRCDIR\game\client\client_experiment.vpc"
+$Include "$SRCDIR\game\client\client_experiment.vpc"
 
 $Configuration
 {
 	$Compiler
 	{
-		$AdditionalIncludeDirectories		"$BASE;hl2mp\ui,.\hl2mp,$SRCDIR\game\shared\hl2mp,.\hl2,.\hl2\elements,$SRCDIR\game\shared\hl2;$SRCDIR\thirdparty\mem;$SRCDIR\thirdparty\lighthook"
-		$PreprocessorDefinitions			"$BASE;HL2MP;HL2_CLIENT_DLL;HL2_EPISODIC;NEXT_BOT;ASW_PROJECTED_TEXTURES;GAMEUI_EMBEDDED;GAMEUI_EXPORTS"
+		$AdditionalIncludeDirectories		"$BASE;hl2mp\ui,.\hl2mp,$SRCDIR\game\shared\hl2mp,.\hl2,.\hl2\elements,$SRCDIR\game\shared\hl2;$SRCDIR\game\shared\srcbox;$SRCDIR\thirdparty\mem;$SRCDIR\thirdparty\lighthook"
+		$PreprocessorDefinitions			"$BASE;HL2MP;HL2_CLIENT_DLL;HL2_EPISODIC;NEXT_BOT;ASW_PROJECTED_TEXTURES;GAMEUI_EMBEDDED;GAMEUI_EXPORTS;MAPBASE"
 	}
 }
 
@@ -55,7 +60,14 @@ $Project "Client (HL2MP)"
 			$File	"NextBot\C_NextBot.cpp"
 			$File	"NextBot\C_NextBot.h"
 		}
-		
+		$Folder "Gmod"
+		{
+			$File	"$SRCDIR\game\shared\gmod\env_skypaint.cpp"
+		}
+		$Folder "Portal"
+		{
+			$File	"$SRCDIR\game\shared\portal\weapon_portalgun.cpp"
+		}
 		$Folder "terror"
 		{
 			$Folder "Weapons"
@@ -187,7 +199,6 @@ $Project "Client (HL2MP)"
 				$File	"$SRCDIR\game\shared\hl2mp\weapon_physcannon.h"
 				$File	"$SRCDIR\game\shared\hl2mp\weapon_physgun.cpp"
 				$File	"$SRCDIR\game\shared\hl2mp\weapon_physgun.h"
-				$File	"$SRCDIR\game\shared\terror\weapon_pistol_terror.cpp"
 				$File	"$SRCDIR\game\shared\hl2mp\weapon_pistol.cpp"
 				$File	"$SRCDIR\game\shared\hl2mp\weapon_rpg.cpp"
 				$File	"$SRCDIR\game\shared\hl2mp\weapon_rpg.h"

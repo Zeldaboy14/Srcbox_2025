@@ -36,6 +36,8 @@ public:
 
 	void	Spawn( void );
 	void	Precache( void );
+	//virtual void Remove(void) OVERRIDE;
+	virtual void Remove(void);
 	void	LoadScriptedEntity( void );
 	void	InitScriptedEntity( void );
 
@@ -44,11 +46,19 @@ public:
 	void	EndTouch( CBaseEntity *pOther );
 
 #ifdef CLIENT_DLL
+virtual RenderGroup_t GetRenderGroup() OVERRIDE;
+
 	// model specific
 	virtual int DrawModel( int flags );
 #endif
 
 	virtual void VPhysicsUpdate( IPhysicsObject *pPhysics );
+
+#ifdef LUA_SDK
+#ifndef CLIENT_DLL
+	virtual int UpdateTransmitState();
+#endif
+#endif
 
 #ifdef CLIENT_DLL
 // IClientThinkable.
@@ -66,6 +76,9 @@ private:
 	CNetworkString( m_iScriptedClassname, 255 );
 };
 
+#ifdef CLIENT_DLL
+int m_iRenderGroupOverride = -1;
+#endif
 void RegisterScriptedEntity( const char *szClassname );
 void ResetEntityFactoryDatabase( void );
 

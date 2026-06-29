@@ -294,11 +294,11 @@ bool CHudElement::ShouldDraw( void )
 	C_BasePlayer* pPlayer = C_BasePlayer::GetLocalPlayer();
 	if (pPlayer)
 	{
-		BEGIN_LUA_CALL_HOOK("HudElementShouldDraw");
+		LUA_CALL_HOOK_BEGIN("HudElementShouldDraw");
 		lua_pushstring(L, GetName());
-		END_LUA_CALL_HOOK(1, 1);
+		LUA_CALL_HOOK_END(1, 1);
 
-		RETURN_LUA_BOOLEAN();
+		LUA_RETURN_BOOLEAN();
 	}
 #endif
 

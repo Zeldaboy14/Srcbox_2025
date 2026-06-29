@@ -1381,6 +1381,11 @@ void C_BaseAnimating::GetBoneControllers(float controllers[MAXSTUDIOBONECTRLS])
 	}
 }
 
+float C_BaseAnimating::GetPoseParameter(const char* szName)
+{
+	return GetPoseParameter(LookupPoseParameter(szName));
+}
+
 float C_BaseAnimating::GetPoseParameter( int iPoseParameter )
 {
 	CStudioHdr *pStudioHdr = GetModelPtr();
@@ -5631,6 +5636,24 @@ int C_BaseAnimating::FindTransitionSequence( int iCurrentSequence, int iGoalSequ
 
 	return ::FindTransitionSequence( hdr, iCurrentSequence, iGoalSequence, piDir );
 
+}
+
+void C_BaseAnimating::SetSkin(int iSkin)
+{
+	if (m_nSkin != iSkin)
+	{
+		m_nSkin = iSkin;
+		//OnTranslucencyTypeChanged();
+	}
+}
+
+void C_BaseAnimating::SetBody(int iBody)
+{
+	if (m_nBody != iBody)
+	{
+		m_nBody = iBody;
+		//OnTranslucencyTypeChanged();
+	}
 }
 
 void C_BaseAnimating::SetBodygroup( int iGroup, int iValue )

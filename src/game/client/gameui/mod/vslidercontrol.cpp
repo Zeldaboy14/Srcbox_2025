@@ -4,7 +4,7 @@
 #include "vgui_controls/ProgressBar.h"
 #include "tier1/KeyValues.h"
 #include "IGameUIFuncs.h"
-#include "gameui_util.h"
+#include "../gameui_util.h"
 #include "vgui/IInput.h"
 #include "VFlyoutMenu.h"
 

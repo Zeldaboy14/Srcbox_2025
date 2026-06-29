@@ -27,12 +27,12 @@
 // instance of class
 CVGuiSystemModuleLoader g_VModuleLoader;
 
-#ifdef GAMEUI_EXPORTS
+//#ifdef GAMEUI_EXPORTS
 extern vgui::VPANEL GetGameUIBasePanel();
-#else
-#include "../SteamUI/PlatformMainPanel.h"
-extern CPlatformMainPanel *g_pMainPanel;
-#endif
+//#else
+//#include "../SteamUI/PlatformMainPanel.h"
+//extern CPlatformMainPanel *g_pMainPanel;
+//#endif
 
 bool bSteamCommunityFriendsVersion = false;
 

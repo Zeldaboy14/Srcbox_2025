@@ -13,6 +13,7 @@
 #include "prediction.h"
 #include "client_virtualreality.h"
 #include "sourcevr/isourcevirtualreality.h"
+#include "hl2mp_gamerules.h"
 #else
 #include "vguiscreen.h"
 #endif
@@ -686,5 +687,78 @@ bool CBaseViewModel::GetAttachmentVelocity( int number, Vector &originVel, Quate
 
 	return BaseClass::GetAttachmentVelocity( number, originVel, angleVel );
 }
+
+#ifdef USE_TERROR_VIEWMODEL_ADDON
+//--------------------------------------------------------------------------------------------------------  
+bool CBaseViewModel::InitializeAsClientEntityL4D(const char* pszModelName, bool bRenderWithViewModels)
+{
+	RenderGroup_t renderGroup;
+	//if (!BaseClass::InitializeAsClientEntity(pszModelName, bRenderWithViewModels))
+	if (!BaseClass::InitializeAsClientEntity(pszModelName, renderGroup))
+		return false;
+
+	AddEffects(EF_BONEMERGE);
+	AddEffects(EF_BONEMERGE_FASTCULL);
+
+#ifdef L4DASW
+#pragma message( __FILE__ "(" __LINE__AS_STRING ") : warning custom: Remove this ifdef eventually!" )
+#else
+	AddEffects(EF_NODRAW);
+#endif
+	return true;
+}
+
+bool CBaseViewModel::UpdateViewModelAddon(void)
+{
+	CBasePlayer* owner = ToBasePlayer(GetOwner());
+
+	// Conditions 2 and 3 are just best guesses and may not be accurate!
+	//if (owner && owner->IsAlive() && owner->GetTeamNumber() == TEAM_SURVIVOR)
+	if (owner && owner->IsAlive() && owner->GetTeamNumber() == TEAM_REBELS)
+	{
+		//CTerrorWeapon* pWpn = static_cast<CTerrorWeapon*>(GetOwningWeapon());
+		C_BaseCombatWeapon* pWpn = static_cast<C_BaseCombatWeapon*>(GetOwningWeapon());
+		if (pWpn)
+		{
+			const char* pszArmsModel = pWpn->GetTerrorWeaponData()->GetViewModelAddonName(SurvivorCharacterName(owner->GetSurvivorCharacter()), false);
+			if (pszArmsModel && pszArmsModel[0])
+			{
+				if (m_viewmodelAddon)
+				{
+					if (V_stricmp(m_viewmodelAddonName, pszArmsModel) == 0)
+					{
+						// Don't remove our current viewmodel addon
+						return false;
+					}
+					m_viewmodelAddon->Remove();
+				}
+
+				C_BaseViewModel* pEnt = new class C_BaseViewModel;
+				if (pEnt && pEnt->InitializeAsClientEntityL4D(pszArmsModel, true))
+				{
+					//Msg( "pEnt && pEnt->InitializeAsClientEntity( pszArmsModel, true ) %s", pszArmsModel );
+					m_viewmodelAddon = pEnt;
+					V_strncpy(m_viewmodelAddonName, pszArmsModel, sizeof(m_viewmodelAddonName));
+
+					pEnt->SetSkin(GetSkin());
+					pEnt->SetParent(this);
+					pEnt->SetLocalOrigin(vec3_origin);
+					pEnt->UpdatePartitionListEntry();
+					pEnt->CollisionProp()->UpdatePartition();
+					pEnt->UpdateVisibility();
+					return true;
+				}
+			}
+		}
+	}
+
+	if (m_viewmodelAddon)
+	{
+		m_viewmodelAddon->Remove();
+	}
+
+	return false;
+}
+#endif
 
 #endif

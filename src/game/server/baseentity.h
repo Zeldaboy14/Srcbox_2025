@@ -23,6 +23,12 @@
 #include "vscript/ivscript.h"
 #include "vscript_server.h"
 
+#ifdef LUA_SDK
+#include "luamanager.h"
+#include "lsingleluainstance.h"
+#include "../lua/lauxlib.h"
+#endif
+
 class CDamageModifier;
 class CDmgAccumulator;
 
@@ -114,14 +120,14 @@ enum Class_T
 	CLASS_ANTLION,
 	CLASS_BARNACLE,
 	CLASS_BULLSEYE,
-	//CLASS_BULLSQUID,	
+	CLASS_BULLSQUID,	
 	CLASS_CITIZEN_PASSIVE,	
 	CLASS_CITIZEN_REBEL,
 	CLASS_COMBINE,
 	CLASS_COMBINE_GUNSHIP,
 	CLASS_CONSCRIPT,
 	CLASS_HEADCRAB,
-	//CLASS_HOUNDEYE,
+	CLASS_HOUNDEYE,
 	CLASS_MANHACK,
 	CLASS_METROPOLICE,		
 	CLASS_MILITARY,		
@@ -135,6 +141,17 @@ enum Class_T
 	CLASS_EARTH_FAUNA,
 	CLASS_HACKED_ROLLERMINE,
 	CLASS_COMBINE_HUNTER,
+
+	CLASS_HUMAN_PASSIVE,
+	CLASS_HUMAN_MILITARY,
+	CLASS_ALIEN_MILITARY,
+	CLASS_ALIEN_MONSTER,
+	CLASS_ALIEN_PREY,
+	CLASS_ALIEN_PREDATOR,
+	CLASS_INSECT,
+	CLASS_MACHINE_HL1,
+	CLASS_PLAYER_BIOWEAPON,
+	CLASS_ALIEN_BIOWEAPON,
 
 	NUM_AI_CLASSES
 };
@@ -213,6 +230,19 @@ enum Class_T
 	NUM_AI_CLASSES
 };
 
+#endif
+
+#ifdef LUA_SDK
+namespace USABILITY_TYPE
+{
+	enum TYPE
+	{
+		CONTINUOUS = 0,  // FCAP_CONTINUOUS_USE
+		ON_OFF,          // FCAP_ONOFF_USE
+		DIRECTIONAL,     // FCAP_DIRECTIONAL_USE
+		IMPULSE,         // FCAP_IMPULSE_USE
+	};
+}
 #endif
 
 //
@@ -359,6 +389,10 @@ struct rotatingpushmove_t;
 //
 class CBaseEntity : public IServerEntity
 {
+#ifdef LUA_SDK
+	LUA_DECLARE_SINGLE_LUA_INSTANCE(CBaseEntity, LUA_BASEENTITYMETANAME);
+#endif
+
 public:
 	DECLARE_CLASS_NOBASE( CBaseEntity );	
 
@@ -378,6 +412,7 @@ protected:
 
 	static bool				m_bDebugPause;		// Whether entity i/o is paused for debugging.
 	static int				m_nDebugSteps;		// Number of entity outputs to fire before pausing again.
+	bool					m_bTransmitWithParent = false;
 
 	static bool				sm_bDisableTouchFuncs;	// Disables PhysicsTouch and PhysicsStartTouch function calls
 public:
@@ -389,6 +424,11 @@ public:
 	CBaseEntity( bool bServerOnly=false );
 	virtual ~CBaseEntity();
 
+#ifdef LUA_SDK
+	virtual void SetupRefTable(lua_State* L);
+	virtual void SetUseType(USABILITY_TYPE::TYPE useType);
+#endif
+
 	// prediction system
 	DECLARE_PREDICTABLE();
 	// network data
@@ -397,6 +437,16 @@ public:
 	DECLARE_DATADESC();
 	// script description
 	DECLARE_ENT_SCRIPTDESC();
+
+#ifdef LUA_SDK
+	CNetworkArray(bool, m_LuaVariables_bool, LUA_MAX_NETWORK_VARIABLES);
+	CNetworkArray(int, m_LuaVariables_int, LUA_MAX_NETWORK_VARIABLES);
+	CNetworkArray(float, m_LuaVariables_float, LUA_MAX_NETWORK_VARIABLES);
+	CNetworkArray(Vector, m_LuaVariables_Vector, LUA_MAX_NETWORK_VARIABLES);
+	CNetworkArray(QAngle, m_LuaVariables_QAngle, LUA_MAX_NETWORK_VARIABLES);
+	CNetworkArray(string_t, m_LuaVariables_String, LUA_MAX_NETWORK_VARIABLES_STRING);
+	CNetworkArray(EHANDLE, m_LuaVariables_Entity, LUA_MAX_NETWORK_VARIABLES);
+#endif
 	
 	// memory handling
     void *operator new( size_t stAllocateBlock );
@@ -426,6 +476,9 @@ public:
 
 	void					ClearModelIndexOverrides( void );
 	virtual void			SetModelIndexOverride( int index, int nValue );
+
+	virtual void			SetTransmitWithParent(bool bTransmitWithParent);
+	bool					GetTransmitWithParent();
 
 public:
 	// virtual methods for derived classes to override
@@ -515,14 +568,22 @@ public:
 	HSCRIPT					GetScriptOwnerEntity();
 	virtual void			SetScriptOwnerEntity( HSCRIPT pOwner );
 
+#ifdef LUA_SDK
+	void AddDeleteOnRemove(CBaseEntity* pEntity);
+	void RemoveDeleteOnRemove(CBaseEntity* pEntity);
+#endif
 
 	// Only CBaseEntity implements these. CheckTransmit calls the virtual ShouldTransmit to see if the
 	// entity wants to be sent. If so, it calls SetTransmit, which will mark any dependents for transmission too.
 	virtual int				ShouldTransmit( const CCheckTransmitInfo *pInfo );
+#ifdef LUA_SDK
+	virtual void			SetPreventTransmit(CRecipientFilter& filter, bool bPreventTransmitting);
+	virtual void			SetPreventTransmit(CBasePlayer* filter, bool bPreventTransmitting);
+#endif
 
 	// update the global transmit state if a transmission rule changed
-		    int				SetTransmitState( int nFlag);
-			int				GetTransmitState( void );
+	int					SetTransmitState( int nFlag);
+	int					GetTransmitState( void );
 	int						DispatchUpdateTransmitState();
 	
 	// Do NOT call this directly. Use DispatchUpdateTransmitState.
@@ -869,6 +930,8 @@ public:
 	void SetRenderColorG( byte g );
 	void SetRenderColorB( byte b );
 	void SetRenderColorA( byte a );
+	void SetRenderAlpha( byte a );
+	byte GetRenderAlpha( ) const;
 
 	// was pev->animtime:  consider moving to CBaseAnimating
 	float		m_flPrevAnimTime;
@@ -889,12 +952,25 @@ public:
 	// used so we know when things are no longer touching
 	int			touchStamp;			
 	
-#if defined( LUA_SDK )
-	// Andrew; This is used to determine an entity's reference in Lua's LUA_REGISTRYINDEX.
-	// I'd rather do this than create a struct and pass that to each bounded function, plus it'll save some perf for massive executions, like Think funcs.
-	int				m_nTableReference;
-	// Henry; There's an IsPlayer and IsWorld and such, why not an IsWeapon?
-	virtual bool	IsWeapon(void) const { return false; }
+#ifdef LUA_SDK
+    // Andrew; This is used to determine an entity's reference in Lua's
+    // LUA_REGISTRYINDEX. I'd rather do this than create a struct and pass
+    // that to each bounded function, plus it'll save some perf for massive
+    // executions, like Think funcs.
+    int m_nTableReference;
+
+    // Henry; There's an IsPlayer and IsWorld and such, why not an IsWeapon?
+    virtual bool IsWeapon( void ) const
+    {
+        return false;
+    }
+
+    virtual bool IsVehicle( void );
+
+    virtual bool IsScripted( void ) const
+    {
+        return false;
+    }
 #endif
 
 protected:
@@ -908,6 +984,9 @@ protected:
 	};
 	int		GetIndexForThinkContext( const char *pszContext );
 	CUtlVector< thinkfunc_t >	m_aThinkFunctions;
+#ifdef LUA_SDK
+	CRecipientFilter* m_rfPreventTransmitEntities;
+#endif
 
 #ifdef _DEBUG
 	int							m_iCurrentThinkContext;
@@ -1053,6 +1132,10 @@ public:
 	bool			InSameTeam( const CBaseEntity *pEntity ) const;	// Returns true if the specified entity is on the same team as this one
 	bool			IsInAnyTeam( void ) const;			// Returns true if this entity is in any team
 	const char		*TeamID( void ) const;				// Returns the name of the team this entity is on.
+#ifdef LUA_SDK
+	void SetNoCollidingWithTeammates(bool);
+	bool GetNoCollidingWithTeammates(void);
+#endif
 
 	// Entity events... these are events targetted to a particular entity
 	// Each event defines its own well-defined event data structure
@@ -1848,6 +1931,9 @@ private:
 	// Team handling
 	int			m_iInitialTeamNum;		// Team number of this entity's team read from file
 	CNetworkVar( int, m_iTeamNum );				// Team number of this entity's team. 
+#ifdef LUA_SDK
+	CNetworkVar(bool, m_bNoCollidingWithTeammates);
+#endif
 
 	// Sets water type + level for physics objects
 	unsigned char	m_nWaterTouch;
@@ -1895,6 +1981,10 @@ private:
 	// A counter to help quickly build a list of potentially pushed objects for physics
 	int				m_nPushEnumCount;
 
+#ifdef LUA_SDK
+	int				m_UsabilityType;
+#endif
+
 	Vector			m_vecAbsOrigin;
 	CNetworkVectorForDerived( m_vecVelocity );
 	
@@ -1919,6 +2009,10 @@ private:
 
 	// was pev->view_ofs ( FIXME:  Move somewhere up the hierarch, CBaseAnimating, etc. )
 	CNetworkVectorForDerived( m_vecViewOffset );
+
+#ifdef LUA_SDK
+	CUtlVector< EHANDLE > m_EntitiesToDeleteOnRemove;
+#endif
 
 private:
 	// dynamic model state tracking
@@ -2565,6 +2659,16 @@ inline void CBaseEntity::SetWaterLevel( int nLevel )
 inline const color32 CBaseEntity::GetRenderColor() const
 {
 	return m_clrRender.Get();
+}
+
+inline void CBaseEntity::SetRenderAlpha(byte a)
+{
+	m_clrRender.SetA(a);
+}
+
+inline byte CBaseEntity::GetRenderAlpha() const
+{
+	return m_clrRender->a;
 }
 
 inline void CBaseEntity::SetRenderColor( byte r, byte g, byte b )

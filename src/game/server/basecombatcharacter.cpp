@@ -1032,7 +1032,7 @@ Activity CBaseCombatCharacter::GetDeathActivity ( void )
 
 
 // UNDONE: Should these operate on a list of weapon/items
-Activity CBaseCombatCharacter::Weapon_TranslateActivity( Activity baseAct, bool *pRequired )
+/*Activity CBaseCombatCharacter::Weapon_TranslateActivity(Activity baseAct, bool* pRequired)
 {
 	Activity translated = baseAct;
 
@@ -1046,7 +1046,7 @@ Activity CBaseCombatCharacter::Weapon_TranslateActivity( Activity baseAct, bool 
 	}
 
 	return translated;
-}
+}*/
 
 //-----------------------------------------------------------------------------
 // Purpose: NPCs should override this function to translate activities

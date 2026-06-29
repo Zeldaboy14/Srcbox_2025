@@ -8,6 +8,7 @@
 #define __VHYBRIDBUTTON_H__
 
 #include "basemodui.h"
+#include <vgui_controls/Button.h>
 
 //=============================================================================
 // The Hybrid Button has the ability to either display a texture , solid color
@@ -53,6 +54,8 @@ public:
 	BaseModHybridButton( Panel *parent, const char *panelName, const char *text, Panel *pActionSignalTarget = NULL, const char *pCmd = NULL );
 	BaseModHybridButton( Panel *parent, const char *panelName, const wchar_t *text, Panel *pActionSignalTarget = NULL, const char *pCmd = NULL );
 	virtual ~BaseModHybridButton();
+
+	void DrawRoundedBox(int x, int y, int wide, int tall, Color color, float normalizedAlpha, bool bHighlightGradient, Color highlightCenterColor);
 
 	State			GetCurrentState();
 	int				GetOriginalTall() { return m_originalTall; }
@@ -134,6 +137,11 @@ private:
 	int			m_iSelectedArrowSize;		// size to draw the arrow
 
 	int			m_nWideAtOpen;
+
+	CPanelAnimationVarAliasType(int, m_nNBBgTextureId1, "NBTexture1", "vgui/hud/800corner1", "textureid");
+	CPanelAnimationVarAliasType(int, m_nNBBgTextureId2, "NBTexture2", "vgui/hud/800corner2", "textureid");
+	CPanelAnimationVarAliasType(int, m_nNBBgTextureId3, "NBTexture3", "vgui/hud/800corner3", "textureid");
+	CPanelAnimationVarAliasType(int, m_nNBBgTextureId4, "NBTexture4", "vgui/hud/800corner4", "textureid");
 };
 
 }; //namespace BaseModUI

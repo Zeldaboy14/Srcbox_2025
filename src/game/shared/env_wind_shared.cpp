@@ -220,14 +220,6 @@ float CEnvWindShared::WindThink( float flTime )
 
 	ComputeWindVariation( flTime );
 
-#if defined(SRCBOX) && defined(CLIENT_DLL)
-	if (m_flTreeSwayScale != 0.0f)
-	{
-		// Update Tree Sway
-		UpdateTreeSway(flTime);
-	}
-#endif
-
 	// Update Tree Sway
 	UpdateTreeSway( flTime );
 
