@@ -1,0 +1,37 @@
+//-----------------------------------------------------------------------------
+//	ENGINE_PATCHES_BASE.VPC
+//
+//	Project Script
+//-----------------------------------------------------------------------------
+
+$Configuration
+{
+    $Compiler
+    {
+        $PreprocessorDefinitions		"$BASE;WITH_ENGINE_PATCHES"
+    }
+}
+
+$Project
+{
+    $Folder "Engine Patches"
+    {
+        $File   "$SRCDIR\engine\engine_patches.h"
+        $File   "$SRCDIR\engine\engine_patches.cpp"
+        {
+            $Configuration
+            {
+                $Compiler
+                {
+                    $Create/UsePrecompiledHeader	"Not Using Precompiled Headers"
+                }
+            }
+        }
+    }
+
+    $Folder	"Link Libraries"
+    {
+        $Lib    "MinHook.x64" [$WIN64]
+        $Lib    "MinHook.x86" [$WIN32]
+    }
+}
