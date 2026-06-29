@@ -1327,10 +1327,10 @@ $Project
         // $Lib	"$LIBCOMMON\libcurl" [$WINDOWS]
         $Lib    "$LIBCOMMON/lzma"
 		
-        //$Lib	"lua54"
-        //$Lib	"luasocket"
-        //$Lib    "libpng"
-        //$Lib    "bass"
+        $Lib	"lua54"
+        $Lib	"luasocket"
+        $Lib    "libpng"
+        $Lib    "bass"
  	}
 
 }

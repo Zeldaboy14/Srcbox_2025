@@ -1771,27 +1771,18 @@ FORCEINLINE void StoreAligned3SIMD( VectorAligned * RESTRICT pSIMD, const fltx4 
 	StoreAlignedSIMD( pSIMD->Base(),a );
 }
 
-#define IS_FLOAT_TYPE(T) \
-	( sizeof( T ) == sizeof( float ) || sizeof ( T ) == sizeof( fltx4 ) )
-
-template <typename T>
-FORCEINLINE fltx4 LoadAlignedSIMD( const T *pSIMD )
+FORCEINLINE fltx4 LoadAlignedSIMD( const void *pSIMD )
 {
-	static_assert( IS_FLOAT_TYPE(T), "You are doing something wrong." );
 	return _mm_load_ps( reinterpret_cast< const float *> ( pSIMD ) );
 }
 
-template <typename T>
-FORCEINLINE shortx8 LoadAlignedShortSIMD( const T *pSIMD )
+FORCEINLINE shortx8 LoadAlignedShortSIMD( const void *pSIMD )
 {
-	static_assert( IS_FLOAT_TYPE(T), "You are doing something wrong." );
 	return _mm_load_si128( reinterpret_cast< const shortx8 *> ( pSIMD ) );
 }
 
-template <typename T>
-FORCEINLINE shortx8 LoadUnalignedShortSIMD( const T *pSIMD )
+FORCEINLINE shortx8 LoadUnalignedShortSIMD( const void *pSIMD )
 {
-	static_assert( IS_FLOAT_TYPE(T), "You are doing something wrong." );
 	return _mm_loadu_si128( reinterpret_cast< const shortx8 *> ( pSIMD ) );
 }
 
@@ -1828,17 +1819,13 @@ FORCEINLINE fltx4 LoadAlignedSIMD( const VectorAligned & pSIMD )
 	return SetWToZeroSIMD( LoadAlignedSIMD(pSIMD.Base()) );
 }
 
-template <typename T>
-NO_ASAN_FORCEINLINE fltx4 LoadUnalignedSIMD( const T *pSIMD )
+NO_ASAN_FORCEINLINE fltx4 LoadUnalignedSIMD( const void *pSIMD )
 {
-	static_assert( IS_FLOAT_TYPE(T), "You are doing something wrong." );
 	return _mm_loadu_ps( reinterpret_cast<const float *>( pSIMD ) );
 }
 
-template <typename T>
-NO_ASAN_FORCEINLINE fltx4 LoadUnaligned3SIMD( const T *pSIMD )
+NO_ASAN_FORCEINLINE fltx4 LoadUnaligned3SIMD( const void *pSIMD )
 {
-	static_assert( IS_FLOAT_TYPE(T), "You are doing something wrong." );
 	return _mm_loadu_ps( reinterpret_cast<const float *>( pSIMD ) );
 }
 
