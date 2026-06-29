@@ -461,7 +461,7 @@ public:
 	virtual bool					IsViewModel() const;
 	virtual void					UpdateOnRemove( void );
 
-#ifdef LUA_SDL
+#ifdef LUA_SDK
 
 	void SetMaterialOverride(const char* pMaterialName)
 	{

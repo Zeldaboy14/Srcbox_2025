@@ -20,6 +20,7 @@
 #include "iservervehicle.h"
 #endif
 #include "lbaseplayer_shared.h"
+#include "basescripted.h"
 #include "lgametrace.h"
 #include "SoundEmitterSystem/lisoundemittersystembase.h"
 #include "lshareddefs.h"
@@ -34,6 +35,7 @@
 #include <filesystem.h>
 #include <utlbuffer.h>
 #include <saverestore.h>
+#include "gamestringpool.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -709,7 +711,7 @@ LUA_BINDING_BEGIN( Entity, GetClass, "class", "Get class name." )
             lua_pushstring( L, pScripted->GetScriptedClassname() );
         else
         {
-            CExperimentScriptedWeapon *pWeapon = dynamic_cast< CExperimentScriptedWeapon * >( pEntity );
+            CHL2MPScriptedWeapon *pWeapon = dynamic_cast< CHL2MPScriptedWeapon * >( pEntity );
 
             AssertMsg( pWeapon, "Entity is not a scripted entity, nor weapon." );  // which other scripted entity is there?
 
@@ -3220,7 +3222,7 @@ LUA_BINDING_BEGIN( Entity, __tostring, "class", "Metamethod that is called when 
                 lua_pushfstring( L, "Entity: %s (%d)", pScripted->GetScriptedClassname(), pEntity->entindex() );
             else
             {
-                CExperimentScriptedWeapon *pWeapon = dynamic_cast< CExperimentScriptedWeapon * >( pEntity );
+                CHL2MPScriptedWeapon *pWeapon = dynamic_cast<CHL2MPScriptedWeapon* >( pEntity );
 
                 AssertMsg( pWeapon, "Entity is not a scripted entity, nor weapon." );  // which other scripted entity is there?
 

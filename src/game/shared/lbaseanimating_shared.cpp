@@ -5,7 +5,7 @@
 #include "lbaseentity_shared.h"
 #ifdef CLIENT_DLL
 #include "lc_baseanimating.h"
-#include <c_experiment_player.h>
+#include <c_hl2mp_player.h>
 #else
 #include "lbaseanimating.h"
 #include "hl2mp_player.h"
@@ -629,7 +629,7 @@ LUA_BINDING_BEGIN( CBaseAnimating, GetRagdollOwner, "class", "Returns the player
     }
 
 #ifdef CLIENT_DLL
-    HL2MPRagdol*pRagdoll = dynamic_cast<HL2MPRagdol* >( pAnimating );
+    C_HL2MPRagdoll *pRagdoll = dynamic_cast<C_HL2MPRagdoll* >( pAnimating );
 #else
     CHL2MPRagdoll *pRagdoll = dynamic_cast<CHL2MPRagdoll* >( pAnimating );
 #endif

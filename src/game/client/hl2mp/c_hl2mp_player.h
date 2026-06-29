@@ -13,6 +13,7 @@ class C_HL2MP_Player;
 #include "c_basehlplayer.h"
 #include "hl2mp_player_shared.h"
 #include "beamdraw.h"
+#include "hl2mp_playeranimstate.h"
 
 //=============================================================================
 //=============================================================================
@@ -139,12 +140,59 @@ class C_HL2MP_Player : public C_BaseHLPlayer
         return m_fIsWalking;
     }
 
+#ifdef LUA_SDK
+    // Avoiding players
+    void SetAvoidPlayers(bool shouldAvoid);
+    bool GetAvoidPlayers();
+
+    virtual void UpdateClientSideAnimation();
+    void DoAnimationEvent(PlayerAnimEvent_t event, int nData = 0);
+    virtual void CalculateIKLocks(float currentTime);
+
+    bool KeyDown(int buttonCode);
+
+    static void RecvProxy_CycleLatch(const CRecvProxyData* pData, void* pStruct, void* pOut);
+
+    virtual float GetServerIntendedCycle()
+    {
+        return m_flServerCycle;
+    }
+    virtual void SetServerIntendedCycle(float cycle)
+    {
+        m_flServerCycle = cycle;
+    }
+
+    bool IsAirborne() const
+    {
+        return (!(GetFlags() & FL_ONGROUND));
+    }
+
+    CHL2MPPlayerAnimState* GetAnimState() const
+    {
+        return m_PlayerAnimState;
+    }
+
+    EHANDLE GetRagdollEntity() const
+    {
+        return m_hRagdoll;
+    }
+
+    bool FlashlightIsOn() const
+    {
+        return IsEffectActive(EF_DIMLIGHT);
+    }
+#endif
+
     virtual void PostThink( void );
 
     private:
     C_HL2MP_Player( const C_HL2MP_Player & );
 
-    CPlayerAnimState m_PlayerAnimState;
+#ifdef LUA_SDK
+    CHL2MPPlayerAnimState* m_PlayerAnimState;
+#else
+    CHL2MPPlayerAnimState m_PlayerAnimState;
+#endif
 
     QAngle m_angEyeAngles;
 
@@ -181,6 +229,11 @@ class C_HL2MP_Player : public C_BaseHLPlayer
     CNetworkVar( HL2MPPlayerState, m_iPlayerState );
 
     bool m_fIsWalking = false;
+#ifdef LUA_SDK
+    int m_cycleLatch;  // The animation cycle goes out of sync very easily. Mostly from the player entering/exiting PVS. Server will frequently update us with a new one.
+    float m_flServerCycle;
+    bool m_bAvoidPlayers;
+#endif
 };
 
 inline C_HL2MP_Player *ToHL2MPPlayer( CBaseEntity *pEntity )
@@ -208,6 +261,13 @@ class C_HL2MPRagdoll : public C_BaseAnimatingOverlay
     void ImpactTrace( trace_t *pTrace, int iDamageType, const char *pCustomImpactName );
     void UpdateOnRemove( void );
     virtual void SetupWeights( const matrix3x4_t *pBoneToWorld, int nFlexWeightCount, float *pFlexWeights, float *pFlexDelayedWeights );
+
+#ifdef LUA_SDK
+    C_BasePlayer* GetRagdollPlayer() const
+    {
+        return dynamic_cast<C_BasePlayer*>(m_hPlayer.Get());
+    }
+#endif
 
     private:
     C_HL2MPRagdoll( const C_HL2MPRagdoll & ) {}

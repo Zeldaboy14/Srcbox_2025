@@ -112,7 +112,7 @@ void CBaseClientRenderTargets::ShutdownClientRenderTargets()
 	m_CameraTexture.Shutdown();
 }
 
-#include "../../dx9sdk/include/d3d9.h"
+//#include "../../dx9sdk/include/d3d9.h"
 
 // ...
 /*void ExampleToFetchSwapChain()

@@ -1,6 +1,0 @@
-#ifndef P3_COMMON_DEFINES
-#define P3_COMMON_DEFINES
-
-#define CP3_NPC CAI_BaseNPC
-
-#endif // P3_COMMON_DEFINES

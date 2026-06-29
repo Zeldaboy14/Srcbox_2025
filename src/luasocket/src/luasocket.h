@@ -24,8 +24,13 @@
 #endif
 #endif
 
+#ifdef HL2MP
+#include "../../lua/lua.h"
+#include "../../lua/lauxlib.h"
+#else
 #include "lua.h"
 #include "lauxlib.h"
+#endif
 #include "compat.h"
 
 /*-------------------------------------------------------------------------*\

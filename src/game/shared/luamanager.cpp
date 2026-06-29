@@ -12,7 +12,7 @@
 #include "steam/isteamfriends.h"
 #include "networkstringtabledefs.h"
 #ifdef CLIENT_DLL
-#include <scriptedclientluapanel.h>
+#include <scripted_controls\scriptedclientluapanel.h>
 #include <vgui_int.h>
 #include "ienginevgui.h"
 #endif

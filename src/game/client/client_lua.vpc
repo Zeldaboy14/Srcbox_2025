@@ -16,7 +16,7 @@ $Configuration
 	$Compiler
 	{
 		$AdditionalIncludeDirectories	"$BASE;$SRCDIR\lua;$SRCDIR\luasocket\src"
-		$PreprocessorDefinitions		"$BASE"
+		$PreprocessorDefinitions		"$BASE;LUA_SDK"
 	}
 }
 
@@ -114,8 +114,8 @@ $Project
             $File "$SRCDIR\game\shared\mountaddons.cpp"
             $File "$SRCDIR\game\shared\mountsteamcontent.h"
             $File "$SRCDIR\game\shared\mountsteamcontent.cpp"
-            $File "$SRCDIR\game\shared\jsontokv.cpp"
-            $File "$SRCDIR\game\shared\jsontokv.h"
+            $File "$SRCDIR\game\shared\hl2mp\utils\jsontokv.cpp"
+            $File "$SRCDIR\game\shared\hl2mp\utils\jsontokv.h"
             $File "$SRCDIR\game\shared\lsystem.cpp"
             $File "$SRCDIR\game\shared\lsystem.h"
             $File "$SRCDIR\public\mathlib\langle.cpp"
@@ -128,6 +128,8 @@ $Project
             $File "$SRCDIR\public\lsounds.cpp"
             $File "$SRCDIR\public\lsounds.h"
             $File "$SRCDIR\public\XUnzip.cpp"
+            $File "$SRCDIR\lua\lua.h"
+            $File "$SRCDIR\lua\lauxlib.h"
         }
 		
         $Folder	"Scripted Controls"

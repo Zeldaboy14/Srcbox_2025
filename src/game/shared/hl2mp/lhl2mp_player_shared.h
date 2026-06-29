@@ -3,7 +3,7 @@
 #pragma once
 
 #ifdef CLIENT_DLL
-#include "c_experiment_player.h"
+#include "c_hl2mp_player.h"
 #else
 #include "HL2MP_player.h"
 #endif
