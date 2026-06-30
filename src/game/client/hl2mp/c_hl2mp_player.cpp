@@ -14,6 +14,23 @@
 #include "iviewrender_beams.h"  // flashlight beam
 #include "r_efx.h"
 #include "dlight.h"
+#include "c_basetempentity.h"
+#include "prediction.h"
+#include "bone_setup.h"
+#include "c_team.h"
+#include <collisionutils.h>
+
+#ifdef LUA_SDK
+#include "luamanager.h"
+#include "lgametrace.h"
+#include "lhl2mp_player_shared.h"
+#include "ltakedamageinfo.h"
+#include "mathlib/lvector.h"
+#endif
+
+//#if defined( ARGG )
+#include "iclientmode.h"
+//#endif
 
 // Don't alias here
 #if defined( CHL2MP_Player )
@@ -1212,6 +1229,129 @@ void C_HL2MPRagdoll::SetupWeights( const matrix3x4_t *pBoneToWorld, int nFlexWei
     }
 }
 
+#ifdef LUA_SDK
+
+void C_HL2MP_Player::UpdateClientSideAnimation()
+{
+    m_PlayerAnimState->Update(EyeAngles()[YAW], EyeAngles()[PITCH]);
+
+    BaseClass::UpdateClientSideAnimation();
+}
+
+void C_HL2MP_Player::DoAnimationEvent(PlayerAnimEvent_t event,
+    int nData)
+{
+    if (IsLocalPlayer())
+    {
+        if ((prediction->InPrediction() && !prediction->IsFirstTimePredicted()))
+            return;
+    }
+
+    MDLCACHE_CRITICAL_SECTION();
+    m_PlayerAnimState->DoAnimationEvent(event, nData);
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+void C_HL2MP_Player::CalculateIKLocks(float currentTime)
+{
+    if (!m_pIk)
+        return;
+
+    int targetCount = m_pIk->m_target.Count();
+    if (targetCount == 0)
+        return;
+
+    // In TF, we might be attaching a player's view to a walking model that's
+    // using IK. If we are, it can get in here during the view setup code, and
+    // it's not normally supposed to be able to access the spatial partition
+    // that early in the rendering loop. So we allow access right here for that
+    // special case.
+    SpatialPartitionListMask_t curSuppressed = partition->GetSuppressedLists();
+    partition->SuppressLists(PARTITION_ALL_CLIENT_EDICTS, false);
+    CBaseEntity::PushEnableAbsRecomputations(false);
+
+    for (int i = 0; i < targetCount; i++)
+    {
+        trace_t trace;
+        CIKTarget* pTarget = &m_pIk->m_target[i];
+
+        if (!pTarget->IsActive())
+            continue;
+
+        switch (pTarget->type)
+        {
+        case IK_GROUND:
+        {
+            pTarget->SetPos(Vector(pTarget->est.pos.x, pTarget->est.pos.y, GetRenderOrigin().z));
+            pTarget->SetAngles(GetRenderAngles());
+        }
+        break;
+
+        case IK_ATTACHMENT:
+        {
+            C_BaseEntity* pEntity = NULL;
+            float flDist = pTarget->est.radius;
+
+            // FIXME: make entity finding sticky!
+            // FIXME: what should the radius check be?
+            for (CEntitySphereQuery sphere(pTarget->est.pos, 64);
+                (pEntity = sphere.GetCurrentEntity()) != NULL;
+                sphere.NextEntity())
+            {
+                C_BaseAnimating* pAnim = pEntity->GetBaseAnimating();
+                if (!pAnim)
+                    continue;
+
+                int iAttachment = pAnim->LookupAttachment(
+                    pTarget->offset.pAttachmentName);
+                if (iAttachment <= 0)
+                    continue;
+
+                Vector origin;
+                QAngle angles;
+                pAnim->GetAttachment(iAttachment, origin, angles);
+
+                // debugoverlay->AddBoxOverlay( origin, Vector( -1, -1, -1
+                // ), Vector( 1, 1, 1 ), QAngle( 0, 0, 0 ), 255, 0, 0, 0, 0
+                // );
+
+                float d = (pTarget->est.pos - origin).Length();
+
+                if (d >= flDist)
+                    continue;
+
+                flDist = d;
+                pTarget->SetPos(origin);
+                pTarget->SetAngles(angles);
+                // debugoverlay->AddBoxOverlay( pTarget->est.pos, Vector(
+                // -pTarget->est.radius, -pTarget->est.radius,
+                // -pTarget->est.radius ), Vector( pTarget->est.radius,
+                // pTarget->est.radius, pTarget->est.radius), QAngle( 0, 0,
+                // 0 ), 0, 255, 0, 0, 0 );
+            }
+
+            if (flDist >= pTarget->est.radius)
+            {
+                // debugoverlay->AddBoxOverlay( pTarget->est.pos, Vector(
+                // -pTarget->est.radius, -pTarget->est.radius,
+                // -pTarget->est.radius ), Vector( pTarget->est.radius,
+                // pTarget->est.radius, pTarget->est.radius), QAngle( 0, 0,
+                // 0 ), 0, 0, 255, 0, 0 ); no solution, disable ik rule
+                pTarget->IKFailed();
+            }
+        }
+        break;
+        }
+    }
+
+    CBaseEntity::PopEnableAbsRecomputations();
+    partition->SuppressLists(curSuppressed, true);
+}
+
+#endif
+
 void C_HL2MP_Player::PostThink( void )
 {
     BaseClass::PostThink();
@@ -1223,4 +1363,9 @@ void C_HL2MP_Player::PostThink( void )
     {
         SetCollisionBounds( VEC_CROUCH_TRACE_MIN, VEC_CROUCH_TRACE_MAX );
     }
+}
+
+bool C_HL2MP_Player::KeyDown(int buttonCode)
+{
+    return m_nButtons & buttonCode;
 }

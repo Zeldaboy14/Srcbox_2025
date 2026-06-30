@@ -74,12 +74,12 @@ private:
 	CBaseScripted( const CBaseScripted & ); // not defined, not accessible
 
 	CNetworkString( m_iScriptedClassname, 255 );
-};
 
 #ifdef CLIENT_DLL
-int m_iRenderGroupOverride = -1;
+	int m_iRenderGroupOverride = -1;
 #endif
-void RegisterScriptedEntity( const char *szClassname );
+};
+//void RegisterScriptedEntity( const char *szClassname );
 void ResetEntityFactoryDatabase( void );
 
 #endif

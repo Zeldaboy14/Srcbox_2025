@@ -615,8 +615,8 @@ void CHL2MPScriptedWeapon::OnDataChanged( DataUpdateType_t updateType )
 			InitScriptedWeapon();
 
 #ifdef LUA_SDK
-			BEGIN_LUA_CALL_WEAPON_METHOD( "Precache" );
-			END_LUA_CALL_WEAPON_METHOD( 0, 0 );
+			//BEGIN_LUA_CALL_WEAPON_METHOD( "Precache" );
+			//END_LUA_CALL_WEAPON_METHOD( 0, 0 );
 #endif
 		}
 	}

@@ -74,13 +74,17 @@ public:
 
 	CGameTrace() = default;
 
-//#if !defined ( LUA_SDK )
-	// HACKHACK: We only do this for Lua, but Lua classes which use traces will
-	// throw errors when we compile, so define this outside of the Lua SDK.
+#if !defined ( LUA_SDK )
 private:
 	// No copy constructors allowed
 	CGameTrace(const CGameTrace& vOther);
-//#endif
+#else
+public:
+	// HACKHACK: We only do this for Lua, but Lua classes which use traces will
+	// throw errors when we compile, so define this outside of the Lua SDK.
+	// No copy constructors allowed
+	CGameTrace(const CGameTrace& vOther);
+#endif
 };
 
 

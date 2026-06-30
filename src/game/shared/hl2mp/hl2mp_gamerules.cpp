@@ -23,9 +23,6 @@
 #include "mathlib/lvector.h"
 #endif
 
-extern ConVar srcbox_gamemode_sandbox;
-extern ConVar srcbox_gamemode_hl2;
-
 #ifdef CLIENT_DLL
 	#include "c_hl2mp_player.h"
 #else
@@ -1297,14 +1294,15 @@ const char *CHL2MPRules::GetGameDescription( void )
 #if !defined( SRCBOX )
 	return "Deathmatch"; 
 #else
-	if (srcbox_gamemode_sandbox.GetInt() == 1) {
+	return "Sandbox";
+	/*if (srcbox_gamemode_sandbox.GetInt() == 1) {
 		return "Sandbox";
 	}
 	else if (srcbox_gamemode_hl2.GetInt() == 1) {
 		return "Half-Life 2 Campaign";
 	} else {
 		return "Deathmatch";
-	}
+	}*/
 #endif
 }
 

@@ -3326,21 +3326,21 @@ ISaveRestoreBlockSet *g_pGameSaveRestoreBlockSet = &g_SaveRestoreBlockSet;
 //------------------------------------------------------------------------------
 // Creates all entities that lie in the transition list
 //------------------------------------------------------------------------------
-void CreateEntitiesInTransitionList( CSaveRestoreData *pSaveData, int levelMask )
+void CreateEntitiesInTransitionList(CSaveRestoreData* pSaveData, int levelMask)
 {
-	CBaseEntity *pent;
+	CBaseEntity* pent;
 	int i;
-	for ( i = 0; i < pSaveData->NumEntities(); i++ )
+	for (i = 0; i < pSaveData->NumEntities(); i++)
 	{
-		entitytable_t *pEntInfo = pSaveData->GetEntityInfo( i );
+		entitytable_t* pEntInfo = pSaveData->GetEntityInfo(i);
 		pEntInfo->hEnt = NULL;
 
-		if ( pEntInfo->size == 0 || pEntInfo->edictindex == 0 )
+		if (pEntInfo->size == 0 || pEntInfo->edictindex == 0)
 			continue;
 
-		if ( pEntInfo->classname == NULL_STRING )
+		if (pEntInfo->classname == NULL_STRING)
 		{
-			Warning( "Entity with data saved, but with no classname\n" );
+			Warning("Entity with data saved, but with no classname\n");
 			Assert(0);
 			continue;
 		}
@@ -3349,83 +3349,82 @@ void CreateEntitiesInTransitionList( CSaveRestoreData *pSaveData, int levelMask 
 
 		// spawn players
 		pent = NULL;
-		if ( (pEntInfo->edictindex > 0) && (pEntInfo->edictindex <= gpGlobals->maxClients) )	
+		if ((pEntInfo->edictindex > 0) && (pEntInfo->edictindex <= gpGlobals->maxClients))
 		{
-			edict_t *ed = INDEXENT( pEntInfo->edictindex );
+			edict_t* ed = INDEXENT(pEntInfo->edictindex);
 
-			if ( active && ed && !ed->IsFree() )
+			if (active && ed && !ed->IsFree())
 			{
-				if ( !(pEntInfo->flags & FENTTABLE_PLAYER) )
+				if (!(pEntInfo->flags & FENTTABLE_PLAYER))
 				{
-					Warning( "ENTITY IS NOT A PLAYER: %d\n" , i );
+					Warning("ENTITY IS NOT A PLAYER: %d\n", i);
 					Assert(0);
 				}
 
-				pent = CBasePlayer::CreatePlayer( STRING(pEntInfo->classname), ed );
+				pent = CBasePlayer::CreatePlayer(STRING(pEntInfo->classname), ed);
 			}
 		}
-		else if ( active )
+		else if (active)
 		{
-			pent = CreateEntityByName( STRING(pEntInfo->classname) );
+			pent = CreateEntityByName(STRING(pEntInfo->classname));
 		}
 
 		pEntInfo->hEnt = pent;
 	}
 }
 
-
 //-----------------------------------------------------------------------------
-int CreateEntityTransitionList( CSaveRestoreData *pSaveData, int levelMask )
+int CreateEntityTransitionList(CSaveRestoreData* pSaveData, int levelMask)
 {
-	CBaseEntity *pent;
-	entitytable_t *pEntInfo;
+	CBaseEntity* pent;
+	entitytable_t* pEntInfo;
 
 	// Create entity list
-	CreateEntitiesInTransitionList( pSaveData, levelMask );
-	
+	CreateEntitiesInTransitionList(pSaveData, levelMask);
+
 	// Now spawn entities
-	CUtlVector<int> checkList;
+	CUtlVector< int > checkList;
 
 	int i;
 	int movedCount = 0;
-	for ( i = 0; i < pSaveData->NumEntities(); i++ )
+	for (i = 0; i < pSaveData->NumEntities(); i++)
 	{
-		pEntInfo = pSaveData->GetEntityInfo( i );
+		pEntInfo = pSaveData->GetEntityInfo(i);
 		pent = pEntInfo->hEnt;
-//		pSaveData->currentIndex = i;
-		pSaveData->Seek( pEntInfo->location );
-		
+		//		pSaveData->currentIndex = i;
+		pSaveData->Seek(pEntInfo->location);
+
 		// clear this out - it must be set on a per-entity basis
 		pSaveData->modelSpaceOffset.Init();
 
-		if ( pent && (pEntInfo->flags & levelMask) )		// Screen out the player if he's not to be spawned
+		if (pent && (pEntInfo->flags & levelMask))  // Screen out the player if he's not to be spawned
 		{
-			if ( pEntInfo->flags & FENTTABLE_GLOBAL )
+			if (pEntInfo->flags & FENTTABLE_GLOBAL)
 			{
-				DevMsg( 2, "Merging changes for global: %s\n", STRING(pEntInfo->classname) );
-			
+				DevMsg(2, "Merging changes for global: %s\n", STRING(pEntInfo->classname));
+
 				// -------------------------------------------------------------------------
 				// Pass the "global" flag to the DLL to indicate this entity should only override
 				// a matching entity, not be spawned
-				if ( g_EntitySaveRestoreBlockHandler.RestoreGlobalEntity( pent, pSaveData, pEntInfo ) > 0 )
+				if (g_EntitySaveRestoreBlockHandler.RestoreGlobalEntity(pent, pSaveData, pEntInfo) > 0)
 				{
 					movedCount++;
 					pEntInfo->restoreentityindex = pEntInfo->hEnt.Get()->entindex();
-					AddRestoredEntity( pEntInfo->hEnt.Get() );
+					AddRestoredEntity(pEntInfo->hEnt.Get());
 				}
 				else
 				{
-					UTIL_RemoveImmediate( pEntInfo->hEnt.Get() );
+					UTIL_RemoveImmediate(pEntInfo->hEnt.Get());
 				}
 				// -------------------------------------------------------------------------
 			}
-			else 
+			else
 			{
-				DevMsg( 2, "Transferring %s (%d)\n", STRING(pEntInfo->classname), pent->edict() ? ENTINDEX(pent->edict()) : -1 );
-				CRestore restoreHelper( pSaveData );
-				if ( g_EntitySaveRestoreBlockHandler.RestoreEntity( pent, &restoreHelper, pEntInfo ) < 0 )
+				DevMsg(2, "Transferring %s (%d)\n", STRING(pEntInfo->classname), pent->edict() ? ENTINDEX(pent->edict()) : -1);
+				CRestore restoreHelper(pSaveData);
+				if (g_EntitySaveRestoreBlockHandler.RestoreEntity(pent, &restoreHelper, pEntInfo) < 0)
 				{
-					UTIL_RemoveImmediate( pent );
+					UTIL_RemoveImmediate(pent);
 				}
 				else
 				{
@@ -3439,22 +3438,22 @@ int CreateEntityTransitionList( CSaveRestoreData *pSaveData, int levelMask )
 		}
 	}
 
-	for ( i = checkList.Count()-1; i >= 0; --i )
+	for (i = checkList.Count() - 1; i >= 0; --i)
 	{
-		pEntInfo = pSaveData->GetEntityInfo( checkList[i] );
+		pEntInfo = pSaveData->GetEntityInfo(checkList[i]);
 		pent = pEntInfo->hEnt;
 
 		// NOTE: pent can be NULL because UTIL_RemoveImmediate (called below) removes all in hierarchy
-		if ( !pent )
+		if (!pent)
 			continue;
 
 		MDLCACHE_CRITICAL_SECTION();
 
-		if ( !(pEntInfo->flags & FENTTABLE_PLAYER) && UTIL_EntityInSolid( pent ) )
+		if (!(pEntInfo->flags & FENTTABLE_PLAYER) && UTIL_EntityInSolid(pent))
 		{
 			// this can happen during normal processing - PVS is just a guess, some map areas won't exist in the new map
-			DevMsg( 2, "Suppressing %s\n", STRING(pEntInfo->classname) );
-			UTIL_RemoveImmediate( pent );
+			DevMsg(2, "Suppressing %s\n", STRING(pEntInfo->classname));
+			UTIL_RemoveImmediate(pent);
 			// Remove any entities that were removed using UTIL_Remove() as a result of the above calls to UTIL_RemoveImmediate()
 			gEntList.CleanupDeleteList();
 		}
@@ -3463,12 +3462,13 @@ int CreateEntityTransitionList( CSaveRestoreData *pSaveData, int levelMask )
 			movedCount++;
 			pEntInfo->flags = FENTTABLE_REMOVED;
 			pEntInfo->restoreentityindex = pent->entindex();
-			AddRestoredEntity( pent );
+			AddRestoredEntity(pent);
 		}
 	}
 
 	return movedCount;
 }
+#endif
 
 /**
  *
@@ -3476,233 +3476,232 @@ int CreateEntityTransitionList( CSaveRestoreData *pSaveData, int levelMask )
  *
  */
 
-// TODO: The code below was entirely generated by an LLM. Needs checking and testing.
+ // TODO: The code below was entirely generated by an LLM. Needs checking and testing.
 
-/**
- * Pushes the value of a single field onto the Lua stack.
- * This helper function handles individual data types and arrays.
- */
-#ifdef LUA_SDK
-void PushFieldToLua( lua_State *L, void *pFieldData, typedescription_t *pField, bool showAll )
+ /**
+  * Pushes the value of a single field onto the Lua stack.
+  * This helper function handles individual data types and arrays.
+  */
+void PushFieldToLua(lua_State* L, void* pFieldData, typedescription_t* pField, bool showAll)
 {
-    // Handle arrays by creating a sub-table
-    if ( pField->fieldSize > 1 && pField->fieldType != FIELD_CHARACTER )
-    {
-        lua_newtable( L );  // Create a new table for the array
-        for ( int i = 0; i < pField->fieldSize; ++i )
-        {
-            // Create a temporary typedescription_t to describe a single element
-            typedescription_t singleFieldDesc = *pField;
-            singleFieldDesc.fieldSize = 1;
+	// Handle arrays by creating a sub-table
+	if (pField->fieldSize > 1 && pField->fieldType != FIELD_CHARACTER)
+	{
+		lua_newtable(L);  // Create a new table for the array
+		for (int i = 0; i < pField->fieldSize; ++i)
+		{
+			// Create a temporary typedescription_t to describe a single element
+			typedescription_t singleFieldDesc = *pField;
+			singleFieldDesc.fieldSize = 1;
 
-            // Calculate the address of the current array element
-            void *pElementData = ( char * )pFieldData + ( i * ( pField->fieldSizeInBytes / pField->fieldSize ) );
+			// Calculate the address of the current array element
+			void* pElementData = (char*)pFieldData + (i * (pField->fieldSizeInBytes / pField->fieldSize));
 
-            lua_pushinteger( L, i + 1 );                          // Push array index (1-based)
-            PushFieldToLua( L, pElementData, &singleFieldDesc, showAll );  // Recursively push the single element's value
-            lua_settable( L, -3 );                                // Set table[i+1] = value
-        }
-        return;
-    }
+			lua_pushinteger(L, i + 1);                          // Push array index (1-based)
+			PushFieldToLua(L, pElementData, &singleFieldDesc, showAll);  // Recursively push the single element's value
+			lua_settable(L, -3);                                // Set table[i+1] = value
+		}
+		return;
+	}
 
-    // Handle single elements based on their type
-    switch ( pField->fieldType )
-    {
-        case FIELD_FLOAT:
-            lua_pushnumber( L, *( float * )pFieldData );
-            break;
+	// Handle single elements based on their type
+	switch (pField->fieldType)
+	{
+	case FIELD_FLOAT:
+		lua_pushnumber(L, *(float*)pFieldData);
+		break;
 
-        case FIELD_TIME:
-            lua_pushnumber( L, *( float * )pFieldData );
-            break;
+	case FIELD_TIME:
+		lua_pushnumber(L, *(float*)pFieldData);
+		break;
 
-        case FIELD_INTEGER:
-            lua_pushinteger( L, *( int * )pFieldData );
-            break;
+	case FIELD_INTEGER:
+		lua_pushinteger(L, *(int*)pFieldData);
+		break;
 
-        case FIELD_TICK:
-            lua_pushinteger( L, *( int * )pFieldData );
-            break;
+	case FIELD_TICK:
+		lua_pushinteger(L, *(int*)pFieldData);
+		break;
 
-        case FIELD_BOOLEAN:
-            lua_pushboolean( L, *( bool * )pFieldData );
-            break;
+	case FIELD_BOOLEAN:
+		lua_pushboolean(L, *(bool*)pFieldData);
+		break;
 
-        case FIELD_SHORT:
-            lua_pushinteger( L, *( short * )pFieldData );
-            break;
+	case FIELD_SHORT:
+		lua_pushinteger(L, *(short*)pFieldData);
+		break;
 
-        case FIELD_CHARACTER:
-            // For arrays of characters, push the whole string. For single chars, push a one-character string.
-            lua_pushlstring( L, ( char * )pFieldData, pField->fieldSizeInBytes );
-            break;
+	case FIELD_CHARACTER:
+		// For arrays of characters, push the whole string. For single chars, push a one-character string.
+		lua_pushlstring(L, (char*)pFieldData, pField->fieldSizeInBytes);
+		break;
 
-        case FIELD_STRING:
-        {
-            string_t val = *( string_t * )pFieldData;
-            lua_pushstring( L, ( val == NULL_STRING ) ? "" : STRING( val ) );
-            break;
-        }
+	case FIELD_STRING:
+	{
+		string_t val = *(string_t*)pFieldData;
+		lua_pushstring(L, (val == NULL_STRING) ? "" : STRING(val));
+		break;
+	}
 
-        case FIELD_VECTOR:
-        {
-            Vector *vec = ( Vector * )pFieldData;
-            lua_newtable( L );
-            lua_pushstring( L, "x" );
-            lua_pushnumber( L, vec->x );
-            lua_settable( L, -3 );
-            lua_pushstring( L, "y" );
-            lua_pushnumber( L, vec->y );
-            lua_settable( L, -3 );
-            lua_pushstring( L, "z" );
-            lua_pushnumber( L, vec->z );
-            lua_settable( L, -3 );
-            break;
-        }
+	case FIELD_VECTOR:
+	{
+		Vector* vec = (Vector*)pFieldData;
+		lua_newtable(L);
+		lua_pushstring(L, "x");
+		lua_pushnumber(L, vec->x);
+		lua_settable(L, -3);
+		lua_pushstring(L, "y");
+		lua_pushnumber(L, vec->y);
+		lua_settable(L, -3);
+		lua_pushstring(L, "z");
+		lua_pushnumber(L, vec->z);
+		lua_settable(L, -3);
+		break;
+	}
 
-        case FIELD_VECTOR2D:
-        {
-            Vector2D *vec = ( Vector2D * )pFieldData;
-            lua_newtable( L );
-            lua_pushstring( L, "x" );
-            lua_pushnumber( L, vec->x );
-            lua_settable( L, -3 );
-            lua_pushstring( L, "y" );
-            lua_pushnumber( L, vec->y );
-            lua_settable( L, -3 );
-            break;
-        }
+	case FIELD_VECTOR2D:
+	{
+		Vector2D* vec = (Vector2D*)pFieldData;
+		lua_newtable(L);
+		lua_pushstring(L, "x");
+		lua_pushnumber(L, vec->x);
+		lua_settable(L, -3);
+		lua_pushstring(L, "y");
+		lua_pushnumber(L, vec->y);
+		lua_settable(L, -3);
+		break;
+	}
 
-        case FIELD_QUATERNION:
-        {
-            Quaternion *q = ( Quaternion * )pFieldData;
-            lua_newtable( L );
-            lua_pushstring( L, "x" );
-            lua_pushnumber( L, q->x );
-            lua_settable( L, -3 );
-            lua_pushstring( L, "y" );
-            lua_pushnumber( L, q->y );
-            lua_settable( L, -3 );
-            lua_pushstring( L, "z" );
-            lua_pushnumber( L, q->z );
-            lua_settable( L, -3 );
-            lua_pushstring( L, "w" );
-            lua_pushnumber( L, q->w );
-            lua_settable( L, -3 );
-            break;
-        }
+	case FIELD_QUATERNION:
+	{
+		Quaternion* q = (Quaternion*)pFieldData;
+		lua_newtable(L);
+		lua_pushstring(L, "x");
+		lua_pushnumber(L, q->x);
+		lua_settable(L, -3);
+		lua_pushstring(L, "y");
+		lua_pushnumber(L, q->y);
+		lua_settable(L, -3);
+		lua_pushstring(L, "z");
+		lua_pushnumber(L, q->z);
+		lua_settable(L, -3);
+		lua_pushstring(L, "w");
+		lua_pushnumber(L, q->w);
+		lua_settable(L, -3);
+		break;
+	}
 
-        case FIELD_COLOR32:
-        {
-            color32 *color = ( color32 * )pFieldData;
-            lua_newtable( L );
-            lua_pushstring( L, "r" );
-            lua_pushinteger( L, color->r );
-            lua_settable( L, -3 );
-            lua_pushstring( L, "g" );
-            lua_pushinteger( L, color->g );
-            lua_settable( L, -3 );
-            lua_pushstring( L, "b" );
-            lua_pushinteger( L, color->b );
-            lua_settable( L, -3 );
-            lua_pushstring( L, "a" );
-            lua_pushinteger( L, color->a );
-            lua_settable( L, -3 );
-            break;
-        }
+	case FIELD_COLOR32:
+	{
+		color32* color = (color32*)pFieldData;
+		lua_newtable(L);
+		lua_pushstring(L, "r");
+		lua_pushinteger(L, color->r);
+		lua_settable(L, -3);
+		lua_pushstring(L, "g");
+		lua_pushinteger(L, color->g);
+		lua_settable(L, -3);
+		lua_pushstring(L, "b");
+		lua_pushinteger(L, color->b);
+		lua_settable(L, -3);
+		lua_pushstring(L, "a");
+		lua_pushinteger(L, color->a);
+		lua_settable(L, -3);
+		break;
+	}
 
-        case FIELD_EHANDLE:
-            lua_pushinteger( L, ( ( EHANDLE * )pFieldData )->GetEntryIndex() );
-            break;
+	case FIELD_EHANDLE:
+		lua_pushinteger(L, ((EHANDLE*)pFieldData)->GetEntryIndex());
+		break;
 
-        case FIELD_FUNCTION:
-        {
-            // Convert the function pointer to its name using the engine's utility function
-            inputfunc_t pfn = *( inputfunc_t * )pFieldData;
-            // The root map is needed to search for the function name
-            datamap_t *pRootMap = pField->td;
-            if ( pfn && pRootMap )
-            {
-                const char *pszFuncName = UTIL_FunctionToName( pRootMap, &pfn );
-                if ( pszFuncName )
-                {
-                    lua_pushstring( L, pszFuncName );
-                }
-                else
-                {
-                    lua_pushnil( L );  // Function pointer found but not in the data map
-                }
-            }
-            else
-            {
-                lua_pushnil( L );
-            }
-            break;
-        }
+	case FIELD_FUNCTION:
+	{
+		// Convert the function pointer to its name using the engine's utility function
+		inputfunc_t pfn = *(inputfunc_t*)pFieldData;
+		// The root map is needed to search for the function name
+		datamap_t* pRootMap = pField->td;
+		if (pfn && pRootMap)
+		{
+			const char* pszFuncName = UTIL_FunctionToName(pRootMap, &pfn);
+			if (pszFuncName)
+			{
+				lua_pushstring(L, pszFuncName);
+			}
+			else
+			{
+				lua_pushnil(L);  // Function pointer found but not in the data map
+			}
+		}
+		else
+		{
+			lua_pushnil(L);
+		}
+		break;
+	}
 
-        case FIELD_EMBEDDED:
-        {
-            // This is a nested object. Create a new table and recursively fill it.
-            PushLuaSaveTable( L, pFieldData, pField->td, showAll );
-            break;
-        }
+	case FIELD_EMBEDDED:
+	{
+		// This is a nested object. Create a new table and recursively fill it.
+		PushLuaSaveTable(L, pFieldData, pField->td, showAll);
+		break;
+	}
 
-        // Types that are pointers or not easily representable in Lua are pushed as nil or a placeholder.
-        case FIELD_CLASSPTR:
-        case FIELD_EDICT:
-        case FIELD_CUSTOM:  // Custom fields would require a dedicated "PushToLua" operation
-        default:
-            // For unknown or unsupported types, push nil
-            lua_pushnil( L );
-            break;
-    }
+	// Types that are pointers or not easily representable in Lua are pushed as nil or a placeholder.
+	case FIELD_CLASSPTR:
+	case FIELD_EDICT:
+	case FIELD_CUSTOM:  // Custom fields would require a dedicated "PushToLua" operation
+	default:
+		// For unknown or unsupported types, push nil
+		lua_pushnil(L);
+		break;
+	}
 }
 
 /**
  * Recursively traverses an object's data map and populates the Lua table
  * currently at the top of the stack.
  */
-void PushLuaDataMap( lua_State *L, void *pObject, datamap_t *pMap, bool showAll )
+void PushLuaDataMap(lua_State* L, void* pObject, datamap_t* pMap, bool showAll)
 {
-    if ( !pMap ) return;
+	if (!pMap) return;
 
-    // Recursively handle base classes first. This means derived class
-    // values will correctly overwrite base class values if names conflict.
-    if ( pMap->baseMap )
-    {
-        PushLuaDataMap( L, pObject, pMap->baseMap, showAll );
-    }
+	// Recursively handle base classes first. This means derived class
+	// values will correctly overwrite base class values if names conflict.
+	if (pMap->baseMap)
+	{
+		PushLuaDataMap(L, pObject, pMap->baseMap, showAll);
+	}
 
-    // Iterate through all fields in the current data map
-    for ( int i = 0; i < pMap->dataNumFields; ++i )
-    {
-        typedescription_t *pField = &pMap->dataDesc[i];
+	// Iterate through all fields in the current data map
+	for (int i = 0; i < pMap->dataNumFields; ++i)
+	{
+		typedescription_t* pField = &pMap->dataDesc[i];
 
-        // Only process fields marked for saving if showAll is false
-        if ( !showAll && !( pField->flags & FTYPEDESC_SAVE ) )
-        {
-            continue;
-        }
+		// Only process fields marked for saving if showAll is false
+		if (!showAll && !(pField->flags & FTYPEDESC_SAVE))
+		{
+			continue;
+		}
 
-        // Get a pointer to the actual data for this field
-        void *pFieldData = ( char * )pObject + pField->fieldOffset[TD_OFFSET_NORMAL];
+		// Get a pointer to the actual data for this field
+		void* pFieldData = (char*)pObject + pField->fieldOffset[TD_OFFSET_NORMAL];
 
-        // Skip if the fieldname is NULL (happens on the last field of a datamap)
-        if ( !pField->fieldName )
-        {
-            continue;
-        }
+		// Skip if the fieldname is NULL (happens on the last field of a datamap)
+		if (!pField->fieldName)
+		{
+			continue;
+		}
 
-        // Push the field name (key) onto the stack
-        lua_pushstring( L, pField->fieldName );
+		// Push the field name (key) onto the stack
+		lua_pushstring(L, pField->fieldName);
 
-        // Push the field's value onto the stack
-        PushFieldToLua( L, pFieldData, pField, showAll );
+		// Push the field's value onto the stack
+		PushFieldToLua(L, pFieldData, pField, showAll);
 
-        // Add the key-value pair to the table at the top of the stack.
-        // The table is now at index -3 because the key and value were pushed.
-        lua_settable( L, -3 );
-    }
+		// Add the key-value pair to the table at the top of the stack.
+		// The table is now at index -3 because the key and value were pushed.
+		lua_settable(L, -3);
+	}
 }
 
 /**
@@ -3715,57 +3714,57 @@ void PushLuaDataMap( lua_State *L, void *pObject, datamap_t *pMap, bool showAll 
  * @param pObject A pointer to the C++ object instance (e.g., a CBaseEntity*).
  * @param pMap A pointer to the data map for the object's class.
  */
-void PushLuaSaveTable( lua_State *L, void *pObject, datamap_t *pMap, bool showAll )
+void PushLuaSaveTable(lua_State* L, void* pObject, datamap_t* pMap, bool showAll)
 {
-    if ( !pObject || !pMap )
-    {
-        lua_pushnil( L );
-        return;
-    }
+	if (!pObject || !pMap)
+	{
+		lua_pushnil(L);
+		return;
+	}
 
-    // Create the root table that will hold all the data
-    lua_newtable( L );
+	// Create the root table that will hold all the data
+	lua_newtable(L);
 
-    // Call the recursive helper to populate the table
-    PushLuaDataMap( L, pObject, pMap, showAll );
+	// Call the recursive helper to populate the table
+	PushLuaDataMap(L, pObject, pMap, showAll);
 }
 
 /**
  * Helper function to recursively search for a field by name in a datamap.
  * Returns a pointer to the field description if found, null otherwise.
  */
-typedescription_t *FindFieldInDataMap( datamap_t *pMap, const char *pszFieldName, void **ppFieldData, void *pObject )
+typedescription_t* FindFieldInDataMap(datamap_t* pMap, const char* pszFieldName, void** ppFieldData, void* pObject)
 {
-    if ( !pMap || !pszFieldName )
-        return nullptr;
+	if (!pMap || !pszFieldName)
+		return nullptr;
 
-    // Search in base classes first (depth-first search)
-    if ( pMap->baseMap )
-    {
-        typedescription_t *pFoundField = FindFieldInDataMap( pMap->baseMap, pszFieldName, ppFieldData, pObject );
-        if ( pFoundField )
-            return pFoundField;
-    }
+	// Search in base classes first (depth-first search)
+	if (pMap->baseMap)
+	{
+		typedescription_t* pFoundField = FindFieldInDataMap(pMap->baseMap, pszFieldName, ppFieldData, pObject);
+		if (pFoundField)
+			return pFoundField;
+	}
 
-    // Search through all fields in the current data map
-    for ( int i = 0; i < pMap->dataNumFields; ++i )
-    {
-        typedescription_t *pField = &pMap->dataDesc[i];
+	// Search through all fields in the current data map
+	for (int i = 0; i < pMap->dataNumFields; ++i)
+	{
+		typedescription_t* pField = &pMap->dataDesc[i];
 
-        // Only consider fields marked for saving
-        if ( !( pField->flags & FTYPEDESC_SAVE ) )
-            continue;
+		// Only consider fields marked for saving
+		if (!(pField->flags & FTYPEDESC_SAVE))
+			continue;
 
-        // Check if this is the field we're looking for
-        if ( Q_stricmp( pField->fieldName, pszFieldName ) == 0 )
-        {
-            // Calculate the field data pointer
-            *ppFieldData = ( char * )pObject + pField->fieldOffset[TD_OFFSET_NORMAL];
-            return pField;
-        }
-    }
+		// Check if this is the field we're looking for
+		if (Q_stricmp(pField->fieldName, pszFieldName) == 0)
+		{
+			// Calculate the field data pointer
+			*ppFieldData = (char*)pObject + pField->fieldOffset[TD_OFFSET_NORMAL];
+			return pField;
+		}
+	}
 
-    return nullptr;
+	return nullptr;
 }
 
 /**
@@ -3780,295 +3779,295 @@ typedescription_t *FindFieldInDataMap( datamap_t *pMap, const char *pszFieldName
  * @param showAll If true, all fields will be pushed regardless of their save flags.
  * @return true if the field was found and pushed, false if the field doesn't exist.
  */
-bool PushLuaSaveTableField( lua_State *L, void *pObject, datamap_t *pMap, const char *pszFieldName )
+bool PushLuaSaveTableField(lua_State* L, void* pObject, datamap_t* pMap, const char* pszFieldName)
 {
-    if ( !pObject || !pMap || !pszFieldName )
-    {
-        lua_pushnil( L );
-        return false;
-    }
+	if (!pObject || !pMap || !pszFieldName)
+	{
+		lua_pushnil(L);
+		return false;
+	}
 
-    void *pFieldData = nullptr;
-    typedescription_t *pField = FindFieldInDataMap( pMap, pszFieldName, &pFieldData, pObject );
+	void* pFieldData = nullptr;
+	typedescription_t* pField = FindFieldInDataMap(pMap, pszFieldName, &pFieldData, pObject);
 
-    if ( !pField || !pFieldData )
-    {
-        // Field not found, push nil
-        lua_pushnil( L );
-        return false;
-    }
+	if (!pField || !pFieldData)
+	{
+		// Field not found, push nil
+		lua_pushnil(L);
+		return false;
+	}
 
-    // Field found, push its value using the existing helper function
-    PushFieldToLua( L, pFieldData, pField, true );
-    return true;
+	// Field found, push its value using the existing helper function
+	PushFieldToLua(L, pFieldData, pField, true);
+	return true;
 }
 
 /**
  * Sets the value of a single field from the value on top of the Lua stack.
  * This helper function handles individual data types and arrays.
  */
-bool SetFieldFromLua( lua_State *L, void *pFieldData, typedescription_t *pField )
+bool SetFieldFromLua(lua_State* L, void* pFieldData, typedescription_t* pField)
 {
-    // Handle arrays by expecting a table
-    if ( pField->fieldSize > 1 && pField->fieldType != FIELD_CHARACTER )
-    {
-        if ( !lua_istable( L, -1 ) )
-        {
-            return false;  // Expected table for array field
-        }
+	// Handle arrays by expecting a table
+	if (pField->fieldSize > 1 && pField->fieldType != FIELD_CHARACTER)
+	{
+		if (!lua_istable(L, -1))
+		{
+			return false;  // Expected table for array field
+		}
 
-        // Iterate through the array elements
-        for ( int i = 0; i < pField->fieldSize; ++i )
-        {
-            lua_pushinteger( L, i + 1 );  // Push array index (1-based)
-            lua_gettable( L, -2 );        // Get table[i+1]
+		// Iterate through the array elements
+		for (int i = 0; i < pField->fieldSize; ++i)
+		{
+			lua_pushinteger(L, i + 1);  // Push array index (1-based)
+			lua_gettable(L, -2);        // Get table[i+1]
 
-            if ( lua_isnil( L, -1 ) )
-            {
-                lua_pop( L, 1 );  // Pop the nil value
-                continue;         // Skip nil values, leaving original data unchanged
-            }
+			if (lua_isnil(L, -1))
+			{
+				lua_pop(L, 1);  // Pop the nil value
+				continue;         // Skip nil values, leaving original data unchanged
+			}
 
-            // Create a temporary typedescription_t to describe a single element
-            typedescription_t singleFieldDesc = *pField;
-            singleFieldDesc.fieldSize = 1;
+			// Create a temporary typedescription_t to describe a single element
+			typedescription_t singleFieldDesc = *pField;
+			singleFieldDesc.fieldSize = 1;
 
-            // Calculate the address of the current array element
-            void *pElementData = ( char * )pFieldData + ( i * ( pField->fieldSizeInBytes / pField->fieldSize ) );
+			// Calculate the address of the current array element
+			void* pElementData = (char*)pFieldData + (i * (pField->fieldSizeInBytes / pField->fieldSize));
 
-            // Recursively set the single element's value
-            bool success = SetFieldFromLua( L, pElementData, &singleFieldDesc );
-            lua_pop( L, 1 );  // Pop the element value
+			// Recursively set the single element's value
+			bool success = SetFieldFromLua(L, pElementData, &singleFieldDesc);
+			lua_pop(L, 1);  // Pop the element value
 
-            if ( !success )
-            {
-                return false;
-            }
-        }
-        return true;
-    }
+			if (!success)
+			{
+				return false;
+			}
+		}
+		return true;
+	}
 
-    // Handle single elements based on their type
-    switch ( pField->fieldType )
-    {
-        case FIELD_FLOAT:
-        case FIELD_TIME:
-            if ( !lua_isnumber( L, -1 ) )
-                return false;
-            *( float * )pFieldData = ( float )lua_tonumber( L, -1 );
-            break;
+	// Handle single elements based on their type
+	switch (pField->fieldType)
+	{
+	case FIELD_FLOAT:
+	case FIELD_TIME:
+		if (!lua_isnumber(L, -1))
+			return false;
+		*(float*)pFieldData = (float)lua_tonumber(L, -1);
+		break;
 
-        case FIELD_INTEGER:
-        case FIELD_TICK:
-            if ( !lua_isnumber( L, -1 ) )
-                return false;
-            *( int * )pFieldData = ( int )lua_tointeger( L, -1 );
-            break;
+	case FIELD_INTEGER:
+	case FIELD_TICK:
+		if (!lua_isnumber(L, -1))
+			return false;
+		*(int*)pFieldData = (int)lua_tointeger(L, -1);
+		break;
 
-        case FIELD_BOOLEAN:
-            *( bool * )pFieldData = lua_toboolean( L, -1 ) != 0;
-            break;
+	case FIELD_BOOLEAN:
+		*(bool*)pFieldData = lua_toboolean(L, -1) != 0;
+		break;
 
-        case FIELD_SHORT:
-            if ( !lua_isnumber( L, -1 ) )
-                return false;
-            *( short * )pFieldData = ( short )lua_tointeger( L, -1 );
-            break;
+	case FIELD_SHORT:
+		if (!lua_isnumber(L, -1))
+			return false;
+		*(short*)pFieldData = (short)lua_tointeger(L, -1);
+		break;
 
-        case FIELD_CHARACTER:
-            if ( !lua_isstring( L, -1 ) )
-                return false;
-            {
-                size_t len;
-                const char *str = lua_tolstring( L, -1, &len );
-                // Copy string data, ensuring we don't exceed field size
-                size_t copyLen = ( len < pField->fieldSizeInBytes ) ? len : pField->fieldSizeInBytes - 1;
-                memcpy( pFieldData, str, copyLen );
-                // Null-terminate if there's space
-                if ( copyLen < pField->fieldSizeInBytes )
-                    ( ( char * )pFieldData )[copyLen] = '\0';
-            }
-            break;
+	case FIELD_CHARACTER:
+		if (!lua_isstring(L, -1))
+			return false;
+		{
+			size_t len;
+			const char* str = lua_tolstring(L, -1, &len);
+			// Copy string data, ensuring we don't exceed field size
+			size_t copyLen = (len < pField->fieldSizeInBytes) ? len : pField->fieldSizeInBytes - 1;
+			memcpy(pFieldData, str, copyLen);
+			// Null-terminate if there's space
+			if (copyLen < pField->fieldSizeInBytes)
+				((char*)pFieldData)[copyLen] = '\0';
+		}
+		break;
 
-        case FIELD_STRING:
-            if ( lua_isnil( L, -1 ) )
-            {
-                *( string_t * )pFieldData = NULL_STRING;
-            }
-            else if ( lua_isstring( L, -1 ) )
-            {
-                const char *str = lua_tostring( L, -1 );
-                *( string_t * )pFieldData = AllocPooledString( str );
-            }
-            else
-            {
-                return false;
-            }
-            break;
+	case FIELD_STRING:
+		if (lua_isnil(L, -1))
+		{
+			*(string_t*)pFieldData = NULL_STRING;
+		}
+		else if (lua_isstring(L, -1))
+		{
+			const char* str = lua_tostring(L, -1);
+			*(string_t*)pFieldData = AllocPooledString(str);
+		}
+		else
+		{
+			return false;
+		}
+		break;
 
-        case FIELD_VECTOR:
-            if ( !lua_istable( L, -1 ) )
-                return false;
-            {
-                Vector *vec = ( Vector * )pFieldData;
+	case FIELD_VECTOR:
+		if (!lua_istable(L, -1))
+			return false;
+		{
+			Vector* vec = (Vector*)pFieldData;
 
-                lua_pushstring( L, "x" );
-                lua_gettable( L, -2 );
-                if ( lua_isnumber( L, -1 ) )
-                    vec->x = ( float )lua_tonumber( L, -1 );
-                lua_pop( L, 1 );
+			lua_pushstring(L, "x");
+			lua_gettable(L, -2);
+			if (lua_isnumber(L, -1))
+				vec->x = (float)lua_tonumber(L, -1);
+			lua_pop(L, 1);
 
-                lua_pushstring( L, "y" );
-                lua_gettable( L, -2 );
-                if ( lua_isnumber( L, -1 ) )
-                    vec->y = ( float )lua_tonumber( L, -1 );
-                lua_pop( L, 1 );
+			lua_pushstring(L, "y");
+			lua_gettable(L, -2);
+			if (lua_isnumber(L, -1))
+				vec->y = (float)lua_tonumber(L, -1);
+			lua_pop(L, 1);
 
-                lua_pushstring( L, "z" );
-                lua_gettable( L, -2 );
-                if ( lua_isnumber( L, -1 ) )
-                    vec->z = ( float )lua_tonumber( L, -1 );
-                lua_pop( L, 1 );
-            }
-            break;
+			lua_pushstring(L, "z");
+			lua_gettable(L, -2);
+			if (lua_isnumber(L, -1))
+				vec->z = (float)lua_tonumber(L, -1);
+			lua_pop(L, 1);
+		}
+		break;
 
-        case FIELD_VECTOR2D:
-            if ( !lua_istable( L, -1 ) )
-                return false;
-            {
-                Vector2D *vec = ( Vector2D * )pFieldData;
+	case FIELD_VECTOR2D:
+		if (!lua_istable(L, -1))
+			return false;
+		{
+			Vector2D* vec = (Vector2D*)pFieldData;
 
-                lua_pushstring( L, "x" );
-                lua_gettable( L, -2 );
-                if ( lua_isnumber( L, -1 ) )
-                    vec->x = ( float )lua_tonumber( L, -1 );
-                lua_pop( L, 1 );
+			lua_pushstring(L, "x");
+			lua_gettable(L, -2);
+			if (lua_isnumber(L, -1))
+				vec->x = (float)lua_tonumber(L, -1);
+			lua_pop(L, 1);
 
-                lua_pushstring( L, "y" );
-                lua_gettable( L, -2 );
-                if ( lua_isnumber( L, -1 ) )
-                    vec->y = ( float )lua_tonumber( L, -1 );
-                lua_pop( L, 1 );
-            }
-            break;
+			lua_pushstring(L, "y");
+			lua_gettable(L, -2);
+			if (lua_isnumber(L, -1))
+				vec->y = (float)lua_tonumber(L, -1);
+			lua_pop(L, 1);
+		}
+		break;
 
-        case FIELD_QUATERNION:
-            if ( !lua_istable( L, -1 ) )
-                return false;
-            {
-                Quaternion *q = ( Quaternion * )pFieldData;
+	case FIELD_QUATERNION:
+		if (!lua_istable(L, -1))
+			return false;
+		{
+			Quaternion* q = (Quaternion*)pFieldData;
 
-                lua_pushstring( L, "x" );
-                lua_gettable( L, -2 );
-                if ( lua_isnumber( L, -1 ) )
-                    q->x = ( float )lua_tonumber( L, -1 );
-                lua_pop( L, 1 );
+			lua_pushstring(L, "x");
+			lua_gettable(L, -2);
+			if (lua_isnumber(L, -1))
+				q->x = (float)lua_tonumber(L, -1);
+			lua_pop(L, 1);
 
-                lua_pushstring( L, "y" );
-                lua_gettable( L, -2 );
-                if ( lua_isnumber( L, -1 ) )
-                    q->y = ( float )lua_tonumber( L, -1 );
-                lua_pop( L, 1 );
+			lua_pushstring(L, "y");
+			lua_gettable(L, -2);
+			if (lua_isnumber(L, -1))
+				q->y = (float)lua_tonumber(L, -1);
+			lua_pop(L, 1);
 
-                lua_pushstring( L, "z" );
-                lua_gettable( L, -2 );
-                if ( lua_isnumber( L, -1 ) )
-                    q->z = ( float )lua_tonumber( L, -1 );
-                lua_pop( L, 1 );
+			lua_pushstring(L, "z");
+			lua_gettable(L, -2);
+			if (lua_isnumber(L, -1))
+				q->z = (float)lua_tonumber(L, -1);
+			lua_pop(L, 1);
 
-                lua_pushstring( L, "w" );
-                lua_gettable( L, -2 );
-                if ( lua_isnumber( L, -1 ) )
-                    q->w = ( float )lua_tonumber( L, -1 );
-                lua_pop( L, 1 );
-            }
-            break;
+			lua_pushstring(L, "w");
+			lua_gettable(L, -2);
+			if (lua_isnumber(L, -1))
+				q->w = (float)lua_tonumber(L, -1);
+			lua_pop(L, 1);
+		}
+		break;
 
-        case FIELD_COLOR32:
-            if ( !lua_istable( L, -1 ) )
-                return false;
-            {
-                color32 *color = ( color32 * )pFieldData;
+	case FIELD_COLOR32:
+		if (!lua_istable(L, -1))
+			return false;
+		{
+			color32* color = (color32*)pFieldData;
 
-                lua_pushstring( L, "r" );
-                lua_gettable( L, -2 );
-                if ( lua_isnumber( L, -1 ) )
-                    color->r = ( unsigned char )lua_tointeger( L, -1 );
-                lua_pop( L, 1 );
+			lua_pushstring(L, "r");
+			lua_gettable(L, -2);
+			if (lua_isnumber(L, -1))
+				color->r = (unsigned char)lua_tointeger(L, -1);
+			lua_pop(L, 1);
 
-                lua_pushstring( L, "g" );
-                lua_gettable( L, -2 );
-                if ( lua_isnumber( L, -1 ) )
-                    color->g = ( unsigned char )lua_tointeger( L, -1 );
-                lua_pop( L, 1 );
+			lua_pushstring(L, "g");
+			lua_gettable(L, -2);
+			if (lua_isnumber(L, -1))
+				color->g = (unsigned char)lua_tointeger(L, -1);
+			lua_pop(L, 1);
 
-                lua_pushstring( L, "b" );
-                lua_gettable( L, -2 );
-                if ( lua_isnumber( L, -1 ) )
-                    color->b = ( unsigned char )lua_tointeger( L, -1 );
-                lua_pop( L, 1 );
+			lua_pushstring(L, "b");
+			lua_gettable(L, -2);
+			if (lua_isnumber(L, -1))
+				color->b = (unsigned char)lua_tointeger(L, -1);
+			lua_pop(L, 1);
 
-                lua_pushstring( L, "a" );
-                lua_gettable( L, -2 );
-                if ( lua_isnumber( L, -1 ) )
-                    color->a = ( unsigned char )lua_tointeger( L, -1 );
-                lua_pop( L, 1 );
-            }
-            break;
+			lua_pushstring(L, "a");
+			lua_gettable(L, -2);
+			if (lua_isnumber(L, -1))
+				color->a = (unsigned char)lua_tointeger(L, -1);
+			lua_pop(L, 1);
+		}
+		break;
 
-        //case FIELD_EHANDLE:
-        //    if ( !lua_isnumber( L, -1 ) )
-        //        return false;
-        //    {
-        //        int entryIndex = ( int )lua_tointeger( L, -1 );
-        //        ( ( EHANDLE * )pFieldData )->Set( entryIndex );
-        //    }
-        //    break;
+		//case FIELD_EHANDLE:
+		//    if ( !lua_isnumber( L, -1 ) )
+		//        return false;
+		//    {
+		//        int entryIndex = ( int )lua_tointeger( L, -1 );
+		//        ( ( EHANDLE * )pFieldData )->Set( entryIndex );
+		//    }
+		//    break;
 
-        //case FIELD_FUNCTION:
-        //    if ( lua_isnil( L, -1 ) )
-        //    {
-        //        *( inputfunc_t * )pFieldData = NULL;
-        //    }
-        //    else if ( lua_isstring( L, -1 ) )
-        //    {
-        //        const char *pszFuncName = lua_tostring( L, -1 );
-        //        // Convert function name back to function pointer using the engine's utility function
-        //        datamap_t *pRootMap = pField->td;
-        //        if ( pRootMap )
-        //        {
-        //            inputfunc_t pfn = UTIL_FunctionFromName( pRootMap, pszFuncName );
-        //            *( inputfunc_t * )pFieldData = pfn;
-        //        }
-        //        else
-        //        {
-        //            return false;
-        //        }
-        //    }
-        //    else
-        //    {
-        //        return false;
-        //    }
-        //    break;
+		//case FIELD_FUNCTION:
+		//    if ( lua_isnil( L, -1 ) )
+		//    {
+		//        *( inputfunc_t * )pFieldData = NULL;
+		//    }
+		//    else if ( lua_isstring( L, -1 ) )
+		//    {
+		//        const char *pszFuncName = lua_tostring( L, -1 );
+		//        // Convert function name back to function pointer using the engine's utility function
+		//        datamap_t *pRootMap = pField->td;
+		//        if ( pRootMap )
+		//        {
+		//            inputfunc_t pfn = UTIL_FunctionFromName( pRootMap, pszFuncName );
+		//            *( inputfunc_t * )pFieldData = pfn;
+		//        }
+		//        else
+		//        {
+		//            return false;
+		//        }
+		//    }
+		//    else
+		//    {
+		//        return false;
+		//    }
+		//    break;
 
-        //case FIELD_EMBEDDED:
-        //    if ( !lua_istable( L, -1 ) )
-        //        return false;
-        //    {
-        //        // This is a nested object. Recursively set its fields from the table.
-        //        return SetLuaDataMap( L, pFieldData, pField->td );
-        //    }
+		//case FIELD_EMBEDDED:
+		//    if ( !lua_istable( L, -1 ) )
+		//        return false;
+		//    {
+		//        // This is a nested object. Recursively set its fields from the table.
+		//        return SetLuaDataMap( L, pFieldData, pField->td );
+		//    }
 
-        // Types that are not easily settable from Lua
-        case FIELD_CLASSPTR:
-        case FIELD_EDICT:
-        case FIELD_CUSTOM:
-        default:
-            // For unsupported types, we can't set them safely
-            return false;
-    }
+		// Types that are not easily settable from Lua
+	case FIELD_CLASSPTR:
+	case FIELD_EDICT:
+	case FIELD_CUSTOM:
+	default:
+		// For unsupported types, we can't set them safely
+		return false;
+	}
 
-    return true;
+	return true;
 }
 
 ///**
@@ -4136,24 +4135,22 @@ bool SetFieldFromLua( lua_State *L, void *pFieldData, typedescription_t *pField 
  * @param pszFieldName The name of the field to set.
  * @return true if the field was found and set successfully, false otherwise.
  */
-bool SetLuaSaveTableField( lua_State *L, void *pObject, datamap_t *pMap, const char *pszFieldName )
+bool SetLuaSaveTableField(lua_State* L, void* pObject, datamap_t* pMap, const char* pszFieldName)
 {
-    if ( !pObject || !pMap || !pszFieldName )
-    {
-        return false;
-    }
+	if (!pObject || !pMap || !pszFieldName)
+	{
+		return false;
+	}
 
-    void *pFieldData = nullptr;
-    typedescription_t *pField = FindFieldInDataMap( pMap, pszFieldName, &pFieldData, pObject );
+	void* pFieldData = nullptr;
+	typedescription_t* pField = FindFieldInDataMap(pMap, pszFieldName, &pFieldData, pObject);
 
-    if ( !pField || !pFieldData )
-    {
-        // Field not found
-        return false;
-    }
+	if (!pField || !pFieldData)
+	{
+		// Field not found
+		return false;
+	}
 
-    // Field found, set its value from the Lua stack
-    return SetFieldFromLua( L, pFieldData, pField );
+	// Field found, set its value from the Lua stack
+	return SetFieldFromLua(L, pFieldData, pField);
 }
-#endif
-#endif

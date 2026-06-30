@@ -1,342 +1,483 @@
-//===== Copyright © 1996-2005, Valve Corporation, All rights reserved. ======//
-//
-// Purpose: 
-//
-// $NoKeywords: $
-//===========================================================================//
-
-#define LIInput_cpp
-
 #include <cbase.h>
 #include "vgui/iinput.h"
 #include "vgui_controls/Controls.h"
 #include <luamanager.h>
 #include "luasrclib.h"
-#include "vgui_controls/lPanel.h"
+#include <mathlib/lvector.h>
+
+#include "scripted_controls/lPanel.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
 using namespace vgui;
 
+LUA_REGISTRATION_INIT( Inputs )
 
-static int input_CandidateListStartsAtOne (lua_State *L) {
-  lua_pushboolean(L, input()->CandidateListStartsAtOne());
-  return 1;
+LUA_BINDING_BEGIN( Inputs, IsCandidateListStartingAtOne, "library", "Check if the candidate list starts at index one." )
+{
+    lua_pushboolean( L, input()->CandidateListStartsAtOne() );
+    return 1;
 }
+LUA_BINDING_END( "boolean", "Whether the candidate list starts at index one." )
 
-static int input_GetAppModalSurface (lua_State *L) {
-  lua_pushpanel(L, input()->GetAppModalSurface());
-  return 1;
+LUA_BINDING_BEGIN( Inputs, GetAppModalSurface, "library", "Get the application modal surface panel." )
+{
+    Panel::PushVPanelLuaInstance( L, input()->GetAppModalSurface() );
+    return 1;
 }
+LUA_BINDING_END( "PanelHandle", "The application modal surface panel." )
 
-static int input_GetCandidateListCount (lua_State *L) {
-  lua_pushinteger(L, input()->GetCandidateListCount());
-  return 1;
+LUA_BINDING_BEGIN( Inputs, GetCandidateListCount, "library", "Get the count of candidates in the candidate list." )
+{
+    lua_pushinteger( L, input()->GetCandidateListCount() );
+    return 1;
 }
+LUA_BINDING_END( "integer", "Count of candidates." )
 
-static int input_GetCandidateListPageSize (lua_State *L) {
-  lua_pushinteger(L, input()->GetCandidateListPageSize());
-  return 1;
+LUA_BINDING_BEGIN( Inputs, GetCandidateListPageSize, "library", "Get the page size of the candidate list." )
+{
+    lua_pushinteger( L, input()->GetCandidateListPageSize() );
+    return 1;
 }
+LUA_BINDING_END( "integer", "Page size of the candidate list." )
 
-static int input_GetCandidateListPageStart (lua_State *L) {
-  lua_pushinteger(L, input()->GetCandidateListPageStart());
-  return 1;
+LUA_BINDING_BEGIN( Inputs, GetCandidateListPageStart, "library", "Get the starting index of the current page in the candidate list." )
+{
+    lua_pushinteger( L, input()->GetCandidateListPageStart() );
+    return 1;
 }
+LUA_BINDING_END( "integer", "Starting index of the current page." )
 
-static int input_GetCandidateListSelectedItem (lua_State *L) {
-  lua_pushinteger(L, input()->GetCandidateListSelectedItem());
-  return 1;
+LUA_BINDING_BEGIN( Inputs, GetCandidateListSelectedItem, "library", "Get the selected item's index in the candidate list." )
+{
+    lua_pushinteger( L, input()->GetCandidateListSelectedItem() );
+    return 1;
 }
+LUA_BINDING_END( "integer", "Index of the selected item." )
 
-static int input_GetCurrentIMEHandle (lua_State *L) {
-  lua_pushinteger(L, input()->GetCurrentIMEHandle());
-  return 1;
+LUA_BINDING_BEGIN( Inputs, GetCurrentImeHandle, "library", "Get the handle of the current Input Method Editor (IME)." )
+{
+    lua_pushinteger( L, input()->GetCurrentIMEHandle() );
+    return 1;
 }
+LUA_BINDING_END( "integer", "IME handle." )
 
-static int input_GetCursorPos__USE_VCR_MODE (lua_State *L) {
-  int x, y;
-  input()->GetCursorPos__USE_VCR_MODE(x, y);
-  lua_pushinteger(L, x);
-  lua_pushinteger(L, y);
-  return 2;
+LUA_BINDING_BEGIN( Inputs, GetCursorPositionVcrMode, "library", "Get the cursor position using VCR mode." )
+{
+    int x, y;
+    input()->GetCursorPos__USE_VCR_MODE( x, y );
+    lua_pushinteger( L, x );
+    lua_pushinteger( L, y );
+    return 2;
 }
+LUA_BINDING_END( "integer, integer", "Cursor X and Y positions." )
 
-static int input_GetCursorPosition (lua_State *L) {
-  int x, y;
-  input()->GetCursorPosition(x, y);
-  lua_pushinteger(L, x);
-  lua_pushinteger(L, y);
-  return 2;
+LUA_BINDING_BEGIN( Inputs, GetCursorPosition, "library", "Get the current cursor position." )
+{
+    int x, y;
+    input()->GetCursorPosition( x, y );
+    lua_pushinteger( L, x );
+    lua_pushinteger( L, y );
+    return 2;
 }
+LUA_BINDING_END( "integer, integer", "Cursor X and Y positions." )
 
-static int input_GetEnglishIMEHandle (lua_State *L) {
-  lua_pushinteger(L, input()->GetEnglishIMEHandle());
-  return 1;
+LUA_BINDING_BEGIN( Inputs, GetEnglishImeHandle, "library", "Get the handle of the English Input Method Editor (IME)." )
+{
+    lua_pushinteger( L, input()->GetEnglishIMEHandle() );
+    return 1;
 }
+LUA_BINDING_END( "integer", "IME handle." )
 
-static int input_GetFocus (lua_State *L) {
-  lua_pushpanel(L, input()->GetFocus());
-  return 1;
+LUA_BINDING_BEGIN( Inputs, GetFocus, "library", "Get the panel that currently has focus." )
+{
+    Panel::PushVPanelLuaInstance( L, input()->GetFocus() );
+    return 1;
 }
+LUA_BINDING_END( "PanelHandle", "Focused panel." )
 
-static int input_GetModalSubTree (lua_State *L) {
-  lua_pushpanel(L, input()->GetModalSubTree());
-  return 1;
+LUA_BINDING_BEGIN( Inputs, GetModalSubTree, "library", "Get the topmost modal sub-tree panel." )
+{
+    Panel::PushVPanelLuaInstance( L, input()->GetModalSubTree() );
+    return 1;
 }
+LUA_BINDING_END( "PanelHandle", "Topmost modal sub-tree panel." )
 
-static int input_GetMouseCapture (lua_State *L) {
-  lua_pushpanel(L, input()->GetMouseCapture());
-  return 1;
+LUA_BINDING_BEGIN( Inputs, GetMouseCapture, "library", "Get the panel that currently has mouse capture." )
+{
+    Panel::PushVPanelLuaInstance( L, input()->GetMouseCapture() );
+    return 1;
 }
+LUA_BINDING_END( "PanelHandle", "Mouse capture panel." )
 
-static int input_GetMouseOver (lua_State *L) {
-  lua_pushpanel(L, input()->GetMouseOver());
-  return 1;
+LUA_BINDING_BEGIN( Inputs, GetMouseOver, "library", "Get the panel that currently is under the mouse cursor." )
+{
+    Panel::PushVPanelLuaInstance( L, input()->GetMouseOver() );
+    return 1;
 }
+LUA_BINDING_END( "PanelHandle", "Mouse over panel." )
 
-static int input_GetShouldInvertCompositionString (lua_State *L) {
-  lua_pushboolean(L, input()->GetShouldInvertCompositionString());
-  return 1;
+LUA_BINDING_BEGIN( Inputs, GetShouldInvertCompositionString, "library", "Check if the composition string should be inverted." )
+{
+    lua_pushboolean( L, input()->GetShouldInvertCompositionString() );
+    return 1;
 }
+LUA_BINDING_END( "boolean", "Whether the composition string should be inverted." )
 
-static int input_IsKeyDown (lua_State *L) {
-  lua_pushboolean(L, input()->IsKeyDown((KeyCode)luaL_checkint(L, 1)));
-  return 1;
+LUA_BINDING_BEGIN( Inputs, IsKeyDown, "library", "Check if a specific key is down." )
+{
+    KeyCode code = LUA_BINDING_ARGUMENT_ENUM( KeyCode, 1, "keyCode" );
+    lua_pushboolean( L, input()->IsKeyDown( code ) );
+    return 1;
 }
+LUA_BINDING_END( "boolean", "Whether the key is down." )
 
-static int input_IsMouseDown (lua_State *L) {
-  lua_pushboolean(L, input()->IsMouseDown((KeyCode)luaL_checkint(L, 1)));
-  return 1;
+LUA_BINDING_BEGIN( Inputs, IsMouseDown, "library", "Check if a specific mouse button is down." )
+{
+    MouseCode code = LUA_BINDING_ARGUMENT_ENUM( MouseCode, 1, "mouseCode" );
+    lua_pushboolean( L, input()->IsMouseDown( code ) );
+    return 1;
 }
+LUA_BINDING_END( "boolean", "Whether the mouse button is down." )
 
-static int input_OnChangeIME (lua_State *L) {
-  input()->OnChangeIME(luaL_checkboolean(L, 1));
-  return 0;
+LUA_BINDING_BEGIN( Inputs, LookupBinding, "library", "Look up a key binding." )
+{
+    const char *keyName = LUA_BINDING_ARGUMENT( luaL_checkstring, 1, "keyName" );
+    bool exact = LUA_BINDING_ARGUMENT( lua_toboolean, 2, "exactMatch" );
+    if ( exact )
+        lua_pushstring( L, engine->Key_LookupBindingExact( keyName ) );
+    else
+        lua_pushstring( L, engine->Key_LookupBinding( keyName ) );
+    return 1;
 }
+LUA_BINDING_END( "string", "The key binding." )
 
-static int input_OnChangeIMEByHandle (lua_State *L) {
-  input()->OnChangeIMEByHandle(luaL_checkint(L, 1));
-  return 0;
+LUA_BINDING_BEGIN( Inputs, LookupKeyBinding, "library", "Get the binding for a specific key code." )
+{
+    ButtonCode_t code = LUA_BINDING_ARGUMENT_ENUM( ButtonCode_t, 1, "keyCode" );
+    const char *binding = engine->Key_BindingForKey( code );
+    if ( binding && ( ( uintptr_t )binding != 0x10000 ) )  // Checking for special case as noted
+        lua_pushstring( L, binding );
+    else
+        lua_pushstring( L, "" );
+    return 1;
 }
+LUA_BINDING_END( "string", "The key binding." )
 
-static int input_OnChangeIMEConversionModeByHandle (lua_State *L) {
-  input()->OnChangeIMEConversionModeByHandle(luaL_checkint(L, 1));
-  return 0;
+LUA_BINDING_BEGIN( Inputs, KeyCodeToString, "library", "Converts a key code to its string representation, e.g: KEY_W -> 'KEY_W'" )
+{
+    KeyCode keyCode = LUA_BINDING_ARGUMENT_ENUM( KeyCode, 1, "keyCode" );
+    lua_pushstring( L, Panel::KeyCodeToString( keyCode ) );
+    return 1;
 }
+LUA_BINDING_END( "string", "The string representation of the key code" )
 
-static int input_OnChangeIMESentenceModeByHandle (lua_State *L) {
-  input()->OnChangeIMESentenceModeByHandle(luaL_checkint(L, 1));
-  return 0;
+LUA_BINDING_BEGIN( Inputs, KeyCodeToDisplayString, "library", "Converts a key code to a user-friendly string, e.g: KEY_W -> 'W'" )
+{
+    KeyCode keyCode = LUA_BINDING_ARGUMENT_ENUM( KeyCode, 1, "keyCode" );
+    wchar_t const *displayString = Panel::KeyCodeToDisplayString( keyCode );
+
+    int len = Q_wcslen( displayString ) + 1;  // Include null terminator
+    char buffer[256];
+    V_wcstostr( displayString, len, buffer, len );
+
+    lua_pushstring( L, buffer );
+
+    return 1;
 }
+LUA_BINDING_END( "string", "The user-friendly string representation of the key code" )
 
-static int input_OnIMEChangeCandidates (lua_State *L) {
-  input()->OnIMEChangeCandidates();
-  return 0;
+LUA_BINDING_BEGIN( Inputs, OnChangeIme, "library", "Trigger a change in the IME state." )
+{
+    bool activate = LUA_BINDING_ARGUMENT( luaL_checkboolean, 1, "activate" );
+    input()->OnChangeIME( activate );
+    return 0;
 }
+LUA_BINDING_END()
 
-static int input_OnIMECloseCandidates (lua_State *L) {
-  input()->OnIMECloseCandidates();
-  return 0;
+LUA_BINDING_BEGIN( Inputs, OnChangeImeByHandle, "library", "Change the IME by handle." )
+{
+    unsigned int handle = LUA_BINDING_ARGUMENT( luaL_checknumber, 1, "handle" );
+    input()->OnChangeIMEByHandle( handle );
+    return 0;
 }
+LUA_BINDING_END()
 
-static int input_OnIMEComposition (lua_State *L) {
-  input()->OnIMEComposition(luaL_checkint(L, 1));
-  return 0;
+LUA_BINDING_BEGIN( Inputs, OnChangeImeConversionModeByHandle, "library", "Change the IME conversion mode by handle." )
+{
+    unsigned int handle = LUA_BINDING_ARGUMENT( luaL_checknumber, 1, "handle" );
+    input()->OnChangeIMEConversionModeByHandle( handle );
+    return 0;
 }
+LUA_BINDING_END()
 
-static int input_OnIMEEndComposition (lua_State *L) {
-  input()->OnIMEEndComposition();
-  return 0;
+LUA_BINDING_BEGIN( Inputs, OnChangeImeSentenceModeByHandle, "library", "Change the IME sentence mode by handle." )
+{
+    unsigned int handle = LUA_BINDING_ARGUMENT( luaL_checknumber, 1, "handle" );
+    input()->OnChangeIMESentenceModeByHandle( handle );
+    return 0;
 }
+LUA_BINDING_END()
 
-static int input_OnIMERecomputeModes (lua_State *L) {
-  input()->OnIMERecomputeModes();
-  return 0;
+LUA_BINDING_BEGIN( Inputs, OnImeChangeCandidates, "library", "Notify a change in IME candidates." )
+{
+    input()->OnIMEChangeCandidates();
+    return 0;
 }
+LUA_BINDING_END()
 
-static int input_OnIMEShowCandidates (lua_State *L) {
-  input()->OnIMEShowCandidates();
-  return 0;
+LUA_BINDING_BEGIN( Inputs, OnImeCloseCandidates, "library", "Close the IME candidates." )
+{
+    input()->OnIMECloseCandidates();
+    return 0;
 }
+LUA_BINDING_END()
 
-static int input_OnIMEStartComposition (lua_State *L) {
-  input()->OnIMEStartComposition();
-  return 0;
+LUA_BINDING_BEGIN( Inputs, OnImeComposition, "library", "Handle IME composition." )
+{
+    unsigned int composition = LUA_BINDING_ARGUMENT( luaL_checknumber, 1, "composition" );
+    input()->OnIMEComposition( composition );
+    return 0;
 }
+LUA_BINDING_END()
 
-static int input_OnInputLanguageChanged (lua_State *L) {
-  input()->OnInputLanguageChanged();
-  return 0;
+LUA_BINDING_BEGIN( Inputs, OnImeEndComposition, "library", "End the IME composition." )
+{
+    input()->OnIMEEndComposition();
+    return 0;
 }
+LUA_BINDING_END()
 
-static int input_OnKeyCodeUnhandled (lua_State *L) {
-  input()->OnKeyCodeUnhandled(luaL_checkint(L, 1));
-  return 0;
+LUA_BINDING_BEGIN( Inputs, OnImeRecomputeModes, "library", "Recompute IME modes." )
+{
+    input()->OnIMERecomputeModes();
+    return 0;
 }
+LUA_BINDING_END()
 
-static int input_RegisterKeyCodeUnhandledListener (lua_State *L) {
-  input()->RegisterKeyCodeUnhandledListener(luaL_checkvpanel(L, 1));
-  return 0;
+LUA_BINDING_BEGIN( Inputs, OnImeShowCandidates, "library", "Show IME candidates." )
+{
+    input()->OnIMEShowCandidates();
+    return 0;
 }
+LUA_BINDING_END()
 
-static int input_ReleaseAppModalSurface (lua_State *L) {
-  input()->ReleaseAppModalSurface();
-  return 0;
+LUA_BINDING_BEGIN( Inputs, OnImeStartComposition, "library", "Start the IME composition." )
+{
+    input()->OnIMEStartComposition();
+    return 0;
 }
+LUA_BINDING_END()
 
-static int input_ReleaseModalSubTree (lua_State *L) {
-  input()->ReleaseModalSubTree();
-  return 0;
+LUA_BINDING_BEGIN( Inputs, OnInputLanguageChanged, "library", "Handle input language change." )
+{
+    input()->OnInputLanguageChanged();
+    return 0;
 }
+LUA_BINDING_END()
 
-static int input_SetAppModalSurface (lua_State *L) {
-  input()->SetAppModalSurface(luaL_checkvpanel(L, 1));
-  return 0;
+LUA_BINDING_BEGIN( Inputs, OnKeyCodeUnhandled, "library", "Handle unhandled key codes." )
+{
+    KeyCode code = LUA_BINDING_ARGUMENT_ENUM( KeyCode, 1, "keyCode" );
+    input()->OnKeyCodeUnhandled( code );
+    return 0;
 }
+LUA_BINDING_END()
 
-static int input_SetCandidateListPageStart (lua_State *L) {
-  input()->SetCandidateListPageStart(luaL_checkint(L, 1));
-  return 0;
+LUA_BINDING_BEGIN( Inputs, RegisterKeyCodeUnhandledListener, "library", "Register a listener for unhandled key codes." )
+{
+    Panel *panel = LUA_BINDING_ARGUMENT( luaL_checkpanel, 1, "panel" );
+    input()->RegisterKeyCodeUnhandledListener( panel->GetVPanel() );
+    return 0;
 }
+LUA_BINDING_END()
 
-static int input_SetCandidateWindowPos (lua_State *L) {
-  input()->SetCandidateWindowPos(luaL_checkint(L, 1), luaL_checkint(L, 2));
-  return 0;
+LUA_BINDING_BEGIN( Inputs, ReleaseAppModalSurface, "library", "Release the application modal surface." )
+{
+    input()->ReleaseAppModalSurface();
+    return 0;
 }
+LUA_BINDING_END()
 
-static int input_SetCursorPos (lua_State *L) {
-  input()->SetCursorPos(luaL_checkint(L, 1), luaL_checkint(L, 2));
-  return 0;
+LUA_BINDING_BEGIN( Inputs, ReleaseModalSubTree, "library", "Release the modal sub-tree." )
+{
+    input()->ReleaseModalSubTree();
+    return 0;
 }
+LUA_BINDING_END()
 
-static int input_SetModalSubTree (lua_State *L) {
-  input()->SetModalSubTree(luaL_checkvpanel(L, 1), luaL_checkvpanel(L, 2), luaL_optboolean(L, 3, true));
-  return 0;
+LUA_BINDING_BEGIN( Inputs, ScreenToWorld, "library", "Convert screen coordinates to world coordinates." )
+{
+    float x = LUA_BINDING_ARGUMENT( luaL_checknumber, 1, "x" );
+    float y = LUA_BINDING_ARGUMENT( luaL_checknumber, 2, "y" );
+    //Vector vecPickingRay = ScreenToWorld( x, y );
+    //lua_pushvector( L, vecPickingRay );
+    return 1;
 }
+LUA_BINDING_END( "Vector", "World coordinates vector." )
 
-static int input_SetModalSubTreeReceiveMessages (lua_State *L) {
-  input()->SetModalSubTreeReceiveMessages(luaL_checkboolean(L, 1));
-  return 0;
+LUA_BINDING_BEGIN( Inputs, AimToVector, "library", "Convert aiming angles and screen coordinates to a vector." )
+{
+    QAngle vecAngles = LUA_BINDING_ARGUMENT( luaL_checkangle, 1, "angles" );
+    float fov = LUA_BINDING_ARGUMENT( luaL_checknumber, 2, "fov" );
+    float x = LUA_BINDING_ARGUMENT( luaL_checknumber, 3, "x" );
+    float y = LUA_BINDING_ARGUMENT( luaL_checknumber, 4, "y" );
+    float nScreenWidth = LUA_BINDING_ARGUMENT( luaL_checknumber, 5, "screenWidth" );
+    float nScreenHeight = LUA_BINDING_ARGUMENT( luaL_checknumber, 6, "screenHeight" );
+    Vector vecPickingRay;
+    //ScreenToWorld( x, y, fov, vecAngles, vecPickingRay, nScreenWidth, nScreenHeight );
+    lua_pushvector( L, vecPickingRay );
+    return 1;
 }
+LUA_BINDING_END( "Vector", "Aim vector in world coordinates." )
 
-static int input_SetMouseCapture (lua_State *L) {
-  input()->SetMouseCapture(luaL_checkvpanel(L, 1));
-  return 0;
+LUA_BINDING_BEGIN( Inputs, SetAppModalSurface, "library", "Set the application modal surface." )
+{
+    Panel *panel = LUA_BINDING_ARGUMENT( luaL_checkpanel, 1, "panel" );
+    input()->SetAppModalSurface( panel->GetVPanel() );
+    return 0;
 }
+LUA_BINDING_END()
 
-static int input_SetMouseCaptureEx (lua_State *L) {
-  input()->SetMouseCaptureEx(luaL_checkvpanel(L, 1), (MouseCode)luaL_checkint(L, 2));
-  return 0;
+LUA_BINDING_BEGIN( Inputs, SetCandidateListPageStart, "library", "Set the starting index of the current page in the candidate list." )
+{
+    int index = LUA_BINDING_ARGUMENT( luaL_checknumber, 1, "index" );
+    input()->SetCandidateListPageStart( index );
+    return 0;
 }
+LUA_BINDING_END()
 
-static int input_SetMouseFocus (lua_State *L) {
-  input()->SetMouseFocus(luaL_checkvpanel(L, 1));
-  return 0;
+LUA_BINDING_BEGIN( Inputs, SetCandidateWindowPos, "library", "Set the position of the candidate window." )
+{
+    int x = LUA_BINDING_ARGUMENT( luaL_checknumber, 1, "x" );
+    int y = LUA_BINDING_ARGUMENT( luaL_checknumber, 2, "y" );
+    input()->SetCandidateWindowPos( x, y );
+    return 0;
 }
+LUA_BINDING_END()
 
-static int input_ShouldModalSubTreeReceiveMessages (lua_State *L) {
-  lua_pushboolean(L, input()->ShouldModalSubTreeReceiveMessages());
-  return 1;
+LUA_BINDING_BEGIN( Inputs, SetCursorPosition, "library", "Set the cursor position." )
+{
+    int x = LUA_BINDING_ARGUMENT( luaL_checknumber, 1, "x" );
+    int y = LUA_BINDING_ARGUMENT( luaL_checknumber, 2, "y" );
+    input()->SetCursorPos( x, y );
+    return 0;
 }
+LUA_BINDING_END()
 
-static int input_UnregisterKeyCodeUnhandledListener (lua_State *L) {
-  input()->UnregisterKeyCodeUnhandledListener(luaL_checkvpanel(L, 1));
-  return 0;
+LUA_BINDING_BEGIN( Inputs, SetModalSubTree, "library", "Set the modal sub-tree." )
+{
+    Panel *panel = LUA_BINDING_ARGUMENT( luaL_checkpanel, 1, "modalSubTree" );
+    Panel *scope = LUA_BINDING_ARGUMENT( luaL_checkpanel, 2, "scopePanel" );
+    bool receiveMessages = LUA_BINDING_ARGUMENT_WITH_DEFAULT( luaL_optboolean, 3, true, "receiveMessages" );
+    input()->SetModalSubTree( panel->GetVPanel(), scope->GetVPanel(), receiveMessages );
+    return 0;
 }
+LUA_BINDING_END()
 
-static int input_WasKeyPressed (lua_State *L) {
-  lua_pushboolean(L, input()->WasKeyPressed((KeyCode)luaL_checkint(L, 1)));
-  return 1;
+LUA_BINDING_BEGIN( Inputs, SetModalSubTreeReceiveMessages, "library", "Set the modal sub-tree to receive messages." )
+{
+    bool receive = LUA_BINDING_ARGUMENT( luaL_checkboolean, 1, "receive" );
+    input()->SetModalSubTreeReceiveMessages( receive );
+    return 0;
 }
+LUA_BINDING_END()
 
-static int input_WasKeyReleased (lua_State *L) {
-  lua_pushboolean(L, input()->WasKeyReleased((KeyCode)luaL_checkint(L, 1)));
-  return 1;
+LUA_BINDING_BEGIN( Inputs, SetMouseCapture, "library", "Set the panel that captures the mouse input." )
+{
+    Panel *panel = LUA_BINDING_ARGUMENT_WITH_DEFAULT( luaL_optpanel, 1, NULL, "panel" );
+    input()->SetMouseCapture( panel ? panel->GetVPanel() : NULL );
+    return 0;
 }
+LUA_BINDING_END()
 
-static int input_WasKeyTyped (lua_State *L) {
-  lua_pushboolean(L, input()->WasKeyTyped((KeyCode)luaL_checkint(L, 1)));
-  return 1;
+LUA_BINDING_BEGIN( Inputs, SetMouseCaptureExtended, "library", "Set the mouse capture with specific mouse code." )
+{
+    Panel *panel = LUA_BINDING_ARGUMENT( luaL_checkpanel, 1, "panel" );
+    MouseCode code = LUA_BINDING_ARGUMENT_ENUM( MouseCode, 2, "mouseCode" );
+    input()->SetMouseCaptureEx( panel->GetVPanel(), code );
+    return 0;
 }
+LUA_BINDING_END()
 
-static int input_WasMouseDoublePressed (lua_State *L) {
-  lua_pushboolean(L, input()->WasMouseDoublePressed((MouseCode)luaL_checkint(L, 1)));
-  return 1;
+LUA_BINDING_BEGIN( Inputs, SetMouseFocus, "library", "Set the mouse focus to a panel." )
+{
+    Panel *panel = LUA_BINDING_ARGUMENT( luaL_checkpanel, 1, "panel" );
+    input()->SetMouseFocus( panel->GetVPanel() );
+    return 0;
 }
+LUA_BINDING_END()
 
-static int input_WasMousePressed (lua_State *L) {
-  lua_pushboolean(L, input()->WasMousePressed((MouseCode)luaL_checkint(L, 1)));
-  return 1;
+LUA_BINDING_BEGIN( Inputs, ShouldModalSubTreeReceiveMessages, "library", "Check if the modal sub-tree should receive messages." )
+{
+    lua_pushboolean( L, input()->ShouldModalSubTreeReceiveMessages() );
+    return 1;
 }
+LUA_BINDING_END( "boolean", "Whether the modal sub-tree should receive messages." )
 
-static int input_WasMouseReleased (lua_State *L) {
-  lua_pushboolean(L, input()->WasMouseReleased((MouseCode)luaL_checkint(L, 1)));
-  return 1;
+LUA_BINDING_BEGIN( Inputs, UnregisterKeyCodeUnhandledListener, "library", "Unregister a listener for unhandled key codes." )
+{
+    Panel *panel = LUA_BINDING_ARGUMENT( luaL_checkpanel, 1, "panel" );
+    input()->UnregisterKeyCodeUnhandledListener( panel->GetVPanel() );
+    return 0;
 }
+LUA_BINDING_END()
 
+LUA_BINDING_BEGIN( Inputs, WasKeyPressed, "library", "Check if a specific key was pressed." )
+{
+    KeyCode code = LUA_BINDING_ARGUMENT_ENUM( KeyCode, 1, "keyCode" );
+    lua_pushboolean( L, input()->WasKeyPressed( code ) );
+    return 1;
+}
+LUA_BINDING_END( "boolean", "Whether the key was pressed." )
 
-static const luaL_Reg inputlib[] = {
-  {"CandidateListStartsAtOne",   input_CandidateListStartsAtOne},
-  {"GetAppModalSurface",   input_GetAppModalSurface},
-  {"GetCandidateListCount",   input_GetCandidateListCount},
-  {"GetCandidateListPageSize",   input_GetCandidateListPageSize},
-  {"GetCandidateListPageStart",   input_GetCandidateListPageStart},
-  {"GetCandidateListSelectedItem",   input_GetCandidateListSelectedItem},
-  {"GetCurrentIMEHandle",   input_GetCurrentIMEHandle},
-  {"GetCursorPos__USE_VCR_MODE",   input_GetCursorPos__USE_VCR_MODE},
-  {"GetCursorPos",   input_GetCursorPos__USE_VCR_MODE},
-  {"GetCursorPosition",   input_GetCursorPosition},
-  {"GetEnglishIMEHandle",   input_GetEnglishIMEHandle},
-  {"GetFocus",   input_GetFocus},
-  {"GetModalSubTree",   input_GetModalSubTree},
-  {"GetMouseCapture",   input_GetMouseCapture},
-  {"GetMouseOver",   input_GetMouseOver},
-  {"GetShouldInvertCompositionString",   input_GetShouldInvertCompositionString},
-  {"IsKeyDown",   input_IsKeyDown},
-  {"IsMouseDown",   input_IsMouseDown},
-  {"OnChangeIME",   input_OnChangeIME},
-  {"OnChangeIMEByHandle",   input_OnChangeIMEByHandle},
-  {"OnChangeIMEConversionModeByHandle",   input_OnChangeIMEConversionModeByHandle},
-  {"OnChangeIMESentenceModeByHandle",   input_OnChangeIMESentenceModeByHandle},
-  {"OnIMEChangeCandidates",   input_OnIMEChangeCandidates},
-  {"OnIMECloseCandidates",   input_OnIMECloseCandidates},
-  {"OnIMEComposition",   input_OnIMEComposition},
-  {"OnIMEEndComposition",   input_OnIMEEndComposition},
-  {"OnIMERecomputeModes",   input_OnIMERecomputeModes},
-  {"OnIMEShowCandidates",   input_OnIMEShowCandidates},
-  {"OnIMEStartComposition",   input_OnIMEStartComposition},
-  {"OnInputLanguageChanged",   input_OnInputLanguageChanged},
-  {"OnKeyCodeUnhandled",   input_OnKeyCodeUnhandled},
-  {"RegisterKeyCodeUnhandledListener",   input_RegisterKeyCodeUnhandledListener},
-  {"ReleaseAppModalSurface",   input_ReleaseAppModalSurface},
-  {"ReleaseModalSubTree",   input_ReleaseModalSubTree},
-  {"SetAppModalSurface",   input_SetAppModalSurface},
-  {"SetCandidateListPageStart",   input_SetCandidateListPageStart},
-  {"SetCandidateWindowPos",   input_SetCandidateWindowPos},
-  {"SetCursorPos",   input_SetCursorPos},
-  {"SetModalSubTree",   input_SetModalSubTree},
-  {"SetModalSubTreeReceiveMessages",   input_SetModalSubTreeReceiveMessages},
-  {"SetMouseCapture",   input_SetMouseCapture},
-  {"SetMouseCaptureEx",   input_SetMouseCaptureEx},
-  {"SetMouseFocus",   input_SetMouseFocus},
-  {"ShouldModalSubTreeReceiveMessages",   input_ShouldModalSubTreeReceiveMessages},
-  {"UnregisterKeyCodeUnhandledListener",   input_UnregisterKeyCodeUnhandledListener},
-  {"WasKeyPressed",   input_WasKeyPressed},
-  {"WasKeyReleased",   input_WasKeyReleased},
-  {"WasKeyTyped",   input_WasKeyTyped},
-  {"WasMouseDoublePressed",   input_WasMouseDoublePressed},
-  {"WasMousePressed",   input_WasMousePressed},
-  {"WasMouseReleased",   input_WasMouseReleased},
-  {NULL, NULL}
-};
+LUA_BINDING_BEGIN( Inputs, WasKeyReleased, "library", "Check if a specific key was released." )
+{
+    KeyCode code = LUA_BINDING_ARGUMENT_ENUM( KeyCode, 1, "keyCode" );
+    lua_pushboolean( L, input()->WasKeyReleased( code ) );
+    return 1;
+}
+LUA_BINDING_END( "boolean", "Whether the key was released." )
 
+LUA_BINDING_BEGIN( Inputs, WasKeyTyped, "library", "Check if a specific key was typed." )
+{
+    KeyCode code = LUA_BINDING_ARGUMENT_ENUM( KeyCode, 1, "keyCode" );
+    lua_pushboolean( L, input()->WasKeyTyped( code ) );
+    return 1;
+}
+LUA_BINDING_END( "boolean", "Whether the key was typed." )
+
+LUA_BINDING_BEGIN( Inputs, WasMouseDoublePressed, "library", "Check if a specific mouse button was double pressed." )
+{
+    MouseCode code = LUA_BINDING_ARGUMENT_ENUM( MouseCode, 1, "mouseCode" );
+    lua_pushboolean( L, input()->WasMouseDoublePressed( code ) );
+    return 1;
+}
+LUA_BINDING_END( "boolean", "Whether the mouse button was double pressed." )
+
+LUA_BINDING_BEGIN( Inputs, WasMousePressed, "library", "Check if a specific mouse button was pressed." )
+{
+    MouseCode code = LUA_BINDING_ARGUMENT_ENUM( MouseCode, 1, "mouseCode" );
+    lua_pushboolean( L, input()->WasMousePressed( code ) );
+    return 1;
+}
+LUA_BINDING_END( "boolean", "Whether the mouse button was pressed." )
+
+LUA_BINDING_BEGIN( Inputs, WasMouseReleased, "library", "Check if a specific mouse button was released." )
+{
+    MouseCode code = LUA_BINDING_ARGUMENT_ENUM( MouseCode, 1, "mouseCode" );
+    lua_pushboolean( L, input()->WasMouseReleased( code ) );
+    return 1;
+}
+LUA_BINDING_END( "boolean", "Whether the mouse button was released." )
 
 /*
 ** Open input library
 */
-LUALIB_API int luaopen_input (lua_State *L) {
-  luaL_register(L, LUA_INPUTLIBNAME, inputlib);
-  return 1;
+LUALIB_API int luaopen_input( lua_State *L )
+{
+    LUA_REGISTRATION_COMMIT_LIBRARY( Inputs );
+
+    return 1;
 }

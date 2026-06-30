@@ -16,7 +16,7 @@ $Configuration
 	$Compiler
 	{
 		$AdditionalIncludeDirectories	"$BASE;$SRCDIR\lua;$SRCDIR\luasocket\src"
-		$PreprocessorDefinitions		"$BASE;LUA_SDK"
+		$PreprocessorDefinitions		"$BASE"
 	}
 }
 
@@ -74,6 +74,7 @@ $Project
             $File "liclientshadowmgr.cpp"
             $File "$SRCDIR\public\tier1\liconvar.cpp"
             $File "$SRCDIR\public\licvar.cpp"
+            $File "$SRCDIR\public\licvar.h"
             $File "$SRCDIR\public\lienginevgui.cpp"
             $File "$SRCDIR\public\vgui\LIInput.cpp"
             $File "$SRCDIR\public\materialsystem\limaterial.cpp"
@@ -98,6 +99,8 @@ $Project
             $File "$SRCDIR\game\shared\lshareddefs.cpp"
             $File "$SRCDIR\game\shared\lsrcinit.cpp"
             $File "$SRCDIR\public\steam\lsteam_api.cpp"
+            $File "$SRCDIR\game\shared\basescripted.cpp"
+            $File "$SRCDIR\game\shared\basescripted.h"
             $File "$SRCDIR\game\shared\ltakedamageinfo.cpp"
             $File "$SRCDIR\game\shared\ltakedamageinfo.h"
             $File "$SRCDIR\game\shared\luacachefile.cpp"
@@ -110,12 +113,12 @@ $Project
             $File "$SRCDIR\game\shared\lresources.h"
             $File "$SRCDIR\game\shared\lutil_shared.cpp"
             $File "$SRCDIR\game\shared\lserializers.cpp"
+            $File "$SRCDIR\game\shared\Multiplayer\multiplayer_animstate.cpp"
+            $File "$SRCDIR\game\shared\Multiplayer\multiplayer_animstate.h"
             $File "$SRCDIR\game\shared\mountaddons.h"
             $File "$SRCDIR\game\shared\mountaddons.cpp"
             $File "$SRCDIR\game\shared\mountsteamcontent.h"
             $File "$SRCDIR\game\shared\mountsteamcontent.cpp"
-            $File "$SRCDIR\game\shared\hl2mp\utils\jsontokv.cpp"
-            $File "$SRCDIR\game\shared\hl2mp\utils\jsontokv.h"
             $File "$SRCDIR\game\shared\lsystem.cpp"
             $File "$SRCDIR\game\shared\lsystem.h"
             $File "$SRCDIR\public\mathlib\langle.cpp"
@@ -128,8 +131,26 @@ $Project
             $File "$SRCDIR\public\lsounds.cpp"
             $File "$SRCDIR\public\lsounds.h"
             $File "$SRCDIR\public\XUnzip.cpp"
-            $File "$SRCDIR\lua\lua.h"
-            $File "$SRCDIR\lua\lauxlib.h"
+			// New Enteries
+			
+            $File "$SRCDIR\game\shared\hl2mp\lhl2mp_player_shared.cpp"
+            $File "$SRCDIR\game\shared\hl2mp\lhl2mp_player_shared.h"
+            //$File "$SRCDIR\game\shared\experiment\experiment_bot_temp.cpp"
+            //$File "$SRCDIR\game\shared\experiment\experiment_bot_temp.h"
+            $File "$SRCDIR\public\lColor.cpp"
+            $File "$SRCDIR\public\lColor.h"
+            $File "$SRCDIR\game\shared\cpng.cpp"
+            $File "$SRCDIR\game\shared\cpng.h"
+            $File "$SRCDIR\public\zip_utils.cpp"
+            $File "$SRCDIR\public\zip_utils.h"
+            $File "$SRCDIR\game\shared\hl2mp\weapon_hl2mpbase_scriptedweapon.cpp"
+            $File "$SRCDIR\game\shared\hl2mp\weapon_hl2mpbase_scriptedweapon.h"
+            $File "$SRCDIR\public\base64.cpp"
+            $File "$SRCDIR\public\base64.h"
+            $File "$SRCDIR\game\shared\lrecipientfilter.cpp"
+            $File "$SRCDIR\game\shared\lrecipientfilter.h"
+			$File "$SRCDIR\game\shared\gameinfostore.h"
+			$File "$SRCDIR\game\shared\gameinfostore.cpp"
         }
 		
         $Folder	"Scripted Controls"
@@ -165,5 +186,22 @@ $Project
             $File "$SRCDIR\game\client\scripted_controls\lTextEntry.cpp"
             $File "$SRCDIR\game\client\scripted_controls\lTextEntry.h"
 		}
+        $Folder "Util"
+        {
+            $File "$SRCDIR\game\client\hl2mp\util\bassmanager.cpp"
+            $File "$SRCDIR\game\client\hl2mp\util\bassmanager.h"
+            $File "$SRCDIR\game\shared\hl2mp\util\jsontokv.h"
+            $File "$SRCDIR\game\shared\hl2mp\util\jsontokv.cpp"
+
+            $File "$SRCDIR\game\shared\hl2mp\util\lnetworks.h"
+            $File "$SRCDIR\game\shared\hl2mp\util\lnetworks.cpp"
+            $File "$SRCDIR\game\shared\hl2mp\util\networkmessage.h"
+            $File "$SRCDIR\game\shared\hl2mp\util\networkmessage.cpp"
+            $File "$SRCDIR\game\shared\hl2mp\util\networkmanager.h"
+            $File "$SRCDIR\game\shared\hl2mp\util\networkmanager.cpp"
+
+            $File "$SRCDIR\game\shared\hl2mp\util\lwebconnections.h"
+            $File "$SRCDIR\game\shared\hl2mp\util\lwebconnections.cpp"
+        }
 	}
 }

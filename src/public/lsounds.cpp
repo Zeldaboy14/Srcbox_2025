@@ -4,6 +4,7 @@
 #include <lsounds.h>
 #include <engine/IEngineSound.h>
 #include <lrecipientfilter.h>
+#include "zip/XUnzip.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

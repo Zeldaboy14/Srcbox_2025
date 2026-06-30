@@ -20,7 +20,6 @@
 #include "iservervehicle.h"
 #endif
 #include "lbaseplayer_shared.h"
-#include "basescripted.h"
 #include "lgametrace.h"
 #include "SoundEmitterSystem/lisoundemittersystembase.h"
 #include "lshareddefs.h"
@@ -30,12 +29,13 @@
 #include "engine/IEngineSound.h"
 #include <lbasecombatweapon_shared.h>
 #include "vcollide_parse.h"
+#include <gamestringpool.h>
+#include <basescripted.h>
 #include <lColor.h>
 #include <datacache/imdlcache.h>
 #include <filesystem.h>
 #include <utlbuffer.h>
 #include <saverestore.h>
-#include "gamestringpool.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

@@ -28,7 +28,7 @@ $Include "$SRCDIR\game\client\client_lua.vpc"
 //-----------------------------------------
 // EXPERIMENT Lua Weapons setups
 //-----------------------------------------
-$Include "$SRCDIR\game\client\client_experiment.vpc"
+//$Include "$SRCDIR\game\client\client_experiment.vpc"
 
 $Configuration
 {

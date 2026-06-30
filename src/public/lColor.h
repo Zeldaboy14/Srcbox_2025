@@ -1,10 +1,3 @@
-//========= Copyright © 1996-2005, Valve Corporation, All rights reserved. ============//
-//
-// Purpose: 
-//
-// $NoKeywords: $
-//=============================================================================//
-
 #ifndef LCOLOR_H
 #define LCOLOR_H
 
@@ -12,26 +5,50 @@
 #pragma once
 #endif
 
+class LColor : public Color
+{
+    public:
+    LColor()
+        : Color() {}
+    LColor( int _r, int _g, int _b )
+        : Color( _r, _g, _b ) {}
+    LColor( int _r, int _g, int _b, int _a )
+        : Color( _r, _g, _b, _a ) {}
+    LColor( float *rawColor )
+        : Color( rawColor[0] * 255, rawColor[1] * 255, rawColor[2] * 255, rawColor[3] * 255 ) {}
+
+    int m_nTableReference = LUA_NOREF;
+
+    void SetupRefTable( lua_State *L )
+    {
+        lua_newtable( L );
+        m_nTableReference = luaL_ref( L, LUA_REGISTRYINDEX );
+    }
+
+    Vector &ToVector() const
+    {
+        return Vector( r(), g(), b() );
+    }
+};
+
 /* type for Color functions */
-typedef Color lua_Color;
-
-
+typedef LColor lua_Color;
 
 /*
 ** access functions (stack -> C)
 */
 
-LUA_API lua_Color      &(lua_tocolor) (lua_State *L, int idx);
+LUA_API lua_Color &( lua_tocolor )( lua_State *L, int idx );
 
+LUALIB_API bool lua_iscolor( lua_State *L, int narg );
 
 /*
 ** push functions (C -> stack)
 */
-LUA_API void  (lua_pushcolor) (lua_State *L, lua_Color &clr);
+LUA_API void( lua_pushcolor )( lua_State *L, lua_Color &clr );
+LUA_API void( lua_pushcolor )( lua_State *L, Color &clr );
 
+LUALIB_API lua_Color &( luaL_checkcolor )( lua_State *L, int narg );
+LUALIB_API lua_Color &( luaL_optcolor )( lua_State *L, int narg, lua_Color def );
 
-
-LUALIB_API lua_Color &(luaL_checkcolor) (lua_State *L, int narg);
-
-
-#endif // LCOLOR_H
+#endif  // LCOLOR_H

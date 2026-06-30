@@ -23,9 +23,6 @@
 
 extern const char* GetGameTypeID;
 
-extern ConVar srcbox_gamemode_sandbox;
-extern ConVar srcbox_gamemode_hl2;
-
 using namespace vgui;
 
 class CNonFocusableMenu : public Menu
@@ -331,13 +328,13 @@ void CMyPanel::OnCommand(const char* pcCommand)
 		//if (m_pGamemode == "Sandbox")
 		if (!Q_stricmp(mode, "Sandbox"))
 		{
-			srcbox_gamemode_sandbox.SetValue(1);
-			srcbox_gamemode_hl2.SetValue(0);
+			//srcbox_gamemode_sandbox.SetValue(1);
+			//srcbox_gamemode_hl2.SetValue(0);
 		}
 		else if (!Q_stricmp(mode, "Half-Life 2"))
 		{
-			srcbox_gamemode_sandbox.SetValue(0);
-			srcbox_gamemode_hl2.SetValue(1);
+			//srcbox_gamemode_sandbox.SetValue(0);
+			//srcbox_gamemode_hl2.SetValue(1);
 		};
 		PlaySelectedMap();
 		//IsTeamplay() == true;

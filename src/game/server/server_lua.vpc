@@ -173,18 +173,18 @@ $Project
 		}
         $Folder "Util"
         {
-            $File "$SRCDIR\game\shared\experiment\util\jsontokv.h"
-            $File "$SRCDIR\game\shared\experiment\util\jsontokv.cpp"
+            $File "$SRCDIR\game\shared\hl2mp\util\jsontokv.h"
+            $File "$SRCDIR\game\shared\hl2mp\util\jsontokv.cpp"
 
-            $File "$SRCDIR\game\shared\experiment\util\lnetworks.h"
-            $File "$SRCDIR\game\shared\experiment\util\lnetworks.cpp"
-            $File "$SRCDIR\game\shared\experiment\util\networkmessage.h"
-            $File "$SRCDIR\game\shared\experiment\util\networkmessage.cpp"
-            $File "$SRCDIR\game\shared\experiment\util\networkmanager.h"
-            $File "$SRCDIR\game\shared\experiment\util\networkmanager.cpp"
+            $File "$SRCDIR\game\shared\hl2mp\util\lnetworks.h"
+            $File "$SRCDIR\game\shared\hl2mp\util\lnetworks.cpp"
+            $File "$SRCDIR\game\shared\hl2mp\util\networkmessage.h"
+            $File "$SRCDIR\game\shared\hl2mp\util\networkmessage.cpp"
+            $File "$SRCDIR\game\shared\hl2mp\util\networkmanager.h"
+            $File "$SRCDIR\game\shared\hl2mp\util\networkmanager.cpp"
 
-            $File "$SRCDIR\game\shared\experiment\util\lwebconnections.h"
-            $File "$SRCDIR\game\shared\experiment\util\lwebconnections.cpp"
+            $File "$SRCDIR\game\shared\hl2mp\util\lwebconnections.h"
+            $File "$SRCDIR\game\shared\hl2mp\util\lwebconnections.cpp"
         }
 	}
 }

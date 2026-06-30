@@ -136,7 +136,9 @@ public:
 	// Returns the DLL identifier
 	virtual CVarDLLIdentifier_t	GetDLLIdentifier() const;
 
+#ifndef PLATFORM_64BITS
 protected:
+#endif
 	virtual void				CreateBase( const char *pName, const char *pHelpString = 0, 
 									int flags = 0 );
 
@@ -283,7 +285,9 @@ public:
 	// Invoke the function
 	virtual void Dispatch( const CCommand &command );
 
+#ifndef PLATFORM_64BITS
 private:
+#endif
 	// NOTE: To maintain backward compat, we have to be very careful:
 	// All public virtual methods must appear in the same order always
 	// since engine code will be calling into this code, which *does not match*

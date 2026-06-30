@@ -25,9 +25,6 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-/*
-** access functions (stack -> C)
-*/
 
 LUA_API lua_CBasePlayer *lua_toplayer( lua_State *L, int idx )
 {
