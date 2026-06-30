@@ -174,17 +174,23 @@ class HTML : public Panel
             m_SteamAPIContext.SteamHTMLSurface()->MouseMove( m_unBrowserHandle, x, y );
     }
 
+#ifdef LUA_SDK
     // Javascript interop
     virtual void InstallInteropStubs();
     virtual void OnInstallJavaScriptInterop(){};
+#endif
     virtual void RunJavascript( const char *pchScript );
+#ifdef LUA_SDK
     virtual void AddJavascriptObject( const char *pszObjectName );
     virtual void AddJavascriptObjectCallback( const char *pszObjectName, const char *pszPropertyName );
     virtual void CallJavascriptObjectCallback( int callbackId, KeyValues *args );
     // Override OnJavaScriptCallback in a subclass to customize how to react to the callback
+#endif
 
     protected:
+#ifdef LUA_SDK
     MESSAGE_FUNC_PARAMS( OnJavaScriptCallback, "JavaScriptCallback", pKV );
+#endif
 
     virtual void ApplySchemeSettings( IScheme *pScheme );
 

@@ -255,6 +255,9 @@ HTML::~HTML()
     m_vecHCursor.RemoveAll();
 }
 
+
+#ifdef LUA_SDK
+
 /// <summary>
 /// Adds an object to the browser's javascript context
 /// </summary>
@@ -416,6 +419,8 @@ void HTML::OnFinishRequest( const char *url, const char *pageTitle, const CUtlMa
 {
     InstallInteropStubs();
 }
+#endif
+
 
 //-----------------------------------------------------------------------------
 // Purpose: Handle message to change our cursor
@@ -1945,6 +1950,12 @@ void HTML::BrowserLinkAtPositionResponse( HTML_LinkAtPosition_t *pCmd )
 //-----------------------------------------------------------------------------
 void HTML::BrowserJSAlert( HTML_JSAlert_t *pCmd )
 {
+#ifndef LUA_SDK
+    MessageBox* pDlg = new MessageBox(m_sCurrentURL, (const char*)pCmd->pchMessage, this);
+    pDlg->AddActionSignalTarget(this);
+    pDlg->SetCommand(new KeyValues("DismissJSDialog", "result", false));
+    pDlg->DoModal();
+#else
     // Experiment; STEAM_CALLBACKs are called for every instance :/ So we need to check if this is for us.
     if ( pCmd->unBrowserHandle != m_unBrowserHandle )
         return;
@@ -1982,6 +1993,7 @@ void HTML::BrowserJSAlert( HTML_JSAlert_t *pCmd )
 
     // This must be called!
     DismissJSDialog( true );
+#endif
 }
 
 //-----------------------------------------------------------------------------
