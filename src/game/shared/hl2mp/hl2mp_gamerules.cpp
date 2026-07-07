@@ -1285,17 +1285,18 @@ const char *CHL2MPRules::GetGameDescription( void )
 	if ( IsTeamplay() )
 		return "Team Deathmatch";
 #else
-	LUA_CALL_HOOK_BEGIN("GetGameDescription");
-	LUA_CALL_HOOK_END(0, 1);
+	//LUA_CALL_HOOK_BEGIN("GetGameDescription");
+	//LUA_CALL_HOOK_END(0, 1);
 
-	LUA_RETURN_STRING();
+	//LUA_RETURN_STRING();
+
+	return "Deathmatch";
 #endif
 
 #if !defined( SRCBOX )
 	return "Deathmatch"; 
-#else
-	return "Sandbox";
-	/*if (srcbox_gamemode_sandbox.GetInt() == 1) {
+/*#else
+	if (srcbox_gamemode_sandbox.GetInt() == 1) {
 		return "Sandbox";
 	}
 	else if (srcbox_gamemode_hl2.GetInt() == 1) {
