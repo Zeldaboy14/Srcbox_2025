@@ -131,6 +131,15 @@ $Project
             $File "$SRCDIR\public\lsounds.cpp"
             $File "$SRCDIR\public\lsounds.h"
             $File "$SRCDIR\public\XUnzip.cpp"
+			{
+				$Configuration
+				{
+					$Compiler
+					{
+						$Create/UsePrecompiledHeader	"Not Using Precompiled Headers"
+					}
+				}
+			}
 			// New Enteries
 			
             $File "$SRCDIR\game\shared\hl2mp\lhl2mp_player_shared.cpp"
@@ -142,6 +151,15 @@ $Project
             $File "$SRCDIR\game\shared\cpng.cpp"
             $File "$SRCDIR\game\shared\cpng.h"
             $File "$SRCDIR\public\zip_utils.cpp"
+			{
+				$Configuration
+				{
+					$Compiler
+					{
+						$Create/UsePrecompiledHeader	"Not Using Precompiled Headers"
+					}
+				}
+			}
             $File "$SRCDIR\public\zip_utils.h"
             $File "$SRCDIR\game\shared\hl2mp\weapon_hl2mpbase_scriptedweapon.cpp"
             $File "$SRCDIR\game\shared\hl2mp\weapon_hl2mpbase_scriptedweapon.h"
