@@ -299,15 +299,19 @@ ClientModeShared::ClientModeShared()
 	m_pScriptedViewport = NULL;
 #endif
 	m_pViewport = NULL;
-#ifdef LUA_SDK
+/*#ifdef LUA_SDK
 	m_pClientLuaPanel = NULL;
-#endif
+#endif*/
 	m_pChatElement = NULL;
 	m_pWeaponSelection = NULL;
 	m_nRootSize[ 0 ] = m_nRootSize[ 1 ] = -1;
 
 	m_pCurrentPostProcessController = NULL;
 	m_PostProcessLerpTimer.Invalidate();
+
+	// Fenix: Needed for the custom background loading screens
+	//g_pMapLoadingPanel = NULL;
+	//pMatMapBg = NULL;
 
 #if defined( REPLAY_ENABLED )
 	m_pReplayReminderPanel = NULL;
@@ -327,9 +331,9 @@ ClientModeShared::~ClientModeShared()
 	delete m_pScriptedViewport;
 #endif
 	delete m_pViewport;
-#ifdef LUA_SDK
+/*#ifdef LUA_SDK
 	delete m_pClientLuaPanel;
-#endif 
+#endif*/
 }
 
 void ClientModeShared::ReloadScheme( bool flushLowLevel )
@@ -429,10 +433,12 @@ void ClientModeShared::VGui_Shutdown()
 #endif
 	delete m_pViewport;
 	m_pViewport = NULL;
-#ifdef LUA_SDK
-	delete m_pClientLuaPanel;
-	m_pClientLuaPanel = NULL;
-#endif
+
+    // Experiment; This is redundant since its unset in luasrc_shutdown
+    // #ifdef LUA_SDK
+    //    delete g_pClientLuaPanel;
+    //    g_pClientLuaPanel = NULL;
+    // #endif
 }
 
 
@@ -523,8 +529,8 @@ void ClientModeShared::OverrideView( CViewSetup *pSetup )
 bool ClientModeShared::ShouldDrawEntity(C_BaseEntity *pEnt)
 {
 #ifdef LUA_SDK
-	LUA_CALL_HOOK_BEGIN("ShouldDrawEntity");
-	CBaseEntity::PushLuaInstanceSafe(L, pEnt);
+	LUA_CALL_HOOK_BEGIN("ShouldDrawEntity", "Whether the given entity should be drawn");
+	CBaseEntity::PushLuaInstanceSafe(L, pEnt);  // doc: entity
 	LUA_CALL_HOOK_END(1, 1);
 
 	LUA_RETURN_BOOLEAN();
@@ -539,8 +545,8 @@ bool ClientModeShared::ShouldDrawEntity(C_BaseEntity *pEnt)
 bool ClientModeShared::ShouldDrawParticles( )
 {
 #ifdef LUA_SDK
-	LUA_CALL_HOOK_BEGIN("ShouldDrawParticles");
-	LUA_CALL_HOOK_END(0, 1);
+	LUA_CALL_HOOK_BEGIN("ShouldDrawParticles", "Whether particles should be drawn");
+	LUA_CALL_HOOK_END(0, 1);  // doc: boolean (return false to prevent particles from being drawn)
 
 	LUA_RETURN_BOOLEAN();
 #endif
@@ -592,8 +598,8 @@ void ClientModeShared::OverrideMouseInput( float *x, float *y )
 bool ClientModeShared::ShouldDrawViewModel()
 {
 #ifdef LUA_SDK
-	LUA_CALL_HOOK_BEGIN("ShouldDrawViewModel");
-	LUA_CALL_HOOK_END(0, 1);
+	LUA_CALL_HOOK_BEGIN("ShouldDrawViewModels", "Whether viewmodels should be drawn");
+	LUA_CALL_HOOK_END(0, 1);  // doc: boolean (return false to prevent viewmodels from being drawn)
 
 	LUA_RETURN_BOOLEAN();
 #endif
@@ -604,8 +610,8 @@ bool ClientModeShared::ShouldDrawViewModel()
 bool ClientModeShared::ShouldDrawDetailObjects( )
 {
 #ifdef LUA_SDK
-	LUA_CALL_HOOK_BEGIN("ShouldDrawDetailObjects");
-	LUA_CALL_HOOK_END(0, 1);
+	LUA_CALL_HOOK_BEGIN("ShouldDrawDetailObjects", "Whether detail objects should be drawn");
+	LUA_CALL_HOOK_END(0, 1);  // doc: boolean (return false to prevent detail objects from being drawn)
 
 	LUA_RETURN_BOOLEAN();
 #endif
@@ -668,7 +674,7 @@ bool ClientModeShared::ShouldDrawLocalPlayer( C_BasePlayer *pPlayer )
 bool ClientModeShared::ShouldDrawFog( void )
 {
 #ifdef LUA_SDK
-	LUA_CALL_HOOK_BEGIN("ShouldDrawFog");
+	LUA_CALL_HOOK_BEGIN("ShouldDrawFog", "Whether fog should be drawn");
 	LUA_CALL_HOOK_END(0, 1);  // doc: boolean (return false to prevent fog from being drawn)
 
 	LUA_RETURN_BOOLEAN();
@@ -708,6 +714,10 @@ void ClientModeShared::AdjustEngineViewport( int& x, int& y, int& width, int& he
 //-----------------------------------------------------------------------------
 void ClientModeShared::PreRender( CViewSetup *pSetup )
 {
+#ifdef LUA_SDK
+	LUA_CALL_HOOK_BEGIN("PreRender", "Called before rendering the scene");
+	LUA_CALL_HOOK_END(0, 0);
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -717,10 +727,19 @@ void ClientModeShared::PostRender()
 {
 	// Let the particle manager simulate things that haven't been simulated.
 	ParticleMgr()->PostRender();
+
+#ifdef LUA_SDK
+	LUA_CALL_HOOK_BEGIN("PostRender", "Called after rendering the scene");
+	LUA_CALL_HOOK_END(0, 0);
+#endif
 }
 
 void ClientModeShared::PostRenderVGui()
 {
+#ifdef LUA_SDK
+	LUA_CALL_HOOK_BEGIN("PostRenderVgui", "Called after rendering the VGUI");
+	LUA_CALL_HOOK_END(0, 0);
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -785,6 +804,7 @@ void ClientModeShared::ProcessInput(bool bActive)
 int	ClientModeShared::KeyInput( int down, ButtonCode_t keynum, const char *pszCurrentBinding )
 {
 #ifdef LUA_SDK
+	// Let the Console always dominate key input, only then let Lua handle it
 	if (g_bLuaInitialized)
 	{
 		LUA_CALL_HOOK_BEGIN("KeyInput", "Called when a key is pressed");
@@ -1067,9 +1087,11 @@ void ClientModeShared::Enable()
 		m_pScriptedViewport->SetParent(pRoot);
 #endif
 		m_pViewport->SetParent(pRoot);
-#ifdef LUA_SDK
+
+// HL2SB
+/*#ifdef LUA_SDK
 		m_pClientLuaPanel->SetParent(pRoot);
-#endif
+#endif*/
 	}
 
 	// All hud elements should be proportional
@@ -1078,26 +1100,33 @@ void ClientModeShared::Enable()
 	m_pScriptedViewport->SetProportional(true);
 #endif
 	m_pViewport->SetProportional(true);
-#ifdef LUA_SDK
+
+// HL2SB
+/*#ifdef LUA_SDK
 	m_pClientLuaPanel->SetProportional(false);
-#endif
+#endif*/
 
 #ifdef LUA_SDK
 	m_pScriptedViewport->SetCursor(m_CursorNone);
 #endif
 	m_pViewport->SetCursor(m_CursorNone);
-#ifdef LUA_SDK
+
+// HL2SB
+/*#ifdef LUA_SDK
 	m_pClientLuaPanel->SetCursor(m_CursorNone);
-#endif
+#endif*/
 	vgui::surface()->SetCursor(m_CursorNone);
 
 #ifdef LUA_SDK
 	m_pScriptedViewport->SetVisible(true);
 #endif
 	m_pViewport->SetVisible(true);
-#ifdef LUA_SDK
+
+// HL2SB
+/*#ifdef LUA_SDK
 	m_pClientLuaPanel->SetVisible(true);
-#endif
+#endif*/
+
 #ifdef LUA_SDK
 	if (m_pScriptedViewport->IsKeyBoardInputEnabled())
 	{
@@ -1108,11 +1137,17 @@ void ClientModeShared::Enable()
 	{
 		m_pViewport->RequestFocus();
 	}
-#ifdef LUA_SDK
+
+// HL2SB
+/*#ifdef LUA_SDK
 	if (m_pClientLuaPanel->IsKeyBoardInputEnabled())
 	{
 		m_pClientLuaPanel->RequestFocus();
 	}
+#endif*/
+
+#ifdef LUA_SDK
+	luasrc_ui_enable();
 #endif
 
 	Layout();
@@ -1130,17 +1165,21 @@ void ClientModeShared::Disable()
 		m_pScriptedViewport->SetParent((vgui::VPANEL)NULL);
 #endif
 		m_pViewport->SetParent((vgui::VPANEL)NULL);
-#ifdef LUA_SDK
+/*#ifdef LUA_SDK
 		m_pClientLuaPanel->SetParent((vgui::VPANEL)NULL);
-#endif
+#endif*/
 	}
 
 #ifdef LUA_SDK
 	m_pScriptedViewport->SetVisible(false);
 #endif
 	m_pViewport->SetVisible(false);
-#ifdef LUA_SDK
+/*#ifdef LUA_SDK
 	m_pClientLuaPanel->SetVisible(false);
+#endif*/
+
+#ifdef LUA_SDK
+	luasrc_ui_disable();
 #endif
 }
 
@@ -1163,8 +1202,12 @@ void ClientModeShared::Layout()
 		m_pScriptedViewport->SetBounds(0, 0, wide, tall);
 #endif
 		m_pViewport->SetBounds(0, 0, wide, tall);
-#ifdef LUA_SDK
+/*#ifdef LUA_SDK
 		m_pClientLuaPanel->SetBounds(0, 0, wide, tall);
+#endif*/
+
+#ifdef LUA_SDK
+		luasrc_ui_layout(wide, tall);
 #endif
 		if ( changed )
 		{

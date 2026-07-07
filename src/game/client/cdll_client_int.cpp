@@ -550,6 +550,10 @@ INetworkStringTable *g_pStringTableInfoPanel = NULL;
 INetworkStringTable *g_pStringTableClientSideChoreoScenes = NULL;
 INetworkStringTable *g_pStringTableServerMapCycle = NULL;
 
+#ifdef LUA_SDK
+INetworkStringTable* g_pStringTableLuaNetworkStrings = NULL;
+#endif
+
 #ifdef TF_CLIENT_DLL
 INetworkStringTable *g_pStringTableServerPopFiles = NULL;
 INetworkStringTable *g_pStringTableServerMapCycleMvM = NULL;
@@ -1362,6 +1366,25 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 		return false;
 	}
 
+#if defined( EXPERIMENT_SOURCE )
+	// NOTE: This is the earliest useful point we can start showing a loading indicator in the game.
+	// however, shortly after the menu is already available. So we should probably let HTML handle
+	// the loading and updating screens.
+	// vgui::VPANEL parent = enginevgui->GetPanel( PANEL_ROOT );
+	// vgui::Label *label = new vgui::Label( NULL, "HelloWorldLabel", "Loading..." );
+	// label->SetBounds( 0, 0, 1600, 900 );
+	// label->SetContentAlignment( vgui::Label::a_center );
+	// label->SetVisible( true );
+	// label->SetParent( parent );
+	// label->SetZPos( 10000 );
+
+	// Andrew; then mount everything the user wants to use.
+	InitializeGameContentMounting();
+
+	// Finally, load all of the player's addons.
+	MountAddons();
+#endif
+
 	if ( CommandLine()->FindParm( "-textmode" ) )
 		g_bTextMode = true;
 
@@ -1382,6 +1405,10 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 
 	g_pcv_ThreadMode = g_pCVar->FindVar( "host_thread_mode" );
 
+#ifdef EXPERIMENT_SOURCE
+	g_pGameInfoStore = new CGameInfoStore();
+#endif
+
 	if (!Initializer::InitializeAllObjects())
 		return false;
 
@@ -1394,7 +1421,9 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 
 	vgui::VGui_InitMatSysInterfacesList( "ClientDLL", &appSystemFactory, 1 );
 
-#if defined ( LUA_SDK )
+#ifdef LUA_SDK
+	SetDefLessFunc(CPngTextureRegen::m_mapProceduralMaterials);
+
 	// Initialize the GameUI state
 	luasrc_init_gameui();
 
@@ -1719,6 +1748,9 @@ void CHLClient::Shutdown( void )
 	view->Shutdown();
 	g_pParticleSystemMgr->UncacheAllParticleSystems();
 	UncacheAllMaterials();
+#ifdef LUA_SDK
+	CPngTextureRegen::ReleaseAllTextureData();
+#endif
 
 	IGameSystem::ShutdownAllSystems();
 
@@ -1729,6 +1761,16 @@ void CHLClient::Shutdown( void )
 	
 	gHUD.Shutdown();
 	VGui_Shutdown();
+
+#ifdef LUA_SDK
+	// Only shutdown the GameUI Lua State after VGui has shut down and cleaned up
+	luasrc_shutdown_gameui();
+#endif
+
+#ifdef EXPERIMENT_SOURCE
+	delete g_pGameInfoStore;
+	g_pGameInfoStore = NULL;
+#endif
 	
 	ParticleMgr()->Term();
 	
@@ -2115,31 +2157,26 @@ void CHLClient::View_Fade( ScreenFade_t *pSF )
 //-----------------------------------------------------------------------------
 void CHLClient::LevelInitPreEntity( char const* pMapName )
 {
-	int i, l;
-
-/*#define BSPVERSION2 23
-	const char* mapsDir = "maps/*.bsp";
-	FileFindHandle_t findHandle;
-	const char* fileName = g_pFullFileSystem->FindFirst(mapsDir, &findHandle);
-	//i = header.version;
-	if (i < MINBSPVERSION || i > BSPVERSION2)
-	{
-		//g_pFileSystem->Close(fp);
-		ConMsg("Map [%s] has incorrect BSP version (%i should be %i).\n", fileName, i, BSPVERSION);
-		return;
-	}*/
-
 	ReloadParticleEffects();
-	//Sleep(10000);
 
 	// HACK: Bogus, but the logic is too complicated in the engine
 	if (g_bLevelInitialized)
 		return;
 	g_bLevelInitialized = true;
 
-	//MemAlloc_CompactHeap();
-	//datacache->Flush(true, false);
-	//UncacheAllMaterials();
+#ifdef LUA_SDK
+	lcf_recursivedeletefile(LUA_PATH_CACHE);
+
+	// Add the Lua environment.
+	// Andrew; unarchive the Lua Cache File
+	if (gpGlobals->maxClients > 1)
+	{
+		luasrc_ExtractLcf();
+	}
+
+	luasrc_init();
+#endif
+
 	// While this doesn't really flush things by itself, it does unload some things, and fixes async loading at least
 	mdlcache->Flush(MDLCACHE_FLUSH_IGNORELOCK);
 	// We need this or another type, but datacache is crashing on everything
@@ -2278,6 +2315,11 @@ void CHLClient::ResetStringTablePointers()
 	g_pStringTableClientSideChoreoScenes = NULL;
 	g_pStringTableServerMapCycle = NULL;
 
+#ifdef LUA_SDK
+	g_pStringTableLuaNetworkStrings = NULL;
+#endif
+
+
 #ifdef TF_CLIENT_DLL
 	g_pStringTableServerPopFiles = NULL;
 	g_pStringTableServerMapCycleMvM = NULL;
@@ -2373,6 +2415,11 @@ void CHLClient::LevelShutdown( void )
 	// don't want to do this for TF2 because we have particle systems in our
 	// character loadout screen that can be viewed when we're not connected to a server
 	g_pParticleSystemMgr->UncacheAllParticleSystems();
+#endif
+
+#ifdef LUA_SDK
+	DestroyCreatedTextureIds();
+	CPngTextureRegen::ReleaseAllTextureData();
 #endif
 	UncacheAllMaterials();
 
