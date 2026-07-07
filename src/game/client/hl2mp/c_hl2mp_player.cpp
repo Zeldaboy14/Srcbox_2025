@@ -1238,6 +1238,59 @@ void C_HL2MP_Player::UpdateClientSideAnimation()
     BaseClass::UpdateClientSideAnimation();
 }
 
+/*void C_HL2MP_Player::DoAnimationEvent(PlayerAnimEvent_t event,
+    int nData)
+{
+    if (IsLocalPlayer())
+    {
+        if ((prediction->InPrediction() && !prediction->IsFirstTimePredicted()))
+            return;
+    }
+
+    MDLCACHE_CRITICAL_SECTION();
+    m_PlayerAnimState->DoAnimationEvent(event, nData);
+}*/
+
+// --------------------------------------------------------------------------------
+// Player animation event. Sent to the client when a player fires, jumps,
+// reloads, etc..
+// --------------------------------------------------------------------------------
+class C_TEPlayerAnimEvent : public C_BaseTempEntity
+{
+public:
+    DECLARE_CLASS(C_TEPlayerAnimEvent, C_BaseTempEntity);
+    DECLARE_CLIENTCLASS();
+
+    virtual void PostDataUpdate(DataUpdateType_t updateType)
+    {
+        // Create the effect.
+        C_HL2MP_Player* pPlayer =
+            dynamic_cast<C_HL2MP_Player*>(m_hPlayer.Get());
+        if (pPlayer && !pPlayer->IsDormant())
+        {
+            pPlayer->DoAnimationEvent((PlayerAnimEvent_t)m_iEvent.Get(),
+                m_nData);
+        }
+    }
+
+public:
+    CNetworkHandle(CBasePlayer, m_hPlayer);
+    CNetworkVar(int, m_iEvent);
+    CNetworkVar(int, m_nData);
+};
+
+;  // clang-format off
+
+IMPLEMENT_CLIENTCLASS_EVENT(C_TEPlayerAnimEvent, DT_TEPlayerAnimEvent, CTEPlayerAnimEvent);
+
+BEGIN_RECV_TABLE_NOBASE(C_TEPlayerAnimEvent, DT_TEPlayerAnimEvent)
+RecvPropEHandle(RECVINFO(m_hPlayer)),
+RecvPropInt(RECVINFO(m_iEvent)),
+RecvPropInt(RECVINFO(m_nData))
+END_RECV_TABLE()
+
+;  // clang-format on
+
 void C_HL2MP_Player::DoAnimationEvent(PlayerAnimEvent_t event,
     int nData)
 {
