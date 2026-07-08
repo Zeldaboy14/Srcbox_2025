@@ -1285,12 +1285,10 @@ const char *CHL2MPRules::GetGameDescription( void )
 	if ( IsTeamplay() )
 		return "Team Deathmatch";
 #else
-	//LUA_CALL_HOOK_BEGIN("GetGameDescription");
-	//LUA_CALL_HOOK_END(0, 1);
+	LUA_CALL_HOOK_BEGIN("GetGameDescription");
+	LUA_CALL_HOOK_END(0, 1);
 
-	//LUA_RETURN_STRING();
-
-	return "Deathmatch";
+	LUA_RETURN_STRING();
 #endif
 
 #if !defined( SRCBOX )
