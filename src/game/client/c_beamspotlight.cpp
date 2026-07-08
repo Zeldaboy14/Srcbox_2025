@@ -84,7 +84,8 @@ private:
 	Vector	m_vSpotlightDir;
 
 	CHandle<C_Beam>	m_hSpotlight;
-	CHandle<C_Beam>	m_hSpotlightTarget;
+	// zb14 - adding this due to sdk differences :3
+	//CHandle<C_SpotlightEnd>	m_hSpotlightTarget;
 	
 	float	m_flSpotlightCurLength;
 
@@ -244,8 +245,8 @@ void C_BeamSpotLight::SpotlightCreate(void)
 	// Set the temporary spawnflag on the beam so it doesn't save (we'll recreate it on restore)
 	m_hSpotlight->SetHDRColorScale( m_flHDRColorScale );
 	//const color24 c = GetRenderColor();
-	//m_hSpotlight->SetColor( c.r, c.g, c.b ); 
-	m_hSpotlight->SetColor(m_clrRender->r, m_clrRender->g, m_clrRender->b);
+	const color32 c = GetRenderColor();
+	m_hSpotlight->SetColor( c.r, c.g, c.b ); 
 	m_hSpotlight->SetHaloTexture(m_nHaloIndex);
 	m_hSpotlight->SetHaloScale(60);
 	m_hSpotlight->SetEndWidth(m_flSpotlightGoalWidth);
@@ -303,19 +304,19 @@ void C_BeamSpotLight::ComputeRenderInfo()
 	if ( m_flSpotlightCurLength > 2*m_flSpotlightMaxLength )
 	{
 		//SetRenderAlpha( 0 );
-		m_hSpotlightTarget->SetRenderColorA(0);
+		SetRenderColorA( 0 );
 		m_hSpotlight->SetFadeLength( m_flSpotlightMaxLength );
 	}
 	else if ( m_flSpotlightCurLength > m_flSpotlightMaxLength )		
 	{
 		//SetRenderAlpha( (1-((m_flSpotlightCurLength-m_flSpotlightMaxLength)/m_flSpotlightMaxLength)) );
-		m_hSpotlightTarget->SetRenderColorA((1 - ((m_flSpotlightCurLength - m_flSpotlightMaxLength) / m_flSpotlightMaxLength)));
+		SetRenderColorA( (1-((m_flSpotlightCurLength-m_flSpotlightMaxLength)/m_flSpotlightMaxLength)) );
 		m_hSpotlight->SetFadeLength( m_flSpotlightMaxLength );
 	}
 	else
 	{
 		//SetRenderAlpha( 1.0 );
-		m_hSpotlightTarget->SetRenderColorA(1.0);
+		SetRenderColorA( 1.0 );
 		m_hSpotlight->SetFadeLength( m_flSpotlightCurLength );
 	}
 
@@ -328,11 +329,13 @@ void C_BeamSpotLight::ComputeRenderInfo()
 	{
 		// <<TODO>> - magic number 1.8 depends on sprite size
 		m_flLightScale = 1.8*flNewWidth;
-		/*
+
 		if ( m_flLightScale > 0 ) 
 		{
+			//const color24 c = GetRenderColor();
 			const color32 c = GetRenderColor();
 			//float a = GetRenderAlpha() / 255.0f;
+			float a = GetRenderColor().a / 255.0f;
 			ColorRGBExp32 color;
 			color.r	= c.r * a;
 			color.g	= c.g * a;
@@ -353,7 +356,7 @@ void C_BeamSpotLight::ComputeRenderInfo()
 			m_pDynamicLight->origin		= GetAbsOrigin() + Vector(0,0,5);
 			m_pDynamicLight->die		= gpGlobals->curtime + 0.05f;
 			m_pDynamicLight->color		= color;
-		}*/
+		}
 	}
 }
 

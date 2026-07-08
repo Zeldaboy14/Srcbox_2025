@@ -2397,6 +2397,14 @@ inline bool C_BaseEntity::IsEnabledInToolView() const
 }
 
 //-----------------------------------------------------------------------------
+// Client version of UTIL_Remove
+//-----------------------------------------------------------------------------
+inline void UTIL_Remove(C_BaseEntity* pEntity)
+{
+    pEntity->Remove();
+}
+
+//-----------------------------------------------------------------------------
 // Purpose:
 // Input  :  -
 // Output : inline bool

@@ -27,7 +27,7 @@ enum BeamSpotlightSpawnFlags_t
 
 class CBeamSpotlight : public CBaseEntity
 {
-	DECLARE_CLASS( CBeamSpotlight, CBaseEntity);
+	DECLARE_CLASS( CBeamSpotlight, CBaseEntity );
 public:
 	DECLARE_DATADESC();
 	DECLARE_SERVERCLASS();
@@ -111,22 +111,15 @@ END_SEND_TABLE()
 // Purpose: 
 //-----------------------------------------------------------------------------
 CBeamSpotlight::CBeamSpotlight()
-: m_bSpotlightOn()
-, m_bHasDynamicLight()
-, m_flSpotlightMaxLength()
-, m_flSpotlightGoalWidth()
-, m_flHDRColorScale()
-, m_isRotating( false )
-, m_isReversed( false )
-, m_flmaxSpeed( 100.0f )
-, m_flRotationSpeed()
-, m_nRotationAxis()
 {
 	m_bSpotlightOn = false;
 	m_bHasDynamicLight = true;
 	m_flSpotlightMaxLength = 500.0f;
-	m_flSpotlightMaxLength = 50.0f;
+	m_flSpotlightGoalWidth = 50.0f;
 	m_flHDRColorScale = 0.7f;
+	m_isRotating = false;
+	m_isReversed = false;
+	m_flmaxSpeed = 100.0f;
 	m_flRotationSpeed = 0.0f;
 	m_nRotationAxis = 0;
 }
