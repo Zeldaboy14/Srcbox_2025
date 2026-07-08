@@ -270,7 +270,11 @@ class C_HL2MPRagdoll : public C_BaseAnimatingOverlay
 #endif
 
     private:
-    C_HL2MPRagdoll( const C_HL2MPRagdoll & ) {}
+#ifdef LUA_SDK
+    C_HL2MPRagdoll(const C_HL2MPRagdoll&)
+    {
+    }
+#endif
 
     void Interp_Copy( C_BaseAnimatingOverlay *pDestinationEntity );
     void CreateHL2MPRagdoll( void );

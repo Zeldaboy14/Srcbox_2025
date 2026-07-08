@@ -185,22 +185,58 @@ void C_HL2MP_Player::UpdateIDTarget()
 
 void C_HL2MP_Player::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr, CDmgAccumulator *pAccumulator )
 {
+
+#ifdef LUA_SDK
+    // Andrew; push a copy of the damageinfo/vector, bring the changes back out
+    // of Lua and set info/vecDir to the new value if it's been modified.
+    CTakeDamageInfo lInfo = info;
+    Vector lvecDir = vecDir;
+
+    LUA_CALL_HOOK_BEGIN("PlayerTraceAttack");
+    C_HL2MP_Player::PushLuaInstanceSafe(L, this);
+    lua_pushdamageinfo(L, lInfo);
+    lua_pushvector(L, lvecDir);
+    lua_pushtrace(L, *ptr);
+    LUA_CALL_HOOK_END(4, 1);
+
+    LUA_RETURN_NONE_IF_FALSE();
+
+    Vector vecOrigin = ptr->endpos - lvecDir * 4;
+#else
     Vector vecOrigin = ptr->endpos - vecDir * 4;
+#endif
 
     float flDistance = 0.0f;
 
-    if ( info.GetAttacker() )
+#ifdef LUA_SDK
+    if (lInfo.GetAttacker())
     {
-        flDistance = ( ptr->endpos - info.GetAttacker()->GetAbsOrigin() ).Length();
+        flDistance =
+            (ptr->endpos - lInfo.GetAttacker()->GetAbsOrigin()).Length();
     }
+#else
+    if (info.GetAttacker())
+    {
+        flDistance =
+            (ptr->endpos - info.GetAttacker()->GetAbsOrigin()).Length();
+    }
+#endif
 
     if ( m_takedamage )
     {
-        AddMultiDamage( info, this );
+#ifdef LUA_SDK
+        AddMultiDamage(lInfo, this);
+#else
+        AddMultiDamage(info, this);
+#endif
 
         int blood = BloodColor();
 
-        CBaseEntity *pAttacker = info.GetAttacker();
+#ifdef LUA_SDK
+        CBaseEntity* pAttacker = lInfo.GetAttacker();
+#else
+        CBaseEntity* pAttacker = info.GetAttacker();
+#endif
 
         if ( pAttacker )
         {
@@ -210,8 +246,14 @@ void C_HL2MP_Player::TraceAttack( const CTakeDamageInfo &info, const Vector &vec
 
         if ( blood != DONT_BLEED )
         {
-            SpawnBlood( vecOrigin, vecDir, blood, flDistance );  // a little surface blood.
-            TraceBleed( flDistance, vecDir, ptr, info.GetDamageType() );
+            // a little surface blood.
+#ifdef LUA_SDK
+            SpawnBlood(vecOrigin, lvecDir, blood, flDistance);
+            TraceBleed(flDistance, lvecDir, ptr, lInfo.GetDamageType());
+#else
+            SpawnBlood(vecOrigin, vecDir, blood, flDistance);
+            TraceBleed(flDistance, vecDir, ptr, info.GetDamageType());
+#endif
         }
     }
 }
@@ -697,7 +739,7 @@ const QAngle &C_HL2MP_Player::GetRenderAngles()
     else
     {
 #ifdef LUA_SDK
-        return m_PlayerAnimState->GetRenderAngles();
+        //return m_PlayerAnimState->GetRenderAngles();
 #else
         return m_PlayerAnimState.GetRenderAngles();
 #endif
@@ -734,6 +776,94 @@ void C_HL2MP_Player::NotifyShouldTransmit( ShouldTransmitState_t state )
 
     BaseClass::NotifyShouldTransmit( state );
 }
+
+#ifdef LUA_SDK
+
+void C_HL2MPRagdoll::CreateHL2MPRagdoll(void)
+{
+    // First, initialize all our data. If we have the player's entity on our client,
+    // then we can make ourselves start out exactly where the player is.
+    C_HL2MP_Player* pPlayer = dynamic_cast<C_HL2MP_Player*>(m_hPlayer.Get());
+
+    if (pPlayer && !pPlayer->IsDormant())
+    {
+        // move my current model instance to the ragdoll's so decals are preserved.
+        pPlayer->SnatchModelInstance(this);
+
+        VarMapping_t* varMap = GetVarMapping();
+
+        // Copy all the interpolated vars from the player entity.
+        // The entity uses the interpolated history to get bone velocity.
+        bool bRemotePlayer = (pPlayer != C_BasePlayer::GetLocalPlayer());
+        if (bRemotePlayer)
+        {
+            Interp_Copy(pPlayer);
+
+            SetAbsAngles(pPlayer->GetRenderAngles());
+            GetRotationInterpolator().Reset();
+
+            m_flAnimTime = pPlayer->m_flAnimTime;
+            SetSequence(pPlayer->GetSequence());
+            m_flPlaybackRate = pPlayer->GetPlaybackRate();
+        }
+        else
+        {
+            // This is the local player, so set them in a default
+            // pose and slam their velocity, angles and origin
+            SetAbsOrigin(m_vecRagdollOrigin);
+
+            SetAbsAngles(pPlayer->GetRenderAngles());
+
+            SetAbsVelocity(m_vecRagdollVelocity);
+
+            int iSeq = pPlayer->GetSequence();
+            if (iSeq == -1)
+            {
+                Assert(false);  // missing walk_lower?
+                iSeq = 0;
+            }
+
+            SetSequence(iSeq);  // walk_lower, basic pose
+            SetCycle(0.0);
+
+            Interp_Reset(varMap);
+        }
+    }
+    else
+    {
+        // overwrite network origin so later interpolation will
+        // use this position
+        SetNetworkOrigin(m_vecRagdollOrigin);
+
+        SetAbsOrigin(m_vecRagdollOrigin);
+        SetAbsVelocity(m_vecRagdollVelocity);
+
+        Interp_Reset(GetVarMapping());
+    }
+
+    SetModelIndex(m_nModelIndex);
+
+    // Make us a ragdoll..
+    m_nRenderFX = kRenderFxRagdoll;
+
+    matrix3x4_t boneDelta0[MAXSTUDIOBONES];
+    matrix3x4_t boneDelta1[MAXSTUDIOBONES];
+    matrix3x4_t currentBones[MAXSTUDIOBONES];
+    const float boneDt = 0.05f;
+
+    if (pPlayer && !pPlayer->IsDormant())
+    {
+        pPlayer->GetRagdollInitBoneArrays(boneDelta0, boneDelta1, currentBones, boneDt);
+    }
+    else
+    {
+        GetRagdollInitBoneArrays(boneDelta0, boneDelta1, currentBones, boneDt);
+    }
+
+    InitAsClientRagdoll(boneDelta0, boneDelta1, currentBones, boneDt);
+}
+
+#endif
 
 void C_HL2MP_Player::OnDataChanged( DataUpdateType_t type )
 {
@@ -1294,7 +1424,7 @@ END_RECV_TABLE()
 void C_HL2MP_Player::DoAnimationEvent(PlayerAnimEvent_t event,
     int nData)
 {
-    if (IsLocalPlayer())
+   if (IsLocalPlayer())
     {
         if ((prediction->InPrediction() && !prediction->IsFirstTimePredicted()))
             return;
@@ -1303,6 +1433,7 @@ void C_HL2MP_Player::DoAnimationEvent(PlayerAnimEvent_t event,
     MDLCACHE_CRITICAL_SECTION();
     m_PlayerAnimState->DoAnimationEvent(event, nData);
 }
+
 
 //-----------------------------------------------------------------------------
 // Purpose:
