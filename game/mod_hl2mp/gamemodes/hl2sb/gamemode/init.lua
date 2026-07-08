@@ -21,7 +21,9 @@ local tSpawnPointClassnames = {
 	"info_player_counterterrorist",
 	"info_player_axis",
 	"info_player_allies",
-	"info_player_start"
+	"info_player_start",
+	"info_survivor_position",
+	"info_survivor_rescue"
 }
 
 function GM:AddLevelDesignerPlacedObject(pEntity)
