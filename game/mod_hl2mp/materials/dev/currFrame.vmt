@@ -1,0 +1,4 @@
+"N64_Motionblur"
+{
+	"$basetexture" "_rt_FullFrameFB"
+}

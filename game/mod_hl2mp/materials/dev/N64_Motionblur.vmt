@@ -1,0 +1,5 @@
+"N64_Motionblur"
+{
+	"$prevframe" "prevFrame"
+	"$currframe" "currentFrame"
+}
