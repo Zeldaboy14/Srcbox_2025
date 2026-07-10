@@ -96,8 +96,8 @@ void COptionsSubKeyboard::OnApplyChanges()
 {
 	ApplyAllBindings();
 
-	ConVarRef con_enable( "con_enable" );
-	con_enable.SetValue( GetControlInt( "ConsoleCheck", 0 ) );
+	//ConVarRef con_enable( "con_enable" );
+	//con_enable.SetValue( GetControlInt( "ConsoleCheck", 0 ) );
 }
 
 //-----------------------------------------------------------------------------
