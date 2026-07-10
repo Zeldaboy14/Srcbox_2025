@@ -1979,6 +1979,7 @@ bool CHL2MP_Player::KeyDown(int buttonCode)
 //-----------------------------------------------------------------------------
 void CHL2MP_Player::SetupBones(matrix3x4_t* pBoneToWorld, int boneMask)
 {
+	/*
 	VPROF_BUDGET("CHL2MP_Player::SetupBones", VPROF_BUDGETGROUP_SERVER_ANIM);
 
 	// Get the studio header.
@@ -2041,6 +2042,7 @@ void CHL2MP_Player::SetupBones(matrix3x4_t* pBoneToWorld, int boneMask)
 		GetModelScale(),  // Scaling
 		pBoneToWorld,
 		boneMask);
+		*/
 }
 #endif
 
