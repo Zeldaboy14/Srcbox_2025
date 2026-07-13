@@ -67,8 +67,9 @@ BEGIN_SEND_TABLE_NOBASE( CHL2MP_Player, DT_HL2MPLocalPlayerExclusive )
 	SendPropFloat   (SENDINFO_VECTORELEM(m_vecOrigin, 2), -1, SPROP_NOSCALE|SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, SendProxy_OriginZ ),
 
 	SendPropFloat( SENDINFO_VECTORELEM(m_angEyeAngles, 0), 8, SPROP_CHANGES_OFTEN, -90.0f, 90.0f ),
+#ifndef LUA_SDK
 	SendPropAngle( SENDINFO_VECTORELEM(m_angEyeAngles, 1), 10, SPROP_CHANGES_OFTEN ),
-
+#endif
 END_SEND_TABLE()
 
 // all players except the local player
@@ -83,6 +84,12 @@ BEGIN_SEND_TABLE_NOBASE( CHL2MP_Player, DT_HL2MPNonLocalPlayerExclusive )
 END_SEND_TABLE()
 
 IMPLEMENT_SERVERCLASS_ST(CHL2MP_Player, DT_HL2MP_Player)
+#ifdef LUA_SDK
+	SendPropExclude("DT_BaseAnimating", "m_flPlaybackRate"),
+	SendPropExclude("DT_BaseAnimating", "m_nSequence"),
+	SendPropExclude("DT_BaseEntity", "m_angRotation"),
+	SendPropExclude("DT_BaseAnimatingOverlay", "overlay_vars"),
+#endif
 	SendPropExclude( "DT_BaseEntity", "m_vecOrigin" ),
 
 	// misyl:
@@ -94,6 +101,15 @@ IMPLEMENT_SERVERCLASS_ST(CHL2MP_Player, DT_HL2MP_Player)
 	// So, just never send it, and don't predict it on the client either.
 	SendPropExclude( "DT_BasePlayer", "m_flMaxspeed" ),
 
+#ifdef LUA_SDK
+	// playeranimstate and clientside animation takes care of these on the client
+	SendPropExclude("DT_ServerAnimationData", "m_flCycle"),
+	SendPropExclude("DT_AnimTimeMustBeFirst", "m_flAnimTime"),
+
+	SendPropExclude("DT_BaseFlex", "m_flexWeight"),
+	SendPropExclude("DT_BaseFlex", "m_blinktoggle"),
+	SendPropExclude("DT_BaseFlex", "m_viewtarget"),
+#endif
 
 	// Data that only gets sent to the local player
 	SendPropDataTable( "hl2mplocaldata", 0, &REFERENCE_SEND_TABLE( DT_HL2MPLocalPlayerExclusive ), SendProxy_SendLocalDataTable ),
@@ -104,6 +120,10 @@ IMPLEMENT_SERVERCLASS_ST(CHL2MP_Player, DT_HL2MP_Player)
 	SendPropEHandle( SENDINFO( m_hRagdoll ) ),
 	SendPropInt( SENDINFO( m_iSpawnInterpCounter), 4 ),
 	SendPropInt( SENDINFO( m_iPlayerSoundType), 3 ),
+#ifdef LUA_SDK
+	SendPropInt(SENDINFO(m_ArmorValue)),
+	SendPropInt(SENDINFO(m_MaxArmorValue)),
+#endif
 	
 	SendPropExclude( "DT_BaseAnimating", "m_flPoseParameter" ),
 	SendPropExclude( "DT_BaseFlex", "m_viewtarget" ),
@@ -269,12 +289,14 @@ void CHL2MP_Player::GiveAllItems(void)
 
 void CHL2MP_Player::GiveDefaultItems( void )
 {
+	//if (gpGlobals->eLoadType == MapLoad_Transition)
+		//return;
+//#undef LUA_SDK
 #if defined ( LUA_SDK )
     LUA_CALL_HOOK_BEGIN( "GiveDefaultItems" );
     CHL2MP_Player::PushLuaInstanceSafe( L, this );
     LUA_CALL_HOOK_END( 1, 0 );
 #else
-	if (srcbox_gamemode_sandbox.GetInt() == 1) {
 
 	const char* szDefaultWeaponName = engine->GetClientConVarValue(engine->IndexOfEdict(edict()), "cl_defaultweapon");
 
@@ -339,8 +361,6 @@ void CHL2MP_Player::GiveDefaultItems( void )
 	{
 		Weapon_Switch( Weapon_OwnsThisType( "weapon_physgun" ) );
 	}
-	}
-	else {}
 #endif
 }
 
@@ -1630,8 +1650,14 @@ CBaseEntity* CHL2MP_Player::EntSelectSpawnPoint( void )
 			goto ReturnSpot;
 		if (!pSpot)
 			return pSpot2;
-		//if (!pSpot && !pSpot2)
-			//return pSpot3;
+		if (!pSpot2)
+			return pSpot3;
+		if (!pSpot3)
+			return pSpot4;
+		if (!pSpot4)
+			return pSpot5;
+		if (!pSpot5)
+			return pSpot6;
 	}
 
 ReturnSpot:
@@ -2041,8 +2067,7 @@ void CHL2MP_Player::SetupBones(matrix3x4_t* pBoneToWorld, int boneMask)
 		-1,
 		GetModelScale(),  // Scaling
 		pBoneToWorld,
-		boneMask);
-		*/
+		boneMask);*/
 }
 #endif
 

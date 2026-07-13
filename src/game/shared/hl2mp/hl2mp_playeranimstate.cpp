@@ -8,12 +8,11 @@
 #include "utldict.h"
 
 #include "hl2mp_playeranimstate.h"
-#include "base_playeranimstate.h"
 #include "datacache/imdlcache.h"
 #include <mathlib/lvector.h>
 
 #ifdef CLIENT_DLL
-#include "c_experiment_player.h"
+#include "c_hl2mp_player.h"
 #include "voice_status.h"
 #else
 #include "hl2mp_player.h"
@@ -27,7 +26,7 @@ ConVar cl_leganimtype(
     FCVAR_ARCHIVE | FCVAR_REPLICATED,
     "Set to 1 to use 9-way leg animations, 0 to use 8-way" );
 
-CHL2MPPlayerAnimState *CreateExperimentPlayerAnimState( CHL2MP_Player *pPlayer )
+CHL2MPPlayerAnimState *CreateHL2MPPlayerAnimState( CHL2MP_Player *pPlayer )
 {
     MDLCACHE_CRITICAL_SECTION();
 

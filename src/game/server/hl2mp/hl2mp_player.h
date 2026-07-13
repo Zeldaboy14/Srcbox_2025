@@ -22,8 +22,8 @@ class CHL2MP_Player;
 #include "Multiplayer\multiplayer_animstate.h"
 #ifdef LUA_SDK
 #include "lsingleluainstance.h"
-#endif
 #include "hl2mp_playeranimstate.h"
+#endif
 
 //=============================================================================
 // >> HL2MP_Player
@@ -62,9 +62,9 @@ public:
 	DECLARE_DATADESC();
 	DECLARE_ENT_SCRIPTDESC();
 
+#ifdef LUA_SDK
 	// This passes the event to the client's and server's CHL2MPPlayerAnimState.
 	void			DoAnimationEvent(PlayerAnimEvent_t event, int nData = 0);
-#ifdef LUA_SDK
 	void SetupBones(matrix3x4_t* pBoneToWorld, int boneMask);
 	bool KeyDown(int buttonCode);
 

@@ -7,6 +7,7 @@
 
 #include "convar.h"
 #include "../Multiplayer/multiplayer_animstate.h"
+#include "hl2mp_playeranimstate.h"
 
 #if defined( CLIENT_DLL )
 class C_HL2MP_Player;
@@ -47,6 +48,6 @@ class CHL2MPPlayerAnimState : public CMultiPlayerAnimState
     bool m_bWasJumping;
 };
 
-CHL2MPPlayerAnimState *CreateExperimentPlayerAnimState( CHL2MP_Player *pPlayer );
+CHL2MPPlayerAnimState *CreateHL2MPPlayerAnimState( CHL2MP_Player *pPlayer );
 
 #endif  // Experiment_PLAYERANIMSTATE_H

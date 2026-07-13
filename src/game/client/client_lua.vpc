@@ -144,8 +144,8 @@ $Project
 			
             $File "$SRCDIR\game\shared\hl2mp\lhl2mp_player_shared.cpp"
             $File "$SRCDIR\game\shared\hl2mp\lhl2mp_player_shared.h"
-            //$File "$SRCDIR\game\shared\experiment\experiment_bot_temp.cpp"
-            //$File "$SRCDIR\game\shared\experiment\experiment_bot_temp.h"
+            $File "$SRCDIR\game\shared\hl2mp\hl2mp_playeranimstate.cpp"
+            $File "$SRCDIR\game\shared\hl2mp\hl2mp_playeranimstate.h"
             $File "$SRCDIR\public\lColor.cpp"
             $File "$SRCDIR\public\lColor.h"
             $File "$SRCDIR\game\shared\cpng.cpp"
@@ -169,7 +169,31 @@ $Project
             $File "$SRCDIR\game\shared\lrecipientfilter.h"
 			$File "$SRCDIR\game\shared\gameinfostore.h"
 			$File "$SRCDIR\game\shared\gameinfostore.cpp"
-        }
+		}
+	
+		$Folder	"UI"
+		{
+			//$File	"hl2mp\ui\mainmenu.cpp"
+			//$File	"hl2mp\ui\mainmenu.h"
+			$File	"hl2mp\ui\backgroundpanel.cpp"
+			$File	"hl2mp\ui\backgroundpanel.h"
+			//$File	"hl2mp\experiment_hud_chat.cpp"
+			//$File	"hl2mp\experiment_hud_chat.h"
+			//$File	"hl2mp\experiment_hud_team.cpp"
+			//$File	"hl2mp\ui\experimentclientscoreboard.cpp"
+			//$File	"hl2mp\ui\experimentclientscoreboard.h"
+			//$File	"hl2mp\ui\experimenttextwindow.cpp"
+			//$File	"hl2mp\ui\experimenttextwindow.h"
+
+			//$File	"hl2mp\ui\lua_createmultiplayergamedialog.cpp"
+			//$File	"hl2mp\ui\lua_createmultiplayergamedialog.h"
+			//$File	"hl2mp\ui\lua_createmultiplayergamegameplaypage.cpp"
+			//$File	"hl2mp\ui\lua_createmultiplayergamegameplaypage.h"
+			//$File	"hl2mp\ui\lua_createmultiplayergameserverpage.cpp"
+			//$File	"hl2mp\ui\lua_createmultiplayergameserverpage.h"
+			//$File	"hl2mp\ui\lua_createmultiplayergamebotpage.cpp"
+			//$File	"hl2mp\ui\lua_createmultiplayergamebotpage.h"
+		}
 		
         $Folder	"Scripted Controls"
         {
