@@ -1,8 +1,0 @@
-"VertexLitGeneric"
-{
-
-	"$baseTexture" 		"models/zkane/zarahair"
-	"$halflambert" 		"1"
-	"$nocull" 			"1"
-
-}

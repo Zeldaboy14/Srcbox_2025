@@ -1,7 +1,0 @@
-"VertexlitGeneric"
-{
-	"$basetexture" "Models/humans/female/claire/drak"
-	"$halflambert" 1
-	"$nocull" "1"
-
-}

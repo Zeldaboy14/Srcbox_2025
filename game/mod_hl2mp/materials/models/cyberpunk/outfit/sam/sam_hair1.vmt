@@ -1,6 +1,0 @@
-"VertexLitGeneric"
-{
-	"$baseTexture" "models/cyberpunk/outfit/sam/sam_hair1"
-	"$nocull" 1
-	"$translucent" 1
-}
