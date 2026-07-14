@@ -26,6 +26,7 @@
 #include "lhl2mp_player_shared.h"
 #include "ltakedamageinfo.h"
 #include "mathlib/lvector.h"
+#include "hl2mp_playeranimstate.h"
 #endif
 
 //#if defined( ARGG )
@@ -51,7 +52,9 @@ RecvPropVectorXY( RECVINFO_NAME( m_vecNetworkOrigin, m_vecOrigin ) ),
     RecvPropFloat( RECVINFO_NAME( m_vecNetworkOrigin[2], m_vecOrigin[2] ) ),
 
     RecvPropFloat( RECVINFO( m_angEyeAngles[0] ) ),
+#ifndef LUA_SDK
     RecvPropFloat( RECVINFO( m_angEyeAngles[1] ) ),
+#endif
     END_RECV_TABLE()
 
     // all players except the local player
@@ -70,13 +73,26 @@ RecvPropVectorXY( RECVINFO_NAME( m_vecNetworkOrigin, m_vecOrigin ) ),
     RecvPropEHandle( RECVINFO( m_hRagdoll ) ),
     RecvPropInt( RECVINFO( m_iSpawnInterpCounter ) ),
     RecvPropInt( RECVINFO( m_iPlayerSoundType ) ),
+#ifdef LUA_SDK
+    RecvPropInt(RECVINFO(m_ArmorValue)),
+    RecvPropInt(RECVINFO(m_MaxArmorValue)),
+#endif
 
     RecvPropBool( RECVINFO( m_fIsWalking ) ),
     END_RECV_TABLE()
 
         BEGIN_PREDICTION_DATA( C_HL2MP_Player )
-            DEFINE_PRED_FIELD( m_fIsWalking, FIELD_BOOLEAN, FTYPEDESC_INSENDTABLE ),
+#ifdef LUA_SDK
+    DEFINE_PRED_FIELD(m_flCycle, FIELD_FLOAT, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK),
+#endif
+    DEFINE_PRED_FIELD( m_fIsWalking, FIELD_BOOLEAN, FTYPEDESC_INSENDTABLE ),
 
+#ifdef LUA_SDK
+    DEFINE_PRED_FIELD(m_nSequence, FIELD_INTEGER, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK),
+    DEFINE_PRED_FIELD(m_flPlaybackRate, FIELD_FLOAT, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK),
+    DEFINE_PRED_ARRAY_TOL(m_flEncodedController, FIELD_FLOAT, MAXSTUDIOBONECTRLS, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE, 0.02f),
+    DEFINE_PRED_FIELD(m_nNewSequenceParity, FIELD_INTEGER, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK),
+#endif
     // misyl: Ammo is server side entities in HL2MP. Not catastrophic to error about.
     // Just let the server stomp all over us.
     //
@@ -84,7 +100,7 @@ RecvPropVectorXY( RECVINFO_NAME( m_vecNetworkOrigin, m_vecOrigin ) ),
     // with just altfire ammo, and get new ammo and we force reload. But the additional pred error sorts that out itself
     // without this for every pickup which is 1000% more common.
     DEFINE_PRED_ARRAY( m_iAmmo, FIELD_INTEGER, MAX_AMMO_TYPES, FTYPEDESC_INSENDTABLE | FTYPEDESC_OVERRIDE | FTYPEDESC_NOERRORCHECK ),
-    END_PREDICTION_DATA()
+END_PREDICTION_DATA()
 
         ConVar hl2_walkspeed( "hl2_walkspeed", "150", FCVAR_REPLICATED );
 ConVar hl2_normspeed( "hl2_normspeed", "190", FCVAR_REPLICATED );
@@ -117,13 +133,8 @@ CSuitPowerDevice SuitDeviceFlashlight( bits_SUIT_DEVICE_FLASHLIGHT, 2.222 );  //
 #endif
 CSuitPowerDevice SuitDeviceBreather( bits_SUIT_DEVICE_BREATHER, 6.7f );  // 100 units in 15 seconds (plus three padded seconds)
 
-#ifdef LUA_SDK
 C_HL2MP_Player::C_HL2MP_Player()
     : m_iv_angEyeAngles("C_HL2MP_Player::m_iv_angEyeAngles")
-#else
-C_HL2MP_Player::C_HL2MP_Player()
-    : m_PlayerAnimState( this ), m_iv_angEyeAngles( "C_HL2MP_Player::m_iv_angEyeAngles" )
-#endif
 {
     m_iIDEntIndex = 0;
     m_iSpawnInterpCounterCache = 0;
@@ -131,6 +142,11 @@ C_HL2MP_Player::C_HL2MP_Player()
     m_angEyeAngles.Init();
 
     AddVar( &m_angEyeAngles, &m_iv_angEyeAngles, LATCH_SIMULATION_VAR );
+
+#ifdef LUA_SDK
+    // m_EntClientFlags |= ENTCLIENTFLAG_DONTUSEIK;
+    m_PlayerAnimState = CreateHL2MPPlayerAnimState(this);
+#endif
 
     m_EntClientFlags |= ENTCLIENTFLAG_DONTUSEIK;
     m_blinkTimer.Invalidate();
@@ -633,6 +649,7 @@ void C_HL2MP_Player::SuitPower_Update( void )
 //-----------------------------------------------------------------------------
 void C_HL2MP_Player::AddEntity( void )
 {
+#ifndef LUA_SDK
     BaseClass::AddEntity();
 
     QAngle vTempAngles = GetLocalAngles();
@@ -640,8 +657,7 @@ void C_HL2MP_Player::AddEntity( void )
 
     SetLocalAngles( vTempAngles );
 
-#ifndef LUA_SDK
-    m_PlayerAnimState.Update();
+    //m_PlayerAnimState.Update();
 #endif
 
     // Zero out model pitch, blending takes care of all of it.
@@ -739,7 +755,7 @@ const QAngle &C_HL2MP_Player::GetRenderAngles()
     else
     {
 #ifdef LUA_SDK
-        //return m_PlayerAnimState->GetRenderAngles();
+        return m_PlayerAnimState->GetRenderAngles();
 #else
         return m_PlayerAnimState.GetRenderAngles();
 #endif
@@ -1448,6 +1464,7 @@ void C_HL2MP_Player::CalculateIKLocks(float currentTime)
 
 #endif
 
+#ifndef LUA_SDK
 void C_HL2MP_Player::PostThink( void )
 {
     BaseClass::PostThink();
@@ -1460,8 +1477,11 @@ void C_HL2MP_Player::PostThink( void )
         SetCollisionBounds( VEC_CROUCH_TRACE_MIN, VEC_CROUCH_TRACE_MAX );
     }
 }
+#endif
 
+#ifdef LUA_SDK
 bool C_HL2MP_Player::KeyDown(int buttonCode)
 {
     return m_nButtons & buttonCode;
 }
+#endif

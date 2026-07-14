@@ -15,6 +15,11 @@ class C_HL2MP_Player;
 #include "beamdraw.h"
 #include "hl2mp_playeranimstate.h"
 
+#ifdef SRCBOX
+//#include "srcbox/tf/tf_item.h"
+//#include "srcbox/tf/tf_shareddefs.h"
+#endif
+
 //=============================================================================
 //=============================================================================
 class CSuitPowerDevice
@@ -45,6 +50,45 @@ class CSuitPowerDevice
 };
 
 extern ConVar hl2_sprintspeed;
+
+#ifdef SRCBOX_EXPERIMENT
+//-----------------------------------------------------------------------------
+// For entity_capture_flags to use when placed in the world
+// NOTE: Inserting to most or all of the enums in this file will BREAK DEMOS -
+// please add to the end instead.
+//-----------------------------------------------------------------------------
+enum ETFFlagType
+{
+    TF_FLAGTYPE_CTF = 0,
+    TF_FLAGTYPE_ATTACK_DEFEND,
+    TF_FLAGTYPE_TERRITORY_CONTROL,
+    TF_FLAGTYPE_INVADE,
+    TF_FLAGTYPE_RESOURCE_CONTROL,
+    TF_FLAGTYPE_ROBOT_DESTRUCTION,
+    TF_FLAGTYPE_PLAYER_DESTRUCTION
+
+    //
+    // ADD NEW ITEMS HERE TO AVOID BREAKING DEMOS
+    //
+};
+
+//-----------------------------------------------------------------------------
+// Items.
+//-----------------------------------------------------------------------------
+enum
+{
+    TF_ITEM_UNDEFINED = 0,
+    TF_ITEM_CAPTURE_FLAG = (1 << 0),
+    TF_ITEM_HEALTH_KIT = (1 << 1),
+    TF_ITEM_ARMOR = (1 << 2),
+    TF_ITEM_AMMO_PACK = (1 << 3),
+    TF_ITEM_GRENADE_PACK = (1 << 4),
+
+    //
+    // ADD NEW ITEMS HERE TO AVOID BREAKING DEMOS
+    //
+};
+#endif
 
 //=============================================================================
 // >> HL2MP_Player
@@ -140,6 +184,17 @@ class C_HL2MP_Player : public C_BaseHLPlayer
         return m_fIsWalking;
     }
 
+#ifdef SRCBOX_EXPERIMENT
+
+    bool			HasItem(void) const;				// Currently can have only one item at a time.
+    void			SetItem(C_TFItem* pItem);
+    C_TFItem*       GetItem(void) const;
+    bool			HasTheFlag(ETFFlagType exceptionTypes[] = NULL, int nNumExceptions = 0) const;
+    virtual bool	IsAllowedToPickUpFlag(void) const;
+
+	CNetworkHandle( C_TFItem, m_hItem );
+#endif
+
 #ifdef LUA_SDK
     // Avoiding players
     void SetAvoidPlayers(bool shouldAvoid);
@@ -183,7 +238,9 @@ class C_HL2MP_Player : public C_BaseHLPlayer
     }
 #endif
 
+#ifndef LUA_SDK
     virtual void PostThink( void );
+#endif
 
     private:
     C_HL2MP_Player( const C_HL2MP_Player & );
