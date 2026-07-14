@@ -606,6 +606,14 @@ class C_BaseEntity : public IClientEntity
     int GetFlags( void ) const;
     void ClearFlags();
 
+    // start asw stuff
+    void							SetDistanceFade(float flMinDist, float flMaxDist);
+    void							SetGlobalFadeScale(float flFadeScale);
+    float							GetMinFadeDist() const;
+    float							GetMaxFadeDist() const;
+    float							GetGlobalFadeScale() const;
+    // end asw stuff
+
     MoveType_t GetMoveType( void ) const;
     MoveCollide_t GetMoveCollide( void ) const;
     virtual SolidType_t GetSolid( void ) const;
@@ -957,6 +965,9 @@ class C_BaseEntity : public IClientEntity
     void SetSize( const Vector &vecMin, const Vector &vecMax );  // UTIL_SetSize( pev, mins, maxs );
     char const *GetClassname( void );
     char const *GetDebugName( void );
+#ifdef SRCBOX
+    virtual const char* GetPlayerName() const { return NULL; }
+#endif
     static int PrecacheModel( const char *name );
     static bool PrecacheSound( const char *name );
     static void PrefetchSound( const char *name );
@@ -1732,6 +1743,15 @@ class C_BaseEntity : public IClientEntity
     // A random value used by material proxies for each model instance.
     float m_flProxyRandomValue;
 
+    // start asw stuff
+    // 
+    // Fades
+    float							m_fadeMinDist;
+    float							m_fadeMaxDist;
+    float							m_flFadeScale;
+
+    // end asw stuff
+
     ClientThinkHandle_t m_hThink;
 
     int m_iEFlags;  // entity flags EFL_*
@@ -2396,6 +2416,7 @@ inline bool C_BaseEntity::IsEnabledInToolView() const
 #endif
 }
 
+// added from asw
 //-----------------------------------------------------------------------------
 // Client version of UTIL_Remove
 //-----------------------------------------------------------------------------
