@@ -1770,7 +1770,11 @@ void CSceneEntity::DispatchStartSpeak( CChoreoScene *scene, CBaseFlex *actor, CC
 	// Emit sound
 	if ( actor )
 	{
+#ifdef SRCBOX
+		CBroadcastRecipientFilter filter; // repairs breencast, and other sceneentites from distance checks
+#else
 		CPASAttenuationFilter filter( actor );
+#endif
 
 		if ( m_pRecipientFilter )
 		{
