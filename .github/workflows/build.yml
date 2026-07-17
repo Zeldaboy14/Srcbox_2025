@@ -109,43 +109,8 @@ jobs:
         working-directory: src
         shell: bash
         run: |
-          cat > create_hl2mp.sh << 'EOF'
-          #!/bin/bash
-
-          set -euo pipefail
-
-          script=$(readlink -f -- "$0")
-
-          pushd "$(dirname -- "$script")" > /dev/null
-
-          source sdk_container
-
-          run_in_sniper "$@"
-
-          export VPC_NINJA_BUILD_MODE=release
-
-          solution_out="_vpc_/ninja/HL2MP_release"
-
-          if [[ ! -e "$solution_out.ninja" ]]; then
-              devtools/bin/vpc \
-                /hl2mp \
-                /linux64 \
-                /ninja \
-                /define:SOURCESDK \
-                +game \
-                /mksln "$solution_out"
-          fi
-
-          ninja -f "$solution_out.ninja" -j2 || \
-          ninja -f "$solution_out.ninja" -j1
-
-          popd
-
-          EOF
-
           chmod +x create_hl2mp.sh
-
-          ./create_hl2mp.sh
+          ./create_hl2mp.sh release
 
 
       # ======================
