@@ -1,7 +1,6 @@
 name: Build and Push Binaries
 
 on:
-  push:
   workflow_dispatch:
 
 jobs:
@@ -148,7 +147,7 @@ jobs:
               echo "Copying executable:"
               echo "$EXE_PATH"
 
-              cp -f "$EXE_PATH" game/mod_hl2mp/
+              cp -f "$EXE_PATH" game/
             else
               echo "No mod_hl2mp_win64.exe found"
             fi
@@ -170,7 +169,7 @@ jobs:
           echo "Runtime files staged:"
           find game/mod_hl2mp/bin -type f \( -name "*.dll" -o -name "*.so" \) -print
 
-          find game/mod_hl2mp -maxdepth 1 -name "*.exe" -print
+          find game -maxdepth 1 -name "*.exe" -print
 
 
       # ======================
@@ -190,8 +189,8 @@ jobs:
           git add -f game/mod_hl2mp/bin/linux64/*.so || true
 
           # Windows executable
-          if [ -f game/mod_hl2mp/mod_hl2mp_win64.exe ]; then
-            git add -f game/mod_hl2mp/mod_hl2mp_win64.exe
+          if [ -f game/mod_hl2mp_win64.exe ]; then
+            git add -f game/mod_hl2mp_win64.exe
           fi
 
           if git diff --cached --quiet; then
