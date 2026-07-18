@@ -37,6 +37,11 @@ public:
 	virtual void OnFlyoutMenuClose( vgui::Panel* flyTo );
 	virtual void OnFlyoutMenuCancelled();
 
+	void StartMainMenuVideo();
+	void StopMainMenuVideo();
+
+	class CMainMenu* m_pMainMenuPanel;
+
 	MESSAGE_FUNC( OnGameUIHidden, "GameUIHidden" );	// called when the GameUI is hidden
 
 private:

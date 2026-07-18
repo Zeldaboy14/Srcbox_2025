@@ -15,6 +15,7 @@
 #include "../CreateMultiplayerGameDialog.h"
 #include "../OptionsSubKeyboard.h"
 
+static ConVar ui_old_menus("ui_old_menus", "0", FCVAR_HIDDEN, "Brings up the old vgui panels that are recreated.");
 
 class IMaterial;
 class COptionsDialog;

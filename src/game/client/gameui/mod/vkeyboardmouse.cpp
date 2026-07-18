@@ -9,12 +9,12 @@
 #include "VDropDownMenu.h"
 #include "VSliderControl.h"
 #include "VHybridButton.h"
-#include "EngineInterface.h"
-#include "gameui_util.h"
+#include "../EngineInterface.h"
+#include "../gameui_util.h"
 #include "vgui/ISurface.h"
 #include "VGenericConfirmation.h"
 #include "materialsystem/materialsystem_config.h"
-#include "nb_header_footer.h"
+#include "../vgui/nb_header_footer.h"
 
 
 // memdbgon must be the last include file in a .cpp file!!!

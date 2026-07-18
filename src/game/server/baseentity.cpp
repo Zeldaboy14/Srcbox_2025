@@ -68,10 +68,6 @@
 #include "tf_gamerules.h"
 #endif
 
-#ifdef LUA_SDK
-#include "luamanager.h"
-#endif
-
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -263,6 +259,33 @@ void SendProxy_Angles( const SendProp *pProp, const void *pStruct, const void *p
 	pOut->m_Vector[ 2 ] = anglemod( a->z );
 }
 
+#ifdef LUA_SDK  // NetworkVariables
+
+void SendProxy_LuaVariableElement_String(const SendProp* pProp, const void* pStruct, const void* pVarData, DVariant* pOut, int iElement, int objectID)
+{
+#ifdef _DEBUG
+	CBaseEntity* entity = (CBaseEntity*)pStruct;
+	Assert(entity);
+#endif
+
+	string_t* pString = (string_t*)pVarData;
+	pOut->m_pString = (char*)STRING(*pString);
+}
+
+;  // clang-format off
+
+BEGIN_SEND_TABLE_NOBASE(CBaseEntity, DT_BaseEntityLuaVariables)
+SendPropArray(SendPropInt(SENDINFO_ARRAY(m_LuaVariables_bool)), m_LuaVariables_bool),
+SendPropArray(SendPropInt(SENDINFO_ARRAY(m_LuaVariables_int)), m_LuaVariables_int),
+SendPropArray(SendPropFloat(SENDINFO_ARRAY(m_LuaVariables_float)), m_LuaVariables_float),
+SendPropArray(SendPropVector(SENDINFO_ARRAY(m_LuaVariables_Vector)), m_LuaVariables_Vector),
+SendPropArray(SendPropVector(SENDINFO_ARRAY(m_LuaVariables_QAngle)), m_LuaVariables_QAngle),
+SendPropArray(SendPropString(SENDINFO_ARRAY(m_LuaVariables_String), 0, SendProxy_LuaVariableElement_String), m_LuaVariables_String),
+SendPropArray(SendPropEHandle(SENDINFO_ARRAY(m_LuaVariables_Entity)), m_LuaVariables_Entity),
+END_SEND_TABLE()
+
+#endif // LUA_SDK NetworkVariables
+
 // This table encodes the CBaseEntity data.
 IMPLEMENT_SERVERCLASS_ST_NOBASE( CBaseEntity, DT_BaseEntity )
 	SendPropDataTable( "AnimTimeMustBeFirst", 0, &REFERENCE_SEND_TABLE(DT_AnimTimeMustBeFirst), SendProxy_ClientSideAnimation ),
@@ -423,12 +446,22 @@ CBaseEntity::CBaseEntity( bool bServerOnly )
 	AddEFlags( EFL_USE_PARTITION_WHEN_NOT_SOLID );
 #endif
 
+	m_bTruceValidForEnt = false;
+
 #if defined( LUA_SDK )
 	m_nTableReference = LUA_NOREF;
 #endif
-
-	m_bTruceValidForEnt = false;
 }
+
+#ifdef LUA_SDK
+void* CBaseEntity::CreateLuaInstance(lua_State* L, CBaseEntity* pInstance)
+{
+	CBaseHandle* hEntity =
+		(CBaseHandle*)lua_newuserdata(L, sizeof(CBaseHandle));
+	hEntity->Set(pInstance);
+	return hEntity;
+}
+#endif
 
 //-----------------------------------------------------------------------------
 // Purpose: Scale up our physics hull and test against the new one
@@ -489,11 +522,27 @@ CBaseEntity::~CBaseEntity( )
 		gEntList.RemoveEntity( GetRefEHandle() );
 	}
 
-#if defined( LUA_SDK )
-	lua_unref(L, m_nTableReference);
+#ifdef LUA_SDK
+	if (L)
+	{
+		lua_unref(L, m_nTableReference);
+		lua_destroyuserdatainstance(L, m_pLuaInstance);
+	}
+	m_pLuaInstance = nullptr;
 #endif
 
 }
+
+#ifdef LUA_SDK
+//-----------------------------------------------------------------------------
+// Purpose: Initialize any variables in the reference table
+//-----------------------------------------------------------------------------
+void CBaseEntity::SetupRefTable(lua_State* L)
+{
+	lua_newtable(L);
+	m_nTableReference = luaL_ref(L, LUA_REGISTRYINDEX);
+}
+#endif
 
 void CBaseEntity::PostConstructor( const char *szClassname )
 {
@@ -711,6 +760,13 @@ CBaseEntity *CBaseEntity::GetFollowedEntity()
 		return NULL;
 	return GetMoveParent();
 }
+
+#ifdef LUA_SDK
+bool CBaseEntity::IsVehicle(void)
+{
+	return GetServerVehicle() != nullptr;
+}
+#endif
 
 void CBaseEntity::SetClassname( const char *className )
 {
@@ -2551,30 +2607,74 @@ void CBaseEntity::UpdateOnRemove( void )
 int CBaseEntity::ObjectCaps( void ) 
 {
 #if 1
-	model_t *pModel = GetModel();
-	bool bIsBrush = ( pModel && modelinfo->GetModelType( pModel ) == mod_brush );
+#ifdef LUA_SDK
+	model_t* pModel = GetModel();
+	bool bIsBrush = (pModel && modelinfo->GetModelType(pModel) == mod_brush);
+	int caps;
 
 	// We inherit our parent's use capabilities so that we can forward use commands
 	// to our parent.
-	CBaseEntity *pParent = GetParent();
-	if ( pParent )
+	CBaseEntity* pParent = GetParent();
+
+	if (pParent)
+	{
+		caps = pParent->ObjectCaps();
+
+		if (!bIsBrush)
+			caps &= (FCAP_ACROSS_TRANSITION | FCAP_IMPULSE_USE | FCAP_CONTINUOUS_USE | FCAP_ONOFF_USE | FCAP_DIRECTIONAL_USE);
+		else
+			caps &= (FCAP_IMPULSE_USE | FCAP_CONTINUOUS_USE | FCAP_ONOFF_USE | FCAP_DIRECTIONAL_USE);
+
+		if (pParent->IsPlayer())
+			caps |= FCAP_ACROSS_TRANSITION;
+	}
+	else if (!bIsBrush)
+	{
+		caps |= FCAP_ACROSS_TRANSITION;
+	}
+
+	if (m_UsabilityType == USABILITY_TYPE::CONTINUOUS)
+	{
+		caps |= FCAP_CONTINUOUS_USE;
+	}
+	else if (m_UsabilityType == USABILITY_TYPE::ON_OFF)
+	{
+		caps |= FCAP_ONOFF_USE;
+	}
+	else if (m_UsabilityType == USABILITY_TYPE::DIRECTIONAL)
+	{
+		caps |= FCAP_DIRECTIONAL_USE;
+	}
+	else if (m_UsabilityType == USABILITY_TYPE::IMPULSE)
+	{
+		caps |= FCAP_IMPULSE_USE;
+	}
+#else 
+	model_t* pModel = GetModel();
+	bool bIsBrush = (pModel && modelinfo->GetModelType(pModel) == mod_brush);
+
+	// We inherit our parent's use capabilities so that we can forward use commands
+	// to our parent.
+	CBaseEntity* pParent = GetParent();
+	if (pParent)
 	{
 		int caps = pParent->ObjectCaps();
 
-		if ( !bIsBrush )
-			caps &= ( FCAP_ACROSS_TRANSITION | FCAP_IMPULSE_USE | FCAP_CONTINUOUS_USE | FCAP_ONOFF_USE | FCAP_DIRECTIONAL_USE );
+		if (!bIsBrush)
+			caps &= (FCAP_ACROSS_TRANSITION | FCAP_IMPULSE_USE | FCAP_CONTINUOUS_USE | FCAP_ONOFF_USE | FCAP_DIRECTIONAL_USE);
 		else
-			caps &= ( FCAP_IMPULSE_USE | FCAP_CONTINUOUS_USE | FCAP_ONOFF_USE | FCAP_DIRECTIONAL_USE );
+			caps &= (FCAP_IMPULSE_USE | FCAP_CONTINUOUS_USE | FCAP_ONOFF_USE | FCAP_DIRECTIONAL_USE);
 
-		if ( pParent->IsPlayer() )
+		if (pParent->IsPlayer())
 			caps |= FCAP_ACROSS_TRANSITION;
 
 		return caps;
 	}
-	else if ( !bIsBrush ) 
+	else if (!bIsBrush)
 	{
 		return FCAP_ACROSS_TRANSITION;
 	}
+#endif
 
 	return 0;
 #else
@@ -2667,6 +2767,13 @@ void CBaseEntity::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE u
 		}
 	}
 }
+
+#ifdef LUA_SDK
+void CBaseEntity::SetUseType(USABILITY_TYPE::TYPE useType)
+{
+	m_UsabilityType = useType;
+}
+#endif
 
 static CBaseEntity *FindPhysicsBlocker( IPhysicsObject *pPhysics, physicspushlist_t &list, const Vector &pushVel )
 {
@@ -3970,6 +4077,20 @@ CBaseEntity* CBaseEntity::Instance( const CBaseHandle &hEnt )
 	return gEntList.GetBaseEntity( hEnt );
 }
 
+#ifdef LUA_SDK
+
+void CBaseEntity::AddDeleteOnRemove(CBaseEntity* pEntity)
+{
+	m_EntitiesToDeleteOnRemove.AddToTail(pEntity);
+}
+
+void CBaseEntity::RemoveDeleteOnRemove(CBaseEntity* pEntity)
+{
+	m_EntitiesToDeleteOnRemove.FindAndRemove(pEntity);
+}
+
+#endif
+
 int CBaseEntity::GetTransmitState( void )
 {
 	edict_t *ed = edict();
@@ -4108,6 +4229,40 @@ int CBaseEntity::ShouldTransmit( const CCheckTransmitInfo *pInfo )
 	return FL_EDICT_PVSCHECK;
 }
 
+#ifdef LUA_SDK
+void CBaseEntity::SetPreventTransmit(CBasePlayer* filter, bool bPreventTransmitting)
+{
+	if (!m_rfPreventTransmitEntities)
+	{
+		m_rfPreventTransmitEntities = new CRecipientFilter();
+	}
+
+	Assert(filter);
+
+	if (bPreventTransmitting)
+	{
+		m_rfPreventTransmitEntities->AddRecipient(filter);
+	}
+	else
+	{
+		m_rfPreventTransmitEntities->RemoveRecipient(filter);
+	}
+}
+
+void CBaseEntity::SetPreventTransmit(CRecipientFilter& filter, bool bPreventTransmitting)
+{
+	int c = filter.GetRecipientCount();
+
+	for (int i = 0; i < c; i++)
+	{
+		CBasePlayer* player = UTIL_PlayerByIndex(filter.GetRecipientIndex(i));
+		if (!player)
+			continue;
+
+		SetPreventTransmit(player, bPreventTransmitting);
+	}
+}
+#endif
 
 //-----------------------------------------------------------------------------
 // Rules about which entities need to transmit along with me

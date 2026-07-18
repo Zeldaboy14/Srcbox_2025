@@ -8,11 +8,6 @@
 #include "luamanager.h"
 #include "lhl2mp_player_shared.h"
 
-// memdbgon must be the last include file in a .cpp file!!!
-#include "tier0/memdbgon.h"
-
-#include "luamanager.h"
-#include "lhl2mp_player_shared.h"
 #include "lbaseentity_shared.h"
 #ifdef CLIENT_DLL
 #include "lc_baseanimating.h"

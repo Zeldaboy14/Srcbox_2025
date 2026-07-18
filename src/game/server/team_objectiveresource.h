@@ -79,6 +79,7 @@ public:
 
 	void AssertValidIndex( int index )
 	{
+		return;
 		Assert( 0 <= index && index <= MAX_CONTROL_POINTS && index < m_iNumControlPoints );
 	}
 
@@ -90,10 +91,14 @@ public:
 
 	int GetCappingTeam( int index )
 	{
+	#if TF_DLL
 		if ( index >= m_iNumControlPoints )
 			return TEAM_UNASSIGNED;
 
 		return m_iCappingTeam[index];
+	#else
+		return 1;
+#	endif
 	}
 
 	void SetTimerInHUD( CBaseEntity *pTimer )

@@ -7,55 +7,14 @@
 #include "cbase.h"
 #include "beam_shared.h"
 #include "spotlightend.h"
-#include "dlight.h"
-#include "iefx.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
 // Spawnflags
-enum BeamSpotlightSpawnFlags_t
-{
-	SF_BEAM_SPOTLIGHT_START_LIGHT_ON = 1,
-	SF_BEAM_SPOTLIGHT_NO_DYNAMIC_LIGHT = 2,
-	SF_BEAM_SPOTLIGHT_START_ROTATE_ON = 4,
-	SF_BEAM_SPOTLIGHT_REVERSE_DIRECTION = 8,
-	SF_BEAM_SPOTLIGHT_X_AXIS = 16,
-	SF_BEAM_SPOTLIGHT_Y_AXIS = 32,
-};
+#define SF_SPOTLIGHT_START_LIGHT_ON			0x1
+#define SF_SPOTLIGHT_NO_DYNAMIC_LIGHT		0x2
 
-// For backwards compatibility
-#define SF_SPOTLIGHT_START_LIGHT_ON SF_BEAM_SPOTLIGHT_START_LIGHT_ON
-#define SF_SPOTLIGHT_NO_DYNAMIC_LIGHT SF_BEAM_SPOTLIGHT_NO_DYNAMIC_LIGHT
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-class CSpotlightTraceCacheEntry
-{
-public:
-	CSpotlightTraceCacheEntry()
-	{
-		m_origin.Init();
-		m_radius = -1.0f;
-	}
-	bool IsValidFor(const Vector& origin)
-	{
-		if (m_radius > 0 && m_origin.DistToSqr(origin) < 1.0f)
-			return true;
-		return false;
-	}
-	void Cache(const Vector& origin, const trace_t& tr)
-	{
-		m_radius = (tr.endpos - origin).Length();
-		m_origin = origin;
-	}
-
-	Vector	m_origin;
-	float	m_radius;
-};
-
-static const int NUM_CACHE_ENTRIES = 64;
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -78,8 +37,6 @@ public:
 
 private:
 	int 	UpdateTransmitState();
-	void	RecalcRotation(void);
-
 	void	SpotlightThink(void);
 	void	SpotlightUpdate(void);
 	Vector	SpotlightCurrentPos(void);
@@ -92,10 +49,6 @@ private:
 	void InputLightOn( inputdata_t &inputdata );
 	void InputLightOff( inputdata_t &inputdata );
 
-	void InputStart(inputdata_t& inputdata);
-	void InputStop(inputdata_t& inputdata);
-	void InputReverse(inputdata_t& inputdata);
-
 	// Creates the efficient spotlight 
 	void CreateEfficientSpotlight();
 
@@ -106,7 +59,6 @@ private:
 
 private:
 	bool	m_bSpotlightOn;
-	bool	m_bHasDynamicLight;
 	bool	m_bEfficientSpotlight;
 	bool	m_bIgnoreSolid;
 	Vector	m_vSpotlightTargetPos;
@@ -115,24 +67,12 @@ private:
 	int		m_nHaloSprite;
 	CHandle<CBeam>			m_hSpotlight;
 	CHandle<CSpotlightEnd>	m_hSpotlightTarget;
-
-	float	m_flLightScale;
-	dlight_t* m_pDynamicLight;
-	float	m_lastTime;
-	CSpotlightTraceCacheEntry* m_pCache;
 	
 	float	m_flSpotlightMaxLength;
 	float	m_flSpotlightCurLength;
 	float	m_flSpotlightGoalWidth;
 	float	m_flHDRColorScale;
 	int		m_nMinDXLevel;
-
-	int m_nRotationAxis;
-	float m_flRotationSpeed;
-
-	float m_flmaxSpeed;
-	bool m_isRotating;
-	bool m_isReversed;
 
 public:
 	COutputEvent m_OnOn, m_OnOff;     ///< output fires when turned on, off
@@ -142,13 +82,6 @@ BEGIN_DATADESC( CPointSpotlight )
 	DEFINE_FIELD( m_flSpotlightCurLength, FIELD_FLOAT ),
 
 	DEFINE_FIELD( m_bSpotlightOn,			FIELD_BOOLEAN ),
-
-	DEFINE_FIELD(m_bHasDynamicLight, FIELD_BOOLEAN),
-	DEFINE_FIELD(m_flRotationSpeed, FIELD_FLOAT),
-	DEFINE_FIELD(m_isRotating, FIELD_BOOLEAN),
-	DEFINE_FIELD(m_isReversed, FIELD_BOOLEAN),
-	DEFINE_FIELD(m_nRotationAxis, FIELD_INTEGER),
-
 	DEFINE_FIELD( m_bEfficientSpotlight,	FIELD_BOOLEAN ),
 	DEFINE_FIELD( m_vSpotlightTargetPos,	FIELD_POSITION_VECTOR ),
 	DEFINE_FIELD( m_vSpotlightCurrentPos,	FIELD_POSITION_VECTOR ),
@@ -169,11 +102,6 @@ BEGIN_DATADESC( CPointSpotlight )
 	// Inputs
 	DEFINE_INPUTFUNC( FIELD_VOID,		"LightOn",		InputLightOn ),
 	DEFINE_INPUTFUNC( FIELD_VOID,		"LightOff",		InputLightOff ),
-
-	DEFINE_INPUTFUNC( FIELD_VOID,		"Start", InputStart),
-	DEFINE_INPUTFUNC( FIELD_VOID,		"Stop", InputStop),
-	DEFINE_INPUTFUNC( FIELD_VOID,		"Reverse", InputReverse),
-
 	DEFINE_OUTPUT( m_OnOn, "OnLightOn" ),
 	DEFINE_OUTPUT( m_OnOff, "OnLightOff" ),
 
@@ -183,7 +111,6 @@ END_DATADESC()
 
 
 LINK_ENTITY_TO_CLASS(point_spotlight, CPointSpotlight);
-LINK_ENTITY_TO_CLASS(beam_spotlight, CPointSpotlight);
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -198,20 +125,6 @@ CPointSpotlight::CPointSpotlight()
 	m_flHDRColorScale = 1.0f;
 	m_nMinDXLevel = 0;
 	m_bIgnoreSolid = false;
-
-	m_bHasDynamicLight = true;
-	m_flSpotlightMaxLength = 500.0f;
-	m_flSpotlightGoalWidth = 50.0f;
-	m_flHDRColorScale = 0.7f;
-	m_isRotating = false;
-	m_isReversed = false;
-	m_flmaxSpeed = 100.0f;
-	m_flRotationSpeed = 0.0f;
-	m_nRotationAxis = 0;
-
-	// beam_spotlight client stuff
-	m_flLightScale = 100.0f;
-
 
 	AddEFlags( EFL_FORCE_ALLOW_MOVEPARENT );
 }
@@ -237,18 +150,43 @@ void CPointSpotlight::Spawn(void)
 {
 	Precache();
 
-	UTIL_SetSize(this, vec3_origin, vec3_origin);
-	AddSolidFlags(FSOLID_NOT_SOLID);
-	SetMoveType(MOVETYPE_NONE);
-	AddEFlags(EFL_FORCE_CHECK_TRANSMIT);
+	UTIL_SetSize( this,vec3_origin,vec3_origin );
+	AddSolidFlags( FSOLID_NOT_SOLID );
+	SetMoveType( MOVETYPE_NONE );
 	m_bEfficientSpotlight = true;
 
-	m_bHasDynamicLight = !HasSpawnFlags(SF_BEAM_SPOTLIGHT_NO_DYNAMIC_LIGHT);
-	m_bSpotlightOn = HasSpawnFlags( SF_SPOTLIGHT_START_LIGHT_ON );
-	m_isRotating = HasSpawnFlags(SF_BEAM_SPOTLIGHT_START_ROTATE_ON);
-	m_isReversed = HasSpawnFlags(SF_BEAM_SPOTLIGHT_REVERSE_DIRECTION);
+	// Check for user error
+	if (m_flSpotlightMaxLength <= 0)
+	{
+		DevMsg("%s (%s) has an invalid spotlight length <= 0, setting to 500\n", GetClassname(), GetDebugName() );
+		m_flSpotlightMaxLength = 500;
+	}
+	if (m_flSpotlightGoalWidth <= 0)
+	{
+		DevMsg("%s (%s) has an invalid spotlight width <= 0, setting to 10\n", GetClassname(), GetDebugName() );
+		m_flSpotlightGoalWidth = 10;
+	}
+	
+	if (m_flSpotlightGoalWidth > MAX_BEAM_WIDTH )
+	{
+		DevMsg("%s (%s) has an invalid spotlight width %.1f (max %.1f).\n", GetClassname(), GetDebugName(), m_flSpotlightGoalWidth, MAX_BEAM_WIDTH );
+		m_flSpotlightGoalWidth = MAX_BEAM_WIDTH; 
+	}
 
-	RecalcRotation();
+	// ------------------------------------
+	//	Init all class vars 
+	// ------------------------------------
+	m_vSpotlightTargetPos	= vec3_origin;
+	m_vSpotlightCurrentPos	= vec3_origin;
+	m_hSpotlight			= NULL;
+	m_hSpotlightTarget		= NULL;
+	m_vSpotlightDir			= vec3_origin;
+	m_flSpotlightCurLength	= m_flSpotlightMaxLength;
+
+	m_bSpotlightOn = HasSpawnFlags( SF_SPOTLIGHT_START_LIGHT_ON );
+
+	SetThink( &CPointSpotlight::SpotlightThink );
+	SetNextThink( gpGlobals->curtime + 0.1f );
 }
 
 
@@ -280,35 +218,14 @@ void CPointSpotlight::ComputeRenderInfo()
 	m_hSpotlight->SetEndWidth(flNewWidth);
 
 	// Adjust width of light on the end.  
-	if (m_bHasDynamicLight)
+	if ( FBitSet (m_spawnflags, SF_SPOTLIGHT_NO_DYNAMIC_LIGHT) )
+	{
+		m_hSpotlightTarget->m_flLightScale = 0.0;
+	}
+	else
 	{
 		// <<TODO>> - magic number 1.8 depends on sprite size
 		m_hSpotlightTarget->m_flLightScale = 1.8*flNewWidth;
-		if (m_flLightScale > 0)
-		{
-			const color32 c = GetRenderColor();
-			//float a = GetRenderAlpha() / 255.0f;
-			//ColorRGBExp32 color;
-			//color.r = c.r * a;
-			//color.g = c.g * a;
-			//color.b = c.b * a;
-			//color.exponent = 0;
-			//if (color.r == 0 && color.g == 0 && color.b == 0)
-			//	return;
-
-			// Deal with the environment light
-			//if (!m_pDynamicLight || (m_pDynamicLight->key != index))
-			//{
-			//	m_pDynamicLight = effects->CL_AllocDlight(index);
-			//	assert(m_pDynamicLight);
-			//}
-
-			//m_pDynamicLight->flags = DLIGHT_NO_MODEL_ILLUMINATION;
-			m_pDynamicLight->radius = m_flLightScale * 3.0f;
-			m_pDynamicLight->origin = GetAbsOrigin() + Vector(0, 0, 5);
-			m_pDynamicLight->die = gpGlobals->curtime + 0.05f;
-			//m_pDynamicLight->color = color;
-		}
 	}
 }
 
@@ -498,36 +415,6 @@ void CPointSpotlight::SpotlightCreate(void)
 		PassParentToChildren( pParent );
 }
 
-//-----------------------------------------------------------------------------
-void CPointSpotlight::RecalcRotation(void)
-{
-	if (!m_isRotating || m_flmaxSpeed == 0.0f)
-	{
-		m_flRotationSpeed = 0.0f;
-		return;
-	}
-
-	//
-	// Build the axis of rotation based on spawnflags.
-	//
-	// Pitch Yaw Roll -> Y Z X
-	m_nRotationAxis = 1;
-	if (HasSpawnFlags(SF_BEAM_SPOTLIGHT_Y_AXIS))
-	{
-		m_nRotationAxis = 0;
-	}
-	else if (HasSpawnFlags(SF_BEAM_SPOTLIGHT_X_AXIS))
-	{
-		m_nRotationAxis = 2;
-	}
-
-	m_flRotationSpeed = m_flmaxSpeed;
-	if (m_isReversed)
-	{
-		m_flRotationSpeed *= -1.0f;
-	}
-}
-
 //------------------------------------------------------------------------------
 // Purpose :
 // Input   :
@@ -574,12 +461,6 @@ void CPointSpotlight::SpotlightDestroy(void)
 //------------------------------------------------------------------------------
 void CPointSpotlight::SpotlightUpdate(void)
 {
-	float dt = gpGlobals->curtime - m_lastTime;
-	if (!m_lastTime)
-	{
-		dt = 0.0f;
-	}
-	m_lastTime = gpGlobals->curtime;
 	// ---------------------------------------------------
 	//  If I don't have a spotlight attempt to create one
 	// ---------------------------------------------------
@@ -601,18 +482,13 @@ void CPointSpotlight::SpotlightUpdate(void)
 		return;
 	}
 	
-	// update rotation
-	if (m_flRotationSpeed != 0.0f)
+	if ( !m_hSpotlightTarget )
 	{
-		QAngle angles = GetAbsAngles();
-		angles[m_nRotationAxis] += m_flRotationSpeed * dt;
-		angles[m_nRotationAxis] = anglemod(angles[m_nRotationAxis]);
-		if (!m_pCache)
-		{
-			m_pCache = new CSpotlightTraceCacheEntry[NUM_CACHE_ENTRIES];
-		}
-
-		SetAbsAngles(angles);
+		DevWarning( "**Attempting to update point_spotlight but target ent is NULL\n" );
+		SpotlightDestroy();
+		SpotlightCreate();
+		if ( !m_hSpotlightTarget )
+			return;
 	}
 
 	m_vSpotlightCurrentPos = SpotlightCurrentPos();
@@ -654,13 +530,6 @@ void CPointSpotlight::SpotlightUpdate(void)
 	//NDebugOverlay::Cross3D(GetAbsOrigin(),Vector(-5,-5,-5),Vector(5,5,5),0,255,0,true,0.1);
 	//NDebugOverlay::Cross3D(m_vSpotlightCurrentPos,Vector(-5,-5,-5),Vector(5,5,5),0,255,0,true,0.1);
 	//NDebugOverlay::Cross3D(m_vSpotlightTargetPos,Vector(-5,-5,-5),Vector(5,5,5),255,0,0,true,0.1);
-
-	// Do we need to keep updating?
-	if (!GetMoveParent() && m_flRotationSpeed == 0)
-	{
-		// No reason to think again, we're not going to move unless there's a data change
-		SetNextThink(TICK_NEVER_THINK);
-	}
 }
 
 //-----------------------------------------------------------------------------
@@ -693,32 +562,6 @@ void CPointSpotlight::InputLightOff( inputdata_t &inputdata )
 	}
 }
 
-//-----------------------------------------------------------------------------
-void CPointSpotlight::InputStart(inputdata_t& inputdata)
-{
-	if (!m_isRotating)
-	{
-		m_isRotating = true;
-		RecalcRotation();
-	}
-}
-
-//-----------------------------------------------------------------------------
-void CPointSpotlight::InputStop(inputdata_t& inputdata)
-{
-	if (m_isRotating)
-	{
-		m_isRotating = false;
-		RecalcRotation();
-	}
-}
-
-//-----------------------------------------------------------------------------
-void CPointSpotlight::InputReverse(inputdata_t& inputdata)
-{
-	m_isReversed = !m_isReversed;
-	RecalcRotation();
-}
 
 void CPointSpotlight::PassParentToChildren( CBaseEntity *pParent )
 {

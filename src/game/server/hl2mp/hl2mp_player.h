@@ -20,7 +20,10 @@ class CHL2MP_Player;
 #include "hl2mp_gamerules.h"
 #include "utldict.h"
 #include "Multiplayer\multiplayer_animstate.h"
+#ifdef LUA_SDK
+#include "lsingleluainstance.h"
 #include "hl2mp_playeranimstate.h"
+#endif
 
 //=============================================================================
 // >> HL2MP_Player
@@ -29,16 +32,20 @@ class CHL2MPPlayerStateInfo
 {
 public:
 	HL2MPPlayerState m_iPlayerState;
-	const char *m_pStateName;
+	const char* m_pStateName;
 
-	void (CHL2MP_Player::*pfnEnterState)();	// Init and deinit the state.
-	void (CHL2MP_Player::*pfnLeaveState)();
+	void (CHL2MP_Player::* pfnEnterState)();	// Init and deinit the state.
+	void (CHL2MP_Player::* pfnLeaveState)();
 
-	void (CHL2MP_Player::*pfnPreThink)();	// Do a PreThink() in this state.
+	void (CHL2MP_Player::* pfnPreThink)();	// Do a PreThink() in this state.
 };
 
 class CHL2MP_Player : public CHL2_Player
 {
+#ifdef LUA_SDK
+	LUA_OVERRIDE_SINGLE_LUA_INSTANCE_METATABLE(CHL2MP_Player, LUA_EXPERIMENTPLAYERLIBNAME);
+#endif
+
 public:
 	DECLARE_CLASS( CHL2MP_Player, CHL2_Player );
 
@@ -55,9 +62,16 @@ public:
 	DECLARE_DATADESC();
 	DECLARE_ENT_SCRIPTDESC();
 
+#ifdef LUA_SDK
 	// This passes the event to the client's and server's CHL2MPPlayerAnimState.
 	void			DoAnimationEvent(PlayerAnimEvent_t event, int nData = 0);
-	//void			SetupBones(matrix3x4_t* pBoneToWorld, int boneMask);
+	void SetupBones(matrix3x4_t* pBoneToWorld, int boneMask);
+	bool KeyDown(int buttonCode);
+
+	// Avoiding players
+	void SetAvoidPlayers(bool shouldAvoid);
+	bool GetAvoidPlayers();
+#endif
 
 	virtual void Precache( void );
 	virtual void Spawn( void );
@@ -147,15 +161,43 @@ public:
 
 	virtual bool	CanHearAndReadChatFrom( CBasePlayer *pPlayer );
 
+#ifdef LUA_SDK
+	
+    bool IsAirborne() const
+    {
+        return ( !( GetFlags() & FL_ONGROUND ) );
+    }
+
+    CHL2MPPlayerAnimState *GetAnimState() const
+    {
+        return m_PlayerAnimState;
+    }
+
+    CBaseEntity *GetRagdollEntity() const
+    {
+        return m_hRagdoll;
+    }
+
+    int GetMaxArmor() const
+    {
+        return m_MaxArmorValue;
+    }
+    void SetMaxArmor( int maxArmor )
+    {
+        m_MaxArmorValue.GetForModify() = maxArmor;
+    }
+#endif
+
 	bool IsThreatAimingTowardMe( CBaseEntity* threat, float cosTolerance = 0.8f ) const;
 	bool IsThreatFiringAtMe( CBaseEntity* threat ) const;
 private:
 
-	CHL2MPPlayerAnimState* m_PlayerAnimState;
-
 	CNetworkQAngle( m_angEyeAngles );
-	//CPlayerAnimState   m_PlayerAnimState;
-	//CPlayerAnimState*  m_PlayerAnimState;
+#ifdef LUA_SDK
+	CHL2MPPlayerAnimState* m_PlayerAnimState;
+#else
+	CPlayerAnimState   m_PlayerAnimState;
+#endif
 
 	int m_iLastWeaponFireUsercmd;
 	int m_iModelType;
@@ -177,6 +219,10 @@ private:
 
     bool m_bEnterObserver;
 	bool m_bReady;
+
+	CNetworkVar(bool, m_bAvoidPlayers);
+
+	CNetworkVar(int, m_MaxArmorValue);
 };
 
 inline CHL2MP_Player *ToHL2MPPlayer( CBaseEntity *pEntity )
@@ -186,5 +232,33 @@ inline CHL2MP_Player *ToHL2MPPlayer( CBaseEntity *pEntity )
 
 	return dynamic_cast<CHL2MP_Player*>( pEntity );
 }
+
+#ifdef LUA_SDK
+class CHL2MPRagdoll : public CBaseAnimatingOverlay
+{
+public:
+	DECLARE_CLASS(CHL2MPRagdoll, CBaseAnimatingOverlay);
+	DECLARE_SERVERCLASS();
+
+	// Transmit ragdolls to everyone.
+	virtual int UpdateTransmitState()
+	{
+		return SetTransmitState(FL_EDICT_ALWAYS);
+	}
+
+public:
+	// In case the client has the player entity, we transmit the player index.
+	// In case the client doesn't have it, we transmit the player's model index, origin, and angles
+	// so they can create a ragdoll in the right place.
+	CNetworkHandle(CBaseEntity, m_hPlayer);	// networked entity handle 
+	CNetworkVector(m_vecRagdollVelocity);
+	CNetworkVector(m_vecRagdollOrigin);
+
+	CBasePlayer* GetRagdollPlayer() const
+	{
+		return dynamic_cast<CBasePlayer*>(m_hPlayer.Get());
+	}
+};
+#endif
 
 #endif //HL2MP_PLAYER_H

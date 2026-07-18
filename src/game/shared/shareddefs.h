@@ -112,6 +112,8 @@ public:
 #define TIME_TO_UNDUCK		0.2
 #define TIME_TO_UNDUCK_MS	200.0f
 
+#define MAX_SUB_MATERIAL_OVERRIDES 32 // Experiment; Max material overrides
+
 #define MAX_WEAPON_SLOTS		6	// hud item selection slots
 #define MAX_WEAPON_POSITIONS	20	// max number of items within a slot
 #define MAX_ITEM_TYPES			6	// hud item selection slots
@@ -489,7 +491,7 @@ enum PLAYER_ANIM
 #define	DAMAGE_AIM				3
 
 // Spectator Movement modes
-enum {
+enum OBSERVER_MODE {
 	OBS_MODE_NONE = 0,	// not in spectator mode
 	OBS_MODE_DEATHCAM,	// special mode for death cam animation
 	OBS_MODE_FREEZECAM,	// zooms to a target, and freeze-frames on them
@@ -571,7 +573,7 @@ typedef enum
 #define COLOR_BLACK		Color(0, 0, 0, 255)
 
 // All NPCs need this data
-enum
+enum BLOOD_COLOR
 {
 	DONT_BLEED = -1,
 
@@ -614,7 +616,7 @@ enum
 #define NO_THINK_CONTEXT	-1
 
 // entity flags, CBaseEntity::m_iEFlags
-enum
+enum ENTITY_FLAG
 {
 	EFL_KILLME	=				(1<<0),	// This entity is marked for death -- This allows the game to actually delete ents at a safe time
 	EFL_DORMANT	=				(1<<1),	// Entity is dormant, no updates to client
@@ -767,6 +769,7 @@ struct FireBulletsInfo_t
 	CBaseEntity *m_pAdditionalIgnoreEnt;
 	bool m_bPrimaryAttack;
 	bool m_bUseServerRandomSeed;
+	const char* m_pszTracerType;
 };
 
 //-----------------------------------------------------------------------------

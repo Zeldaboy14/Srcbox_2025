@@ -27,7 +27,12 @@ public:
 	virtual void UpdatePlayerData( void );
 	virtual int  UpdateTransmitState( void );
 	virtual int  GetTeam( int iIndex );
+#ifdef LUA_SDK
+	virtual bool IsConnected(int index);
+	virtual bool IsAlive(int index);
 
+	virtual int GetPing(int index);
+#endif
 protected:
 	virtual void UpdateConnectedPlayer( int iIndex, CBasePlayer *pPlayer );
 	virtual void UpdateDisconnectedPlayer( int iIndex );

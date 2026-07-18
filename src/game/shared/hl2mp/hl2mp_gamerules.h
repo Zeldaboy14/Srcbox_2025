@@ -177,6 +177,8 @@ public:
 
 	
 	bool	IsTeamplay( void ) { return m_bTeamPlayEnabled;	}
+	bool	IsSandbox( void ) { return m_bSandboxEnabled;	}
+	bool	IsCampaign( void ) { return m_bSandboxEnabled;	}
 #ifdef LUA_SDK
 #ifndef CLIENT_DLL
 	bool	FPlayerCanTakeDamage(CBasePlayer* pPlayer, CBaseEntity* pAttacker, const CTakeDamageInfo& info);
@@ -214,6 +216,7 @@ private:
 #endif
 	
 	CNetworkVar( bool, m_bTeamPlayEnabled );
+	CNetworkVar( bool, m_bSandboxEnabled );
 	CNetworkVar( float, m_flGameStartTime );
 	CUtlVector<EHANDLE> m_hRespawnableItemsAndWeapons;
 	float m_tmNextPeriodicThink;
@@ -231,5 +234,16 @@ inline CHL2MPRules* HL2MPRules()
 {
 	return static_cast<CHL2MPRules*>(g_pGameRules);
 }
+
+enum HL2MP_GameState
+{
+	HL2MP_GS_NONE = 0,
+	HL2MP_GS_BRIEFING = 1,		// causes clients to launch their briefing frame
+	HL2MP_GS_LAUNCHING = 2,		// server is spawning and equipping marines
+	HL2MP_GS_INGAME = 3,
+	HL2MP_GS_DEBRIEF = 4,			// causes clients to launch their debrief frame
+	HL2MP_GS_CAMPAIGNMAP = 5,		// causes clients to launch their campaign map
+	HL2MP_GS_OUTRO = 6,			// todo: make clients show the credits scroller
+};
 
 #endif //HL2MP_GAMERULES_H

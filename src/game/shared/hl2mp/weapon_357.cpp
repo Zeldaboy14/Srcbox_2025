@@ -11,7 +11,6 @@
 
 #ifdef CLIENT_DLL
 	#include "c_hl2mp_player.h"
-	#include <prediction.h>
 #else
 	#include "hl2mp_player.h"
 #endif
@@ -134,20 +133,18 @@ void CWeapon357::PrimaryAttack( void )
 	// Fire the bullets, and force the first shot to be perfectly accuracy
 	pPlayer->FireBullets( info );
 
-#ifdef CLIENT_DLL
 	//Disorient the player
-	if ( prediction->IsFirstTimePredicted() )
-	{
-		QAngle angles;
-		engine->GetViewAngles( angles );
-		angles.x += random->RandomInt( -1, 1 );
-		angles.y += random->RandomInt( -1, 1 );
-		angles.z += 0.0f;
-		engine->SetViewAngles( angles );
-	}
-#endif // CLIENT_DLL
+	QAngle angles = pPlayer->GetLocalAngles();
 
-	pPlayer->ViewPunch( QAngle( -8, random->RandomFloat( -2, 2 ), 0 ) );
+	angles.x += random->RandomInt( -1, 1 );
+	angles.y += random->RandomInt( -1, 1 );
+	angles.z = 0;
+
+#ifndef CLIENT_DLL
+	pPlayer->SnapEyeAngles( angles );
+#endif
+
+	//pPlayer->ViewPunch( QAngle( -8, random->RandomFloat( -2, 2 ), 0 ) );
 
 	if ( !m_iClip1 && pPlayer->GetAmmoCount( m_iPrimaryAmmoType ) <= 0 )
 	{

@@ -17,7 +17,8 @@
 
 #ifdef LUA_SDK
 #include "luamanager.h"
-#include "lhl2mp_player_shared.h"
+//#include "lhl2mp_player_shared.h"
+//#include "lexperiment_player_shared.h"
 #include "mathlib/lvector.h"
 #include "lvphysics_interface.h"
 #endif
@@ -78,15 +79,15 @@ Vector CHL2MP_Player::GetAttackSpread( CBaseCombatWeapon *pWeapon, CBaseEntity *
 void CHL2MP_Player::PlayStepSound( Vector &vecOrigin, surfacedata_t *psurface, float fvol, bool force )
 {
 #if defined( LUA_SDK )
-	BEGIN_LUA_CALL_HOOK("PlayerPlayStepSound");
-	lua_pushhl2mpplayer(L, this);
+	LUA_CALL_HOOK_BEGIN("PlayerPlayStepSound");
+	CHL2MP_Player::PushLuaInstanceSafe(L, this);
 	lua_pushvector(L, vecOrigin);
 	lua_pushsurfacedata(L, psurface);
 	lua_pushnumber(L, fvol);
 	lua_pushboolean(L, force);
-	END_LUA_CALL_HOOK(5, 1);
+	LUA_CALL_HOOK_END(5, 1);
 
-	RETURN_LUA_NONE();
+	LUA_RETURN_NONE_IF_FALSE();
 #endif
 
 	if ( gpGlobals->maxClients > 1 && !sv_footsteps.GetFloat() )
@@ -594,3 +595,18 @@ void CPlayerAnimState::GetOuterAbsVelocity( Vector& vel )
 	vel = GetOuter()->GetAbsVelocity();
 #endif
 }
+
+#ifdef LUA_SDK
+void CHL2MP_Player::SetAvoidPlayers(bool shouldAvoid)
+{
+#ifdef CLIENT_DLL
+	m_bAvoidPlayers = shouldAvoid;
+#else
+	m_bAvoidPlayers.GetForModify() = shouldAvoid;
+#endif
+}
+bool CHL2MP_Player::GetAvoidPlayers()
+{
+	return m_bAvoidPlayers;
+}
+#endif

@@ -74,13 +74,24 @@ public:
 
 	CGameTrace() = default;
 
-//#if !defined ( LUA_SDK )
-	// HACKHACK: We only do this for Lua, but Lua classes which use traces will
-	// throw errors when we compile, so define this outside of the Lua SDK.
+#if !defined ( LUA_SDK )
 private:
 	// No copy constructors allowed
 	CGameTrace(const CGameTrace& vOther);
-//#endif
+#else
+public:
+	// HACKHACK: We only do this for Lua, but Lua classes which use traces will
+	// throw errors when we compile, so define this outside of the Lua SDK.
+	// No copy constructors allowed
+	// CGameTrace(const CGameTrace& vOther);
+	//
+	// this shit causes compile issues so I changed it.
+	// the better question is, why was it here twice 
+	// to begin with? - saint
+	inline CGameTrace(const CGameTrace& vOther)
+	{
+	}
+#endif
 };
 
 
@@ -181,4 +192,3 @@ public:
 };
 
 #endif // GAMETRACE_H
-

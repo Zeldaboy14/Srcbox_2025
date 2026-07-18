@@ -6,6 +6,8 @@
 #include <vgui_controls/Button.h>
 #include <vgui_controls/PropertySheet.h>
 #include <vgui_controls/ListPanel.h>
+#include <vgui_controls/ComboBox.h>
+#include <vgui/ISurface.h>
 #include <filesystem.h>
 #include <KeyValues.h>
 #include "ienginevgui.h"
@@ -95,6 +97,14 @@ CSaveBeforeQuitQueryDialog::CSaveBeforeQuitQueryDialog(vgui::VPANEL parent)
 
 	LoadControlSettings("resource/savebeforequitdialog.res");
 
+	int w, h;
+	GetSize(w, h);
+
+	int sw, sh;
+	vgui::surface()->GetScreenSize(sw, sh);
+
+	SetPos((sw - w) / 2, (sh - h) / 2);
+
 	SetVisible(false);
 }
 
@@ -160,8 +170,6 @@ private:
 CReturntoMainMenuDialog::CReturntoMainMenuDialog(vgui::VPANEL parent)
 	: BaseClass(nullptr, "")
 {
-	SetParent(parent);
-
 	SetKeyBoardInputEnabled(true);
 	SetMouseInputEnabled(true);
 
@@ -182,6 +190,14 @@ CReturntoMainMenuDialog::CReturntoMainMenuDialog(vgui::VPANEL parent)
 	m_pQuitPanel = new vgui::Frame(this, "QuitQueryDialog");
 	SetBounds(656, 384, 288, 132);
 	SetScheme(vgui::scheme()->LoadSchemeFromFile("resource/SourceScheme.res", "SourceScheme"));
+
+	int w, h;
+	GetSize(w, h);
+
+	int sw, sh;
+	vgui::surface()->GetScreenSize(sw, sh);
+
+	SetPos((sw - w) / 2, (sh - h) / 2);
 
 	m_pQuitConfirmText = new vgui::Label(this, "", "#GameUI_MainMenuWarning");
 	m_pQuitConfirmText->SetBounds(54, 35, 190, 32);
@@ -293,6 +309,14 @@ CQuitQueryBoxDialog::CQuitQueryBoxDialog(vgui::VPANEL parent)
 	m_pQuitPanel = new vgui::Frame(this, "QuitQueryDialog");
 	SetBounds(655, 392, 290, 116);
 	SetScheme(vgui::scheme()->LoadSchemeFromFile("resource/SourceScheme.res", "SourceScheme"));
+
+	int w, h;
+	GetSize(w, h);
+
+	int sw, sh;
+	vgui::surface()->GetScreenSize(sw, sh);
+
+	SetPos((sw - w) / 2, (sh - h) / 2);
 
 	m_pQuitConfirmText = new vgui::Label(this, "", "#GameUI_QuitConfirmationText");
 	m_pQuitConfirmText->SetBounds(54, 31, 190, 16);

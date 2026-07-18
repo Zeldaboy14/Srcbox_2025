@@ -1,10 +1,3 @@
-//========= Copyright © 1996-2005, Valve Corporation, All rights reserved. ============//
-//
-// Purpose: 
-//
-// $NoKeywords: $
-//=============================================================================//
-
 #ifndef VGUI_LFRAME_H
 #define VGUI_LFRAME_H
 
@@ -22,41 +15,38 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class LFrame : public Frame
 {
-	DECLARE_CLASS_SIMPLE( LFrame, Frame );
+    DECLARE_CLASS_SIMPLE( LFrame, Frame );
 
-public:
-	LFrame(Panel *parent, const char *panelName, bool showTaskbarIcon = true, lua_State *L = NULL);
-	virtual ~LFrame();
+    LUA_OVERRIDE_SINGLE_LUA_INSTANCE_METATABLE( LFrame, "Frame" );
 
-public:
-//#if defined( LUA_SDK )
-	lua_State *m_lua_State;
-	int m_nTableReference;
-	int m_nRefCount;
-//#endif
+    public:
+    LFrame( Panel *parent, const char *panelName, bool showTaskbarIcon = true, lua_State *L = NULL );
+    virtual ~LFrame();
+
+    protected:
+    virtual void ApplySchemeSettings( vgui::IScheme *pScheme )
+    {
+        LUA_CALL_PANEL_METHOD_BEGIN( "ApplySchemeSettings" );
+        LUA_CALL_PANEL_METHOD_END( 0, 0 );
+
+        BaseClass::ApplySchemeSettings( pScheme );
+    }
 };
 
-} // namespace vgui
+}  // namespace vgui
 
 /* type for Frame functions */
-typedef vgui::Frame lua_Frame;
-
-
+typedef LFrame lua_Frame;
 
 /*
 ** access functions (stack -> C)
 */
 
-LUA_API lua_Frame     *(lua_toframe) (lua_State *L, int idx);
-
+LUA_API lua_Frame *( lua_toframe )( lua_State *L, int idx );
 
 /*
 ** push functions (C -> stack)
 */
-LUA_API void  (lua_pushframe) (lua_State *L, lua_Frame *pFrame);
+LUALIB_API lua_Frame *( luaL_checkframe )( lua_State *L, int narg );
 
-
-
-LUALIB_API lua_Frame *(luaL_checkframe) (lua_State *L, int narg);
-
-#endif // VGUI_LFRAME_H
+#endif  // VGUI_LFRAME_H

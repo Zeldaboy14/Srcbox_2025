@@ -18,6 +18,7 @@
 void AddHL1(const char* path)
 {
 	filesystem->AddSearchPath(CFmtStr("%s/hl1/hl1_pak_dir.vpk", path), "GAME", PATH_ADD_TO_HEAD);
+	filesystem->AddSearchPath(CFmtStr("%s/hl1/hl1_pak_dir.vpk", path), "GAME", PATH_ADD_TO_HEAD);
 	filesystem->AddSearchPath(CFmtStr("%s/hl1", path), "GAME", PATH_ADD_TO_TAIL);
 	g_pVGuiLocalize->AddFile("resource/hl1_%language%.txt");
 }
@@ -106,7 +107,6 @@ void AddPortal2(const char* path)
 	filesystem->AddSearchPath(CFmtStr("%s/portal2_dlc1/pak01_dir.vpk", path), "GAME", PATH_ADD_TO_HEAD);
 	filesystem->AddSearchPath(CFmtStr("%s/portal2_dlc1", path), "GAME", PATH_ADD_TO_HEAD);
 	filesystem->AddSearchPath(CFmtStr("%s/portal2_dlc2/pak01_dir.vpk", path), "GAME", PATH_ADD_TO_HEAD);
-	filesystem->AddSearchPath(CFmtStr("%s/portal2_dlc2", path), "GAME", PATH_ADD_TO_HEAD);
 	filesystem->AddSearchPath(CFmtStr("%s/portal2_dlc2", path), "GAME", PATH_ADD_TO_TAIL);
 	g_pVGuiLocalize->AddFile("resource/portal2_%language%.txt");
 }
@@ -116,15 +116,33 @@ void AddCSGO(const char* path)
 	filesystem->AddSearchPath(CFmtStr("%s/csgo/pak01_dir.vpk", path), "GAME", PATH_ADD_TO_HEAD);
 	filesystem->AddSearchPath(CFmtStr("%s/csgo/pakxv_lowviolence_dir.vpk", path), "GAME", PATH_ADD_TO_HEAD);
 	filesystem->AddSearchPath(CFmtStr("%s/csgo/pakxv_perfectworld_dir.vpk", path), "GAME", PATH_ADD_TO_HEAD);
-	filesystem->AddSearchPath(CFmtStr("%s/csgo", path), "GAME", PATH_ADD_TO_TAIL);
+	filesystem->AddSearchPath(CFmtStr("%s/csgo", path), "GAME|MOD", PATH_ADD_TO_TAIL);
 }
 
 // From here, mount the mods!
+
+void AddFOF(const char* path)
+{
+	filesystem->AddSearchPath(CFmtStr("%s/fof/fof_dir.vpk", path), "GAME", PATH_ADD_TO_HEAD);
+	filesystem->AddSearchPath(CFmtStr("%s/fof/fof_new_materials_dir.vpk", path), "GAME", PATH_ADD_TO_HEAD);
+	filesystem->AddSearchPath(CFmtStr("%s/fof/fof2_dir.vpk", path), "GAME", PATH_ADD_TO_HEAD);
+	filesystem->AddSearchPath(CFmtStr("%s/fof", path), "GAME", PATH_ADD_TO_HEAD);
+}
+
 
 void AddTSP(const char* path)
 {
 	filesystem->AddSearchPath(CFmtStr("%s/thestanleyparable", path), "GAME", PATH_ADD_TO_HEAD);
 }
+
+// Fortress Connected
+
+/*void AddFC(const char* path)
+{
+	filesystem->AddSearchPath(CFmtStr("%s/fc_tfsdk/vpks/fc_tfsdk_misc_dir.vpk", path), "GAME", PATH_ADD_TO_HEAD);
+	filesystem->AddSearchPath(CFmtStr("%s/fc_tfsdk/vpks/fc_tfsdk_sound_dir.vpk", path), "GAME", PATH_ADD_TO_HEAD);
+	filesystem->AddSearchPath(CFmtStr("%s/fc_tfsdk/vpks/fc_tfsdk_textures_dir.vpk", path), "GAME", PATH_ADD_TO_HEAD);
+}*/
 
 // Base 2013 MP SDK
 
@@ -235,12 +253,26 @@ void MountExtraContent()
 
 	// Mods
 
+	if (steamapicontext->SteamApps()->BIsAppInstalled(265630) && mountdepots->GetBool("fof"))
+	{
+		char fofPath[MAX_PATH];
+		steamapicontext->SteamApps()->GetAppInstallDir(265630, fofPath, sizeof(fofPath));
+		AddFOF(fofPath);
+	}
+
 	if (steamapicontext->SteamApps()->BIsAppInstalled(221910) && mountdepots->GetBool("tsp"))
 	{
 		char tspPath[MAX_PATH];
 		steamapicontext->SteamApps()->GetAppInstallDir(221910, tspPath, sizeof(tspPath));
 		AddTSP(tspPath);
 	}
+
+	/*if (steamapicontext->SteamApps()->BIsAppInstalled(3561600) && mountdepots->GetBool("fc"))
+	{
+		char fcPath[MAX_PATH];
+		steamapicontext->SteamApps()->GetAppInstallDir(3561600, fcPath, sizeof(fcPath));
+		AddFC(fcPath);
+	}*/
 
 #ifdef HL2MP
 

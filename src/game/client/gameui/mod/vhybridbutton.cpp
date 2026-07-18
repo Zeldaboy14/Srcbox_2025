@@ -8,7 +8,7 @@
 #include "basemodpanel.h"
 #include "VFooterPanel.h"
 #include "VFlyoutMenu.h"
-#include "EngineInterface.h"
+#include "../EngineInterface.h"
 #include "vgui/ISurface.h"
 #include "vgui_controls/Tooltip.h"
 #include "vgui/IVgui.h"
@@ -255,6 +255,47 @@ void BaseModHybridButton::SetHelpText( const char* tooltip, bool enabled )
 	if ( HasFocus() )
 	{
 		UpdateFooterHelpText();
+	}
+}
+
+void BaseModHybridButton::DrawRoundedBox(int x, int y, int wide, int tall, Color color, float normalizedAlpha, bool bHighlightGradient, Color highlightCenterColor)
+{
+	if (m_nNBBgTextureId1 == -1 ||
+		m_nNBBgTextureId2 == -1 ||
+		m_nNBBgTextureId3 == -1 ||
+		m_nNBBgTextureId4 == -1)
+	{
+		return;
+	}
+
+	color[3] *= normalizedAlpha;
+
+	// work out our bounds
+	int cornerWide, cornerTall;
+	GetCornerTextureSize(cornerWide, cornerTall);
+
+	// draw the background in the areas not occupied by the corners
+	// draw it in three horizontal strips
+	surface()->DrawSetColor(color);
+	surface()->DrawFilledRect(x + cornerWide, y, x + wide - cornerWide, y + cornerTall);
+	surface()->DrawFilledRect(x, y + cornerTall, x + wide, y + tall - cornerTall);
+	surface()->DrawFilledRect(x + cornerWide, y + tall - cornerTall, x + wide - cornerWide, y + tall);
+
+	// draw the corners
+	surface()->DrawSetTexture(m_nNBBgTextureId1);
+	surface()->DrawTexturedRect(x, y, x + cornerWide, y + cornerTall);
+	surface()->DrawSetTexture(m_nNBBgTextureId2);
+	surface()->DrawTexturedRect(x + wide - cornerWide, y, x + wide, y + cornerTall);
+	surface()->DrawSetTexture(m_nNBBgTextureId3);
+	surface()->DrawTexturedRect(x + wide - cornerWide, y + tall - cornerTall, x + wide, y + tall);
+	surface()->DrawSetTexture(m_nNBBgTextureId4);
+	surface()->DrawTexturedRect(x + 0, y + tall - cornerTall, x + cornerWide, y + tall);
+
+	if (bHighlightGradient)
+	{
+		surface()->DrawSetColor(highlightCenterColor);
+		surface()->DrawFilledRectFade(x + cornerWide, y, x + wide * 0.5f, y + tall, 0, 255, true);
+		surface()->DrawFilledRectFade(x + wide * 0.5f, y, x + wide - cornerWide, y + tall, 255, 0, true);
 	}
 }
 

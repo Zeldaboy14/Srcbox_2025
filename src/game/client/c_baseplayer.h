@@ -73,6 +73,11 @@ class C_BasePlayer : public C_BaseCombatCharacter, public CGameEventListener
 {
 public:
 	DECLARE_CLASS( C_BasePlayer, C_BaseCombatCharacter );
+
+#ifdef LUA_SDK
+	LUA_OVERRIDE_SINGLE_LUA_INSTANCE_METATABLE(C_BasePlayer, LUA_BASEPLAYERMETANAME)
+#endif
+
 	DECLARE_CLIENTCLASS();
 	DECLARE_PREDICTABLE();
 	DECLARE_INTERPOLATION();
@@ -82,7 +87,10 @@ public:
 
 	virtual void	Spawn( void );
 	virtual void	SharedSpawn(); // Shared between client and server.
-	virtual bool	GetSteamID( CSteamID *pID );
+#if !defined( NO_STEAM )
+    virtual bool GetSteamID( CSteamID *pID );
+    virtual uint GetUniqueID();
+#endif
 
 	// IClientEntity overrides.
 	virtual void	OnPreDataChanged( DataUpdateType_t updateType );
@@ -106,11 +114,19 @@ public:
 	void	SetAnimationExtension( const char *pExtension );
 
 	C_BaseViewModel		*GetViewModel( int viewmodelindex = 0, bool bObserverOK=true );
+
+    C_BaseAnimating *GetHands();
+    void SetHands( C_BaseAnimating *pHandsEntity );
+
+    protected:
+    EHANDLE m_hHandsEntity;
+
+    public:
 	C_BaseCombatWeapon	*GetActiveWeapon( void ) const;
 	const char			*GetTracerType( void );
 
 	// View model prediction setup
-	virtual void		CalcView( Vector &eyeOrigin, QAngle &eyeAngles, float &zNear, float &zFar, float &fov );
+	virtual void		CalcView( CViewSetup &viewSetup );
 	virtual void		CalcViewModelView( const Vector& eyeOrigin, const QAngle& eyeAngles);
 	
 
@@ -201,6 +217,7 @@ public:
 	// Weapon selection code
 	virtual bool				IsAllowedToSwitchWeapons( void ) { return !IsObserver(); }
 	virtual C_BaseCombatWeapon	*GetActiveWeaponForSelection( void );
+	CBaseEntity*				HasNamedPlayerItem(const char* pszItemName);
 
 	// Returns the view model if this is the local player. If you're in third person or 
 	// this is a remote player, it returns the active weapon
@@ -213,7 +230,85 @@ public:
 	virtual float				GetDefaultAnimSpeed( void ) { return 1.0; }
 
 	void						SetMaxSpeed( float flMaxSpeed ) { m_flMaxspeed = flMaxSpeed; }
+	float GetMaxSpeed() const
+	{
+		return m_flMaxspeed;
+	}
+
+	void SetWalkSpeed(float flSpeed)
+	{
+		m_flWalkSpeed = flSpeed;
+	}
+	float GetWalkSpeed(void)
+	{
+		return m_flWalkSpeed;
+	}
+
+	void SetNormalSpeed(float flSpeed)
+	{
+		m_flNormalSpeed = flSpeed;
+	}
+	float GetNormalSpeed(void)
+	{
+		return m_flNormalSpeed;
+	}
+
+	void SetRunSpeed(float flSpeed)
+	{
+		m_flRunSpeed = flSpeed;
+	}
+	float GetRunSpeed(void)
+	{
+		return m_flRunSpeed;
+	}
 	float						MaxSpeed() const		{ return m_flMaxspeed; }
+
+	void SetLadderClimbSpeed(float flSpeed)
+	{
+		m_flLadderClimbSpeed = flSpeed;
+	}
+	float GetLadderClimbSpeed(void)
+	{
+		return m_flLadderClimbSpeed;
+	}
+
+	void SetCrouchWalkFraction(float flSpeed)
+	{
+		m_flCrouchWalkFraction = flSpeed;
+	}
+	float GetCrouchWalkFraction(void)
+	{
+		return m_flCrouchWalkFraction;
+	}
+
+	void SetJumpPower(float flPower)
+	{
+		m_flJumpPower = flPower;
+	}
+	float GetJumpPower(void)
+	{
+		return m_flJumpPower;
+	}
+
+	// Experiment; Note that this issue should be fixed in our implementation: https://github.com/Facepunch/garrysmod-issues/issues/2722
+	void SetDuckSpeedInMilliseconds(float flSpeed)
+	{
+		m_flDuckSpeed = flSpeed;
+	}
+	float GetDuckSpeedInMilliseconds(void)
+	{
+		return m_flDuckSpeed;
+	}
+
+	// Fraction of the duck speed to use when unducking
+	void SetUnDuckFraction(float flSpeed)
+	{
+		m_flUnDuckFraction = flSpeed;
+	}
+	float GetUnDuckFraction(void)
+	{
+		return m_flUnDuckFraction;
+	}
 
 	// Should this object cast shadows?
 	virtual ShadowType_t		ShadowCastType() { return SHADOWS_NONE; }
@@ -232,6 +327,7 @@ public:
 	static bool					ShouldDrawLocalPlayer();
 	static C_BasePlayer			*GetLocalPlayer( void );
 	int							GetUserID( void );
+	C_BaseEntity				*GetVehicleEntity( void );
 	virtual bool				CanSetSoundMixer( void );
 	virtual int					GetVisionFilterFlags( bool bWeaponsCheck = false ) { return 0x00; }
 	bool						HasVisionFilterFlags( int nFlags, bool bWeaponsCheck = false ) { return ( GetVisionFilterFlags( bWeaponsCheck ) & nFlags ) == nFlags; }
@@ -469,12 +565,23 @@ public:
 	float			m_flConstraintRadius;
 	float			m_flConstraintWidth;
 	float			m_flConstraintSpeedFactor;
+	int m_ArmorValue;
+	int m_MaxArmorValue;
+
+	int ArmorValue() const
+	{
+		return m_ArmorValue;
+	}
+
+	int GetMaxArmor() const
+	{
+		return m_MaxArmorValue;
+	}
 
 protected:
 
-	void				CalcPlayerView( Vector& eyeOrigin, QAngle& eyeAngles, float& fov );
-	void				CalcVehicleView(IClientVehicle *pVehicle, Vector& eyeOrigin, QAngle& eyeAngles,
-							float& zNear, float& zFar, float& fov );
+    void				CalcPlayerView( CViewSetup &viewSetup, bool &bForceDrawLocalPlayer );
+    void				CalcVehicleView( IClientVehicle *pVehicle, CViewSetup &viewSetup, bool &bForceDrawLocalPlayer );
 	virtual void		CalcObserverView( Vector& eyeOrigin, QAngle& eyeAngles, float& fov );
 	virtual Vector		GetChaseCamViewOffset( CBaseEntity *target );
 	void				CalcChaseCamView( Vector& eyeOrigin, QAngle& eyeAngles, float& fov );
@@ -518,6 +625,8 @@ protected:
 	float			m_flStepSoundTime;
 	bool			m_IsFootprintOnLeft;
 
+	bool			m_bCalcViewForceDrawPlayer;
+
 private:
 	// Make sure no one calls this...
 	C_BasePlayer& operator=( const C_BasePlayer& src );
@@ -529,6 +638,18 @@ private:
 	EHANDLE			m_hUseEntity;
 	
 	float			m_flMaxspeed;
+
+	// Values to set m_flMaxspeed to when walking slowly, normally, and running.
+	float m_flWalkSpeed;
+	float m_flNormalSpeed;
+	float m_flRunSpeed;
+	float m_flLadderClimbSpeed;
+	float m_flCrouchWalkFraction;
+	float m_flJumpPower;  // In units
+	// Time in milliseconds to go from standing to fully ducked
+	float m_flDuckSpeed;
+	// Fraction of the duck speed to use when unducking
+	float m_flUnDuckFraction;
 
 	int				m_iBonusProgress;
 	int				m_iBonusChallenge;

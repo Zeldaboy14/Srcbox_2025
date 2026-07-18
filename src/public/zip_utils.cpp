@@ -8,6 +8,7 @@
 // or else we get many warnings.
 #undef PROTECTED_THINGS_ENABLE
 #include <tier0/platform.h>
+#undef fopen		// zip_utils intentionally uses fopen directly; undo the -Dfopen=dont_use_fopen project-wide define
 #ifdef IS_WINDOWS_PC
 #include <windows.h>
 #else

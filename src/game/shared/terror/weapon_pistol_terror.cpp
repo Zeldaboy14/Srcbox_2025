@@ -22,6 +22,9 @@
 #define	PISTOL_ACCURACY_SHOT_PENALTY_TIME		0.2f	// Applied amount of time each shot adds to the time we must recover from
 #define	PISTOL_ACCURACY_MAXIMUM_PENALTY_TIME	1.5f	// Maximum penalty to deal out
 
+#define	PISTOL_MELEE_RANGE	65.0f
+#define	PISTOL_MELEE_DAMAGE	15.0f
+
 #ifdef CLIENT_DLL
 #define CWeaponPistol_Terror C_WeaponPistol_Terror
 #endif
@@ -49,13 +52,15 @@ public:
 	void	GetCharacterViewmodelAddon( void );
 	void	AddViewKick( void );
 	void	DryFire( void );
+	void	Drop( const Vector &vecVelocity );
+	float	GetRange( void );
 
 	void	UpdatePenaltyTime( void );
 
 	Activity	GetPrimaryAttackActivity( void );
 
 	virtual bool Reload( void );
-	virtual	float	GetDamageForActivity(Activity hitActivity) { return	10.0f; }
+	virtual	float	GetDamageForActivity(Activity hitActivity);
 
 	virtual const Vector& GetBulletSpread( void )
 	{		
@@ -192,6 +197,14 @@ void CWeaponPistol_Terror::DryFire( void )
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
+void CWeaponPistol_Terror::GetCharacterViewmodelAddon(void)
+{
+	BaseClass::GetCharacterViewmodelAddon();
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
 void CWeaponPistol_Terror::PrimaryAttack( void )
 {
 	if ( ( gpGlobals->curtime - m_flLastAttackTime ) > 0.5f )
@@ -229,8 +242,6 @@ void CWeaponPistol_Terror::PrimaryAttack( void )
 void CWeaponPistol_Terror::SecondaryAttack( void )
 {
 	Swing(true);
-
-	//m_flNextSecondaryAttack = gpGlobals->curtime + 0.4f;
 
 	m_flNextSecondaryAttack = gpGlobals->curtime + GetViewModelSequenceDuration();
 
@@ -290,8 +301,6 @@ void CWeaponPistol_Terror::ItemPostFrame( void )
 	
 	CBasePlayer *pOwner = ToBasePlayer( GetOwner() );
 
-	bool bUsedWeaponMelee = false;
-
 	if ( pOwner == NULL )
 		return;
 
@@ -303,12 +312,6 @@ void CWeaponPistol_Terror::ItemPostFrame( void )
 	else if ( ( pOwner->m_nButtons & IN_ATTACK ) && ( m_flNextPrimaryAttack < gpGlobals->curtime ) && ( m_iClip1 <= 0 ) )
 	{
 		DryFire();
-	}
-
-	if (bUsedWeaponMelee)
-	{
-		SendWeaponAnim(ACT_VM_IDLE);
-		m_flNextSecondaryAttack = gpGlobals->curtime + 0.2;
 	}
 }
 
@@ -361,4 +364,30 @@ void CWeaponPistol_Terror::AddViewKick( void )
 
 	//Add it to the view punch
 	pPlayer->ViewPunch( viewPunch );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------
+// Purpose: Get the damage amount for the animation we're doing
+// Input  : hitActivity - currently played activity
+// Output : Damage amount
+//-----------------------------------------------------------------------------
+float CWeaponPistol_Terror::GetDamageForActivity(Activity hitActivity)
+{
+	return PISTOL_MELEE_DAMAGE;
+}
+
+void CWeaponPistol_Terror::Drop(const Vector& vecVelocity)
+{
+#ifndef CLIENT_DLL
+	UTIL_Remove(this);
+#endif
+}
+
+float CWeaponPistol_Terror::GetRange(void)
+{
+	return	PISTOL_MELEE_RANGE;
 }

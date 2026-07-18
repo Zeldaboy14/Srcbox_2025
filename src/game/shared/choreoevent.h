@@ -304,8 +304,14 @@ public:
 		// A time span during which this actor can respond to events happening in the world, etc.
 		PERMIT_RESPONSES,
 
+		// Camera control
+		CAMERA,
+
 		// A string passed to the game code for interpretation
 		GENERIC,
+
+		// Script function call
+		SCRIPT,
 
 		// THIS MUST BE LAST!!!
 		NUM_TYPES,

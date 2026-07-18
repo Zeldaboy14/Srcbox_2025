@@ -21,7 +21,11 @@
 #define CHAR_TEX_GRATE			'G'
 #define CHAR_TEX_ALIENFLESH		'H'
 #define CHAR_TEX_CLIP			'I'
+#ifdef LUA_SDK
+#define CHAR_TEX_SNOW			'J'  // Experiment; GMOD compatibility
+#else
 //#define CHAR_TEX_UNUSED		'J'
+#endif
 //#define CHAR_TEX_UNUSED		'K'
 #define CHAR_TEX_PLASTIC		'L'
 #define CHAR_TEX_METAL			'M'
@@ -33,9 +37,17 @@
 #define CHAR_TEX_SLOSH			'S'
 #define CHAR_TEX_TILE			'T'
 //#define CHAR_TEX_UNUSED		'U'
+#define CHAR_TEX_GRASS			'U'  // Experiment; GMOD compatibility
+#else
+//#define CHAR_TEX_UNUSED		'U'
+#endif
 #define CHAR_TEX_VENT			'V'
 #define CHAR_TEX_WOOD			'W'
+#ifdef LUA_SDK
+#define CHAR_TEX_DEFAULT		'X'  // Experiment; GMOD compatibility - documented as: Skybox or nodraw texture
+#else
 //#define CHAR_TEX_UNUSED		'X'
+#endif
 #define CHAR_TEX_GLASS			'Y'
 #define CHAR_TEX_WARPSHIELD		'Z' ///< wierd-looking jello effect for advisor shield.
 
@@ -49,4 +61,4 @@ public:
 
 extern IDecalEmitterSystem *decalsystem;
 
-#endif // DECALS_H
+//#endif // DECALS_H

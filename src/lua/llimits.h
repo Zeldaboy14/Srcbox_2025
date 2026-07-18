@@ -36,8 +36,10 @@ typedef signed char ls_byte;
 #define MAX_SIZET ( ( size_t )( ~( size_t )0 ) )
 
 /* maximum size visible for Lua (must be representable in a lua_Integer) */
+#ifndef HL2MP
 #define MAX_SIZE ( sizeof( size_t ) < sizeof( lua_Integer ) ? MAX_SIZET \
                                                             : ( size_t )( LUA_MAXINTEGER ) )
+#endif
 
 #define MAX_LUMEM ( ( lu_mem )( ~( lu_mem )0 ) )
 

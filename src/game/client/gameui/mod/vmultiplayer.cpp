@@ -13,13 +13,13 @@
 #include "vgui_controls/textentry.h"
 #include "vgui_controls/combobox.h"
 #include "vgui_controls/imagepanel.h"
-#include "gameui_util.h"
+#include "../gameui_util.h"
 #include "vgui/ISurface.h"
-#include "EngineInterface.h"
+#include "../EngineInterface.h"
 #include "filesystem.h"
 #include "fmtstr.h"
 #include "cdll_util.h"
-#include "nb_header_footer.h"
+#include "../vgui/nb_header_footer.h"
 #include "materialsystem/materialsystem_config.h"
 
 

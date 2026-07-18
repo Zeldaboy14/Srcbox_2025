@@ -10,7 +10,7 @@ $Configuration
 {
 	$Compiler
 	{
-		$AdditionalIncludeDirectories	"$BASE;.\gameui;.\gameui\vgui;"
+		$AdditionalIncludeDirectories	"$BASE;.\gameui;.\gameui\vgui"
 		$PreprocessorDefinitions		"$BASE;GAMEUI_EMBEDDED;GAMEUI_EXPORTS"
 	}
 }
@@ -47,6 +47,7 @@ $Project
 				$File    "gameui\labeledcommandcombobox.h"
 				$File    "gameui\loadingdialog.h"
 				$File    "gameui\loadingtippanel.h"
+				$File    "gameui\menu_background.h"
 				$File    "gameui\modinfo.h"
 				$File    "gameui\mousemessageforwardingpanel.h"
 				$File    "gameui\multiplayeradvanceddialog.h"
@@ -91,6 +92,7 @@ $Project
 					 "gameui\loadingdialog.cpp" \
 					 "gameui\loadingtippanel.cpp" \
 					 "gameui\logofile.cpp" \
+					 "gameui\menu_background.cpp" \
 					 "gameui\modinfo.cpp" \
 					 "gameui\mousemessageforwardingpanel.cpp" \
 					 "gameui\multiplayeradvanceddialog.cpp" \
@@ -151,6 +153,7 @@ $Project
 					$File    "gameui\mod\vtransitionscreen.h"
 					$File    "gameui\mod\vvideo.h"
 					$File    "gameui\mod\vvoteoptions.h"
+					$File	 "gameui\mod\vgamesettings.h"
 				}
 				$File    "gameui\mod\basemodframe.cpp" \
 						 "gameui\mod\basemodpanel.cpp" \
@@ -177,7 +180,8 @@ $Project
 						 "gameui\mod\vspinnercontrol.cpp" \
 						 "gameui\mod\vtransitionscreen.cpp" \
 						 "gameui\mod\vvideo.cpp" \
-						 "gameui\mod\vvoteoptions.cpp"
+						 "gameui\mod\vvoteoptions.cpp" \
+						 "gameui\mod\vgamesettings.cpp"
 					{
 						$Configuration
 						{

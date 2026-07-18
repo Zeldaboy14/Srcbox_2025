@@ -29,14 +29,14 @@ void CNB_Button::ApplySchemeSettings( vgui::IScheme *pScheme )
 {
 	BaseClass::ApplySchemeSettings( pScheme );
 
-	SetButtonBorderEnabled( false );
+	//SetButtonBorderEnabled( false );
 
 	SetReleasedSound( "UI/menu_accept.wav" );
 }
 
 void CNB_Button::PerformLayout()
 {
-	BaseClass::PerformLayout();
+	//BaseClass::PerformLayout();
 }
 
 void CNB_Button::OnThink()
@@ -49,18 +49,44 @@ void CNB_Button::OnCommand( const char *command )
 	BaseClass::OnCommand( command );
 }
 
+#include "vgui_bitmapbutton.h"
 
 void CNB_Button::Paint()
 {
+	Color col;
+#define BUTTON_ENABLED 0
+#define BUTTON_ENABLED_MOUSE_OVER 1
+#define BUTTON_PRESSED 2
+#define BUTTON_DISABLED 3
+
 	if ( !ShouldPaint() )
 		return; 
 
-	BaseClass::BaseClass::Paint();  // skip drawing regular vgui::Button's focus border
+	BaseClass::Paint();  // skip drawing regular vgui::Button's focus border
+
+	// Determine the image to use based on the state
+	/*int nCurrentImage = BUTTON_ENABLED;
+	if (IsArmed())
+	{
+		if (IsDepressed())
+		{
+			//col.SetColor(190, 121, 6, 255);
+			nCurrentImage = BUTTON_PRESSED;
+		}
+		else
+		{
+			nCurrentImage = BUTTON_ENABLED_MOUSE_OVER;
+		}
+	}
+	else if (!IsEnabled())
+	{
+		nCurrentImage = BUTTON_DISABLED;
+	}
 }
 
 void CNB_Button::DrawRoundedBox( int x, int y, int wide, int tall, Color color, float normalizedAlpha, bool bHighlightGradient, Color highlightCenterColor )
 {
-	if ( m_nNBBgTextureId1 == -1 ||
+	/*if (m_nNBBgTextureId1 == -1 ||
 		m_nNBBgTextureId2 == -1 ||
 		m_nNBBgTextureId3 == -1 ||
 		m_nNBBgTextureId4 == -1 )
@@ -96,27 +122,29 @@ void CNB_Button::DrawRoundedBox( int x, int y, int wide, int tall, Color color, 
 		surface()->DrawSetColor(highlightCenterColor);
 		surface()->DrawFilledRectFade( x + cornerWide, y, x + wide * 0.5f, y + tall, 0, 255, true );
 		surface()->DrawFilledRectFade( x + wide * 0.5f, y, x + wide - cornerWide, y + tall, 255, 0, true );
-	}
+	}*/
 }
 
 void CNB_Button::PaintBackground()
 {
-	// draw gray outline background
+	/*// draw gray outline background
 	DrawRoundedBox( 0, 0, GetWide(), GetTall(), Color( 78, 94, 110, 255 ), 1.0f, false, Color( 0, 0, 0, 0 ) );
 
 	int nBorder = MAX( YRES( 1 ), 1 );
 	if ( IsArmed() || IsDepressed() )
 	{
-		DrawRoundedBox( nBorder, nBorder, GetWide() - nBorder * 2, GetTall() - nBorder * 2, Color( 20, 59, 96, 255 ), 1.0f, true, Color( 28, 80, 130, 255 ) );
+		//DrawRoundedBox( nBorder, nBorder, GetWide() - nBorder * 2, GetTall() - nBorder * 2, Color( 20, 59, 96, 255 ), 1.0f, true, Color( 28, 80, 130, 255 ) );
+		DrawRoundedBox(nBorder, nBorder, GetWide(), GetTall(), Color(210, 135, 0, 255), 1.0f, true, Color(50, 50, 50, 255));
 	}
 	else if ( IsEnabled() )
 	{
-		DrawRoundedBox( nBorder, nBorder, GetWide() - nBorder * 2, GetTall() - nBorder * 2, Color( 24, 43, 66, 255 ), 1.0f, false, Color( 0, 0, 0, 0 ) );
+		//DrawRoundedBox( nBorder, nBorder, GetWide() - nBorder * 2, GetTall() - nBorder * 2, Color( 24, 43, 66, 255 ), 1.0f, false, Color( 0, 0, 0, 0 ) );
+		DrawRoundedBox(nBorder, nBorder, GetWide(), GetTall(), Color(145, 100, 0, 255), 1.0f, false, Color(0, 0, 0, 0));
 	}
 	else
 	{
 		DrawRoundedBox( nBorder, nBorder, GetWide() - nBorder * 2, GetTall() - nBorder * 2, Color( 65, 78, 91, 255 ), 1.0f, false, Color( 0, 0, 0, 0 ) );
-	}
+	}*/
 }
 
 void CNB_Button::OnCursorEntered()

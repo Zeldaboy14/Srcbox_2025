@@ -6,8 +6,8 @@
 
 #include "VInGameKickPlayerList.h"
 #include "VFooterPanel.h"
-#include "EngineInterface.h"
-#include "gameui_util.h"
+#include "../EngineInterface.h"
+#include "../gameui_util.h"
 #include "VHybridButton.h"
 #include "vgui/ILocalize.h"
 #include "game/client/IGameClientExports.h"

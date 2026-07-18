@@ -354,6 +354,46 @@ public:
 
 	bool PrefetchSequence( int iSequence );
 
+#ifdef LUA_SDK
+	void SetMaterialOverride(const char* pMaterialName)
+	{
+		Q_strncpy(m_MaterialOverride.GetForModify(), pMaterialName, MAX_PATH);
+	}
+
+	void GetMaterialOverride(char* pOut, int nLength)
+	{
+		Q_strncpy(pOut, m_MaterialOverride.Get(), nLength);
+	}
+
+	void SetSubMaterialOverride(int iIndex, const char* pMaterialName)
+	{
+		if (iIndex < 0 || iIndex >= MAX_SUB_MATERIAL_OVERRIDES)
+			return;
+
+		// Experiment; TODO: Won't this cause a memory leak?
+		m_SubMaterialOverrides.Set(iIndex, AllocPooledString(pMaterialName));
+	}
+
+	void ClearSubMaterialOverrides()
+	{
+		for (int i = 0; i < MAX_SUB_MATERIAL_OVERRIDES; i++)
+		{
+			m_SubMaterialOverrides.Set(i, NULL_STRING);
+		}
+	}
+
+	void GetSubMaterialOverride(int iIndex, char* pOut, int nLength)
+	{
+		if (iIndex < 0 || iIndex >= MAX_SUB_MATERIAL_OVERRIDES)
+		{
+			pOut[0] = 0;
+			return;
+		}
+
+		Q_strncpy(pOut, STRING(m_SubMaterialOverrides[iIndex]), nLength);
+	}
+#endif
+
 private:
 	void LockStudioHdr();
 	void UnlockStudioHdr();
@@ -441,6 +481,12 @@ protected:
 	CNetworkVar( float, m_fadeMinDist );	// Point at which fading is absolute
 	CNetworkVar( float, m_fadeMaxDist );	// Point at which fading is inactive
 	CNetworkVar( float, m_flFadeScale );	// Scale applied to min / max
+
+#ifdef LUA_SDK
+	// Experiment; Material overrides
+	CNetworkString(m_MaterialOverride, MAX_PATH);
+	CNetworkArray(string_t, m_SubMaterialOverrides, MAX_SUB_MATERIAL_OVERRIDES);
+#endif
 
 public:
 	COutputEvent m_OnIgnite;

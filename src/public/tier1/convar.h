@@ -21,6 +21,7 @@
 #include "tier1/utlvector.h"
 #include "tier1/utlstring.h"
 #include "icvar.h"
+#include "color.h"
 
 #ifdef _WIN32
 #define FORCEINLINE_CVAR FORCEINLINE
@@ -136,7 +137,9 @@ public:
 	// Returns the DLL identifier
 	virtual CVarDLLIdentifier_t	GetDLLIdentifier() const;
 
+#ifndef PLATFORM_64BITS
 protected:
+#endif
 	virtual void				CreateBase( const char *pName, const char *pHelpString = 0, 
 									int flags = 0 );
 
@@ -283,7 +286,9 @@ public:
 	// Invoke the function
 	virtual void Dispatch( const CCommand &command );
 
+#ifndef PLATFORM_64BITS
 private:
+#endif
 	// NOTE: To maintain backward compat, we have to be very careful:
 	// All public virtual methods must appear in the same order always
 	// since engine code will be calling into this code, which *does not match*
@@ -356,6 +361,7 @@ public:
 	// Retrieve value
 	FORCEINLINE_CVAR float			GetFloat( void ) const;
 	FORCEINLINE_CVAR int			GetInt( void ) const;
+	FORCEINLINE_CVAR Color			GetColor( void ) const;
 	FORCEINLINE_CVAR bool			GetBool() const {  return !!GetInt(); }
 	FORCEINLINE_CVAR char const	   *GetString( void ) const;
 
@@ -470,6 +476,15 @@ FORCEINLINE_CVAR int ConVar::GetInt( void ) const
 	return m_pParent->m_nValue;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: Return ConVar value as a color
+// Output : Color
+//-----------------------------------------------------------------------------
+FORCEINLINE_CVAR Color ConVar::GetColor(void) const
+{
+	unsigned char* pColorElement = ((unsigned char*)&m_pParent->m_nValue);
+	return Color(pColorElement[0], pColorElement[1], pColorElement[2], pColorElement[3]);
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: Return ConVar value as a string, return "" for bogus string pointer, etc.

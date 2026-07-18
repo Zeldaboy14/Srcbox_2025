@@ -12,6 +12,8 @@
 
 using namespace vgui;
 
+#ifdef PLATFORM_64BITS
+
 CBackgroundMovie *g_pBackgroundMovie = NULL;
 
 CBackgroundMovie* BackgroundMovie()
@@ -40,6 +42,9 @@ CBackgroundMovie::~CBackgroundMovie()
 
 void CBackgroundMovie::SetCurrentMovie( const char *szFilename )
 {
+	float			m_flU;	// U,V ranges for video on its sheet
+	float			m_flV;
+
 	if ( Q_strcmp( m_szCurrentMovie, szFilename ) )
 	{
 		ClearCurrentMovie();
@@ -48,7 +53,7 @@ void CBackgroundMovie::SetCurrentMovie( const char *szFilename )
 		static int g_nGlobalAVIAllocationCount = 0;
 		Q_snprintf(szMaterialName, sizeof(szMaterialName), "BackgroundAVIMaterial%i", g_nGlobalAVIAllocationCount++);
 
-		m_pMaterial = g_pVideo->CreateVideoMaterial(szMaterialName, szFilename, "GAME", VideoPlaybackFlags::LOOP_VIDEO);
+		m_pMaterial = g_pVideo->CreateVideoMaterial("VideoMaterial", szFilename, "GAME", VideoPlaybackFlags::LOOP_VIDEO);
 
 		if (m_pMaterial)
 		{
@@ -98,14 +103,19 @@ int CBackgroundMovie::SetTextureMaterial()
 
 void CBackgroundMovie::Update()
 {
-	if ( engine->IsConnected() && GameRules() )
+	if (engine->IsConnected() && GameRules())
 	{
 		// Do something based on the gamerules...
 		int nGameState = 1;
 		if ( nGameState != m_nLastGameState )
 		{
+			DevMsg( "Attempting to play widescreen video\n" );
+			m_pMaterial->SetLooping(true);
+
 			//SetCurrentMovie( "media/BGFX_01.bik" );
-			SetCurrentMovie("media/BGFX_01.bik");
+			SetCurrentMovie("media/mainmenu.webm");
+			//engine->ClientCmd("background_video mainmenu.webm");
+			//SetCurrentMovie("media/BGFX_01.bik");
 			m_nLastGameState = nGameState;
 		}
 	}
@@ -116,6 +126,7 @@ void CBackgroundMovie::Update()
 		{
 			//SetCurrentMovie( "media/BG_02.bik" );
 			SetCurrentMovie("media/mainmenu.webm");
+			//engine->ClientCmd("background_video mainmenu.webm");
 			m_nLastGameState = nGameState;
 		}
 		//else if (nGameState == m_nLastGameState)
@@ -125,8 +136,9 @@ void CBackgroundMovie::Update()
 
 	if (m_pMaterial)
 		m_pMaterial->Update();
-	
 }
+
+#endif
 
 // ======================================
 
@@ -299,7 +311,7 @@ void CNB_Header_Footer::SetMovieEnabled( bool bMovieEnabled )
 
 void CNB_Header_Footer::PaintBackground()
 {
-
+#ifdef PLATFORM_32BITS
 	BaseClass::PaintBackground();
 
 
@@ -321,7 +333,7 @@ void CNB_Header_Footer::PaintBackground()
 			h /= BackgroundMovie()->MaxV();
 		}
 	}
-
+#endif
 
 	// test of gradient header/footer
 	/*

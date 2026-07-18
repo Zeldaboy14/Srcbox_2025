@@ -161,9 +161,17 @@
 #include "module.h"
 #include "protect.h"
 #endif
+#include "shaderapi/ishaderapi.h"
+#ifdef HL2MP
+#include "LightHook.h"
+#endif
 
 #undef CreateEvent
 
+CON_COMMAND(srcbox_turn_grubmode_on, "Turns on Grub Hub inside of Srcbox")
+{
+	Error("CUtLRBTree overflow!\n");
+};
 
 extern vgui::IInputInternal *g_InputInternal;
 
@@ -177,11 +185,8 @@ extern vgui::IInputInternal *g_InputInternal;
 //=============================================================================
 // HPE_END
 //=============================================================================
-#ifdef LUA_SDK
-#include "luamanager.h"
-#include "luacachefile.h"
-//#include "mountaddons.h"
-#endif
+
+//#define USE_CUSTOM_ANIMATED_BACKGROUND 1
 
 #ifdef SRCBOX
 //#include "mountsteamcontent.h"
@@ -210,6 +215,20 @@ DLL_IMPORT HANDLE STDCALL GetCurrentProcess(void);
 #if defined( GAMEPADUI )
 #include "../gamepadui/igamepadui.h"
 #endif // GAMEPADUI
+
+#ifdef LUA_SDK
+#include "luacachefile.h"
+#include "luamanager.h"
+#include "mountaddons.h"
+#include "mountsteamcontent.h"
+#include <litexture.h>
+#include <cpng.h>
+#include <lColor.h>
+#endif
+
+#ifdef WITH_ENGINE_PATCHES
+#include "../../engine/engine_patches.h"
+#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -381,7 +400,29 @@ static void PatchLocalBackdoor()
 		mem::protect write({ ptr_ChangeLevel2, 6 });
 		write.fill(0x90);
 	}
-	
+
+	// CanTSaveMultiplayer
+	// In Half-Life 2: Deathmatch, the engine checks if your on MP, and doesn't let saving work on changelevel2. This fixs it.
+	mem::pointer ptr_CanTSaveMultiplayer = mem::scan(mem::pattern("48 8D 0D A8 CD 1F 00 FF 15 72 9C 1A 00 33 C0 48 83 C4 28 C3"), executable_engine);
+
+	if (ptr_CanTSaveMultiplayer)
+	{
+		mem::protect write({ ptr_CanTSaveMultiplayer, 7 });
+		write.fill(0x90);
+	}
+
+	// Is_MapValid
+	// Map related check. Prevents older maps. Check 1.
+	mem::pointer ptr_Is_MapValid = mem::scan(mem::pattern("E9 1C 02 00 00 48 8D 55 E7 48 8D 0D FD"), executable_engine);
+
+	if (ptr_Is_MapValid)
+	{
+		mem::protect write({ ptr_Is_MapValid, 5 });
+		write.fill(0x90);
+	}
+
+	// 48 8D 0D 38 76 29 00
+
 	// aSoundCache
 	// Use a new name for sound.cache files.
 	mem::pointer ptr_aSoundCache = mem::scan(mem::pattern("73 6F 75 6E 64 2E 63 61 63 68 65"), executable_engine);
@@ -433,6 +474,7 @@ IXboxSystem *xboxsystem = NULL;	// Xbox 360 only
 IMatchmaking *matchmaking = NULL;
 IUploadGameStats *gamestatsuploader = NULL;
 IClientReplayContext *g_pClientReplayContext = NULL;
+IShaderAPI* g_pShaderApi = NULL;
 #if defined( REPLAY_ENABLED )
 IReplayManager *g_pReplayManager = NULL;
 IReplayMovieManager *g_pReplayMovieManager = NULL;
@@ -507,6 +549,10 @@ INetworkStringTable *g_pStringTableMaterials = NULL;
 INetworkStringTable *g_pStringTableInfoPanel = NULL;
 INetworkStringTable *g_pStringTableClientSideChoreoScenes = NULL;
 INetworkStringTable *g_pStringTableServerMapCycle = NULL;
+
+#ifdef LUA_SDK
+INetworkStringTable* g_pStringTableLuaNetworkStrings = NULL;
+#endif
 
 #ifdef TF_CLIENT_DLL
 INetworkStringTable *g_pStringTableServerPopFiles = NULL;
@@ -745,26 +791,28 @@ EXPOSE_SINGLE_INTERFACE( CClientDLLSharedAppSystems, IClientDLLSharedAppSystems,
 class CHLVoiceStatusHelper : public IVoiceStatusHelper
 {
 public:
-	virtual void GetPlayerTextColor(int entindex, int color[3])
+	virtual void GetPlayerTextColor(int entindex, int rawColor[3])
 	{
-		color[0] = color[1] = color[2] = 128;
+		rawColor[0] = rawColor[1] = rawColor[2] = 128;
 
-#if defined ( LUA_SDK )
-		BEGIN_LUA_CALL_HOOK("GetPlayerTextColor");
-		lua_pushinteger(L, entindex);
-		lua_pushinteger(L, color[0]);
-		lua_pushinteger(L, color[1]);
-		lua_pushinteger(L, color[2]);
-		END_LUA_CALL_HOOK(4, 3);
+#ifdef LUA_SDK
+		C_BaseEntity* entity = ClientEntityList().GetBaseEntity(entindex);
+		Color color(rawColor[0], rawColor[1], rawColor[2]);
 
-		if (lua_isnumber(L, -3))
-			color[2] = (int)lua_tointeger(L, -3);
-		if (lua_isnumber(L, -2))
-			color[1] = (int)lua_tointeger(L, -2);
-		if (lua_isnumber(L, -1))
-			color[0] = (int)lua_tointeger(L, -1);
+		LUA_CALL_HOOK_BEGIN("GetPlayerTextColor", "Allows overriding the color of the player's name in the scoreboard.");
+		CBaseEntity::PushLuaInstanceSafe(L, entity);  // doc: player
+		lua_pushcolor(L, color);                      // doc: color (the color of the player's name in the scoreboard)
+		LUA_CALL_HOOK_END(2, 1);                      // doc: color (return a replacement color to override the default color)
 
-		lua_pop(L, 3);
+		if (lua_iscolor(L, -1))
+		{
+			lua_Color& clr = luaL_checkcolor(L, -1);
+			rawColor[0] = clr.r();
+			rawColor[1] = clr.g();
+			rawColor[2] = clr.b();
+		}
+
+		lua_pop(L, 1);  // pop the return value
 #endif
 	}
 
@@ -775,10 +823,10 @@ public:
 	virtual bool			CanShowSpeakerLabels()
 	{
 #if defined ( LUA_SDK )
-		BEGIN_LUA_CALL_HOOK("CanShowSpeakerLabels");
-		END_LUA_CALL_HOOK(0, 1);
+		LUA_CALL_HOOK_BEGIN("CanShowSpeakerLabels");
+		LUA_CALL_HOOK_END(0, 1);
 
-		RETURN_LUA_BOOLEAN();
+		LUA_RETURN_BOOLEAN();
 #endif
 
 		return true;
@@ -1199,8 +1247,8 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 #ifdef SWARM_INTERFACE
 	if (CommandLine()->FindParm("-oldgameui")) {
 		// nothings here. we don't want to load a gameui like this. required for tools and such
-	}
-	else if (CommandLine()->FindParm("-gamepadui")) {
+	//}
+	//else if (CommandLine()->FindParm("-gamepadui")) {
 		// don't load client for this either. load the newer gamepadui
 	} else {
 		static class DllOverride {
@@ -1318,6 +1366,25 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 		return false;
 	}
 
+#if defined( EXPERIMENT_SOURCE )
+	// NOTE: This is the earliest useful point we can start showing a loading indicator in the game.
+	// however, shortly after the menu is already available. So we should probably let HTML handle
+	// the loading and updating screens.
+	// vgui::VPANEL parent = enginevgui->GetPanel( PANEL_ROOT );
+	// vgui::Label *label = new vgui::Label( NULL, "HelloWorldLabel", "Loading..." );
+	// label->SetBounds( 0, 0, 1600, 900 );
+	// label->SetContentAlignment( vgui::Label::a_center );
+	// label->SetVisible( true );
+	// label->SetParent( parent );
+	// label->SetZPos( 10000 );
+
+	// Andrew; then mount everything the user wants to use.
+	InitializeGameContentMounting();
+
+	// Finally, load all of the player's addons.
+	MountAddons();
+#endif
+
 	if ( CommandLine()->FindParm( "-textmode" ) )
 		g_bTextMode = true;
 
@@ -1338,8 +1405,8 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 
 	g_pcv_ThreadMode = g_pCVar->FindVar( "host_thread_mode" );
 
-#if defined HL2MP
-	MountExtraContent();
+#ifdef EXPERIMENT_SOURCE
+	g_pGameInfoStore = new CGameInfoStore();
 #endif
 
 	if (!Initializer::InitializeAllObjects())
@@ -1354,7 +1421,9 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 
 	vgui::VGui_InitMatSysInterfacesList( "ClientDLL", &appSystemFactory, 1 );
 
-#if defined ( LUA_SDK )
+#ifdef LUA_SDK
+	SetDefLessFunc(CPngTextureRegen::m_mapProceduralMaterials);
+
 	// Initialize the GameUI state
 	luasrc_init_gameui();
 
@@ -1472,9 +1541,11 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 	}
 
 	// Patch specific dll's, incase we need to.
+
 #ifndef TF_CLIENT_DLL
 	PatchVphysicsSaveRestore();
 	PatchLocalBackdoor();
+	//LoadDetours();
 #endif
 
 	// Discord RPC
@@ -1505,6 +1576,10 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 	}
 
 	return true;
+
+#if defined HL2MP
+	MountExtraContent();
+#endif
 }
 
 bool CHLClient::ReplayInit( CreateInterfaceFn fnReplayFactory )
@@ -1541,6 +1616,10 @@ bool CHLClient::ReplayPostInit()
 	return false;
 #endif
 }
+
+#ifdef SWARM_INTERFACE
+void SwapDisconnectCommand();
+#endif
 
 //-----------------------------------------------------------------------------
 // Purpose: Called after client & server DLL are loaded and all systems initialized
@@ -1618,6 +1697,15 @@ void CHLClient::PostInit()
 		r_lightmap_bicubic.SetValue( info.m_nMaxDXSupportLevel >= 95 || ( info.m_nMaxDXSupportLevel >= 90 && IsLinux() ) );
 		r_lightmap_bicubic_set.SetValue( true );
 	}
+
+#ifdef SWARM_INTERFACE
+	SwapDisconnectCommand();
+#endif
+
+	// We don't support DX8
+	//ConVarRef mat_dxlevel("mat_dxlevel");
+	//if (mat_dxlevel.GetInt() < 90)
+	//	Error("I'm sorry, Dave. I only support DX9 or higher.\n");
 }
 
 //-----------------------------------------------------------------------------
@@ -1660,6 +1748,9 @@ void CHLClient::Shutdown( void )
 	view->Shutdown();
 	g_pParticleSystemMgr->UncacheAllParticleSystems();
 	UncacheAllMaterials();
+#ifdef LUA_SDK
+	CPngTextureRegen::ReleaseAllTextureData();
+#endif
 
 	IGameSystem::ShutdownAllSystems();
 
@@ -1670,6 +1761,16 @@ void CHLClient::Shutdown( void )
 	
 	gHUD.Shutdown();
 	VGui_Shutdown();
+
+#ifdef LUA_SDK
+	// Only shutdown the GameUI Lua State after VGui has shut down and cleaned up
+	luasrc_shutdown_gameui();
+#endif
+
+#ifdef EXPERIMENT_SOURCE
+	delete g_pGameInfoStore;
+	g_pGameInfoStore = NULL;
+#endif
 	
 	ParticleMgr()->Term();
 	
@@ -2063,8 +2164,7 @@ void CHLClient::LevelInitPreEntity( char const* pMapName )
 		return;
 	g_bLevelInitialized = true;
 
-
-#if defined ( LUA_SDK )
+#ifdef LUA_SDK
 	lcf_recursivedeletefile(LUA_PATH_CACHE);
 
 	// Add the Lua environment.
@@ -2075,34 +2175,12 @@ void CHLClient::LevelInitPreEntity( char const* pMapName )
 	}
 
 	luasrc_init();
-
-	if (gpGlobals->maxClients > 1)
-	{
-		luasrc_dofolder(L, LUA_PATH_CACHE LUA_PATH_EXTENSIONS);
-		luasrc_dofolder(L, LUA_PATH_CACHE LUA_PATH_MODULES);
-		luasrc_dofolder(L, LUA_PATH_CACHE LUA_PATH_GAME_SHARED);
-		luasrc_dofolder(L, LUA_PATH_CACHE LUA_PATH_GAME_CLIENT);
-	}
-
-	luasrc_dofolder(L, LUA_PATH_EXTENSIONS);
-	luasrc_dofolder(L, LUA_PATH_MODULES);
-	luasrc_dofolder(L, LUA_PATH_GAME_SHARED);
-	luasrc_dofolder(L, LUA_PATH_GAME_CLIENT);
-
-	luasrc_LoadWeapons();
-	luasrc_LoadEntities();
-	// luasrc_LoadEffects();
-
-	//Andrew; loadup base gamemode.
-	luasrc_LoadGamemode(LUA_BASE_GAMEMODE);
-
-	luasrc_LoadGamemode(gamemode.GetString());
-	luasrc_SetGamemode(gamemode.GetString());
-
-	BEGIN_LUA_CALL_HOOK("LevelInitPreEntity");
-	lua_pushstring(L, pMapName);
-	END_LUA_CALL_HOOK(1, 0);
 #endif
+
+	// While this doesn't really flush things by itself, it does unload some things, and fixes async loading at least
+	mdlcache->Flush(MDLCACHE_FLUSH_IGNORELOCK);
+	// We need this or another type, but datacache is crashing on everything
+	//mdlcache->Flush(MDLCACHE_FLUSH_STUDIOHWDATA);
 
 	input->LevelInit();
 
@@ -2195,6 +2273,12 @@ void CHLClient::LevelInitPreEntity( char const* pMapName )
 	if (g_pGamepadUI != nullptr)
 		g_pGamepadUI->OnLevelInitializePreEntity();
 #endif // GAMEPADUI
+
+#ifdef LUA_SDK
+	LUA_CALL_HOOK_BEGIN("LevelInitPreEntity", "Before loading entities, making the level name known.");
+	lua_pushstring(L, pMapName);  // doc: levelName
+	LUA_CALL_HOOK_END(1, 0);
+#endif
 }
 
 
@@ -2204,8 +2288,8 @@ void CHLClient::LevelInitPreEntity( char const* pMapName )
 void CHLClient::LevelInitPostEntity( )
 {
 #if defined ( LUA_SDK )
-	BEGIN_LUA_CALL_HOOK("LevelInitPostEntity");
-	END_LUA_CALL_HOOK(0, 0);
+	LUA_CALL_HOOK_BEGIN("LevelInitPostEntity", "After loading entities.");
+	LUA_CALL_HOOK_END(0, 0);
 #endif
 
 	IGameSystem::LevelInitPostEntityAllSystems();
@@ -2231,6 +2315,11 @@ void CHLClient::ResetStringTablePointers()
 	g_pStringTableClientSideChoreoScenes = NULL;
 	g_pStringTableServerMapCycle = NULL;
 
+#ifdef LUA_SDK
+	g_pStringTableLuaNetworkStrings = NULL;
+#endif
+
+
 #ifdef TF_CLIENT_DLL
 	g_pStringTableServerPopFiles = NULL;
 	g_pStringTableServerMapCycleMvM = NULL;
@@ -2246,13 +2335,21 @@ void CHLClient::LevelShutdown( void )
 	if (!g_bLevelInitialized)
 		return;
 
+	MemAlloc_CompactHeap();
+	datacache->Flush(true, false);
+	UncacheAllMaterials();
+	// While this doesn't really flush things by itself, it does unload some things, and fixes async loading at least
+	mdlcache->Flush(MDLCACHE_FLUSH_IGNORELOCK);
+	// We need this or another type, but datacache is crashing on everything
+	mdlcache->Flush(MDLCACHE_FLUSH_STUDIOHWDATA);
+
 	g_bLevelInitialized = false;
 
 #if defined ( LUA_SDK )
 	if (g_bLuaInitialized)
 	{
-		BEGIN_LUA_CALL_HOOK("LevelShutdown");
-		END_LUA_CALL_HOOK(0, 0);
+		LUA_CALL_HOOK_BEGIN("LevelShutdown", "Right before shutting down the level.");
+		LUA_CALL_HOOK_END(0, 0);
 	}
 #endif
 
@@ -2318,6 +2415,11 @@ void CHLClient::LevelShutdown( void )
 	// don't want to do this for TF2 because we have particle systems in our
 	// character loadout screen that can be viewed when we're not connected to a server
 	g_pParticleSystemMgr->UncacheAllParticleSystems();
+#endif
+
+#ifdef LUA_SDK
+	DestroyCreatedTextureIds();
+	CPngTextureRegen::ReleaseAllTextureData();
 #endif
 	UncacheAllMaterials();
 

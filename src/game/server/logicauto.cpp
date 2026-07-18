@@ -49,6 +49,7 @@ private:
 };
 
 LINK_ENTITY_TO_CLASS(logic_auto, CLogicAuto);
+//LINK_ENTITY_TO_CLASS(trigger_auto, CLogicAuto);
 
 
 BEGIN_DATADESC( CLogicAuto )

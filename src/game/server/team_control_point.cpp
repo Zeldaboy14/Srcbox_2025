@@ -22,6 +22,7 @@
 
 #define CONTROL_POINT_UNLOCK_THINK			"UnlockThink"
 
+
 BEGIN_DATADESC(CTeamControlPoint)
 	DEFINE_KEYFIELD( m_iszPrintName,			FIELD_STRING,	"point_printname" ),
 	DEFINE_KEYFIELD( m_iCPGroup,				FIELD_INTEGER,	"point_group" ),
@@ -336,6 +337,11 @@ void CTeamControlPoint::InputSetOwner( inputdata_t &input )
 
 	Assert( iCapTeam >= 0 && iCapTeam < GetNumberOfTeams() );
 
+	Assert( input.pCaller );
+
+	if ( !input.pCaller )
+		return;
+
 	if ( GetOwner() == iCapTeam )
 		return;
 
@@ -344,7 +350,7 @@ void CTeamControlPoint::InputSetOwner( inputdata_t &input )
 		// must be done before setting the owner
 		HandleScoring( iCapTeam );
 
-		if ( input.pCaller && input.pCaller->IsPlayer() )
+		if ( input.pCaller->IsPlayer() )
 		{
 			int iCappingPlayer = input.pCaller->entindex();
 			InternalSetOwner( iCapTeam, true, 1, &iCappingPlayer );

@@ -2920,72 +2920,10 @@ void CAI_ChangeHintGroup::InputActivate( inputdata_t &inputdata )
 #define SF_CAMERA_PLAYER_SNAP_TO		16
 #define SF_CAMERA_PLAYER_NOT_SOLID		32
 #define SF_CAMERA_PLAYER_INTERRUPT		64
-
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-class CTriggerCamera : public CBaseEntity
-{
-public:
-	DECLARE_CLASS( CTriggerCamera, CBaseEntity );
-
-	void Spawn( void );
-	bool KeyValue( const char *szKeyName, const char *szValue );
-	void Enable( void );
-	void Disable( void );
-	void Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
-	void FollowTarget( void );
-	void Move(void);
-
-	// Always transmit to clients so they know where to move the view to
-	virtual int UpdateTransmitState();
-	
-	DECLARE_DATADESC();
-
-	// Input handlers
-	void InputEnable( inputdata_t &inputdata );
-	void InputDisable( inputdata_t &inputdata );
-
-private:
-	EHANDLE m_hPlayer;
-	EHANDLE m_hTarget;
-
-	// used for moving the camera along a path (rail rides)
-	CBaseEntity *m_pPath;
-	string_t m_sPath;
-	float m_flWait;
-	float m_flReturnTime;
-	float m_flStopTime;
-	float m_moveDistance;
-	float m_targetSpeed;
-	float m_initialSpeed;
-	float m_acceleration;
-	float m_deceleration;
-	int	  m_state;
-	Vector m_vecMoveDir;
-
-
-	string_t m_iszTargetAttachment;
-	int	  m_iAttachmentIndex;
-	bool  m_bSnapToGoal;
-
-#if HL2_EPISODIC
-	bool  m_bInterpolatePosition;
-
-	// these are interpolation vars used for interpolating the camera over time
-	Vector m_vStartPos, m_vEndPos;
-	float m_flInterpStartTime;
-
-	const static float kflPosInterpTime; // seconds
+#ifdef MAPBASE
+#define SF_CAMERA_PLAYER_SETFOV			128
+#define SF_CAMERA_PLAYER_NEW_BEHAVIOR			256 // In case anyone or anything relied on the broken features
 #endif
-
-	int   m_nPlayerButtons;
-	int m_nOldTakeDamage;
-
-private:
-	COutputEvent m_OnEndFollow;
-};
 
 #if HL2_EPISODIC
 const float CTriggerCamera::kflPosInterpTime = 2.0f;
@@ -3021,15 +2959,57 @@ BEGIN_DATADESC( CTriggerCamera )
 	DEFINE_FIELD( m_nPlayerButtons, FIELD_INTEGER ),
 	DEFINE_FIELD( m_nOldTakeDamage, FIELD_INTEGER ),
 
+	DEFINE_KEYFIELD( m_fov, FIELD_FLOAT, "fov" ),
+	DEFINE_KEYFIELD( m_fovSpeed, FIELD_FLOAT, "fov_rate" ),
+	DEFINE_KEYFIELD( m_flTrackSpeed, FIELD_FLOAT, "trackspeed" ),
+
+	DEFINE_KEYFIELD( m_bDontSetPlayerView, FIELD_BOOLEAN, "DontSetPlayerView" ),
+
 	// Inputs
 	DEFINE_INPUTFUNC( FIELD_VOID, "Enable", InputEnable ),
 	DEFINE_INPUTFUNC( FIELD_VOID, "Disable", InputDisable ),
+	DEFINE_INPUTFUNC( FIELD_FLOAT, "SetFOV", InputSetFOV ),
+	DEFINE_INPUTFUNC( FIELD_FLOAT, "SetFOVRate", InputSetFOVRate ),
+
+	//DEFINE_INPUTFUNC( FIELD_STRING, "SetTarget", InputSetTarget ), // Defined by base class
+	DEFINE_INPUTFUNC( FIELD_STRING, "SetTargetAttachment", InputSetTargetAttachment ),
+	DEFINE_INPUTFUNC( FIELD_FLOAT, "SetTrackSpeed", InputSetTrackSpeed ),
 
 	// Function Pointers
 	DEFINE_FUNCTION( FollowTarget ),
 	DEFINE_OUTPUT( m_OnEndFollow, "OnEndFollow" ),
-
 END_DATADESC()
+
+// VScript: publish class and select members to script language
+/*BEGIN_ENT_SCRIPTDESC(CTriggerCamera, CBaseEntity, "Server-side camera entity")
+	DEFINE_SCRIPTFUNC_NAMED( ScriptGetFov, "GetFov", "get camera's current fov setting as integer"  )
+	DEFINE_SCRIPTFUNC_NAMED( ScriptSetFov, "SetFov", "set camera's current fov in integer degrees and fov change rate as float"  )
+END_SCRIPTDESC();*/
+
+#ifdef MAPBASE
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+CTriggerCamera::CTriggerCamera()
+{
+	m_fov = 90;
+	m_fovSpeed = 1;
+	m_flTrackSpeed = 40.0f;
+}
+
+//------------------------------------------------------------------------------
+// Cleanup
+//------------------------------------------------------------------------------
+void CTriggerCamera::UpdateOnRemove()
+{
+	if (m_state == USE_ON && HasSpawnFlags(SF_CAMERA_PLAYER_NEW_BEHAVIOR))
+	{
+		Disable();
+	}
+
+	BaseClass::UpdateOnRemove();
+}
+#endif
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -3115,6 +3095,84 @@ void CTriggerCamera::InputDisable( inputdata_t &inputdata )
 	Disable();
 }
 
+#ifdef MAPBASE
+//------------------------------------------------------------------------------
+// Purpose: Input handler to set FOV.
+//------------------------------------------------------------------------------
+void CTriggerCamera::InputSetFOV(inputdata_t& inputdata)
+{
+	m_fov = inputdata.value.Float();
+
+	if (m_state == USE_ON && m_hPlayer)
+	{
+		((CBasePlayer*)m_hPlayer.Get())->SetFOV(this, m_fov, m_fovSpeed);
+	}
+}
+
+//------------------------------------------------------------------------------
+// Purpose: Input handler to set FOV rate.
+//------------------------------------------------------------------------------
+void CTriggerCamera::InputSetFOVRate(inputdata_t& inputdata)
+{
+	m_fovSpeed = inputdata.value.Float();
+}
+
+//------------------------------------------------------------------------------
+// Purpose: 
+//------------------------------------------------------------------------------
+void CTriggerCamera::InputSetTarget(inputdata_t& inputdata)
+{
+	//BaseClass::InputSetTarget(inputdata);
+
+	if (FStrEq(STRING(m_target), "!player"))
+	{
+		AddSpawnFlags(SF_CAMERA_PLAYER_TARGET);
+		m_hTarget = m_hPlayer;
+	}
+	else
+	{
+		RemoveSpawnFlags(SF_CAMERA_PLAYER_TARGET);
+		m_hTarget = GetNextTarget();
+	}
+}
+
+//------------------------------------------------------------------------------
+// Purpose: 
+//------------------------------------------------------------------------------
+void CTriggerCamera::InputSetTargetAttachment(inputdata_t& inputdata)
+{
+	m_iszTargetAttachment = inputdata.value.StringID();
+	m_iAttachmentIndex = 0;
+
+	if (m_hTarget)
+	{
+		if (m_iszTargetAttachment != NULL_STRING)
+		{
+			if (!m_hTarget->GetBaseAnimating())
+			{
+				Warning("%s tried to target an attachment (%s) on target %s, which has no model.\n", GetClassname(), STRING(m_iszTargetAttachment), STRING(m_hTarget->GetEntityName()));
+			}
+			else
+			{
+				m_iAttachmentIndex = m_hTarget->GetBaseAnimating()->LookupAttachment(STRING(m_iszTargetAttachment));
+				if (m_iAttachmentIndex <= 0)
+				{
+					Warning("%s could not find attachment %s on target %s.\n", GetClassname(), STRING(m_iszTargetAttachment), STRING(m_hTarget->GetEntityName()));
+				}
+			}
+		}
+	}
+}
+
+//------------------------------------------------------------------------------
+// Purpose: 
+//------------------------------------------------------------------------------
+void CTriggerCamera::InputSetTrackSpeed(inputdata_t& inputdata)
+{
+	m_flTrackSpeed = inputdata.value.Float();
+}
+#endif
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -3190,6 +3248,20 @@ void CTriggerCamera::Enable( void )
 	{
 		m_bSnapToGoal = true;
 	}
+
+#ifdef MAPBASE
+	if (HasSpawnFlags(SF_CAMERA_PLAYER_SETFOV))
+	{
+		if (pPlayer)
+		{
+			if (pPlayer->GetFOVOwner() && (/*FClassnameIs( pPlayer->GetFOVOwner(), "point_viewcontrol_multiplayer" ) ||*/ FClassnameIs(pPlayer->GetFOVOwner(), "point_viewcontrol")))
+			{
+				pPlayer->ClearZoomOwner();
+			}
+			pPlayer->SetFOV(this, m_fov, m_fovSpeed);
+		}
+	}
+#endif
 
 	if ( HasSpawnFlags(SF_CAMERA_PLAYER_TARGET ) )
 	{
@@ -3272,13 +3344,17 @@ void CTriggerCamera::Enable( void )
 		SetAbsVelocity( vec3_origin );
 	}
 
-
-	pPlayer->SetViewEntity( this );
-
-	// Hide the player's viewmodel
-	if ( pPlayer->GetActiveWeapon() )
+#ifdef MAPBASE
+	if (!m_bDontSetPlayerView)
+#endif
 	{
-		pPlayer->GetActiveWeapon()->AddEffects( EF_NODRAW );
+		pPlayer->SetViewEntity(this);
+
+		// Hide the player's viewmodel
+		if (pPlayer->GetActiveWeapon())
+		{
+			pPlayer->GetActiveWeapon()->AddEffects(EF_NODRAW);
+		}
 	}
 
 	// Only track if we have a target
@@ -3288,6 +3364,18 @@ void CTriggerCamera::Enable( void )
 		SetThink( &CTriggerCamera::FollowTarget );
 		SetNextThink( gpGlobals->curtime );
 	}
+#ifdef MAPBASE
+	else if (m_pPath && HasSpawnFlags(SF_CAMERA_PLAYER_NEW_BEHAVIOR))
+	{
+		// Move if we have a path
+		SetThink(&CTriggerCamera::MoveThink);
+		SetNextThink(gpGlobals->curtime);
+	}
+#endif
+
+#ifdef MAPBASE
+	m_OnStartFollow.FireOutput(pPlayer, this);
+#endif
 
 	m_moveDistance = 0;
 	Move();
@@ -3300,6 +3388,39 @@ void CTriggerCamera::Enable( void )
 //-----------------------------------------------------------------------------
 void CTriggerCamera::Disable( void )
 {
+#ifdef MAPBASE
+	if ( m_hPlayer )
+	{
+		CBasePlayer *pBasePlayer = (CBasePlayer*)m_hPlayer.Get();
+
+		if ( pBasePlayer->IsAlive() )
+		{
+			if ( HasSpawnFlags( SF_CAMERA_PLAYER_NOT_SOLID ) )
+			{
+				pBasePlayer->RemoveSolidFlags( FSOLID_NOT_SOLID );
+			}
+
+			if ( HasSpawnFlags( SF_CAMERA_PLAYER_TAKECONTROL ) )
+			{
+				pBasePlayer->EnableControl( TRUE );
+			}
+
+			if (!m_bDontSetPlayerView)
+			{
+				pBasePlayer->SetViewEntity( NULL );
+				pBasePlayer->m_Local.m_bDrawViewmodel = true;
+			}
+		}
+
+		if ( HasSpawnFlags( SF_CAMERA_PLAYER_SETFOV ) )
+		{
+			pBasePlayer->SetFOV( this, 0, m_fovSpeed );
+		}
+
+		//return the player to previous takedamage state
+		m_hPlayer->m_takedamage = m_nOldTakeDamage;
+	}
+#else
 	if ( m_hPlayer && m_hPlayer->IsAlive() )
 	{
 		if ( HasSpawnFlags( SF_CAMERA_PLAYER_NOT_SOLID ) )
@@ -3318,6 +3439,7 @@ void CTriggerCamera::Disable( void )
 		//return the player to previous takedamage state
 		m_hPlayer->m_takedamage = m_nOldTakeDamage;
 	}
+#endif
 
 	m_state = USE_OFF;
 	m_flReturnTime = gpGlobals->curtime;
@@ -3422,7 +3544,11 @@ void CTriggerCamera::FollowTarget( )
 			dy = dy - 360;
 
 		QAngle vecAngVel;
+#ifdef MAPBASE
+		vecAngVel.Init( dx * m_flTrackSpeed * gpGlobals->frametime, dy * m_flTrackSpeed * gpGlobals->frametime, GetLocalAngularVelocity().z );
+#else
 		vecAngVel.Init( dx * 40 * gpGlobals->frametime, dy * 40 * gpGlobals->frametime, GetLocalAngularVelocity().z );
+#endif
 		SetLocalAngularVelocity(vecAngVel);
 	}
 
@@ -3439,6 +3565,75 @@ void CTriggerCamera::FollowTarget( )
 
 	Move();
 }
+
+void CTriggerCamera::StartCameraShot(const char* pszShotType, CBaseEntity* pSceneEntity, CBaseEntity* pActor1, CBaseEntity* pActor2, float duration)
+{
+	// called from SceneEntity in response to a CChoreoEvent::CAMERA sent from a VCD.
+	// talk to vscript, start a camera move
+
+	HSCRIPT hStartCameraShot = NULL;
+
+	// switch to this camera
+	// Enable();
+
+	// get script module associated with this ent, lookup function in module
+	if (m_iszVScripts != NULL_STRING)
+	{
+		hStartCameraShot = m_ScriptScope.LookupFunction("ScriptStartCameraShot");
+	}
+
+	// call the script function to begin the camera move
+	if (hStartCameraShot)
+	{
+		g_pScriptVM->Call(hStartCameraShot, m_ScriptScope, true, NULL, pszShotType, ToHScript(pSceneEntity), ToHScript(pActor1), ToHScript(pActor2), duration);
+		g_pScriptVM->ReleaseFunction(hStartCameraShot);
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: vscript callback to get the player's fov
+//-----------------------------------------------------------------------------
+int CTriggerCamera::ScriptGetFov(void)
+{
+	if (m_hPlayer)
+	{
+		CBasePlayer* pBasePlayer = (CBasePlayer*)m_hPlayer.Get();
+		int iFOV = pBasePlayer->GetFOV();
+		return iFOV;
+	}
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: vscript callback to slam the player's fov
+//-----------------------------------------------------------------------------
+void CTriggerCamera::ScriptSetFov(int iFOV, float fovSpeed)
+{
+#ifdef MAPBASE
+	m_fov = iFOV;
+	m_fovSpeed = fovSpeed;
+
+	if (m_state == USE_ON && m_hPlayer)
+	{
+#else
+		if (m_hPlayer)
+		{
+			m_fov = iFOV;
+			m_fovSpeed = fovSpeed;
+#endif
+
+			CBasePlayer* pBasePlayer = (CBasePlayer*)m_hPlayer.Get();
+			pBasePlayer->SetFOV(this, iFOV, fovSpeed);
+		}
+	}
+
+#ifdef MAPBASE
+void CTriggerCamera::MoveThink()
+{
+	Move();
+	SetNextThink(gpGlobals->curtime);
+}
+#endif
 
 void CTriggerCamera::Move()
 {

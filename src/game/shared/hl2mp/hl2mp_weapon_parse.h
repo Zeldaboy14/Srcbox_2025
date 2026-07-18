@@ -25,6 +25,8 @@ public:
 	
 	virtual void Parse( ::KeyValues *pKeyValuesData, const char *szWeaponName );
 
+	const char* GetViewModelAddonName(const char* character, bool dualWielding);
+	const char* GetViewModelName(const char* character, bool dualWielding);
 
 public:
 

@@ -43,6 +43,21 @@ class IEntityFactory;
 	#define SETUP_EXTERNC(mapClassName)
 #endif
 
+#ifdef LUA_SDK
+// Experiment; TODO: This feels hacky, but we want some sort of way to know if ScriptedWeapons/Entities are to be got from Lua.
+// This is set just before we create a weapon or entity
+const char *g_szLuaExpectedScriptedLibrary = nullptr;
+
+// Macro to ensure we're in the right library when we're creating a scripted entity.
+#define LUA_EXPECTED_SCRIPTED_LIBRARY_BEGIN( libname )                                                                  \
+    AssertMsg( g_szLuaExpectedScriptedLibrary == nullptr, "LUA_EXPECTED_SCRIPTED_LIBRARY_END call missing somewhere" ); \
+    g_szLuaExpectedScriptedLibrary = libname;
+
+#define LUA_EXPECTED_SCRIPTED_LIBRARY_END( libname )                                                                                     \
+    AssertMsg( Q_strcmp( g_szLuaExpectedScriptedLibrary, libname ) == 0, "LUA_EXPECTED_SCRIPTED_LIBRARY_BEGIN call missing somewhere" ); \
+    g_szLuaExpectedScriptedLibrary = nullptr;
+#endif
+
 //
 // How did I ever live without ASSERT?
 //

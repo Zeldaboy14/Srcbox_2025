@@ -64,21 +64,25 @@ vgui::VPANEL VGui_GetClientDLLRootPanel( void )
 }
 
 #ifdef LUA_SDK
-vgui::Panel* VGui_GetGameUIPanel(void)
-{
-	return g_pScriptedBaseGameUIPanel;
-}
+//vgui::Panel *VGui_GetGameUIPanel( void )
+//{
+//    return g_pScriptedBaseGameUIPanel;
+//}
 
 //-----------------------------------------------------------------------------
 // Purpose: Game specific root panel
 // Output : vgui::Panel
 //-----------------------------------------------------------------------------
-vgui::Panel* VGui_GetClientLuaRootPanel(void)
+CScriptedClientLuaPanel* VGui_GetClientLuaRootPanel(void)
 {
-	ClientModeShared* mode = (ClientModeShared*)GetClientModeNormal();
-	vgui::Panel* pRoot = mode->m_pClientLuaPanel;
-	return pRoot;
+	return g_pClientLuaPanel;
 }
+
+CScriptedClientLuaPanel* VGui_GetClientLuaRootPanelHUD(void)
+{
+	return g_pClientLuaPanelHUD;
+}
+//#endif
 
 //-----------------------------------------------------------------------------
 // C_ScriptedBaseGameUIPanel implementation.
@@ -147,4 +151,5 @@ void C_ScriptedBaseGameUIPanel::LevelInit(void)
 void C_ScriptedBaseGameUIPanel::LevelShutdown(void)
 {
 }
+
 #endif

@@ -22,8 +22,14 @@ ARGG is used by Half-Life 2: Sandbox to implement rotational functionality for t
 **Half-Life 2: Sandbox**  
 https://github.com/Planimeter/hl2sb-src
 
-Some code for Srcbox (lua, physgun implantetion) have been ported and updated for the modern SDK, from the most recent branch, and the original 2007 code.
-The lua dll that is compatible with this mod can be found here (x64) https://sourceforge.net/projects/luabinaries/files/5.1.5/Windows%20Libraries/Dynamic/ (lua-5.1.5_Win64_dll17_lib.zip)
+The Physgun implentation found in HL2SB is closer to Gmod 10's, rather then the stock Physgun in the SDK. HL2SB is also the base for Experiment (see next entry)
+
+<img width="1993" height="485" alt="logo" src="https://github.com/user-attachments/assets/3fb803fc-202e-44c1-869c-c59ad11c39d4" />
+
+**Experiment**  
+https://github.com/experiment-games/experiment-source/
+
+LUA compatibility taken directly from Experiment. Heavy WIP in supporting Garry's Mod addons, but in a state that is still useable, compared to HL2SB's LUA code, which had none
 
 <img src="https://github.com/user-attachments/assets/baa74c07-c669-4d25-82f0-01201567808e" alt="800" width="400">
 

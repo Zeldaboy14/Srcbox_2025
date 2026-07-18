@@ -24,6 +24,8 @@
 #include "icvar.h"
 #include "tier2/tier2.h"
 
+#include "gameui/gameui_interface.h"
+extern CGameUI& GameUI();
 
 // engine interface singleton accessors
 extern IVEngineClient *engine;

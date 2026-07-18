@@ -368,7 +368,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 #endif
 	}
 #endif
-//#ifdef LUA_SDK
+#ifdef LUA_SDK
 	//=========================================================
 	//=========================================================
 	void CMultiplayRules::Think(void)
@@ -411,6 +411,51 @@ ConVarRef suitcharger( "sk_suitcharger" );
 		}
 #endif
 	}
+#endif
+	//=========================================================
+	//=========================================================
+#if !defined ( LUA_SDK )
+	void CMultiplayRules::Think(void)
+	{
+#ifndef CLIENT_DLL
+		BaseClass::Think();
+
+		///// Check game rules /////
+
+		if (g_fGameOver)   // someone else quit the game already
+		{
+			// Tony; wait for intermission to end
+			if (m_flIntermissionEndTime && (m_flIntermissionEndTime < gpGlobals->curtime))
+				ChangeLevel(); // intermission is over
+			return;
+		}
+
+		float flTimeLimit = mp_timelimit.GetFloat() * 60;
+		float flFragLimit = fraglimit.GetFloat();
+
+		if (flTimeLimit != 0 && gpGlobals->curtime >= flTimeLimit)
+		{
+			GoToIntermission();
+			return;
+		}
+
+		if (flFragLimit)
+		{
+			// check if any player is over the frag limit
+			for (int i = 1; i <= gpGlobals->maxClients; i++)
+			{
+				CBasePlayer* pPlayer = UTIL_PlayerByIndex(i);
+
+				if (pPlayer && pPlayer->FragCount() >= flFragLimit)
+				{
+					GoToIntermission();
+					return;
+				}
+			}
+		}
+#endif
+	}
+#endif
 #ifndef CLIENT_DLL
 
 	//=========================================================
@@ -759,7 +804,8 @@ ConVarRef suitcharger( "sk_suitcharger" );
 	CBasePlayer *CMultiplayRules::GetDeathScorer( CBaseEntity *pKiller, CBaseEntity *pInflictor, CBaseEntity *pVictim )
 	{
 		// if this method not overridden by subclass, just call our default implementation
-		return GetDeathScorer( pKiller, pInflictor );
+		//return GetDeathScorer( pKiller, pInflictor );
+		return 0;
 	}
 
 	//=========================================================
@@ -1550,8 +1596,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 	}
 
 
-#endif		
-//#endif		
+#endif			
 
 
 	//-----------------------------------------------------------------------------

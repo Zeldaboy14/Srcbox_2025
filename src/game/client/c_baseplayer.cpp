@@ -1309,6 +1309,8 @@ void C_BasePlayer::UpdateFlashlight()
 				{
 					if (pViewModel)
 					{
+						//pViewModel->GetAttachment(pViewModel->LookupAttachment("muzzle"), vecOrigin, angFlashlightAngle);
+						//iAttachment = pViewModel->LookupAttachment("muzzle");
 						pViewModel->GetAttachment(pViewModel->LookupAttachment("muzzle"), vecOrigin, angFlashlightAngle);
 						iAttachment = pViewModel->LookupAttachment("muzzle");
 					}
@@ -2145,6 +2147,10 @@ int	C_BasePlayer::GetUserID( void )
 	return pi.userID;
 }
 
+C_BaseEntity* C_BasePlayer::GetVehicleEntity(void)
+{
+	return m_hVehicle.Get();
+}
 
 // For weapon prediction
 void C_BasePlayer::SetAnimation( PLAYER_ANIM playerAnim )
@@ -2251,8 +2257,25 @@ void C_BasePlayer::GetToolRecordingState( KeyValues *msg )
 
 	float flZNear = view->GetZNear();
 	float flZFar = view->GetZFar();
-	CalcView( state.m_vecEyePosition, state.m_vecEyeAngles, flZNear, flZFar, state.m_flFOV );
-	state.m_bThirdPerson = !engine->IsPaused() && ::input->CAM_IsThirdPerson();
+
+    CViewSetup setupView;
+    memset( &setupView, 0, sizeof( setupView ) );
+
+    setupView.origin = state.m_vecEyePosition;
+    setupView.angles = state.m_vecEyeAngles;
+    setupView.zNear = flZNear;
+    setupView.zFar = flZFar;
+    setupView.fov = state.m_flFOV;
+
+    CalcView( setupView );
+
+    state.m_vecEyePosition = setupView.origin;
+    state.m_vecEyeAngles = setupView.angles;
+    flZNear = setupView.zNear;
+    flZFar = setupView.zFar;
+    state.m_flFOV = setupView.fov;
+
+    state.m_bThirdPerson = !engine->IsPaused() && ::input->CAM_IsThirdPerson();
 
 	// this is a straight copy from ClientModeShared::OverrideView,
 	// When that method is removed in favor of rolling it into CalcView,

@@ -18,7 +18,7 @@ class CScriptedHudViewport : public vgui::EditablePanel
 	DECLARE_CLASS_SIMPLE( CScriptedHudViewport, vgui::EditablePanel );
 
 public: 
-	CScriptedHudViewport();
+	CScriptedHudViewport(lua_State* L);
 
 	virtual void SetParent(vgui::VPANEL parent);
 

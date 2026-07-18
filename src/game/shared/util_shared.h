@@ -45,6 +45,7 @@ extern ConVar developer;	// developer mode
 #define LANGUAGE_FRENCH					2
 #define LANGUAGE_BRITISH				3
 
+void* GetAppWindow();
 
 //-----------------------------------------------------------------------------
 // Pitch + yaw
@@ -361,6 +362,8 @@ void		UTIL_StringToIntArray( int *pVector, int count, const char *pString );
 void		UTIL_StringToFloatArray( float *pVector, int count, const char *pString );
 void		UTIL_StringToColor32( color32 *color, const char *pString );
 
+float		UTIL_WaterLevel( const Vector &position, float minz, float maxz );
+
 CBasePlayer *UTIL_PlayerByIndex( int entindex );
 // Helper for use with console commands and the like.
 // Returns NULL if not found or if the provided arg would match multiple players.
@@ -377,6 +380,7 @@ CBasePlayer* UTIL_PlayerByCommandArg( const char *arg );
 
 CBasePlayer* UTIL_PlayerByUserId( int userID );
 CBasePlayer* UTIL_PlayerByName( const char *name ); // not case sensitive
+CBasePlayer* UTIL_PlayerBySteamID( const CSteamID &steamID );
 // Finds a player who has this non-ambiguous substring.  Also not case sensitive.
 CBasePlayer* UTIL_PlayerByPartialName( const char *name );
 
@@ -660,6 +664,10 @@ class RealTimeCountdownTimer : public CountdownTimer
 char* ReadAndAllocStringValue( KeyValues *pSub, const char *pName, const char *pFilename = NULL );
 
 int UTIL_StringFieldToInt( const char *szValue, const char **pValueStrings, int iNumStrings );
+#ifdef SRCBOX
+int UTIL_CountNumBitsSet( unsigned int nVar );
+int UTIL_CountNumBitsSet( uint64 nVar );
+#endif
 
 //-----------------------------------------------------------------------------
 // Holidays

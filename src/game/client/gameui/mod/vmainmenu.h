@@ -9,9 +9,14 @@
 
 #include "basemodui.h"
 #include "VFlyoutMenu.h"
+#ifdef GAMEPADUI
 #include "../../../gamepadui/gamepadui_frame.h"
 #include "../../../gamepadui/gamepadui_button.h"
 #include "../../../gamepadui/gamepadui_image.h"
+#endif
+#ifdef PLATFORM_64BITS
+#include "menu_background.h"
+#endif
 
 namespace BaseModUI {
 
@@ -21,7 +26,6 @@ class MainMenu : public CBaseModFrame, public IBaseModFrameListener, public Flyo
 
 public:
 	MainMenu(vgui::Panel *parent, const char *panelName);
-	virtual void MainMenuLogo(vgui::EditablePanel *parent);
 	~MainMenu();
 
 	void UpdateVisibility();
@@ -32,6 +36,11 @@ public:
 	virtual void OnNotifyChildFocus( vgui::Panel* child );
 	virtual void OnFlyoutMenuClose( vgui::Panel* flyTo );
 	virtual void OnFlyoutMenuCancelled();
+
+	void StartMainMenuVideo();
+	void StopMainMenuVideo();
+
+	class CAnimatedBackgroundMovie* m_pMainMenuPanel;
 
 protected:
 	virtual void ApplySchemeSettings(vgui::IScheme *pScheme);
@@ -47,13 +56,10 @@ private:
 	static void AcceptVersusSoftLockCallback();
 	static void AcceptQuitGameCallback();
 	void SetFooterState();
-	//ImagePanel* m_pLogo;
-	wchar_t GameTitle[ 2 ];
-	vgui::HFont m_hLogoFont;
-	GamepadUIString m_LogoText[2];
-	GamepadUIImage  m_LogoImage;
 	KeyValues* m_pModData;
 	bool				m_bFullscreenPoster;
+	bool				m_bDrawBackground;
+	vgui::ImagePanel* m_pBGImage;
 
 	enum MainMenuQuickJoinHelpText
 	{

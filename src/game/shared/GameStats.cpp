@@ -59,6 +59,22 @@ extern const ConVar *sv_cheats;
 #define GAMESTATS_LOG_FILE "gamestats.log"
 #define GAMESTATS_PATHID "MOD"
 
+//ConVar srcbox_gamemode_sandbox(0);
+static ConVar srcbox_gamemode_sandbox("sandbox_gamemode", "0", 0);
+
+const char* GetGameTypeID()
+{
+
+	const char* pszGameTypeID = NULL;
+	if (srcbox_gamemode_sandbox.GetBool())
+	{
+		pszGameTypeID = "sandbox";
+	} else {
+		pszGameTypeID = "halflife2";
+	}
+	return pszGameTypeID = "sandbox";
+}
+
 /*
 #define ONE_DAY_IN_SECONDS 86400
 

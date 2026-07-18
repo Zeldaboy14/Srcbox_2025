@@ -7,7 +7,7 @@
 $IgnoreRedundancyWarning	"ON"
 
 $Macro SRCDIR		".."
-$Macro GAMENAME     "experiment"
+$Macro GAMENAME     "mod_hl2mp"
 
 $Macro OUTBINDIR	"$SRCDIR\..\game\$GAMENAME\bin"
 $Macro OUTBINNAME	"lua54"

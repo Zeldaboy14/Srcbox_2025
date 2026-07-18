@@ -68,7 +68,7 @@ extern IMaterialSystemHardwareConfig *g_pMaterialSystemHardwareConfig;
 // Strider Scout Scanners
 #define SCANNER_SCOUT_MAX_SPEED			150
 
-ConVar	sk_scanner_health( "sk_scanner_health","0");
+ConVar	sk_scanner_health( "sk_scanner_health","30");
 ConVar	g_debug_cscanner( "g_debug_cscanner", "0" );
 
 //-----------------------------------------------------------------------------
@@ -1988,7 +1988,7 @@ void CNPC_CScanner::BlindFlashTarget( CBaseEntity *pTarget )
 
 		if ( tr.startsolid == false && tr.fraction == 1.0)
 		{
-			color32 white = { 255, 255, 255, (byte)(SCANNER_FLASH_MAX_VALUE * dotPr) };
+			color32 white = { 255, 255, 255, SCANNER_FLASH_MAX_VALUE * dotPr };
 
 			if ( ( g_pMaterialSystemHardwareConfig != NULL ) && ( g_pMaterialSystemHardwareConfig->GetHDRType() != HDR_TYPE_NONE ) )
 			{

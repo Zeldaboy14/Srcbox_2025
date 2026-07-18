@@ -74,6 +74,41 @@ CLIENTEFFECT_REGISTER_END()
 CUtlVector< RayTracingEnvironment* > g_RayTraceEnvironments;
 
 //-----------------------------------------------------------------------------
+// Precipitation blocker entity
+//-----------------------------------------------------------------------------
+
+// Just receive the normal data table stuff
+IMPLEMENT_CLIENTCLASS_DT(C_PrecipitationBlocker, DT_PrecipitationBlocker, CPrecipitationBlocker)
+END_RECV_TABLE()
+
+
+static CUtlVector< C_PrecipitationBlocker* > g_PrecipitationBlockers;
+
+C_PrecipitationBlocker::C_PrecipitationBlocker()
+{
+	g_PrecipitationBlockers.AddToTail(this);
+}
+
+C_PrecipitationBlocker::~C_PrecipitationBlocker()
+{
+	g_PrecipitationBlockers.FindAndRemove(this);
+}
+
+bool ParticleIsBlocked(const Vector& end, const Vector& start)
+{
+	for (int i = 0; i < g_PrecipitationBlockers.Count(); ++i)
+	{
+		C_PrecipitationBlocker* blocker = g_PrecipitationBlockers[i];
+		if (blocker->CollisionProp()->IsPointInBounds(end))
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+//-----------------------------------------------------------------------------
 // Precipitation particle type
 //-----------------------------------------------------------------------------
 
@@ -240,7 +275,6 @@ protected:
 private:
 	CClient_Precipitation(const CClient_Precipitation&); // not defined, not accessible
 };
-
 
 // Just receive the normal data table stuff
 IMPLEMENT_CLIENTCLASS_DT(CClient_Precipitation, DT_Precipitation, CPrecipitation)
@@ -1298,6 +1332,32 @@ void CClient_Precipitation::InitializeParticlePrecip(void)
 		physcollision->DestroyDebugMesh(vertCount, outVerts);
 	}
 	rtEnvRainEmission->SetupAccelerationStructure();
+
+	nTriCount = 1;
+
+	for (int i = 0; i < g_PrecipitationBlockers.Count(); ++i)
+	{
+		C_PrecipitationBlocker* blocker = g_PrecipitationBlockers[i];
+
+		vcollide_t* pCollide = modelinfo->GetVCollide(blocker->GetModelIndex());
+
+		if (!pCollide || pCollide->solidCount <= 0)
+			continue;
+
+		Vector* outVerts;
+		int vertCount = physcollision->CreateDebugMesh(pCollide->solids[0], &outVerts);
+
+		if (vertCount)
+		{
+			for (int j = 0; j < vertCount; j += 3)
+			{
+				rtEnvRainBlocker->AddTriangle(nTriCount++, outVerts[j], outVerts[j + 1], outVerts[j + 2], Vector(1, 1, 1));
+			}
+		}
+		physcollision->DestroyDebugMesh(vertCount, outVerts);
+	}
+
+	rtEnvRainBlocker->SetupAccelerationStructure();
 
 	m_bParticlePrecipInitialized = true;
 }

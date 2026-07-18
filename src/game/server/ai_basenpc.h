@@ -724,7 +724,9 @@ protected:
 private:
 	// This function maps the type through TranslateSchedule() and then retrieves the pointer
 	// to the actual CAI_Schedule from the database of schedules available to this class.
+public:
 	CAI_Schedule *		GetScheduleOfType( int scheduleType );
+private:
 	
 	bool				FHaveSchedule( void );
 	bool				FScheduleDone ( void );

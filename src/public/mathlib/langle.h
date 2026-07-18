@@ -1,5 +1,7 @@
 #ifndef LANGLE_H
 #define LANGLE_H
+#include "../../lua/luaconf.h"
+#include "../../lua/lstate.h"
 
 #ifdef _WIN32
 #pragma once

@@ -17,9 +17,9 @@
 #include "scriptedhudviewport.h"
 
 // lua hooks
-//#ifdef LUA_SDK
+#ifdef LUA_SDK
 #include "luamanager.h"
-//#endif
+#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -27,8 +27,10 @@
 using namespace vgui;
 
 //================================================================
-CScriptedHudViewport::CScriptedHudViewport() : vgui::EditablePanel( NULL, "CScriptedHudViewport")
+CScriptedHudViewport::CScriptedHudViewport(lua_State* L) : vgui::EditablePanel(NULL, "CScriptedHudViewport")
 {
+	m_lua_State = L;
+
 	SetKeyBoardInputEnabled( false );
 	SetMouseInputEnabled( false );
 
@@ -49,6 +51,6 @@ void CScriptedHudViewport::SetParent(vgui::VPANEL parent)
 
 void CScriptedHudViewport::Paint()
 {
-	BEGIN_LUA_CALL_HOOK( "HudViewportPaint" );
-	END_LUA_CALL_HOOK( 0, 0 );
+    LUA_CALL_HOOK_BEGIN( "HudDraw" );
+    LUA_CALL_HOOK_END( 0, 0 );
 }

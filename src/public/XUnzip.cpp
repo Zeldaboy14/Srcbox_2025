@@ -93,6 +93,9 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+// Must include tier0 platform headers before tchar.h (pulled in by windows.h)
+#include "tier0/platform.h"
+
 #if defined( WIN32 ) && !defined( _X360 )
 #define STRICT
 #define WIN32_LEAN_AND_MEAN
@@ -2259,6 +2262,10 @@ z_streamp z)
 
 
 
+
+// Undefine inflate_huft helpers - saint
+#undef exop
+#undef bits
 
 // crc32.c -- compute the CRC-32 of a data stream
 // Copyright (C) 1995-1998 Mark Adler
@@ -4487,4 +4494,5 @@ bool SafeUnzipMemory( const void *pvZipped, int cubZipped, void *pvDest, int cub
 	return true;
 }
 
-#include "cbase.h"
+//#include "cbase.h" No newline at end of file
+//this was also causing a million errors... wtf - saint 

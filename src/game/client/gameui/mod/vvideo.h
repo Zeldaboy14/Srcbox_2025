@@ -9,7 +9,7 @@
 
 #include "basemodui.h"
 #include "VFlyoutMenu.h"
-#include "OptionsSubVideo.h"
+#include "../OptionsSubVideo.h"
 
 
 #define MAX_DYNAMIC_AA_MODES 10

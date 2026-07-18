@@ -235,11 +235,11 @@ void CVoiceStatus::DrawHeadLabels()
 			continue;
 
 #if defined ( LUA_SDK )
-		BEGIN_LUA_CALL_HOOK("DrawHeadLabels");
-		lua_pushplayer(L, pPlayer);
-		END_LUA_CALL_HOOK(1, 1);
+        LUA_CALL_HOOK_BEGIN( "DrawHeadLabels" );
+        CBasePlayer::PushLuaInstanceSafe( L, pPlayer );
+        LUA_CALL_HOOK_END( 1, 1 );
 
-		RETURN_LUA_NONE();
+        LUA_RETURN_NONE_IF_FALSE();
 #endif
 
 		// Don't show an icon for dead or spectating players (ie: invisible entities).

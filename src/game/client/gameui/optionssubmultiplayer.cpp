@@ -633,10 +633,10 @@ void COptionsSubMultiplayer::OnFileSelected(const char *fullpath)
 		Q_strncpy(origpath, tgaPath, sizeof(origpath));
 
 		int index = 0;
-		do {
+	/*	do {
 			Q_snprintf(tgaPath, sizeof(tgaPath), "%stemp%d.tga", origpath, index);
 			++index;
-		} while (_access(tgaPath, 0) != -1);
+		} while (_access(tgaPath, 0) != -1);*/
 
 		if (!stricmp(extension, "jpg") || !stricmp(extension, "jpeg"))
 		{

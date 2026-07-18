@@ -166,6 +166,13 @@ public:
 	virtual void FireObsoleteEvent( const Vector& origin, const QAngle& angles, int event, const char *options );
 	virtual const char* ModifyEventParticles( const char* token ) { return token; }
 
+#if defined ( SDK_DLL ) || defined ( HL2MP )
+	virtual void ResetEventsParity() { m_nPrevResetEventsParity = -1; } // used to force animation events to function on players so the muzzleflashes and other events occur
+	// so new functions don't have to be made to parse the models like CSS does in ProcessMuzzleFlashEvent
+	// allows the multiplayer world weapon models to declare the muzzleflashes, and other effects like sp
+	// without the need to script it and add extra parsing code.
+#endif
+
 	// Parses and distributes muzzle flash events
 	virtual bool DispatchMuzzleEffect( const char *options, bool isFirstPerson );
 
@@ -202,6 +209,7 @@ public:
 	float	SetPoseParameter( CStudioHdr *pStudioHdr, int iParameter, float flValue );
 	inline float SetPoseParameter( int iParameter, float flValue ) { return SetPoseParameter( GetModelPtr(), iParameter, flValue ); }
 
+	float	GetPoseParameter( const char *szName );
 	float	GetPoseParameter( int iPoseParameter );
 
 	bool	GetPoseParameterRange( int iPoseParameter, float &minValue, float &maxValue );
@@ -353,6 +361,9 @@ public:
 	void SetBodygroup( int iGroup, int iValue );
 	int GetBodygroup( int iGroup );
 
+	void SetSkin(int iSkin);
+	void SetBody(int iBody);
+
 	const char *GetBodygroupName( int iGroup );
 	int FindBodygroupByName( const char *name );
 	int GetBodygroupCount( int iGroup );
@@ -450,6 +461,46 @@ public:
 	virtual bool					IsViewModel() const;
 	virtual void					UpdateOnRemove( void );
 
+#ifdef LUA_SDK
+
+	void SetMaterialOverride(const char* pMaterialName)
+	{
+		Q_strncpy(m_MaterialOverride, pMaterialName, sizeof(m_MaterialOverride));
+	}
+
+	void GetMaterialOverride(char* pOut, int nLength)
+	{
+		Q_strncpy(pOut, m_MaterialOverride, nLength);
+	}
+
+	void SetSubMaterialOverride(int iIndex, const char* pMaterialName)
+	{
+		if (iIndex < 0 || iIndex >= MAX_SUB_MATERIAL_OVERRIDES)
+			return;
+
+		Q_strncpy(m_SubMaterialOverrides[iIndex], pMaterialName, sizeof(m_SubMaterialOverrides[iIndex]));
+	}
+
+	void ClearSubMaterialOverrides()
+	{
+		for (int i = 0; i < MAX_SUB_MATERIAL_OVERRIDES; i++)
+		{
+			m_SubMaterialOverrides[i][0] = 0;
+		}
+	}
+
+	void GetSubMaterialOverride(int iIndex, char* pOut, int nLength)
+	{
+		if (iIndex < 0 || iIndex >= MAX_SUB_MATERIAL_OVERRIDES)
+		{
+			pOut[0] = 0;
+			return;
+		}
+
+		Q_strncpy(pOut, m_SubMaterialOverrides[iIndex], nLength);
+	}
+#endif
+
 protected:
 	// View models scale their attachment positions to account for FOV. To get the unmodified
 	// attachment position (like if you're rendering something else during the view model's DrawModel call),
@@ -542,6 +593,14 @@ protected:
 	float							m_fadeMaxDist;
 	float							m_flFadeScale;
 
+#ifdef LUA_SDK
+    // Experiment; Material override
+    char							m_MaterialOverride[MAX_PATH];
+    CMaterialReference				m_MaterialOverrideReference;
+    char							m_SubMaterialOverrides[MAX_SUB_MATERIAL_OVERRIDES][MAX_PATH];
+    CMaterialReference				m_SubMaterialOverridesReferences[MAX_SUB_MATERIAL_OVERRIDES];
+#endif
+
 private:
 
 	float							m_flGroundSpeed;	// computed linear movement rate for current sequence
@@ -573,9 +632,12 @@ private:
 	CInterpolatedVarArray< float, MAXSTUDIOBONECTRLS >		m_iv_flEncodedController;
 	float							m_flOldEncodedController[MAXSTUDIOBONECTRLS];
 
+public:
 	// Clientside animation
 	bool							m_bClientSideAnimation;
 	bool							m_bLastClientSideFrameReset;
+
+private:
 
 	int								m_nNewSequenceParity;
 	int								m_nResetEventsParity;

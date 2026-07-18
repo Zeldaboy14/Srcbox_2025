@@ -316,8 +316,12 @@ FileWeaponInfo_t::FileWeaponInfo_t()
 	szPrintName[0] = 0;
 
 	szViewModel[0] = 0;
+	szViewModelDual[0] = 0;
 	szWorldModel[0] = 0;
+	szWorldModelDual[0] = 0;
+	szGlobalModel[0] = 0;
 	szAnimationPrefix[0] = 0;
+	szCharacterViewmodelAddon[0] = 0;
 	iSlot = 0;
 	iPosition = 0;
 	iMaxClip1 = 0;
@@ -364,8 +368,13 @@ void FileWeaponInfo_t::Parse( KeyValues *pKeyValuesData, const char *szWeaponNam
 	Q_strncpy( szPrintName, pKeyValuesData->GetString( "printname", WEAPON_PRINTNAME_MISSING ), MAX_WEAPON_STRING );
 	// View model & world model
 	Q_strncpy( szViewModel, pKeyValuesData->GetString( "viewmodel" ), MAX_WEAPON_STRING );
+	Q_strncpy( szViewModelDual, pKeyValuesData->GetString( "viewmodel_dual" ), MAX_WEAPON_STRING );
 	Q_strncpy( szWorldModel, pKeyValuesData->GetString( "playermodel" ), MAX_WEAPON_STRING );
+	Q_strncpy( szWorldModelDual, pKeyValuesData->GetString( "playermodel_dual" ), MAX_WEAPON_STRING );
+	Q_strncpy( szGlobalModel, pKeyValuesData->GetString( "worldmodel" ), MAX_WEAPON_STRING );
 	Q_strncpy( szAnimationPrefix, pKeyValuesData->GetString( "anim_prefix" ), MAX_WEAPON_PREFIX );
+	//Q_strncpy( szCharacterViewmodelAddon, pKeyValuesData->GetString("CharacterViewmodelAddon"), MAX_WEAPON_STRING);
+	//KeyValues* pAddonKV = pKeyValuesData->FindKey("CharacterViewmodelAddon");
 	iSlot = pKeyValuesData->GetInt( "bucket", 0 );
 	iPosition = pKeyValuesData->GetInt( "bucket_position", 0 );
 	
@@ -461,4 +470,19 @@ void FileWeaponInfo_t::Parse( KeyValues *pKeyValuesData, const char *szWeaponNam
 		}
 	}
 }
+
+	/*KeyValues* pAddonKV = pKeyValuesData->FindKey("CharacterViewmodel");
+	if (pAddonKV)
+	{
+		for (KeyValues* pSub = pAddonKV->GetFirstSubKey();
+			pSub;
+			pSub = pSub->GetNextKey())
+		{
+			CharacterViewmodelAddon_t addon;
+			addon.character = pSub->GetName();      // "Coach"
+			addon.model = pSub->GetString();    // "models/weapons/arms/..."
+
+			m_CharacterViewmodelAddons.AddToTail(addon);
+		}
+	}*/
 

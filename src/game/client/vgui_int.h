@@ -23,10 +23,13 @@ bool VGui_Startup( CreateInterfaceFn appSystemFactory );
 void VGui_Shutdown( void );
 void VGui_CreateGlobalPanels( void );
 vgui::VPANEL VGui_GetClientDLLRootPanel( void );
-vgui::Panel *VGui_GetGameUIPanel( void );
-vgui::Panel *VGui_GetClientLuaRootPanel( void );
-void VGUI_CreateGameUIRootPanel( void );
-void VGUI_DestroyGameUIRootPanel( void );
+#ifdef LUA_SDK
+//vgui::Panel *VGui_GetGameUIPanel( void );
+CScriptedClientLuaPanel *VGui_GetClientLuaRootPanel( void );
+CScriptedClientLuaPanel *VGui_GetClientLuaRootPanelHUD( void );
+// void VGUI_CreateGameUIRootPanel( void );
+// void VGUI_DestroyGameUIRootPanel( void );
+#endif
 void VGUI_CreateClientDLLRootPanel( void );
 void VGUI_DestroyClientDLLRootPanel( void );
 void VGui_PreRender();

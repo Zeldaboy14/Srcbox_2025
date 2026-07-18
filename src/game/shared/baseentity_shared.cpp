@@ -106,6 +106,17 @@ void SpawnBlood(Vector vecSpot, const Vector &vecDir, int bloodColor, float flDa
 	UTIL_BloodDrips( vecSpot, vecDir, bloodColor, (int)flDamage );
 }
 
+
+void CBaseEntity::SetTransmitWithParent(bool bTransmitWithParent)
+{
+	m_bTransmitWithParent = bTransmitWithParent;
+}
+
+bool CBaseEntity::GetTransmitWithParent()
+{
+	return m_bTransmitWithParent;
+}
+
 #if !defined( NO_ENTITY_PREDICTION )
 //-----------------------------------------------------------------------------
 // The player drives simulation of this entity
@@ -125,6 +136,18 @@ void CBaseEntity::UnsetPlayerSimulated( void )
 	}
 	m_hPlayerSimulationOwner = NULL;
 	m_bIsPlayerSimulated = false;
+}
+#endif
+
+#ifdef LUA_SDK
+bool CBaseEntity::GetNoCollidingWithTeammates(void)
+{
+	return m_bNoCollidingWithTeammates;
+}
+
+void CBaseEntity::SetNoCollidingWithTeammates(bool bNoCollide)
+{
+	m_bNoCollidingWithTeammates = bNoCollide;
 }
 #endif
 

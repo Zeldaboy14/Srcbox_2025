@@ -15,7 +15,11 @@
 #endif
 #include "steam/steam_api.h"
 
-DECLARE_BUILD_FACTORY( CAvatarImagePanel );
+#ifdef LUA_SDK
+// TODO: Build factory with Lua parameter
+#else
+DECLARE_BUILD_FACTORY(CAvatarImagePanel);
+#endif
 
 
 CUtlMap< AvatarImagePair_t, int> CAvatarImage::s_AvatarImageCache; // cache of steam id's to textureids to use for images
@@ -338,7 +342,11 @@ vgui::HTexture CAvatarImage::GetID()
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
-CAvatarImagePanel::CAvatarImagePanel( vgui::Panel *parent, const char *name ) : BaseClass( parent, name )
+#ifdef LUA_SDK
+CAvatarImagePanel::CAvatarImagePanel( vgui::Panel *parent, const char *name, lua_State* L ) : BaseClass( parent, name )
+#else
+CAvatarImagePanel::CAvatarImagePanel(vgui::Panel* parent, const char* name)
+#endif
 {
 	m_bScaleImage = false;
 	m_pImage = new CAvatarImage();

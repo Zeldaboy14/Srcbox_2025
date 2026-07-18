@@ -1,168 +1,189 @@
-//===== Copyright © 1996-2005, Valve Corporation, All rights reserved. ========//
-//
-// Purpose: 
-//
-// $NoKeywords: $
-//
-//=============================================================================//
-#define ldbg_cpp
-
 #include "cbase.h"
 #include "lua.hpp"
 #include "luasrclib.h"
 #include "lColor.h"
+#include <luamanager.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+LUA_REGISTRATION_INIT( debug );
 
+LUA_BINDING_BEGIN( debug, SpewActivate, "library", "Activate spew output." )
+{
+    const char *pGroupName = LUA_BINDING_ARGUMENT( luaL_checkstring, 1, "groupName" );
+    int iLevel = LUA_BINDING_ARGUMENT( luaL_checknumber, 2, "level" );
 
-static int luasrc_SpewActivate (lua_State *L) {
-  SpewActivate(luaL_checkstring(L, 1), luaL_checkint(L, 2));
-  return 0;
+    SpewActivate( pGroupName, iLevel );
+    return 0;
 }
+LUA_BINDING_END()
 
-static int luasrc_IsSpewActive (lua_State *L) {
-  lua_pushboolean(L, IsSpewActive(luaL_checkstring(L, 1), luaL_checkint(L, 2)));
-  return 1;
+LUA_BINDING_BEGIN( debug, IsSpewActive, "library", "Check if spew output is active." )
+{
+    const char *pGroupName = LUA_BINDING_ARGUMENT( luaL_checkstring, 1, "groupName" );
+    int iLevel = LUA_BINDING_ARGUMENT( luaL_checknumber, 2, "level" );
+
+    lua_pushboolean( L, IsSpewActive( pGroupName, iLevel ) );
+    return 1;
 }
+LUA_BINDING_END( "boolean", "True if spew output is active, false otherwise." )
 
-static int luasrc_Msg (lua_State *L) {
-  Msg(luaL_checkstring(L, 1));
-  return 0;
+LUA_BINDING_BEGIN( debug, PrintMessage, "library", "Print a message to the console." )
+{
+    const char *pMessage = LUA_BINDING_ARGUMENT( luaL_checkstring, 1, "message" );
+
+    Msg( "%s", pMessage );
+    return 0;
 }
+LUA_BINDING_END()
 
-static int luasrc_DMsg (lua_State *L) {
-  DMsg(luaL_checkstring(L, 1), luaL_checkint(L, 2), luaL_checkstring(L, 3));
-  return 0;
+LUA_BINDING_BEGIN( debug, PrintDebugMessage, "library", "Print a debug message to the console." )
+{
+    const char *pMessage = LUA_BINDING_ARGUMENT( luaL_checkstring, 1, "message" );
+    int iLevel = LUA_BINDING_ARGUMENT( luaL_checknumber, 2, "level" );
+    const char *pGroupName = LUA_BINDING_ARGUMENT( luaL_checkstring, 3, "groupName" );
+
+    DMsg( pGroupName, iLevel, "%s", pMessage );
+    return 0;
 }
+LUA_BINDING_END()
 
-static int luasrc_Warning (lua_State *L) {
-  Warning(luaL_checkstring(L, 1));
-  return 0;
+LUA_BINDING_BEGIN( debug, PrintWarning, "library", "Print a warning message to the console." )
+{
+    const char *pMessage = LUA_BINDING_ARGUMENT( luaL_checkstring, 1, "message" );
+
+    Warning( "%s", pMessage );
+    return 0;
 }
+LUA_BINDING_END()
 
-static int luasrc_DWarning (lua_State *L) {
-  DWarning(luaL_checkstring(L, 1), luaL_checkint(L, 2), luaL_checkstring(L, 3));
-  return 0;
+LUA_BINDING_BEGIN( debug, PrintDebugWarning, "library", "Print a debug warning message to the console." )
+{
+    const char *pMessage = LUA_BINDING_ARGUMENT( luaL_checkstring, 1, "message" );
+    int iLevel = LUA_BINDING_ARGUMENT( luaL_checknumber, 2, "level" );
+    const char *pGroupName = LUA_BINDING_ARGUMENT( luaL_checkstring, 3, "groupName" );
+
+    DWarning( pGroupName, iLevel, "%s", pMessage );
+    return 0;
 }
+LUA_BINDING_END()
 
-static int luasrc_Log (lua_State *L) {
-  Log(luaL_checkstring(L, 1));
-  return 0;
+LUA_BINDING_BEGIN( debug, PrintLog, "library", "Print a log message to the console." )
+{
+    const char *pMessage = LUA_BINDING_ARGUMENT( luaL_checkstring, 1, "message" );
+
+    Log( "%s", pMessage );
+    return 0;
 }
+LUA_BINDING_END()
 
-static int luasrc_DLog (lua_State *L) {
-  DLog(luaL_checkstring(L, 1), luaL_checkint(L, 2), luaL_checkstring(L, 3));
-  return 0;
+LUA_BINDING_BEGIN( debug, PrintDebugLog, "library", "Print a debug log message to the console." )
+{
+    const char *pMessage = LUA_BINDING_ARGUMENT( luaL_checkstring, 1, "message" );
+    int iLevel = LUA_BINDING_ARGUMENT( luaL_checknumber, 2, "level" );
+    const char *pGroupName = LUA_BINDING_ARGUMENT( luaL_checkstring, 3, "groupName" );
+
+    DLog( pGroupName, iLevel, "%s", pMessage );
+    return 0;
 }
+LUA_BINDING_END()
 
-static int luasrc_Error (lua_State *L) {
-  Error(luaL_checkstring(L, 1));
-  return 0;
+// LUA_BINDING_BEGIN( debug, CrashError, "library", "Crashes the game with an error message." )
+//{
+//     const char *pMessage = LUA_BINDING_ARGUMENT( luaL_checkstring, 1, "message" );
+//
+//     Error( "%s", pMessage );
+//     return 0;
+// }
+// LUA_BINDING_END()
+
+LUA_BINDING_BEGIN( debug, PrintDevMessage, "library", "Print a developer message to the console." )
+{
+    const char *pMessage = LUA_BINDING_ARGUMENT( luaL_checkstring, 1, "message" );
+
+    DevMsg( "%s", pMessage );
+    return 0;
 }
+LUA_BINDING_END()
 
-static int luasrc_DevMsg (lua_State *L) {
-  DevMsg(luaL_checkstring(L, 1));
-  return 0;
+LUA_BINDING_BEGIN( debug, PrintDevWarning, "library", "Print a developer warning message to the console." )
+{
+    const char *pMessage = LUA_BINDING_ARGUMENT( luaL_checkstring, 1, "message" );
+
+    DevWarning( "%s", pMessage );
+    return 0;
 }
+LUA_BINDING_END()
 
-static int luasrc_DevWarning (lua_State *L) {
-  DevWarning(luaL_checkstring(L, 1));
-  return 0;
+LUA_BINDING_BEGIN( debug, PrintDevLog, "library", "Print a developer log message to the console." )
+{
+    const char *pMessage = LUA_BINDING_ARGUMENT( luaL_checkstring, 1, "message" );
+
+    DevLog( "%s", pMessage );
+    return 0;
 }
+LUA_BINDING_END()
 
-static int luasrc_DevLog (lua_State *L) {
-  DevLog(luaL_checkstring(L, 1));
-  return 0;
+LUA_BINDING_BEGIN( debug, PrintColorMessage, "library", "Print a message to the console with a specific color." )
+{
+    lua_Color color = LUA_BINDING_ARGUMENT( luaL_checkcolor, 1, "color" );
+    const char *pMessage = LUA_BINDING_ARGUMENT( luaL_checkstring, 2, "message" );
+
+    ConColorMsg( color, "%s", pMessage );
+    return 0;
 }
+LUA_BINDING_END()
 
-static int luasrc_ConColorMsg (lua_State *L) {
-  ConColorMsg(luaL_checkcolor(L, 1), luaL_checkstring(L, 2));
-  return 0;
+LUA_BINDING_BEGIN( debug, PrintDebugColorMessage, "library", "Print a debug message to the console with a specific color." )
+{
+    lua_Color color = LUA_BINDING_ARGUMENT( luaL_checkcolor, 1, "color" );
+    const char *pMessage = LUA_BINDING_ARGUMENT( luaL_checkstring, 2, "message" );
+
+    ConDColorMsg( color, "%s", pMessage );
+    return 0;
 }
+LUA_BINDING_END()
 
-static int luasrc_ConMsg (lua_State *L) {
-  ConMsg(luaL_checkstring(L, 1));
-  return 0;
+LUA_BINDING_BEGIN( debug, PrintNetworkMessage, "library", "Print a network message to the console." )
+{
+    int iLevel = LUA_BINDING_ARGUMENT( luaL_checknumber, 1, "level" );
+    const char *pMessage = LUA_BINDING_ARGUMENT( luaL_checkstring, 2, "message" );
+
+    NetMsg( iLevel, "%s", pMessage );
+    return 0;
 }
+LUA_BINDING_END()
 
-static int luasrc_ConWarning (lua_State *L) {
-  ConWarning(luaL_checkstring(L, 1));
-  return 0;
+LUA_BINDING_BEGIN( debug, PrintNetworkWarning, "library", "Print a network warning message to the console." )
+{
+    int iLevel = LUA_BINDING_ARGUMENT( luaL_checknumber, 1, "level" );
+    const char *pMessage = LUA_BINDING_ARGUMENT( luaL_checkstring, 2, "message" );
+
+    NetWarning( iLevel, "%s", pMessage );
+    return 0;
 }
+LUA_BINDING_END()
 
-static int luasrc_ConLog (lua_State *L) {
-  ConLog(luaL_checkstring(L, 1));
-  return 0;
+LUA_BINDING_BEGIN( debug, PrintNetworkLog, "library", "Print a network log message to the console." )
+{
+    int iLevel = LUA_BINDING_ARGUMENT( luaL_checknumber, 1, "level" );
+    const char *pMessage = LUA_BINDING_ARGUMENT( luaL_checkstring, 2, "message" );
+
+    NetLog( iLevel, "%s", pMessage );
+    return 0;
 }
+LUA_BINDING_END()
 
-static int luasrc_ConDColorMsg (lua_State *L) {
-  ConDColorMsg(luaL_checkcolor(L, 1), luaL_checkstring(L, 2));
-  return 0;
+LUA_BINDING_BEGIN( debug, GetRealmColor, "library", "Get the color of the current realm." )
+{
+    lua_pushcolor( L, REALM_COLOR );
+    return 1;
 }
+LUA_BINDING_END()
 
-static int luasrc_ConDMsg (lua_State *L) {
-  ConDMsg(luaL_checkstring(L, 1));
-  return 0;
+LUALIB_API int luaopen_dbg( lua_State *L )
+{
+    LUA_REGISTRATION_COMMIT_LIBRARY( debug );
+    return 1;
 }
-
-static int luasrc_ConDWarning (lua_State *L) {
-  ConDWarning(luaL_checkstring(L, 1));
-  return 0;
-}
-
-static int luasrc_ConDLog (lua_State *L) {
-  ConDLog(luaL_checkstring(L, 1));
-  return 0;
-}
-
-static int luasrc_NetMsg (lua_State *L) {
-  NetMsg(luaL_checkint(L, 1), luaL_checkstring(L, 2));
-  return 0;
-}
-
-static int luasrc_NetWarning (lua_State *L) {
-  NetWarning(luaL_checkint(L, 1), luaL_checkstring(L, 2));
-  return 0;
-}
-
-static int luasrc_NetLog (lua_State *L) {
-  NetLog(luaL_checkint(L, 1), luaL_checkstring(L, 2));
-  return 0;
-}
-
-
-static const luaL_Reg dbg_funcs[] = {
-  {"SpewActivate",  luasrc_SpewActivate},
-  {"IsSpewActive",  luasrc_IsSpewActive},
-  {"Msg",  luasrc_Msg},
-  {"DMsg",  luasrc_DMsg},
-  {"Warning",  luasrc_Warning},
-  {"DWarning",  luasrc_DWarning},
-  {"Log",  luasrc_Log},
-  {"DLog",  luasrc_DLog},
-  {"Error",  luasrc_Error},
-  {"DevMsg",  luasrc_DevMsg},
-  {"DevWarning",  luasrc_DevWarning},
-  {"DevLog",  luasrc_DevLog},
-  {"ConColorMsg",  luasrc_ConColorMsg},
-  {"ConMsg",  luasrc_ConMsg},
-  {"ConWarning",  luasrc_ConWarning},
-  {"ConLog",  luasrc_ConLog},
-  {"ConDColorMsg",  luasrc_ConDColorMsg},
-  {"ConDMsg",  luasrc_ConDMsg},
-  {"ConDWarning",  luasrc_ConDWarning},
-  {"ConDLog",  luasrc_ConDLog},
-  {"NetMsg",  luasrc_NetMsg},
-  {"NetWarning",  luasrc_NetWarning},
-  {"NetLog",  luasrc_NetLog},
-  {NULL, NULL}
-};
-
-
-LUALIB_API int luaopen_dbg (lua_State *L) {
-  luaL_register(L, LUA_DBGLIBNAME, dbg_funcs);
-  return 1;
-}
-

@@ -81,12 +81,21 @@
 #include "basetoggle.h"
 #include "igameevents.h"
 
+#ifdef LUA_SDK
+//#include "lua_compat.cpp"
+#endif
+
 // saverestore.h declarations
 class ISave;
 class IRestore;
 
 // maximum number of targets a single multi_manager entity may be assigned.
 #define MAX_MULTI_TARGETS	16 
+
+#ifdef P3_DLL
+// redirect P3 related caching to the HL2 precache system
+#define P3_PRECACHE_WEAPON_REGISTER	PRECACHE_WEAPON_REGISTER
+#endif
 
 // NPCEvent.h declarations
 struct animevent_t;

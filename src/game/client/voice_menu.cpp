@@ -17,10 +17,6 @@
 
 static int g_ActiveVoiceMenu = 0;
 
-#if defined( TF_CLIENT_DLL )
-extern ConVar tf_voice_command_suspension_mode;
-#endif
-
 void OpenVoiceMenu( int index )
 {
 	// do not show the menu if the player is dead or is an observer
@@ -32,7 +28,7 @@ void OpenVoiceMenu( int index )
 		return;
 
 #if defined ( TF_CLIENT_DLL )
-	if ( GTFGCClientSystem() && GTFGCClientSystem()->BHaveChatSuspensionInCurrentMatch() && tf_voice_command_suspension_mode.GetInt() == 1 )
+	if ( GTFGCClientSystem() && GTFGCClientSystem()->BHaveChatSuspensionInCurrentMatch() )
 	{
 		CBaseHudChat *pHUDChat = ( CBaseHudChat * ) GET_HUDELEMENT( CHudChat );
 		if ( pHUDChat )

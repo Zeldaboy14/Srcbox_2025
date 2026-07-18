@@ -1,1 +1,0 @@
-"H:\SteamLibrary\steamapps\common\Source SDK Base 2013 Multiplayer\bin\x64\hlmvplusplus.exe" -game "C:\Users\zelda\Documents\GitHub\Srcbox\game\mod_hl2mp"

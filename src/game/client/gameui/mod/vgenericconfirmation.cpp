@@ -8,7 +8,8 @@
 
 #include "vgui_controls/Label.h"
 #include "vgui/ISurface.h"
-#include "nb_button.h"
+#include "../vgui/nb_button.h"
+//#include "VHybridButton.h"
 #include "cdll_util.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -270,16 +271,16 @@ void GenericConfirmation::LoadLayout()
 		dialogWidth = minWidth;
 
 	// now have final dialog dimensions, center the dialog
-	SetPos( ( screenWidth - dialogWidth ) / 2, ( screenHeight - dialogHeight ) / 2 );
-	SetSize( dialogWidth, dialogHeight );
+	SetPos( ( screenWidth - dialogWidth ) / 2, ( screenHeight - dialogHeight ) / 4.3 + 7 );
+	//SetSize( dialogWidth, dialogHeight );
 	//SetPos( screenWidth, ( screenHeight - dialogHeight ) / 2 );
 	//SetSize( screenWidth, dialogHeight );
 
 	if ( pLblTitle )
 	{
 		// horizontally center and vertically inset the title
-		pLblTitle->SetPos( ( dialogWidth - titleWide ) / 2, borderGap );
-		pLblTitle->SetSize( titleWide, titleTall );
+		pLblTitle->SetPos( ( dialogWidth - titleWide ) / 9.5 - 3, 15 );
+		pLblTitle->SetSize( titleWide * 4, titleTall * 4);
 	}
 
 	if ( m_pLblMessage )
@@ -287,8 +288,8 @@ void GenericConfirmation::LoadLayout()
 		// center the message
 		int msgWide, msgTall;
 		m_pLblMessage->GetContentSize( msgWide, msgTall );
-		m_pLblMessage->SetPos( ( dialogWidth - msgWide ) / 2, ( dialogHeight - checkBoxGap - msgTall ) / 2 );
-		m_pLblMessage->SetSize( msgWide, msgTall );
+		m_pLblMessage->SetPos( ( dialogWidth - msgWide ) / 7.4 + 2, ( dialogHeight - checkBoxGap - msgTall ) + 20 );
+		m_pLblMessage->SetSize( msgWide * 2, msgTall );
 
 		if ( m_pCheckBox )
 		{
@@ -305,7 +306,7 @@ void GenericConfirmation::LoadLayout()
 				m_pLblCheckBox->GetContentSize( lblCheckBoxWide, lblCheckBoxTall );
 				boxX = ( dialogWidth - ( boxWide + lblCheckBoxWide ) ) / 2;
 
-				m_pLblCheckBox->SetVisible( true );
+				//m_pLblCheckBox->SetVisible( true );
 				m_pLblCheckBox->SetPos( boxX + boxWide, boxY );
 				m_pLblCheckBox->SetSize( lblCheckBoxWide, lblCheckBoxTall );
 			}
@@ -359,9 +360,9 @@ void GenericConfirmation::LoadLayout()
 			//if( dialogWidth <= minWidth )
 			{
 				// center left the OK
-				pOkButton->SetPos( dialogWidth/2 - buttonWide - borderGap/2, dialogHeight - borderGap - buttonTall );
+				pOkButton->SetPos( dialogWidth / 8 + 5, dialogHeight * 2.445 );
 				// center right the CANCEL
-				pCancelButton->SetPos( dialogWidth/2 + borderGap/2, dialogHeight - borderGap - buttonTall );
+				pCancelButton->SetPos( dialogWidth / 8 + 5, dialogHeight * 2.25);
 			}
 // 				else
 // 				{
@@ -382,7 +383,21 @@ void GenericConfirmation::LoadLayout()
 //=============================================================================
 void GenericConfirmation::PaintBackground()
 {
-	BaseClass::DrawGenericBackground();
+	// Alien Swarm stuff. Don't use
+	//BaseClass::DrawGenericBackground();
+
+	int wide, tall;
+	GetSize(wide, tall);
+	int iHalfWide = wide * 0.5f;
+	float flAlpha = 200.0f / 255.0f;
+
+	// title
+	vgui::surface()->DrawSetColor(Color(0, 0, 0, 255 * flAlpha));
+	vgui::surface()->DrawFilledRect(0, 47, GetWide(), GetTall() / 6.2 + 2);
+
+	// message and buttons
+	vgui::surface()->DrawSetColor(Color(0, 0, 0, 255 * flAlpha));
+	vgui::surface()->DrawFilledRect(0, 8 * 23 + 20, GetWide(), GetTall() / 1.08 + 3);
 
 	if ( m_bNeedsMoveToFront )
 	{

@@ -318,6 +318,16 @@ void CViewRender::Init( void )
 	m_flLastFOV = default_fov.GetFloat();
 #endif
 
+#ifdef SSAO
+		int iW, iH;
+		//materials->EndRenderTargetAllocation();
+		materials->GetBackBufferDimensions( iW, iH );
+		materials->BeginRenderTargetAllocation();
+		materials->CreateNamedRenderTargetTextureEx( "_rt_SSAO", iW, iH, RT_SIZE_NO_CHANGE, materials->GetBackBufferFormat(), 
+													MATERIAL_RT_DEPTH_NONE, TEXTUREFLAGS_NOMIP | TEXTUREFLAGS_NOLOD | TEXTUREFLAGS_RENDERTARGET, 0 );
+		materials->EndRenderTargetAllocation();
+#endif
+
 }
 
 //-----------------------------------------------------------------------------
@@ -659,7 +669,7 @@ void CViewRender::SetUpViews()
 
 	if ( engine->IsHLTV() )
 	{
-		HLTVCamera()->CalcView( viewEye.origin, viewEye.angles, viewEye.fov );
+		HLTVCamera()->CalcView( viewEye );
 	}
 #if defined( REPLAY_ENABLED )
 	else if ( g_pEngineClientReplay->IsPlayingReplayDemo() )
@@ -673,7 +683,7 @@ void CViewRender::SetUpViews()
 		// FIXME: What happens when there's no player?
 		if (pPlayer)
 		{
-			pPlayer->CalcView( viewEye.origin, viewEye.angles, viewEye.zNear, viewEye.zFar, viewEye.fov );
+			pPlayer->CalcView( viewEye );
 
 			// If we are looking through another entities eyes, then override the angles/origin for view
 			int viewentity = render->GetViewEntity();
@@ -723,10 +733,10 @@ void CViewRender::SetUpViews()
 
 	//Find the offset our current FOV is from the default value
 	float fDefaultFov = default_fov.GetFloat();
-	float flFOVOffset = fDefaultFov - viewEye.fov;
+	float flFOVOffset = viewEye.fov / fDefaultFov;
 
 	//Adjust the viewmodel's FOV to move with any FOV offsets on the viewer's end
-	viewEye.fovViewmodel = g_pClientMode->GetViewModelFOV() - flFOVOffset;
+	viewEye.fovViewmodel = g_pClientMode->GetViewModelFOV() * flFOVOffset;
 
 	if ( UseVR() )
 	{

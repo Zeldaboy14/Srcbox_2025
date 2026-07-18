@@ -17,7 +17,6 @@
 //#include "tier2/resourceprecacher.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include "FileSystem.h"
 
 #include "MouseMessageForwardingPanel.h"
 

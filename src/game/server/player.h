@@ -18,6 +18,9 @@
 #include "hintsystem.h"
 #include "SoundEmitterSystem/isoundemittersystembase.h"
 #include "util_shared.h"
+#include "luasrclib.h"
+#include "lsingleluainstance.h"
+#include "view_shared.h"
 
 #if defined USES_ECON_ITEMS
 #include "game_item_schema.h"
@@ -237,8 +240,13 @@ private:
 
 class CBasePlayer : public CBaseCombatCharacter
 {
+#ifdef LUA_SDK
+	LUA_OVERRIDE_SINGLE_LUA_INSTANCE_METATABLE( CBasePlayer, LUA_BASEPLAYERMETANAME)
+#endif
+
 public:
 	DECLARE_CLASS( CBasePlayer, CBaseCombatCharacter );
+
 protected:
 	// HACK FOR BOTS
 	friend class CBotManager;
@@ -265,8 +273,11 @@ public:
 
 	virtual void			CreateViewModel( int viewmodelindex = 0 );
 	CBaseViewModel			*GetViewModel( int viewmodelindex = 0, bool bObserverOK = true );
+	CBaseAnimating			*GetHands();
+    void SetHands			( CBaseAnimating *pHandsModel );
 	void					HideViewModels( void );
 	void					DestroyViewModels( void );
+	EHANDLE					m_hHandsEntity;
 
 	CPlayerState			*PlayerData( void ) { return &pl; }
 	
@@ -401,6 +412,7 @@ public:
 
 	// View model prediction setup
 	void					CalcView( Vector &eyeOrigin, QAngle &eyeAngles, float &zNear, float &zFar, float &fov );
+	virtual void			CalcViewModelView(const Vector& eyeOrigin, const QAngle& eyeAngles);
 
 	// Handle view smoothing when going up stairs
 	void					SmoothViewOnStairs( Vector& eyeOrigin );
@@ -426,7 +438,11 @@ public:
 	// Weapon stuff
 	virtual Vector			Weapon_ShootPosition( );
 	virtual bool			Weapon_CanUse( CBaseCombatWeapon *pWeapon );
+#ifdef LUA_SDK
+	virtual void			Weapon_Equip( CBaseCombatWeapon *pWeapon, bool bGiveAmmo = true);
+#else
 	virtual void			Weapon_Equip( CBaseCombatWeapon *pWeapon );
+#endif
 	virtual	void			Weapon_Drop( CBaseCombatWeapon *pWeapon, const Vector *pvecTarget /* = NULL */, const Vector *pVelocity /* = NULL */ );
 	virtual	bool			Weapon_Switch( CBaseCombatWeapon *pWeapon, int viewmodelindex = 0 );		// Switch to given weapon if has ammo (false if failed)
 	virtual void			Weapon_SetLast( CBaseCombatWeapon *pWeapon );
@@ -570,6 +586,9 @@ public:
 	virtual void			PickupObject( CBaseEntity *pObject, bool bLimitMassAndSize = true ) {}
 	virtual void			ForceDropOfCarriedPhysObjects( CBaseEntity *pOnlyIfHoldindThis = NULL ) {}
 	virtual float			GetHeldObjectMass( IPhysicsObject *pHeldObject );
+#ifdef LUA_SDK
+	virtual					CBaseEntity *GetHeldObject( void );
+#endif
 
 	void					CheckSuitUpdate();
 	void					SetSuitUpdate(const char *name, int fgroup, int iNoRepeat);
@@ -718,6 +737,89 @@ public:
 	virtual void RemoveSuit( void );
 	void	SetMaxSpeed( float flMaxSpeed ) { m_flMaxspeed = flMaxSpeed; }
 
+#ifdef LUA_SDK
+	float GetMaxSpeed() const
+	{
+		return m_flMaxspeed;
+	}
+
+	void SetWalkSpeed(float flSpeed)
+	{
+		m_flWalkSpeed = flSpeed;
+	}
+	float GetWalkSpeed(void)
+	{
+		return m_flWalkSpeed;
+	}
+
+	void SetNormalSpeed(float flSpeed)
+	{
+		m_flNormalSpeed = flSpeed;
+	}
+	float GetNormalSpeed(void)
+	{
+		return m_flNormalSpeed;
+	}
+
+	void SetRunSpeed(float flSpeed)
+	{
+		m_flRunSpeed = flSpeed;
+	}
+	float GetRunSpeed(void)
+	{
+		return m_flRunSpeed;
+	}
+
+	void SetLadderClimbSpeed(float flSpeed)
+	{
+		m_flLadderClimbSpeed = flSpeed;
+	}
+	float GetLadderClimbSpeed(void)
+	{
+		return m_flLadderClimbSpeed;
+	}
+
+	void SetCrouchWalkFraction(float flSpeed)
+	{
+		m_flCrouchWalkFraction = flSpeed;
+	}
+	float GetCrouchWalkFraction(void)
+	{
+		return m_flCrouchWalkFraction;
+	}
+
+	void SetJumpPower(float flPower)
+	{
+		m_flJumpPower = flPower;
+	}
+	float GetJumpPower(void)
+	{
+		return m_flJumpPower;
+	}
+
+	// Experiment; Note that this issue should be fixed in our implementation: https://github.com/Facepunch/garrysmod-issues/issues/2722
+	void SetDuckSpeedInMilliseconds(float flSpeed)
+	{
+		Assert(flSpeed >= 0.0f);
+
+		m_flDuckSpeed = flSpeed;
+	}
+	float GetDuckSpeedInMilliseconds(void)
+	{
+		return m_flDuckSpeed;
+	}
+	void SetUnDuckFraction(float flSpeed)
+	{
+		Assert(flSpeed >= 0.0f && flSpeed <= 1.0f);
+
+		m_flUnDuckFraction = flSpeed;
+	}
+	float GetUnDuckFraction(void)
+	{
+		return m_flUnDuckFraction;
+	}
+#endif
+
 	void	NotifyNearbyRadiationSource( float flRange );
 
 	void	SetAnimationExtension( const char *pExtension );
@@ -738,6 +840,9 @@ public:
 	// Suicide...
 	virtual void CommitSuicide( bool bExplode = false, bool bForce = false );
 	virtual void CommitSuicide( const Vector &vecForce, bool bExplode = false, bool bForce = false );
+#ifdef LUA_SDK
+	virtual void KillSilent();
+#endif
 
 	// For debugging...
 	void	ForceOrigin( const Vector &vecOrigin );
@@ -803,6 +908,7 @@ public:
 	// Steam handling
 	bool		GetSteamID( CSteamID *pID );
 	uint64		GetSteamIDAsUInt64( void );
+	virtual		uint GetUniqueID();
 #endif
 
 	int GetRemainingMovementTicksForUserCmdProcessing() const { return m_nMovementTicksForUserCmdProcessingRemaining; }
@@ -932,11 +1038,10 @@ private:
 
 protected:
 
-	void					CalcPlayerView( Vector& eyeOrigin, QAngle& eyeAngles, float& fov );
-	void					CalcVehicleView( IServerVehicle *pVehicle, Vector& eyeOrigin, QAngle& eyeAngles, 	
-								float& zNear, float& zFar, float& fov );
+    void					CalcPlayerView( CViewSetup &viewSetup, bool &bForceDrawLocalPlayer );
+    void					CalcVehicleView( IServerVehicle *pVehicle, CViewSetup &viewSetup, bool &bForceDrawLocalPlayer );
 	void					CalcObserverView( Vector& eyeOrigin, QAngle& eyeAngles, float& fov );
-	void					CalcViewModelView( const Vector& eyeOrigin, const QAngle& eyeAngles);
+    virtual void			CalcView( CViewSetup &viewSetup );
 
 	virtual	void			Internal_HandleMapEvent( inputdata_t &inputdata ){}
 
@@ -1105,6 +1210,18 @@ private:
 
 // Replicated to all clients
 	CNetworkVar( float, m_flMaxspeed );
+
+#ifdef LUA_SDK
+    // Values to set m_flMaxspeed to when walking slowly, normally, and running.
+    CNetworkVar( float, m_flWalkSpeed );
+    CNetworkVar( float, m_flNormalSpeed );
+    CNetworkVar( float, m_flRunSpeed );
+    CNetworkVar( float, m_flLadderClimbSpeed );
+    CNetworkVar( float, m_flCrouchWalkFraction );
+    CNetworkVar( float, m_flJumpPower );
+    CNetworkVar( float, m_flDuckSpeed );
+    CNetworkVar( float, m_flUnDuckFraction );
+#endif
 	
 // Not transmitted
 	float					m_flWaterJumpTime;  // used to be called teleport_time
@@ -1127,6 +1244,7 @@ public:
 	float					m_flForwardMove;
 	float					m_flSideMove;
 	int						m_nNumCrateHudHints;
+	bool					m_bCalcViewForceDrawPlayer;
 
 private:
 
