@@ -1,0 +1,201 @@
+name: Build and Push Binaries
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-2022
+            name: windows
+          - os: ubuntu-latest
+            name: linux
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+
+      # ======================
+      # CHECKOUT
+      # ======================
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+
+      # ======================
+      # WINDOWS
+      # ======================
+
+      - name: Install Visual Studio MFC Components
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $installer = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vs_installer.exe"
+          $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+
+          if (!(Test-Path $vswhere)) {
+              throw "vswhere.exe not found"
+          }
+
+          $vsPath = & $vswhere -latest -property installationPath
+
+          if (!$vsPath) {
+              throw "Visual Studio installation not found"
+          }
+
+          Write-Host "Visual Studio:"
+          Write-Host $vsPath
+
+          & $installer modify `
+            --installPath "$vsPath" `
+            --add Microsoft.VisualStudio.Workload.VCTools `
+            --add Microsoft.VisualStudio.Component.VC.ATLMFC `
+            --add Microsoft.VisualStudio.Component.VC.ATLMFC.Spectre `
+            --includeRecommended `
+            --quiet `
+            --norestart `
+            --wait
+
+          if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 3010) {
+              throw "Visual Studio installer failed: $LASTEXITCODE"
+          }
+
+
+      - name: Setup MSBuild
+        if: runner.os == 'Windows'
+        uses: microsoft/setup-msbuild@v2
+
+
+      - name: Generate Projects (Windows)
+        if: runner.os == 'Windows'
+        working-directory: src
+        shell: cmd
+        run: |
+          create_hl2mp.bat
+
+
+      - name: Build Full Solution (Windows)
+        if: runner.os == 'Windows'
+        working-directory: src
+        shell: cmd
+        run: |
+          msbuild HL2MP.sln ^
+            /m ^
+            /p:Configuration=Release ^
+            /p:Platform=win64 ^
+            /p:BuildInParallel=true
+
+
+      # ======================
+      # LINUX
+      # ======================
+
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build g++-multilib python3
+
+
+      - name: Build Linux
+        if: runner.os == 'Linux'
+        working-directory: src
+        shell: bash
+        run: |
+          chmod +x create_hl2mp.sh
+          ./create_hl2mp.sh release
+
+
+      # ======================
+      # COPY BINARIES
+      # ======================
+
+      - name: Copy binaries
+        shell: bash
+        run: |
+          mkdir -p game/mod_hl2mp/bin/x64
+          mkdir -p game/mod_hl2mp/bin/linux64
+
+          if [ "${{ runner.os }}" = "Windows" ]; then
+
+            echo "Searching for Windows DLLs..."
+
+            find src/game/mod_hl2mp -iname "*.dll" -print || true
+
+
+            echo "Copying Windows DLLs..."
+
+            cp -f src/game/mod_hl2mp/bin/x64/*.dll \
+              game/mod_hl2mp/bin/x64/ \
+              2>/dev/null || true
+
+
+            echo "Searching for executable..."
+
+            find src -iname "*hl2mp*.exe" -print || true
+
+
+            EXE_PATH=$(find src -name "mod_hl2mp_win64.exe" | head -n 1 || true)
+
+            if [ -n "$EXE_PATH" ]; then
+              echo "Copying executable:"
+              echo "$EXE_PATH"
+
+              cp -f "$EXE_PATH" game/
+            else
+              echo "No mod_hl2mp_win64.exe found"
+            fi
+
+          fi
+
+
+          if [ "${{ runner.os }}" = "Linux" ]; then
+
+            echo "Copying Linux shared libraries..."
+
+            cp -f src/game/mod_hl2mp/bin/linux64/*.so \
+              game/mod_hl2mp/bin/linux64/ \
+              2>/dev/null || true
+
+          fi
+
+
+          echo "Runtime files staged:"
+          find game/mod_hl2mp/bin -type f \( -name "*.dll" -o -name "*.so" \) -print
+
+          find game -maxdepth 1 -name "*.exe" -print
+
+
+      # ======================
+      # COMMIT BINARIES
+      # ======================
+
+      - name: Commit binaries if changed
+        shell: bash
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+          # Windows DLLs only
+          git add -f game/mod_hl2mp/bin/x64/*.dll || true
+
+          # Linux shared objects only
+          git add -f game/mod_hl2mp/bin/linux64/*.so || true
+
+          # Windows executable
+          if [ -f game/mod_hl2mp_win64.exe ]; then
+            git add -f game/mod_hl2mp_win64.exe
+          fi
+
+          if git diff --cached --quiet; then
+            echo "No binary changes"
+          else
+            git commit -m "ci: update binaries from ${{ github.sha }}"
+            git push
+          fi
