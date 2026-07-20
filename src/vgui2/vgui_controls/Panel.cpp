@@ -1420,8 +1420,10 @@ void Panel::PaintTraverse( bool repaint, bool allowForce )
         surface()->PopFullscreenViewport();
     }
 
+#ifdef LUA_SDK
     input()->GetCursorPos( m_nLastLocalCursorX, m_nLastLocalCursorY );
     ScreenToLocal( m_nLastLocalCursorX, m_nLastLocalCursorY );
+#endif
 }
 
 //-----------------------------------------------------------------------------
