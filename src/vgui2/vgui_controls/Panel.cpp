@@ -1431,7 +1431,19 @@ void Panel::PaintTraverse( bool repaint, bool allowForce )
 //-----------------------------------------------------------------------------
 void Panel::PaintBorder()
 {
-    _border->Paint( GetVPanel() );
+    //_border->Paint( GetVPanel() );
+	
+	// Post-20th HL2 uses the thicker frames on higher resolutions. for vgui tools, this definetly isn't ideal
+	// so we revert it for tools (could do this if your using swarms interface as well, as it has the same issues)
+    if (BSurfaceIsMatSysSurface())
+    {
+        _border->Paint(GetVPanel());
+    }
+    else
+    {
+        // This is not going to do the scaling shit from HL2 Anniversary
+        _border->Paint(0, 0, GetWide(), GetTall());
+    }
 
 #ifdef LUA_SDK
     LUA_CALL_PANEL_METHOD_BEGIN( "PaintBorder" );
