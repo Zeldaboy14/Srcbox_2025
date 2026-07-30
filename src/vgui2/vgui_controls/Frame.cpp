@@ -1614,7 +1614,14 @@ void Frame::PaintBackground()
             {
                 nTitleY = QuickPropScale( m_bSmallCaption ? 2 : 9 );
             }
-            _title->SetPos( nTitleX, nTitleY );
+            // normally, if you are using icons with vgui panels in-game, it doesn't work very well. the indent got fucked up in 2013's sdk
+            // code is reverted to sdk 2006 (ep1) to fix the indent issue, and modified to match an earlier interation of where the text was positioned with the icon
+            if (_menuButton && _menuButton->IsVisible())
+            {
+              _title->SetPos(m_iTitleTextInsetX - 4, m_bSmallCaption ? 2 : 9);
+            } else{
+              _title->SetPos(m_iTitleTextInsetX, m_bSmallCaption ? 2 : 9);
+            }
             _title->SetSize( nTitleWidth, tall );
             _title->Paint();
         }
