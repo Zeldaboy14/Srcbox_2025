@@ -289,6 +289,7 @@ const char *CConsolePanel::CompletionItem::GetCommand( void ) const
 CConsolePanel::CConsolePanel( vgui::Panel *pParent, const char *pName, bool bStatusVersion )
     : BaseClass( pParent, pName ), m_bStatusVersion( bStatusVersion )
 {
+    SetScheme(vgui::scheme()->LoadSchemeFromFile("resource/SourceSchemeLegacy.res", "SourceSchemeLegacy")); // added to srcbox
     SetKeyBoardInputEnabled( true );
 
     if ( !m_bStatusVersion )
@@ -853,6 +854,7 @@ void CConsolePanel::PerformLayout()
         m_pHistory->SetBounds( inset + entryWidth + inset, inset, ( wide - entryWidth ) - inset, tall - 2 * inset );
     }
 
+    SetProportional(false); // set so custom schemes can be used. added to srcbox
     UpdateCompletionListPosition();
 }
 
@@ -1108,6 +1110,7 @@ CConsoleDialog::CConsoleDialog( vgui::Panel *pParent, const char *pName, bool bS
     // initialize dialog
     SetVisible( false );
     SetTitle( "#Console_Title", true );
+    SetScheme(vgui::scheme()->LoadSchemeFromFile("resource/SourceSchemeLegacy.res", "SourceSchemeLegacy")); // added to srcbox
     m_pConsolePanel = new CConsolePanel( this, "ConsolePage", bStatusVersion );
     m_pConsolePanel->AddActionSignalTarget( this );
 }
@@ -1143,7 +1146,7 @@ void CConsoleDialog::OnScreenSizeChanged( int iOldWide, int iOldTall )
 void CConsoleDialog::PerformLayout()
 {
     BaseClass::PerformLayout();
-
+    SetProportional(false); // set so custom schemes can be used. added to srcbox
     int x, y, w, h;
     GetClientArea( x, y, w, h );
     m_pConsolePanel->SetBounds( x, y, w, h );
