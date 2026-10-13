@@ -228,6 +228,7 @@ DLL_IMPORT HANDLE STDCALL GetCurrentProcess(void);
 
 #ifdef WITH_ENGINE_PATCHES
 #include "../../engine/engine_patches.h"
+#include "hooks/bsp_compat.h"
 #endif
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -1403,6 +1404,11 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 	// Initialize the console variables.
 	ConVar_Register( FCVAR_CLIENTDLL );
 
+#ifdef WITH_ENGINE_PATCHES
+	// Newer (v21) maps: read them as version 20 maps, before anything can load one
+	BSPCompat_Install();
+#endif
+
 	g_pcv_ThreadMode = g_pCVar->FindVar( "host_thread_mode" );
 
 #ifdef EXPERIMENT_SOURCE
@@ -1714,6 +1720,9 @@ void CHLClient::PostInit()
 //-----------------------------------------------------------------------------
 void CHLClient::Shutdown( void )
 {
+#ifdef WITH_ENGINE_PATCHES
+	BSPCompat_Shutdown();
+#endif
     if (g_pAchievementsAndStatsInterface)
     {
         g_pAchievementsAndStatsInterface->ReleasePanel();

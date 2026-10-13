@@ -67,6 +67,11 @@ $Project "Client (HL2MP)"
 		{
 			$File	"$SRCDIR\game\shared\gmod\env_skypaint.cpp"
 		}
+		$Folder "Srcbox"
+		{
+			$File	"$SRCDIR\game\shared\srcbox\hooks\bsp_compat.cpp"
+			$File	"$SRCDIR\game\shared\srcbox\hooks\bsp_compat.h"
+		}
 		$Folder "Portal"
 		{
 			$File	"$SRCDIR\game\shared\portal\weapon_portalgun.cpp"

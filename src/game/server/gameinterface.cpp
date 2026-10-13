@@ -125,6 +125,7 @@ extern ConVar tf_mm_servermode;
 #endif
 
 #ifdef WITH_ENGINE_PATCHES
+#include "srcbox/hooks/bsp_compat.h"
 #include <../engine/engine_patches.h>
 #endif
 
@@ -786,6 +787,11 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 	gamestatsuploader->InitConnection();
 #endif
 
+#ifdef WITH_ENGINE_PATCHES
+	// Newer (v21) maps: read them as version 20 maps (does nothing if client.dll already did)
+	BSPCompat_Install();
+#endif
+
 	return true;
 }
 
@@ -796,6 +802,9 @@ void CServerGameDLL::PostInit()
 
 void CServerGameDLL::DLLShutdown( void )
 {
+#ifdef WITH_ENGINE_PATCHES
+	BSPCompat_Shutdown();
+#endif
 
 	// Due to dependencies, these are not autogamesystems
 	ModelSoundsCacheShutdown();
