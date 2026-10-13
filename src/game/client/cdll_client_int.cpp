@@ -228,6 +228,7 @@ DLL_IMPORT HANDLE STDCALL GetCurrentProcess(void);
 
 #ifdef WITH_ENGINE_PATCHES
 #include "../../engine/engine_patches.h"
+#include "hooks/staticprop_colormod.h"
 #include "hooks/bsp_compat.h"
 #endif
 
@@ -1553,6 +1554,9 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 	PatchLocalBackdoor();
 	//LoadDetours();
 	ApplyVTFPatch();
+#ifdef WITH_ENGINE_PATCHES
+	StaticPropColorMod_Install(appSystemFactory);
+#endif
 #endif
 
 	// Discord RPC
