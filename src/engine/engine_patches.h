@@ -13,6 +13,7 @@ DWORD_PTR FindPattern( HMODULE module, const char* pattern, const char* mask );
 
 void ApplyDetoursOnDllStartup();
 void NotifyDetoursOnLevelShutdown();
+void ApplyVTFPatch();
 
 /*
 ** Specific detours

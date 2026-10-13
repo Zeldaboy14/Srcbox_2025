@@ -1546,6 +1546,7 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 	PatchVphysicsSaveRestore();
 	PatchLocalBackdoor();
 	//LoadDetours();
+	ApplyVTFPatch();
 #endif
 
 	// Discord RPC
