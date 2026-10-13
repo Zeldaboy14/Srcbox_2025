@@ -564,7 +564,7 @@
     }
 
 #define LUA_METATABLE_INDEX_DERIVE_INDEX( L, DerivedFrom )         \
-    if ( luaL_getmetatable( L, DerivedFrom ) )                     \
+    if ( (luaL_getmetatable( L, DerivedFrom ), !lua_isnil( L, -1 )) ) \
     {                                                              \
         lua_getfield( L, -1, "__index" );                          \
         if ( lua_isfunction( L, -1 ) )                             \
