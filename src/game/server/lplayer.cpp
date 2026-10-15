@@ -786,6 +786,8 @@ LUA_BINDING_BEGIN(Player, Give, "class", "Give the weapon to the player.")
     // Let's make sure the weapon has a valid model, if not, set it to the error model
     if (!weapon->GetModelPtr())
     {
+        // Preache, else you break the fuckin game!
+        CBaseEntity::PrecacheModel("models/error.mdl");
         weapon->SetModel("models/error.mdl");
     }
 

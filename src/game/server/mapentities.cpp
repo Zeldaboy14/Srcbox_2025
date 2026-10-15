@@ -5,6 +5,9 @@
 //=============================================================================//
 
 #include "cbase.h"
+#ifdef LUA_SDK
+#include "luasrclib.h"
+#endif
 #include "entitylist.h"
 #include "mapentities_shared.h"
 #include "soundent.h"
@@ -358,7 +361,14 @@ void MapEntity_ParseAllEntities(const char *pMapData, IMapEntityFilter *pFilter,
 		//
 		CBaseEntity *pEntity;
 		const char *pCurMapData = pMapData;
+#ifdef LUA_SDK
+		// Lets CEntityFactoryDictionary::Create fall back to Lua SENTs placed in the map (ScriptedEntities)
+		LUA_EXPECTED_SCRIPTED_LIBRARY_BEGIN(LUA_SCRIPTEDENTITIESLIBNAME);
+#endif
 		pMapData = MapEntity_ParseEntity(pEntity, pMapData, pFilter);
+#ifdef LUA_SDK
+		LUA_EXPECTED_SCRIPTED_LIBRARY_END(LUA_SCRIPTEDENTITIESLIBNAME);
+#endif
 		if (pEntity == NULL)
 			continue;
 

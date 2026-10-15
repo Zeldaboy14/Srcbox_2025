@@ -37,6 +37,12 @@
 #include "util.h"
 #include "cdll_int.h"
 #include "vscript_server.h"
+#ifdef LUA_SDK
+#include "luamanager.h"
+#include "luasrclib.h"
+#include "basescripted.h"
+#include "weapon_hl2mpbase_scriptedweapon.h"
+#endif
 
 #ifdef PORTAL
 #include "PortalSimulation.h"
@@ -175,6 +181,45 @@ IServerNetworkable *CEntityFactoryDictionary::Create( const char *pClassName )
 	IEntityFactory *pFactory = FindFactory( pClassName );
 	if ( !pFactory )
 	{
+#ifdef LUA_SDK
+		// required
+		if (L && g_szLuaExpectedScriptedLibrary)
+		{
+			int iTop = lua_gettop(L);
+			bool bIsRegistered = false;
+
+			lua_getglobal(L, g_szLuaExpectedScriptedLibrary);
+
+			if (lua_istable(L, -1))
+			{
+				lua_getfield(L, -1, "GetStored");
+
+				if (lua_isfunction(L, -1))
+				{
+					lua_pushstring(L, pClassName);
+
+					if (luasrc_pcall(L, 1, 1) == LUA_OK)
+						bIsRegistered = lua_istable(L, -1);
+				}
+			}
+
+			lua_settop(L, iTop);
+
+			if (bIsRegistered)
+			{
+				if (Q_strcmp(g_szLuaExpectedScriptedLibrary, LUA_SCRIPTEDENTITIESLIBNAME) == 0)
+				{
+					CBaseScripted* pEnt = _CreateEntityTemplate((CBaseScripted*)NULL, pClassName);
+					return pEnt->NetworkProp();
+				}
+				else if (Q_strcmp(g_szLuaExpectedScriptedLibrary, LUA_SCRIPTEDWEAPONSLIBNAME) == 0)
+				{
+					CHL2MPScriptedWeapon* pEnt = _CreateEntityTemplate((CHL2MPScriptedWeapon*)NULL, pClassName);
+					return pEnt->NetworkProp();
+				}
+			}
+		}
+#endif
 		Warning("Attempted to create unknown entity type %s!\n", pClassName );
 		return NULL;
 	}
