@@ -80,6 +80,10 @@
 // Projective textures
 #include "C_Env_Projected_Texture.h"
 
+#ifdef LUA_SDK
+#include "luamanager.h"
+#endif
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -1099,6 +1103,11 @@ void CViewRender::DrawViewModels( const CViewSetup &viewRender, bool drawViewmod
 	render->SetBlend( 1.0f );
 
 	render->Push3DView( viewModelSetup, 0, pRTColor, GetFrustum(), pRTDepth );
+
+#ifdef LUA_SDK
+	LUA_CALL_HOOK_BEGIN("PreDrawViewModels");
+	LUA_CALL_HOOK_END(0, 0);
+#endif
 
 #ifdef PORTAL //the depth range hack doesn't work well enough for the portal mod (and messing with the depth hack values makes some models draw incorrectly)
 				//step up to a full depth clear if we're extremely close to a portal (in a portal environment)
