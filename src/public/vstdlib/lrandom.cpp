@@ -1,13 +1,3 @@
-//===== Copyright © 1996-2005, Valve Corporation, All rights reserved. ======//
-//
-// Purpose: Random number generator
-//
-// $Workfile: $
-// $NoKeywords: $
-//===========================================================================//
-
-#define lrandom_cpp
-
 #include "cbase.h"
 #include "lua.hpp"
 #include "luasrclib.h"
@@ -15,83 +5,120 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+LUA_REGISTRATION_INIT( Randoms );
 
+LUA_BINDING_BEGIN( Randoms, RandomFloat, "library", "Generate a random float." )
+{
+    float min = LUA_BINDING_ARGUMENT_WITH_DEFAULT( luaL_optnumber, 1, 0.0f, "min" );
+    float max = LUA_BINDING_ARGUMENT_WITH_DEFAULT( luaL_optnumber, 2, 0.0f, "max" );
 
-static int random_RandomFloat (lua_State *L) {
-  lua_pushnumber(L, random->RandomFloat(luaL_optnumber(L, 1, 0.0f), luaL_optnumber(L, 2, 0.0f)));
-  return 1;
+    lua_pushnumber( L, random->RandomFloat( min, max ) );
+
+    return 1;
 }
+LUA_BINDING_END( "number", "The generated random float." )
 
-static int random_RandomFloatExp (lua_State *L) {
-  lua_pushnumber(L, random->RandomFloatExp(luaL_optnumber(L, 1, 0.0f), luaL_optnumber(L, 2, 0.0f), luaL_optnumber(L, 3, 1.0f)));
-  return 1;
+LUA_BINDING_BEGIN( Randoms, RandomFloatExponential, "library", "Generate a random float with an exponential distribution." )
+{
+    float min = LUA_BINDING_ARGUMENT_WITH_DEFAULT( luaL_optnumber, 1, 0.0f, "min" );
+    float max = LUA_BINDING_ARGUMENT_WITH_DEFAULT( luaL_optnumber, 2, 0.0f, "max" );
+    float exponent = LUA_BINDING_ARGUMENT_WITH_DEFAULT( luaL_optnumber, 3, 1.0f, "exponent" );
+
+    lua_pushnumber( L, random->RandomFloatExp( min, max, exponent ) );
+
+    return 1;
 }
+LUA_BINDING_END( "number", "The generated random float." )
 
-static int random_RandomInt (lua_State *L) {
-  lua_pushinteger(L, random->RandomInt(luaL_checkint(L, 1), luaL_checkint(L, 2)));
-  return 1;
+LUA_BINDING_BEGIN( Randoms, RandomInteger, "library", "Generate a random integer." )
+{
+    int min = LUA_BINDING_ARGUMENT( luaL_checknumber, 1, "min" );
+    int max = LUA_BINDING_ARGUMENT( luaL_checknumber, 2, "max" );
+
+    lua_pushinteger( L, random->RandomInt( min, max ) );
+
+    return 1;
 }
+LUA_BINDING_END( "integer", "The generated random integer." )
 
-static int random_SetSeed (lua_State *L) {
-  random->SetSeed(luaL_checkint(L, 1));
-  return 0;
+LUA_BINDING_BEGIN( Randoms, SetSeed, "library", "Set the seed for the random number generator." )
+{
+    int seed = LUA_BINDING_ARGUMENT( luaL_checknumber, 1, "seed" );
+
+    random->SetSeed( seed );
+
+    return 0;
 }
+LUA_BINDING_END()
 
+LUA_BINDING_BEGIN( Randoms, SharedRandomFloat, "library", "Generate a shared random float. Whenever generating random numbers in shared/predicted code, these SharedRandom* functions have to be used. Each call should specify a unique 'sharedName' that seeds the random number generator. In loops make sure the additionalSeed is increased with the loop counter, otherwise it will always return the same random number" )
+{
+    const char *sharedName = LUA_BINDING_ARGUMENT( luaL_checkstring, 1, "sharedName" );
+    float min = LUA_BINDING_ARGUMENT( luaL_checknumber, 2, "min" );
+    float max = LUA_BINDING_ARGUMENT( luaL_checknumber, 3, "max" );
+    int additionalSeed = LUA_BINDING_ARGUMENT_WITH_DEFAULT( luaL_optnumber, 4, 0, "additionalSeed" );
 
-static const luaL_Reg randomlib[] = {
-  {"RandomFloat",   random_RandomFloat},
-  {"RandomFloatExp",   random_RandomFloatExp},
-  {"RandomInt",   random_RandomInt},
-  {"SetSeed",   random_SetSeed},
-  {NULL, NULL}
-};
+    lua_pushnumber( L, SharedRandomFloat( sharedName, min, max, additionalSeed ) );
 
-
-#if 0
-static int luasrc_RandomSeed (lua_State *L) {
-  RandomSeed(luaL_checkint(L, 1));
-  return 0;
+    return 1;
 }
+LUA_BINDING_END( "number", "The generated random float." )
 
-static int luasrc_RandomFloat (lua_State *L) {
-  lua_pushnumber(L, RandomFloat(luaL_optnumber(L, 1, 0.0f), luaL_optnumber(L, 2, 0.0f)));
-  return 1;
+LUA_BINDING_BEGIN( Randoms, SharedRandomInt, "library", "Generate a shared random integer. Whenever generating random numbers in shared/predicted code, these SharedRandom* functions have to be used. Each call should specify a unique 'sharedName' that seeds the random number generator. In loops make sure the additionalSeed is increased with the loop counter, otherwise it will always return the same random number" )
+{
+    const char *sharedName = LUA_BINDING_ARGUMENT( luaL_checkstring, 1, "sharedName" );
+    int min = LUA_BINDING_ARGUMENT( luaL_checknumber, 2, "min" );
+    int max = LUA_BINDING_ARGUMENT( luaL_checknumber, 3, "max" );
+    int additionalSeed = LUA_BINDING_ARGUMENT_WITH_DEFAULT( luaL_optnumber, 4, 0, "additionalSeed" );
+
+    lua_pushinteger( L, SharedRandomInt( sharedName, min, max, additionalSeed ) );
+
+    return 1;
 }
+LUA_BINDING_END( "integer", "The generated random integer." )
 
-static int luasrc_RandomFloatExp (lua_State *L) {
-  lua_pushnumber(L, RandomFloatExp(luaL_optnumber(L, 1, 0.0f), luaL_optnumber(L, 2, 1.0f), luaL_optnumber(L, 3, 1.0f)));
-  return 1;
+LUA_BINDING_BEGIN( Randoms, SharedRandomVector, "library", "Generate a shared random vector. Whenever generating random numbers in shared/predicted code, these SharedRandom* functions have to be used. Each call should specify a unique 'sharedName' that seeds the random number generator. In loops make sure the additionalSeed is increased with the loop counter, otherwise it will always return the same random number" )
+{
+    const char *sharedName = LUA_BINDING_ARGUMENT( luaL_checkstring, 1, "sharedName" );
+    float min = LUA_BINDING_ARGUMENT( luaL_checknumber, 2, "min" );
+    float max = LUA_BINDING_ARGUMENT( luaL_checknumber, 3, "max" );
+    int additionalSeed = LUA_BINDING_ARGUMENT_WITH_DEFAULT( luaL_optnumber, 4, 0, "additionalSeed" );
+
+    lua_pushvector( L, SharedRandomVector( sharedName, min, max, additionalSeed ) );
+
+    return 1;
 }
+LUA_BINDING_END( "Vector", "The generated random vector." )
 
-static int luasrc_RandomInt (lua_State *L) {
-  lua_pushinteger(L, RandomInt(luaL_checkint(L, 1), luaL_checkint(L, 2)));
-  return 1;
+LUA_BINDING_BEGIN( Randoms, SharedRandomAngle, "library", "Generate a shared random angle. Whenever generating random numbers in shared/predicted code, these SharedRandom* functions have to be used. Each call should specify a unique 'sharedName' that seeds the random number generator. In loops make sure the additionalSeed is increased with the loop counter, otherwise it will always return the same random number" )
+{
+    const char *sharedName = LUA_BINDING_ARGUMENT( luaL_checkstring, 1, "sharedName" );
+    float min = LUA_BINDING_ARGUMENT( luaL_checknumber, 2, "min" );
+    float max = LUA_BINDING_ARGUMENT( luaL_checknumber, 3, "max" );
+    int additionalSeed = LUA_BINDING_ARGUMENT_WITH_DEFAULT( luaL_optnumber, 4, 0, "additionalSeed" );
+
+    lua_pushangle( L, SharedRandomAngle( sharedName, min, max, additionalSeed ) );
+
+    return 1;
 }
+LUA_BINDING_END( "Angle", "The generated random angle." )
 
-static int luasrc_RandomGaussianFloat (lua_State *L) {
-  lua_pushnumber(L, RandomGaussianFloat(luaL_optnumber(L, 1, 0.0f), luaL_optnumber(L, 2, 1.0f)));
-  return 1;
+#ifdef GAME_DLL
+
+LUA_BINDING_BEGIN( Randoms, RandomBloodVector, "library", "Generate a random blood vector.", "server" )
+{
+    lua_pushvector( L, UTIL_RandomBloodVector() );
+    return 1;
 }
+LUA_BINDING_END( "Vector", "The generated random blood vector." )
 
-
-static const luaL_Reg random_funcs[] = {
-  {"RandomSeed",  luasrc_RandomSeed},
-  {"RandomFloat",  luasrc_RandomFloat},
-  {"RandomFloatExp",  luasrc_RandomFloatExp},
-  {"RandomInt",  luasrc_RandomInt},
-  {"RandomGaussianFloat",  luasrc_RandomGaussianFloat},
-  {NULL, NULL}
-};
-#endif
-
+#endif  // GAME_DLL
 
 /*
 ** Open random library
 */
-LUALIB_API int luaopen_random (lua_State *L) {
-  luaL_register(L, LUA_RANDOMLIBNAME, randomlib);
-  // UNDONE: this has always been redundant.
-  // luaL_register(L, "_G", random_funcs);
-  return 1;
+LUALIB_API int luaopen_random( lua_State *L )
+{
+    LUA_REGISTRATION_COMMIT_LIBRARY( Randoms );
+    return 1;
 }
-
