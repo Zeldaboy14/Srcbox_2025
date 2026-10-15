@@ -164,6 +164,8 @@ ents = {
 	FindInBox = Entities.GetInBox,
 	FindInSphere = Entities.GetInSphere,
 	FindByClass = Entities.GetByClass,
+	-- GMod: ents.GetByIndex( index ) == Entity( index ) (used by HAT's hat_select)
+	GetByIndex = Entities.Find,
 
 	FindInPVS = function(viewOrigin)
 		if (type(viewOrigin) == "Entity") then
@@ -916,6 +918,20 @@ end
 
 function PHYSICS_OBJECT_META:GetAngles()
 	return select(2, self:GetPosition())
+end
+
+-- GMod's PhysObj:SetPos / SetAngles (the engine binding is PhysicsObject:SetPosition(pos, ang, teleport)).
+-- Without these, HAT silently skipped posing props (gQuery ignores missing methods).
+if (PHYSICS_OBJECT_META.SetPosition) then
+	function PHYSICS_OBJECT_META:SetPos(position, teleport)
+		local _, angles = self:GetPosition()
+		self:SetPosition(position, angles, teleport or false)
+	end
+
+	function PHYSICS_OBJECT_META:SetAngles(angles)
+		local position = self:GetPosition()
+		self:SetPosition(position, angles, false)
+	end
 end
 
 local WEAPON_META = FindMetaTable("Weapon")

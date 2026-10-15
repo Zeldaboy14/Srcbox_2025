@@ -2,6 +2,9 @@
 #include "luamanager.h"
 #include "luasrclib.h"
 #include "mathlib/lvector.h"
+#ifdef LUA_SDK
+#include "mathlib/lvmatrix.h"
+#endif
 #include "lbaseentity_shared.h"
 #ifdef CLIENT_DLL
 #include "lc_baseanimating.h"
@@ -105,6 +108,32 @@ LUA_BINDING_BEGIN( CBaseAnimating, GetBonePosition, "class", "Get the bone posit
 }
 LUA_BINDING_END( "Vector", "The origin", "Angle", "The angles" )
 
+#ifdef LUA_SDK
+// GMod: Entity:GetBoneMatrix( bone ) -> bone-to-world VMatrix, or nil for an invalid bone
+LUA_BINDING_BEGIN( CBaseAnimating, GetBoneMatrix, "class", "Get the bone-to-world matrix of a bone." )
+{
+    lua_CBaseAnimating *pAnimating = LUA_BINDING_ARGUMENT( luaL_checkanimating, 1, "entity" );
+    int iBone = LUA_BINDING_ARGUMENT( luaL_checknumber, 2, "bone" );
+
+    CStudioHdr *pStudioHdr = pAnimating->GetModelPtr();
+
+    if ( !pStudioHdr || iBone < 0 || iBone >= pStudioHdr->numbones() )
+    {
+        lua_pushnil( L );
+        return 1;
+    }
+
+    matrix3x4_t boneToWorld;
+    pAnimating->GetBoneTransform( iBone, boneToWorld );
+
+    VMatrix matrix( boneToWorld );
+    lua_pushvmatrix( L, matrix );
+
+    return 1;
+}
+LUA_BINDING_END( "Matrix", "The bone-to-world matrix" )
+#endif
+
 LUA_BINDING_BEGIN( CBaseAnimating, GetCycle, "class", "Get the current cycle." )
 {
     lua_CBaseAnimating *pAnimating = LUA_BINDING_ARGUMENT( luaL_checkanimating, 1, "entity" );
@@ -192,6 +221,20 @@ LUA_BINDING_END( "integer", "The amount of bones" )
 LUA_BINDING_BEGIN( CBaseAnimating, GetModelName, "class", "Get the model path of the entity" )
 {
     lua_CBaseAnimating *pAnimating = LUA_BINDING_ARGUMENT( luaL_checkanimating, 1, "entity" );
+
+#ifdef LUA_SDK
+    // Return the path the model was loaded from (e.g. "models/props_borealis/bluebarrel001.mdl"), like GMod.
+    // pszName() is the name compiled into the .mdl ("props_borealis\\bluebarrel001.mdl"), which can't be
+    // passed back to SetModel/ClientsideModel.
+    const model_t *pModel = pAnimating->GetModel();
+    const char *pszModelPath = pModel ? modelinfo->GetModelName( pModel ) : NULL;
+
+    if ( pszModelPath && pszModelPath[0] )
+    {
+        lua_pushstring( L, pszModelPath );
+        return 1;
+    }
+#endif
 
     CStudioHdr *pstudiohdr = pAnimating->GetModelPtr();
 

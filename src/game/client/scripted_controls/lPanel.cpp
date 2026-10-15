@@ -10,7 +10,6 @@
 #include "luasrclib.h"
 #include "vgui_int.h"
 #include "lPanel.h"
-#include <scripted_controls/lPanel.h>
 #include "lColor.h"
 #include "vgui/LVGUI.h"
 #include <vgui/LIScheme.h>
@@ -1449,7 +1448,13 @@ LUA_BINDING_END()
 LUA_BINDING_BEGIN( Panel, ScreenToLocal, "class", "Converts a screen position to a local position" )
 {
     lua_Panel *panel = LUA_BINDING_ARGUMENT( luaL_checkpanel, 1, "panel" );
+#ifdef LUA_SDK
+    // The screen position was never read from the arguments, so this converted uninitialized values
+    int x = LUA_BINDING_ARGUMENT( luaL_checknumber, 2, "x" );
+    int y = LUA_BINDING_ARGUMENT( luaL_checknumber, 3, "y" );
+#else
     int x, y;
+#endif
     panel->ScreenToLocal( x, y );
     lua_pushinteger( L, x );
     lua_pushinteger( L, y );

@@ -6,6 +6,9 @@
 #include "lvphysics_interface.h"
 #include "vphysics/lperformance.h"
 #include "mathlib/lvector.h"
+#ifdef LUA_SDK
+#include "mathlib/langle.h"
+#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -911,6 +914,20 @@ LUA_BINDING_BEGIN( PhysicsObject, GetPosition, "class", "Gets the world position
     return 2;
 }
 LUA_BINDING_END( "Vector", "The world position.", "QAngle", "The angles." )
+
+#ifdef LUA_SDK
+// Needed for GMod's PhysObj:SetPos / PhysObj:SetAngles (mapped in the gmod_compatibility addon)
+LUA_BINDING_BEGIN( PhysicsObject, SetPosition, "class", "Sets the world position and angles" )
+{
+    lua_IPhysicsObject *physicsObject = LUA_BINDING_ARGUMENT( luaL_checkphysicsobject, 1, "physicsObject" );
+    Vector worldPosition = LUA_BINDING_ARGUMENT( luaL_checkvector, 2, "worldPosition" );
+    QAngle angles = LUA_BINDING_ARGUMENT( luaL_checkangle, 3, "angles" );
+    bool isTeleport = LUA_BINDING_ARGUMENT_WITH_DEFAULT( luaL_optboolean, 4, false, "isTeleport" );
+    physicsObject->SetPosition( worldPosition, angles, isTeleport );
+    return 0;
+}
+LUA_BINDING_END()
+#endif
 
 LUA_BINDING_BEGIN( PhysicsObject, GetShadowPosition, "class", "Gets the shadow position and angles" )
 {
