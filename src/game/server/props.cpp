@@ -206,7 +206,12 @@ void CBaseProp::Spawn( void )
 		else if ( iResult == PARSE_FAILED_NO_DATA )
 		{
 			// If we don't have data, but we're a prop_physics, fail
+#ifdef LUA_SDK
+			// Force spawning of stuff that seemingly has invalid collision. Gmod does it. why not us?
+			if ( FClassnameIs( this, "prop_physics" ) && !modelinfo->GetVCollide( GetModelIndex() ) )
+#else
 			if ( FClassnameIs( this, "prop_physics" ) )
+#endif
 			{
 				DevWarning( "%s at %.0f %.0f %0.f uses model %s, which has no propdata which means it must be used on a prop_static. DELETED.\n", GetClassname(), GetAbsOrigin().x, GetAbsOrigin().y, GetAbsOrigin().z, szModel );
 				UTIL_Remove( this );
