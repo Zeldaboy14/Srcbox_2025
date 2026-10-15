@@ -32,7 +32,7 @@ LUA_REGISTRATION_INIT( Renders );
 // Minifaction and magnification filter stacks
 static CUtlStack< ShaderAPITextureHandle_t > filterTextureHandlesMinification;
 static CUtlStack< ShaderAPITextureHandle_t > filterTextureHandlesMagnification;
-IShaderAPI* g_pShaderApi = NULL;
+extern IShaderAPI* g_pShaderApi;
 
 #ifdef GAME_DLL
 
@@ -524,6 +524,8 @@ LUA_BINDING_BEGIN( Renders, PushFilterMinification, "library", "Push a minificat
     // TODO: This doesn't work
     CMatRenderContextPtr pRenderContext( materials );
     ITexture *screenTexture = pRenderContext->GetFrameBufferCopyTexture( 0 );
+    if (!g_pShaderApi)
+        return 0;
     ShaderAPITextureHandle_t hTexture = g_pShaderApi->CreateTexture(
         screenTexture->GetActualWidth(),
         screenTexture->GetActualHeight(),

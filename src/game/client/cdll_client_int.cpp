@@ -1342,6 +1342,10 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 		return false;
 #endif
 
+#ifdef LUA_SDK
+	g_pShaderApi = (IShaderAPI*)appSystemFactory(SHADERAPI_INTERFACE_VERSION, NULL);
+#endif
+
 #if defined( REPLAY_ENABLED )
 	if ( IsPC() && (g_pEngineReplay = (IEngineReplay *)appSystemFactory( ENGINE_REPLAY_INTERFACE_VERSION, NULL )) == NULL )
 		return false;
