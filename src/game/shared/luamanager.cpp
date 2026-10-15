@@ -1162,6 +1162,10 @@ void luasrc_init_gameui( void )
 
 void luasrc_shutdown_gameui( void )
 {
+    // Safe to call when the GameUI state was never created or is already closed
+    if (!LGameUI)
+        return;
+
     ResetGameUIConCommandDatabase();
 
     lua_close( LGameUI );

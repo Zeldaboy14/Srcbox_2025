@@ -1742,10 +1742,6 @@ void CHLClient::Shutdown( void )
 	g_pSixenseInput = NULL;
 #endif
 
-#ifdef LUA_SDK
-	luasrc_shutdown_gameui();
-#endif
-
 	C_BaseAnimating::ShutdownBoneSetupThreadPool();
 	ClientWorldFactoryShutdown();
 
