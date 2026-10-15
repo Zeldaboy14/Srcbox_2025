@@ -117,6 +117,9 @@ function MakeTestPanel(title)
 	return testPanel
 end
 
+-- Disabled: these overrode sandbox's +menu/-menu, so Q opened this test panel instead of the spawn menu.
+-- Use "lua_run_cl MakeTestPanel()" to open the test panel instead.
+--[[
 ConsoleCommands.Add("+menu", function(client, pCmd, args)
 	local testPanel = vgui.Create("TestPanel2")
 	testPanel:SetTitle("TestPanel2 WithTestEarlyMakePopup")
@@ -126,5 +129,6 @@ end)
 
 ConsoleCommands.Add("-menu", function(client, pCmd, args)
 end)
+]]
 TEST_PANEL = MakeTestPanel("TestPanel (1)")
 TEST_PANEL:MakePopup()

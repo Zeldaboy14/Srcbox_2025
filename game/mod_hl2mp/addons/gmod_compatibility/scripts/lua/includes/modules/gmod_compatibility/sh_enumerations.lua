@@ -509,3 +509,31 @@ FL_DISSOLVING = 536870912
 FL_TRANSRAGDOLL = 1073741824
 --- This moving door can't be blocked by the player
 FL_UNBLOCKABLE_BY_PLAYER = -2147483648
+
+--[[
+	Constants newer Garry's Mod scripts expect, which Experiment doesn't export.
+	Missing ones abort whole files at load time (e.g. halo.lua does
+	bit.bor( STUDIO_RENDER, ... ), which took down the rest of includes/init.lua).
+	Values are from public/model_types.h.
+--]]
+STUDIO_NONE = STUDIO_NONE or 0x00000000
+STUDIO_RENDER = STUDIO_RENDER or 0x00000001
+STUDIO_VIEWXFORMATTACHMENTS = STUDIO_VIEWXFORMATTACHMENTS or 0x00000002
+STUDIO_DRAWTRANSLUCENTSUBMODELS = STUDIO_DRAWTRANSLUCENTSUBMODELS or 0x00000004
+STUDIO_TWOPASS = STUDIO_TWOPASS or 0x00000008
+STUDIO_STATIC_LIGHTING = STUDIO_STATIC_LIGHTING or 0x00000010
+STUDIO_WIREFRAME = STUDIO_WIREFRAME or 0x00000020
+STUDIO_ITEM_BLINK = STUDIO_ITEM_BLINK or 0x00000040
+STUDIO_NOSHADOWS = STUDIO_NOSHADOWS or 0x00000080
+STUDIO_WIREFRAME_VCOLLIDE = STUDIO_WIREFRAME_VCOLLIDE or 0x00000100
+STUDIO_GENERATE_STATS = STUDIO_GENERATE_STATS or 0x01000000
+STUDIO_SSAODEPTHTEXTURE = STUDIO_SSAODEPTHTEXTURE or 0x08000000
+STUDIO_SHADOWDEPTHTEXTURE = STUDIO_SHADOWDEPTHTEXTURE or 0x40000000
+STUDIO_TRANSPARENCY = STUDIO_TRANSPARENCY or 0x80000000
+-- STUDIO_SKIP_DECALS is left undefined on purpose; GMod's own scripts use "or 0" for it.
+
+-- Newer GMod activity. weapon_base/sh_anim.lua indexes a table with it, and a nil key
+-- aborts the file, leaving every SWEP without hold types or TranslateActivity.
+-- Experiment's player animations use ACT_MP_SWIM for swimming, so alias to that
+-- (sh_anim assigns ACT_MP_SWIM right after, so the end result matches GMod).
+ACT_MP_SWIM_IDLE = ACT_MP_SWIM_IDLE or ACT_MP_SWIM

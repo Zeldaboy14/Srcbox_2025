@@ -62,6 +62,32 @@ function math.random(min, max)
 	return originalMathRandom(min, max)
 end
 
+-- Garry's Mod has utf8.force built into its engine (markup.Parse uses it), Lua 5.4's utf8 library doesn't.
+-- Returns the string with every invalid UTF-8 byte replaced by U+FFFD, like GMod does.
+if (utf8 and not utf8.force) then
+	function utf8.force(str)
+		str = tostring(str)
+
+		local parts = {}
+		local position = 1
+
+		while (true) do
+			local length, invalidPosition = utf8.len(str, position)
+
+			if (length) then
+				parts[#parts + 1] = str:sub(position)
+				break
+			end
+
+			parts[#parts + 1] = str:sub(position, invalidPosition - 1)
+			parts[#parts + 1] = "\239\191\189" -- U+FFFD replacement character
+			position = invalidPosition + 1
+		end
+
+		return table.concat(parts)
+	end
+end
+
 function math.pow(base, exponent)
 	return base ^ exponent
 end
@@ -434,7 +460,8 @@ function MESSAGE_WRITER_META:WriteUInt(value, bitCount)
 end
 
 umsg = require("UserMessages")
-umsg.Angle = umsg.WriteAngles
+umsg.Angle = umsg.WriteAngle or umsg.WriteAngles
+umsg.End = umsg.End or umsg.MessageEnd
 umsg.Bool = umsg.WriteBool
 umsg.Char = umsg.WriteChar
 umsg.Entity = umsg.WriteEntity
@@ -549,6 +576,11 @@ game = {
 	end,
 
 	GetMap = Engines.GetLevelName,
+
+	-- Newer sandbox code (spawnmenu/toolpanel.lua) uses this; the world is always entity index 0
+	GetWorld = function()
+		return Entity(0)
+	end,
 
 	AddDecal = function(decalName, materialName)
 		-- TODO: Implement
@@ -887,8 +919,23 @@ function PHYSICS_OBJECT_META:GetAngles()
 end
 
 local WEAPON_META = FindMetaTable("Weapon")
-WEAPON_META.GetHoldType = WEAPON_META.GetAnimationPrefix
-WEAPON_META.SetHoldType = WEAPON_META.SetAnimationPrefix
+-- GMod's (engine) SetHoldType stores the hold type and calls the SWEP's SetWeaponHoldType, which builds the
+-- ActivityTranslate table from weapon_base/sh_anim.lua. SetAnimationPrefix alone does nothing (its C++ body is stubbed).
+function WEAPON_META:SetHoldType(holdType)
+	self.m_strGModHoldType = holdType
+
+	if (self.SetAnimationPrefix) then
+		self:SetAnimationPrefix(holdType)
+	end
+
+	if (isfunction(self.SetWeaponHoldType)) then
+		self:SetWeaponHoldType(holdType)
+	end
+end
+
+function WEAPON_META:GetHoldType()
+	return self.m_strGModHoldType or self.HoldType or "normal"
+end
 WEAPON_META.Ammo1 = WEAPON_META.GetPrimaryAmmoCount
 WEAPON_META.Ammo2 = WEAPON_META.GetSecondaryAmmoCount
 WEAPON_META.SendWeaponAnim = WEAPON_META.SendWeaponAnimation
@@ -1280,7 +1327,7 @@ else
 
 	function render.Clear(r, g, b, a, clearDepth, clearStencil)
 		Renders.ClearBuffers(true, clearDepth or false, clearStencil or false)
-		Renders.ClearColor(r, g, b, a)
+		Renders.ClearColor(Color(r, g, b, a))
 	end
 
 	function render.ClearDepth(clearStencil)
@@ -1361,6 +1408,9 @@ else
 	PANEL_META.ChildrenSize = PANEL_META.GetChildrenSize
 	PANEL_META.NoClipping = PANEL_META.SetPaintClippingEnabled
 
+	-- Deprecated:
+	PANEL_META.SetKeyBoardInputEnabled = PANEL_META.SetKeyboardInputEnabled
+
 	function PANEL_META:SizeToContents(sizeWidth, sizeHeight)
 		-- For some reason DTree_Node uses SizeToContents on a DListLayout, which doesn't have a SizeToContents function.
 		-- :/
@@ -1402,7 +1452,8 @@ else
 
 	-- Change casing and add functionality to pass individual color components.
 	function PANEL_META:SetBGColor(rOrColor, g, b, a)
-		if (istable(rOrColor)) then
+		-- Color objects aren't plain tables (type() is "Color"), so test for numbers instead of istable
+		if (type(rOrColor) ~= "number") then
 			self:SetBackgroundColor(rOrColor)
 		else
 			self:SetBackgroundColor(Colors.Create(rOrColor, g, b, a))
@@ -1411,7 +1462,8 @@ else
 
 	-- Change casing and add functionality to pass individual color components.
 	function PANEL_META:SetFGColor(rOrColor, g, b, a)
-		if (istable(rOrColor)) then
+		-- Color objects aren't plain tables (type() is "Color"), so test for numbers instead of istable
+		if (type(rOrColor) ~= "number") then
 			self:SetForegroundColor(rOrColor)
 		else
 			self:SetForegroundColor(Colors.Create(rOrColor, g, b, a))
@@ -1472,6 +1524,8 @@ else
 	local HTML_PANEL_META = FindMetaTable("Html")
 	HTML_PANEL_META.OpenURL = HTML_PANEL_META.OpenUrl
 	HTML_PANEL_META.SetHTML = HTML_PANEL_META.SetHtml
+	HTML_PANEL_META.NewObject = HTML_PANEL_META.AddJavascriptObject
+	HTML_PANEL_META.NewObjectCallback = HTML_PANEL_META.AddJavascriptObjectCallback
 
 	local TEXT_ENTRY_PANEL_META = FindMetaTable("TextEntry")
 	TEXT_ENTRY_PANEL_META._OriginalSetFont = TEXT_ENTRY_PANEL_META._OriginalSetFont or TEXT_ENTRY_PANEL_META.SetFont
@@ -1568,6 +1622,10 @@ else
 	EyePos = render.MainViewOrigin
 	EyeAngles = render.MainViewAngles
 	EyeVector = render.MainViewForward
+	-- Newer GMod (properties.lua, etc.) uses the MainEye* names for the main view
+	MainEyePos = MainEyePos or render.MainViewOrigin
+	MainEyeAngles = MainEyeAngles or render.MainViewAngles
+	MainEyeVector = MainEyeVector or render.MainViewForward
 
 	LocalPlayer = Players.GetLocalPlayer
 
@@ -1784,14 +1842,53 @@ if (CLIENT) then
 					"GAME")
 				local spawnlist = spawnlistKeyValues:ToTable()
 
+				-- KeyValues:ToTable() returns every value as a string, but sandbox compares ids as numbers
+				-- (AddPropsOfParent( ..., 0 ) uses parentid != Info.parentid), so "0" never matched 0 and
+				-- no spawnlist was added to the tree. GMod's engine passes numbers and a numeric contents list.
+				local contents = {}
+
+				if (istable(spawnlist.contents)) then
+					local keys = {}
+
+					for key in pairs(spawnlist.contents) do
+						keys[#keys + 1] = key
+					end
+
+					table.sort(keys, function(a, b)
+						local numberA, numberB = tonumber(a), tonumber(b)
+
+						if (numberA and numberB) then
+							return numberA < numberB
+						end
+
+						return tostring(a) < tostring(b)
+					end)
+
+					for _, key in ipairs(keys) do
+						local object = spawnlist.contents[key]
+
+						-- Same string problem per entry: SpawnIcon compares skin as a number (body stays a
+						-- bodygroup string like "000000000", as in GMod)
+						if (istable(object)) then
+							for _, numberKey in ipairs({ "skin", "wide", "tall" }) do
+								if (object[numberKey] ~= nil) then
+									object[numberKey] = tonumber(object[numberKey]) or object[numberKey]
+								end
+							end
+						end
+
+						contents[#contents + 1] = object
+					end
+				end
+
 				callback(
 					spawnlistFileName,
 					spawnlist.name,
-					spawnlist.contents,
+					contents,
 					spawnlist.icon,
-					spawnlist.id,
-					spawnlist.parentid,
-					spawnlist.needsapp
+					tonumber(spawnlist.id) or spawnlist.id,
+					tonumber(spawnlist.parentid) or 0,
+					spawnlist.needsapp ~= "" and spawnlist.needsapp or nil
 				)
 			end
 		end,
@@ -1802,6 +1899,9 @@ if (CLIENT) then
 			end
 		end,
 	}
+
+	-- Newer GMod's spawnmenu module calls the engine function SaveToTextFiles
+	spawnmenu.SaveToTextFiles = spawnmenu.DoSaveToTextFiles
 
 	function LoadPresets()
 		local loadedPresets = {}
@@ -2014,6 +2114,267 @@ hook.Add("PreEntityInitialize", "GModCompatibility.CallSetupDataTables", functio
 	end
 end)
 
+--[[
+	GModCompatibility shims: functions newer Garry's Mod code calls that Experiment doesn't provide
+	(found by scanning garrysmod/lua and the base/sandbox gamemodes against Experiment's bindings).
+--]]
+
+-- Removed in Lua 5.4; math.atan takes (y, x) now
+math.atan2 = math.atan2 or function(y, x)
+	return math.atan(y, x or 1)
+end
+
+-- GMod's special teams are TEAM_UNASSIGNED = 1001 / TEAM_SPECTATOR = 1002, the engine's are 0 / 1
+-- (shareddefs.h). The base gamemode does pl:SetTeam( TEAM_UNASSIGNED ) on join, which the engine
+-- rejected ("CBasePlayer::ChangeTeam( 1001 ) - invalid team index"). Translate both ways.
+do
+	local toEngineTeam = {
+		[TEAM_UNASSIGNED] = 0,
+		[TEAM_SPECTATOR] = 1,
+	}
+	local toGModTeam = {
+		[0] = TEAM_UNASSIGNED,
+		[1] = TEAM_SPECTATOR,
+	}
+
+	local playerMeta = FindMetaTable("Player")
+	local entityMeta = FindMetaTable("Entity")
+
+	if (playerMeta and playerMeta.SetTeam) then
+		local engineSetTeam = playerMeta.SetTeam
+
+		playerMeta.SetTeam = function(self, teamId)
+			return engineSetTeam(self, toEngineTeam[teamId] or teamId)
+		end
+	end
+
+	if (entityMeta and entityMeta.Team) then
+		local engineTeam = entityMeta.Team
+
+		entityMeta.Team = function(self)
+			local teamId = engineTeam(self)
+
+			return toGModTeam[teamId] or teamId
+		end
+	end
+end
+
+-- Vector:Unpack()/Angle:Unpack() (used by GMod's extensions/vector.lua, e.g. Vector:ToColor)
+do
+	local vectorMeta = FindMetaTable("Vector")
+	local angleMeta = FindMetaTable("Angle")
+
+	if (vectorMeta and not vectorMeta.Unpack) then
+		vectorMeta.Unpack = function(self) return self.x, self.y, self.z end
+	end
+
+	if (angleMeta and not angleMeta.Unpack) then
+		angleMeta.Unpack = function(self) return self.p, self.y, self.r end
+	end
+end
+
+-- net.WritePlayer/ReadPlayer are just entities on the wire
+do
+	local writerMeta = FindMetaTable("MessageWriter")
+	local readerMeta = FindMetaTable("MessageReader")
+
+	if (writerMeta and not writerMeta.WritePlayer) then
+		writerMeta.WritePlayer = writerMeta.WriteEntity
+	end
+
+	if (readerMeta and not readerMeta.ReadPlayer) then
+		readerMeta.ReadPlayer = readerMeta.ReadEntity
+	end
+end
+
+if (SERVER) then
+	-- GMod returns every entity with the name; Experiment's binding finds one at a time
+	ents.FindByName = ents.FindByName or function(name)
+		local found = {}
+		local entity = Entities.FindByName(name)
+
+		while (IsValid(entity)) do
+			found[#found + 1] = entity
+			entity = Entities.FindByName(name, entity)
+		end
+
+		return found
+	end
+end
+
+if (CLIENT) then
+	-- DModelPanel:DrawModel asks for the current scissor rect; Experiment can't query it,
+	-- so report it as disabled (the model is drawn unclipped instead of erroring every frame)
+	surface.GetScissorRect = surface.GetScissorRect or function()
+		return false, 0, 0, 0, 0
+	end
+
+	-- Only used by derma to refresh every panel after a skin reload
+	vgui.GetAll = vgui.GetAll or function()
+		return {}
+	end
+
+	-- cam.Start/cam.End take a table describing a 2D or 3D view
+	local camStartStack = {}
+
+	cam.Start = cam.Start or function(data)
+		data = data or {}
+
+		if (data.type == "2D") then
+			cam.Start2D()
+		else
+			cam.Start3D(data.origin, data.angles, data.fov, data.x, data.y, data.w, data.h, data.znear, data.zfar)
+		end
+
+		camStartStack[#camStartStack + 1] = data.type
+	end
+
+	cam.End = cam.End or function()
+		local viewType = table.remove(camStartStack)
+
+		if (viewType == "2D") then
+			cam.End2D()
+		else
+			cam.End3D()
+		end
+	end
+end
+
+if (CLIENT) then
+	--[[
+		GMod-style named fonts: surface.CreateFont(name, data).
+		surface is Experiment's Surfaces, whose CreateFont() takes no arguments, so every GMod font
+		(DermaDefault, DermaLarge, all spawnmenu fonts...) became an empty font and its name was lost.
+		Name lookups then fell through to ClientScheme, which doesn't have them, so text measured 0x0.
+	--]]
+	GModCompatibilityFonts = GModCompatibilityFonts or {}
+
+	local FONT_FLAGS = {
+		italic = 0x001,
+		underline = 0x002,
+		strikeout = 0x004,
+		symbol = 0x008,
+		rotary = 0x040,
+		shadow = 0x080,
+		additive = 0x100,
+		outline = 0x200,
+	}
+	local FONT_FLAG_ANTIALIAS = 0x010
+	local FONT_FLAG_GAUSSIANBLUR = 0x020
+
+	local originalCreateFont = Surfaces.CreateFont
+
+	function Surfaces.CreateFont(name, data)
+		-- Experiment's own calls: no name, just a new font container
+		if (type(name) ~= "string") then
+			return originalCreateFont()
+		end
+
+		data = data or {}
+
+		local flags = 0
+
+		if (data.antialias ~= false) then
+			flags = flags | FONT_FLAG_ANTIALIAS
+		end
+
+		if ((data.blursize or 0) > 0) then
+			flags = flags | FONT_FLAG_GAUSSIANBLUR
+		end
+
+		for key, flag in pairs(FONT_FLAGS) do
+			if (data[key]) then
+				flags = flags | flag
+			end
+		end
+
+		-- Recreating a font with the same name reuses its container, like GMod does
+		local container = GModCompatibilityFonts[name] or originalCreateFont()
+
+		Surfaces.SetFontGlyphSet(
+			container,
+			data.font or "Arial",
+			math.floor(data.size or 13),
+			math.floor(data.weight or 500),
+			math.floor(data.blursize or 0),
+			math.floor(data.scanlines or 0),
+			flags
+		)
+
+		GModCompatibilityFonts[name] = container
+	end
+
+	-- Every name lookup (surface.SetFont, GetTextSize, GetFontTall, ...) goes through ResolveFont
+	local originalResolveFont = Surfaces.ResolveFont
+
+	function Surfaces.ResolveFont(font, scheme)
+		if (type(font) == "string" and GModCompatibilityFonts[font]) then
+			return GModCompatibilityFonts[font].font
+		end
+
+		return originalResolveFont(font, scheme)
+	end
+
+	-- Labels and text entries set fonts by scheme name in C++, which doesn't know GMod fonts either
+	for _, metaName in ipairs({ "Label", "TextEntry" }) do
+		local meta = FindMetaTable(metaName)
+
+		if (meta and meta._OriginalSetFont) then
+			local schemeSetFont = meta.SetFont
+			local schemeGetFont = meta.GetFont
+
+			local function setFont(self, font)
+				local container = type(font) == "string" and GModCompatibilityFonts[font]
+
+				if (container) then
+					self._gmodFontName = font
+					return self:_OriginalSetFont(container.font)
+				end
+
+				self._gmodFontName = nil
+				return schemeSetFont(self, font)
+			end
+
+			meta.SetFont = setFont
+			meta.SetFontInternal = setFont
+
+			meta.GetFont = function(self)
+				return self._gmodFontName or schemeGetFont(self)
+			end
+		end
+	end
+end
+
+-- No Steam Workshop integration: answer like GMod does when nothing is available, instead of erroring
+steamworks = steamworks or {
+	GetList = function(type, tags, offset, numRetrieve, days, userID, callback)
+		if (isfunction(callback)) then
+			callback({ numresults = 0, totalresults = 0, results = {} })
+		end
+	end,
+	FileInfo = function(workshopId, callback)
+		if (isfunction(callback)) then
+			callback(nil)
+		end
+	end,
+	GetDownloadedItems = function()
+		return {}
+	end,
+	IsSubscribed = function()
+		return false
+	end,
+	ShouldMountAddon = function()
+		return false
+	end,
+	RequestPlayerInfo = function() end,
+	FileUserInfo = function() end,
+	Download = function() end,
+	DownloadUGC = function() end,
+	SetFavorite = function() end,
+	ViewFile = function() end,
+	Vote = function() end,
+}
+
 -- Setup the Garry's Mod lua include path so Include can find scripts
 -- No need to prefix search paths here, since Include already finds scripts using
 -- the configured search paths.
@@ -2080,22 +2441,49 @@ local filter = {
 local originalRequire = require
 local originalInclude = Include
 
+-- Load each Garry's Mod module/file in isolation. Without this, a single failure (for example
+-- a constant a newer GMod update started using) aborts the rest of includes/init.lua, and every
+-- library after it (math/util/entity extensions, vgui.Register, spawnmenu, search, ...) goes missing.
+local function reportLoadError(kind, name, err)
+	ErrorNoHalt("[GModCompatibility] Failed to " .. kind .. " '" .. tostring(name) .. "': " .. tostring(err) .. "\n")
+end
+
+local function protectedLoad(kind, loader, name)
+	local results = table.pack(xpcall(loader, debug.traceback, name))
+
+	if (not results[1]) then
+		reportLoadError(kind, name, results[2])
+		return
+	end
+
+	return table.unpack(results, 2, results.n)
+end
+
 require = function(name)
 	if (not filter.require[name]) then
-		return originalRequire(name)
+		return protectedLoad("require", originalRequire, name)
 	end
 end
 
 include = function(name)
 	if (not filter.include[name]) then
-		return originalInclude(name)
+		return protectedLoad("include", originalInclude, name)
 	end
 end
+
+-- Newer GMod util.lua redefines isentity() to check a GMod-only metatable field (MetaName == "Entity"),
+-- which Experiment's entities don't have, so every real entity failed it (e.g. ent:SetCreator(ply) in gm_spawn).
+local experimentIsEntity = isentity
 
 include("includes/init.lua")
 
 include = originalInclude
 require = originalRequire
+
+if (experimentIsEntity) then
+	isentity = experimentIsEntity
+	IsEntity = experimentIsEntity
+end
 
 if (CLIENT) then
 	Panels.HTML = Panels.Html
