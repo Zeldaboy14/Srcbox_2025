@@ -225,6 +225,9 @@ CTraceLuaFilter::CTraceLuaFilter( lua_State *L, int filterArg, int collisionGrou
 {
     m_iFilterArgIndex = filterArg = lua_absindex( L, filterArg );
     m_pPassEntity = nullptr;
+    // Was never initialized: an entity/nil filter left garbage here, and if it happened to
+    // equal LUA_TTABLE, ShouldHitEntity ran lua_next on a non-table (crash in luaH_next)
+    m_iFilterType = LUA_TNONE;
 
     if ( lua_isfunction( m_pLuaState, filterArg ) )
     {
@@ -296,7 +299,7 @@ bool CTraceLuaFilter::ShouldHitEntity( IHandleEntity *pHandleEntity, int content
                 CBaseEntity *pEntity = EntityFromEntityHandle( pHandleEntity );
                 if ( pEntity && FClassnameIs( pEntity, lua_tostring( m_pLuaState, -1 ) ) )
                 {
-                    lua_pop( m_pLuaState, 2 );  // Pop the value and the key
+                    lua_pop( m_pLuaState, 3 );  // Pop the value, the key and the table copy
                     return m_bFilterTableInverted;
                 }
             }
@@ -312,7 +315,7 @@ bool CTraceLuaFilter::ShouldHitEntity( IHandleEntity *pHandleEntity, int content
                 else*/
                 if ( pEntity == EntityFromEntityHandle( pHandleEntity ) )
                 {
-                    lua_pop( m_pLuaState, 2 );  // Pop the value and the key
+                    lua_pop( m_pLuaState, 3 );  // Pop the value, the key and the table copy
                     return m_bFilterTableInverted;
                 }
             }
@@ -593,6 +596,7 @@ LUA_BINDING_BEGIN( Traces, TraceLine, "library", "Trace a line." )
     ray.Init( vecStart, vecEnd );
     // enginetrace->TraceRay( ray, mask, filter, &gameTrace );
     UTIL_TraceLine( vecStart, vecEnd, mask, filter, &gameTrace );
+    delete filter;  // allocated by lua_checktracestruct; was leaked on every trace
 
     if ( bOutput )
     {
@@ -624,6 +628,7 @@ LUA_BINDING_BEGIN( Traces, TraceHull, "library", "Trace a hull." )
     Ray_t ray;
     ray.Init( vecStart, vecEnd, vecMins, vecMaxs );
     UTIL_TraceHull( vecStart, vecEnd, vecMins, vecMaxs, mask, filter, &gameTrace );
+    delete filter;  // allocated by lua_checktracestruct; was leaked on every trace
 
     if ( bOutput )
     {
@@ -653,6 +658,7 @@ LUA_BINDING_BEGIN( Traces, TraceEntity, "library", "Runs a trace using the entit
 
     trace_t gameTrace;
     UTIL_TraceEntity( entity, vecStart, vecEnd, mask, filter, &gameTrace );
+    delete filter;  // allocated by lua_checktracestruct; was leaked on every trace
 
     if ( bOutput )
     {
