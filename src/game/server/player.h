@@ -277,7 +277,12 @@ public:
     void SetHands			( CBaseAnimating *pHandsModel );
 	void					HideViewModels( void );
 	void					DestroyViewModels( void );
+
+#ifdef LUA_SDK
+	CNetworkHandle(CBaseEntity, m_hHandsEntity);
+#else
 	EHANDLE					m_hHandsEntity;
+#endif
 
 	CPlayerState			*PlayerData( void ) { return &pl; }
 	
