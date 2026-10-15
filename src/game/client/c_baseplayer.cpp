@@ -50,6 +50,9 @@
 #include "steam/steam_api.h"
 #include "sourcevr/isourcevirtualreality.h"
 #include "client_virtualreality.h"
+#ifdef LUA_SDK
+#include "luamanager.h"
+#endif
 
 #ifdef TF_CLIENT_DLL
 #include "tf_gamerules.h"
@@ -2315,6 +2318,14 @@ void C_BasePlayer::Simulate()
 
 		// Update the player's fog data if necessary.
 		UpdateFogController();
+
+#ifdef LUA_SDK
+		if (L)
+		{
+			LUA_CALL_HOOK_BEGIN("Think");
+			LUA_CALL_HOOK_END(0, 0);
+		}
+#endif
 	}
 	else
 	{

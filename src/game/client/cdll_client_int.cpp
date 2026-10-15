@@ -2681,6 +2681,14 @@ bool CHLClient::DispatchUserMessage( int msg_type, bf_read &msg_data )
 
 void SimulateEntities()
 {
+#ifdef LUA_SDK
+	if (L)
+	{
+		LUA_CALL_HOOK_BEGIN("Tick", "Called right before simulating entities, every frame.");
+		LUA_CALL_HOOK_END(0, 0);
+	}
+#endif
+
 	VPROF_BUDGET("Client SimulateEntities", VPROF_BUDGETGROUP_CLIENT_SIM);
 
 	// Service timer events (think functions).
