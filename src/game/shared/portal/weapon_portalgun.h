@@ -36,6 +36,14 @@
 #include "vphysics_interface.h"
 #include "vphysics/friction.h"
 
+#include "hl2mp_portal_shared.h"
+#if defined( CLIENT_DLL )
+#define CTFWeaponPortalgun C_TFWeaponPortalgun
+#include "portal/c_prop_portal.h"
+#else
+#include "portal/prop_portal.h"
+#endif
+
 //-----------------------------------------------------------------------------
 // Do we have the super-phys gun?
 //-----------------------------------------------------------------------------
@@ -443,6 +451,23 @@ protected:
 
 private:
 	CWeaponPortalGun( const CWeaponPortalGun & );
+
+	void	FirePortal(PortalColor_t portalColor);
+
+	// Validates a candidate placement: the surface must be roughly flat
+	// across the whole footprint of the portal ellipse (checked via corner
+	// traces, not just the center hit), and not sky/nodraw/a hitbox. On
+	// success, fills in the placement basis (right/up, derived from the
+	// surface normal) the portal entity uses for its own orientation.
+	bool	IsValidPortalPlacement(const trace_t& tr, Vector& vecRight, Vector& vecUp) const;
+
+	// Portal spawning is server-only (not client-predicted) - see the
+	// design note above FirePortal() in the .cpp for why. Each player's
+	// portal gun owns exactly one blue and one orange portal; firing again
+	// relocates the existing one rather than creating a new one.
+#if defined( GAME_DLL )
+	CHandle< CTFPortal >	m_hPortal[PORTAL_COLOR_COUNT];
+#endif
 
 #ifndef CLIENT_DLL
 	DECLARE_ACTTABLE();

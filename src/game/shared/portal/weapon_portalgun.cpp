@@ -45,10 +45,22 @@
 #include "weapon_portalgun.h"
 #include "debugoverlay_shared.h"
 
+#include "hl2mp_portal_shared.h"
+#if defined( CLIENT_DLL )
+#define CTFWeaponPortalgun C_TFWeaponPortalgun
+#include "portal/c_prop_portal.h"
+#else
+#include "portal/prop_portal.h"
+#endif
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
 #define	SPRITE_SCALE	128.0f
+
+// Dot-product tolerance between the center hit's normal and each corner
+// trace's normal. ~0.95 to 18 degrees.
+#define PORTALGUN_SURFACE_ANGLE_TOLERANCE	0.95f
 
 static const char *s_pWaitForUpgradeContext = "WaitForUpgrade";
 
@@ -976,6 +988,25 @@ void CWeaponPortalGun::Precache( void )
 	PrecacheScriptSound("Weapon_Portalgun.fire_red_npc");
 	PrecacheScriptSound("Portal.fizzle_invalid_surface");
 
+#if defined( GAME_DLL )
+	// NOTE: no particle-system precache here. The portal surface itself is
+	// drawn by C_TFPortal::DrawModel() using Portal's real portal_1/2_particle
+	// texture (see c_tf_portal.cpp) -- that's the actual visual now, not a
+	// particle effect. We don't have verified real Portal particle-system
+	// names (would need the .pcf files inspected), so rather than guess
+	// another placeholder we're not using any burst particle at placement.
+
+	// All Portalgun.* entries are defined in scripts/game_sounds_portalgun.txt
+	// which is registered via scripts/game_sounds_manifest.txt.
+	// The underlying WAV files live in Portal's "sound/" folder --
+	// see game_sounds_portalgun.txt for the copy list.
+	//PrecacheScriptSound("Portalgun.shoot_blue");
+	//PrecacheScriptSound("Portalgun.shoot_orange");
+	//PrecacheScriptSound("Portalgun.portal_open_blue");
+	//PrecacheScriptSound("Portalgun.portal_open_orange");
+	//PrecacheScriptSound("Portalgun.portal_invalid");
+#endif
+
 	BaseClass::Precache();
 }
 
@@ -1449,6 +1480,8 @@ void CWeaponPortalGun::PrimaryAttack( void )
 		return;
 
 	CBasePlayer *pOwner = ToBasePlayer( GetOwner() );
+
+	FirePortal(PORTAL_COLOR_BLUE);
 	
 	if ( pOwner == NULL )
 		return;
@@ -1553,6 +1586,9 @@ void CWeaponPortalGun::PrimaryAttack( void )
 		}
 		PuntVPhysics( pEntity, forward, tr );
 	}
+
+	// Independent fire-rate gate per portal colour.
+	m_flNextPrimaryAttack = gpGlobals->curtime + 0.5f;
 }
 
 
@@ -1565,7 +1601,9 @@ void CWeaponPortalGun::SecondaryAttack( void )
 		return;
 
 	CBasePlayer *pOwner = ToBasePlayer( GetOwner() );
-	
+
+	FirePortal(PORTAL_COLOR_ORANGE);
+
 	if ( pOwner == NULL )
 		return;
 
@@ -1596,13 +1634,14 @@ void CWeaponPortalGun::SecondaryAttack( void )
 			WeaponSound( SPECIAL1 );
 			SendWeaponAnim( ACT_VM_PRIMARYATTACK );
 			m_flNextSecondaryAttack = gpGlobals->curtime + 0.5f;
+			FirePortal(PORTAL_COLOR_ORANGE);
 
 			// We found an object. Debounce the button
 			m_nAttack2Debounce |= pOwner->m_nButtons;
 			break;
 
 		case OBJECT_NOT_FOUND:
-			m_flNextSecondaryAttack = gpGlobals->curtime + 0.1f;
+			m_flNextSecondaryAttack = gpGlobals->curtime + 0.5f;
 			CloseElements();
 			break;
 
@@ -1614,8 +1653,187 @@ void CWeaponPortalGun::SecondaryAttack( void )
 		DoEffect( EFFECT_HOLDING );
 #endif
 	}
+
+	// If not active, just issue a physics punch in the world.
+	m_flNextPrimaryAttack = gpGlobals->curtime + 0.5f;
+
+	Vector forward;
+	pOwner->EyeVectors(&forward);
+
+	// NOTE: Notice we're *not* using the mega tracelength here
+	// when you have the mega cannon. Punting has shorter range.
+	Vector start, end;
+	start = pOwner->Weapon_ShootPosition();
+	float flPuntDistance = portalgun_tracelength.GetFloat();
+	VectorMA(start, flPuntDistance, forward, end);
+	CTraceFilterNoOwnerTest filter(pOwner, COLLISION_GROUP_NONE);
+	trace_t tr;
+	UTIL_TraceHull(start, end, -Vector(8, 8, 8), Vector(8, 8, 8), MASK_SHOT | CONTENTS_GRATE, &filter, &tr);
+	bool bValid = true;
+	CBaseEntity* pEntity = tr.m_pEnt;
+	if (tr.fraction == 1 || !tr.m_pEnt || tr.m_pEnt->IsEFlagSet(EFL_NO_PHYSCANNON_INTERACTION))
+	{
+		bValid = false;
+	}
+	else if ((pEntity->GetMoveType() != MOVETYPE_VPHYSICS) && (pEntity->m_takedamage == DAMAGE_NO))
+	{
+		bValid = false;
+	}
+
+	// If the entity we've hit is invalid, try a traceline instead
+	if (!bValid)
+	{
+		UTIL_TraceLine(start, end, MASK_SHOT | CONTENTS_GRATE, &filter, &tr);
+		if (tr.fraction == 1 || !tr.m_pEnt || tr.m_pEnt->IsEFlagSet(EFL_NO_PHYSCANNON_INTERACTION))
+		{
+			// Play dry-fire sequence
+			DryFire();
+			return;
+		}
+
+		pEntity = tr.m_pEnt;
+	}
+
+	// See if we hit something
+	if (pEntity->GetMoveType() != MOVETYPE_VPHYSICS)
+	{
+		if (pEntity->m_takedamage == DAMAGE_NO)
+		{
+			DryFire();
+			return;
+		}
+
+		if (GetOwner()->IsPlayer())
+		{
+			// Don't let the player zap any NPC's except regular antlions and headcrabs.
+			if (pEntity->IsPlayer())
+			{
+				DryFire();
+				return;
+			}
+		}
+
+		PuntNonVPhysics(pEntity, forward, tr);
+	}
+	else
+	{
+		if (pEntity->VPhysicsIsFlesh())
+		{
+			DryFire();
+			return;
+		}
+		PuntVPhysics(pEntity, forward, tr);
+	}
+	//m_flNextSecondaryAttack = gpGlobals->curtime + 0.5f;
 }	
 
+//-----------------------------------------------------------------------------
+// Purpose: Traces from the player's eyes, validates the surface, and (on the
+//          server) creates/moves the portal entity.  Portal creation is
+//          server-authoritative only - see header for why.
+//-----------------------------------------------------------------------------
+void CWeaponPortalGun::FirePortal(PortalColor_t portalColor)
+{
+	CHL2MP_Player* pPlayer = ToHL2MPPlayer(GetOwner());
+	if (!pPlayer)
+		return;
+
+	Vector vecSrc = pPlayer->EyePosition();
+	Vector vecAiming;
+	pPlayer->EyeVectors(&vecAiming);
+
+	trace_t tr;
+	UTIL_TraceLine(vecSrc, vecSrc + vecAiming * TF_PORTAL_MAX_RANGE,
+		MASK_SOLID_BRUSHONLY, pPlayer, COLLISION_GROUP_NONE, &tr);
+
+	Vector vecRight, vecUp;
+	bool bValidPlacement = IsValidPortalPlacement(tr, vecRight, vecUp);
+
+#if defined( GAME_DLL )
+	if (!bValidPlacement)
+	{
+		EmitSound("Portalgun.portal_invalid");
+		return;
+	}
+
+	CTFPortal* pPortal = m_hPortal[portalColor].Get();
+	if (!pPortal)
+	{
+		pPortal = static_cast<CTFPortal*>(CreateEntityByName("prop_portal"));
+		if (!pPortal)
+			return;
+
+		DispatchSpawn(pPortal);
+		pPortal->SetPortalColor(portalColor);
+		m_hPortal[portalColor] = pPortal;
+	}
+
+	QAngle angPlacement;
+	VectorAngles(tr.plane.normal, vecUp, angPlacement);
+	pPortal->PlaceAt(tr.endpos, angPlacement, tr.plane.normal);
+
+	// Link the pair together as soon as both exist.
+	PortalColor_t otherColor = (portalColor == PORTAL_COLOR_BLUE) ? PORTAL_COLOR_ORANGE : PORTAL_COLOR_BLUE;
+	CTFPortal* pOtherPortal = m_hPortal[otherColor].Get();
+	if (pOtherPortal)
+	{
+		pPortal->LinkTo(pOtherPortal);
+	}
+
+	// Gun-fire sound plays from the weapon (player position).
+	const char* pszFireSound = (portalColor == PORTAL_COLOR_BLUE)
+		? "Portalgun.shoot_blue" : "Portalgun.shoot_orange";
+	EmitSound(pszFireSound);
+
+	// Portal-open sound plays from the wall where the portal landed.
+	const char* pszOpenSound = (portalColor == PORTAL_COLOR_BLUE)
+		? "Portalgun.portal_open_blue" : "Portalgun.portal_open_orange";
+
+	CPVSFilter filter(tr.endpos);
+	EmitSound(filter, entindex(), pszOpenSound, &tr.endpos);
+#endif
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Checks that the full footprint lies on one continuous, flat
+//          surface.  See header for full description.
+//-----------------------------------------------------------------------------
+bool CWeaponPortalGun::IsValidPortalPlacement( const trace_t &tr, Vector &vecRight, Vector &vecUp ) const
+{
+	if ( !tr.DidHit() || !tr.DidHitWorld() )
+		return false;
+
+	if ( tr.surface.flags & ( SURF_SKY | SURF_NODRAW | SURF_HITBOX ) )
+		return false;
+
+	Vector vecNormal = tr.plane.normal;
+	VectorVectors( vecNormal, vecRight, vecUp );
+
+	Vector vecCorners[4] =
+	{
+		tr.endpos + vecRight *  TF_PORTAL_HALF_WIDTH + vecUp *  TF_PORTAL_HALF_HEIGHT,
+		tr.endpos + vecRight * -TF_PORTAL_HALF_WIDTH + vecUp *  TF_PORTAL_HALF_HEIGHT,
+		tr.endpos + vecRight *  TF_PORTAL_HALF_WIDTH + vecUp * -TF_PORTAL_HALF_HEIGHT,
+		tr.endpos + vecRight * -TF_PORTAL_HALF_WIDTH + vecUp * -TF_PORTAL_HALF_HEIGHT,
+	};
+
+	for ( int i = 0; i < 4; i++ )
+	{
+		trace_t cornerTrace;
+		Vector vecStart = vecCorners[i] + vecNormal * 4.0f;
+		Vector vecEnd   = vecCorners[i] - vecNormal * 4.0f;
+
+		UTIL_TraceLine( vecStart, vecEnd, MASK_SOLID_BRUSHONLY, NULL, COLLISION_GROUP_NONE, &cornerTrace );
+
+		if ( !cornerTrace.DidHit() )
+			return false;
+
+		if ( cornerTrace.plane.normal.Dot( vecNormal ) < PORTALGUN_SURFACE_ANGLE_TOLERANCE )
+			return false;
+	}
+
+	return true;
+}
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -2343,13 +2561,13 @@ void CWeaponPortalGun::ItemPostFrame()
 
 		if ( m_bActive == false )
 		{
-			DoEffect( EFFECT_READY );
+			//DoEffect( EFFECT_READY );
 		}
 	}
 	
-	if (( pOwner->m_nButtons & IN_ATTACK2 ) == 0 )
+	if ( pOwner->m_nButtons & IN_ATTACK2 )
 	{
-		m_nAttack2Debounce = 0;
+		SecondaryAttack();
 	}
 
 	if ( pOwner->m_nButtons & IN_ATTACK )
