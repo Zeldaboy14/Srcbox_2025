@@ -185,6 +185,12 @@ private:
 
 #endif
 
+#ifdef LUA_SDK
+	// Re-entrancy guards for the Pre/PostDrawViewModel Lua hooks (C_BaseViewModel::DrawModel)
+	bool m_bIsPreDrawHookCalling = false;
+	bool m_bIsPostDrawHookCalling = false;
+#endif
+
 private:
 	CNetworkVar( int, m_nViewModelIndex );		// Which viewmodel is it?
 	CNetworkHandle( CBaseEntity, m_hOwner );				// Player or AI carrying this weapon

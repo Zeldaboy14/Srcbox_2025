@@ -36,7 +36,7 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-#ifdef CSTRIKE_DLL || defined( LUA_SDK )
+#if defined( CSTRIKE_DLL ) || defined( LUA_SDK )
 	ConVar cl_righthand( "cl_righthand", "1", FCVAR_ARCHIVE, "Use right-handed view models." );
 #endif
 
@@ -333,6 +333,23 @@ int C_BaseViewModel::DrawModel( int flags )
 	}
 #endif
 
+#ifdef LUA_SDK
+	if (!m_bIsPreDrawHookCalling)
+	{
+		m_bIsPreDrawHookCalling = true;
+
+		LUA_CALL_HOOK_BEGIN("PreDrawViewModel");
+		CBaseViewModel::PushLuaInstanceSafe(L, this);
+		CBasePlayer::PushLuaInstanceSafe(L, pPlayer);
+		CBaseCombatWeapon::PushLuaInstanceSafe(L, pWeapon);
+		LUA_CALL_HOOK_END(3, 1);
+
+		m_bIsPreDrawHookCalling = false;
+
+		LUA_RETURN_VALUE_IF_TRUE(0);
+	}
+#endif
+
 	int ret;
 	// If the local player's overriding the viewmodel rendering, let him do it
 	if ( pPlayer && pPlayer->IsOverridingViewmodel() )
@@ -347,6 +364,21 @@ int C_BaseViewModel::DrawModel( int flags )
 	{
 		ret = BaseClass::DrawModel( flags );
 	}
+
+#ifdef LUA_SDK
+	if ( !m_bIsPostDrawHookCalling )
+	{
+		m_bIsPostDrawHookCalling = true;
+
+		LUA_CALL_HOOK_BEGIN( "PostDrawViewModel" );
+		CBaseViewModel::PushLuaInstanceSafe( L, this );
+		CBasePlayer::PushLuaInstanceSafe( L, pPlayer );
+		CBaseCombatWeapon::PushLuaInstanceSafe( L, pWeapon );
+		LUA_CALL_HOOK_END( 3, 0 );
+
+		m_bIsPostDrawHookCalling = false;
+	}
+#endif
 
 	// Now that we've rendered, reset the animation restart flag
 	if ( flags & STUDIO_RENDER )
