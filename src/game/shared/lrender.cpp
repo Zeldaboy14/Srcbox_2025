@@ -20,6 +20,10 @@
 #include "materialsystem/limaterial.h"
 #include "iviewrender_beams.h"
 #include <mathlib/lvmatrix.h>
+#ifdef LUA_SDK
+#include <KeyValues.h>
+#include "materialsystem/imaterialvar.h"
+#endif
 #endif
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -32,7 +36,7 @@ LUA_REGISTRATION_INIT( Renders );
 // Minifaction and magnification filter stacks
 static CUtlStack< ShaderAPITextureHandle_t > filterTextureHandlesMinification;
 static CUtlStack< ShaderAPITextureHandle_t > filterTextureHandlesMagnification;
-extern IShaderAPI* g_pShaderApi;
+extern IShaderAPI *g_pShaderApi;
 
 #ifdef GAME_DLL
 
@@ -524,8 +528,10 @@ LUA_BINDING_BEGIN( Renders, PushFilterMinification, "library", "Push a minificat
     // TODO: This doesn't work
     CMatRenderContextPtr pRenderContext( materials );
     ITexture *screenTexture = pRenderContext->GetFrameBufferCopyTexture( 0 );
-    if (!g_pShaderApi)
+#ifdef LUA_SDK
+    if ( !g_pShaderApi )
         return 0;
+#endif
     ShaderAPITextureHandle_t hTexture = g_pShaderApi->CreateTexture(
         screenTexture->GetActualWidth(),
         screenTexture->GetActualHeight(),
@@ -547,6 +553,10 @@ LUA_BINDING_END()
 
 LUA_BINDING_BEGIN( Renders, PopFilterMinification, "library", "Pop a minification filter.", "client" )
 {
+#ifdef LUA_SDK
+    if ( !g_pShaderApi || filterTextureHandlesMinification.Count() == 0 )
+        return 0;
+#endif
     g_pShaderApi->DeleteTexture( filterTextureHandlesMinification.Top() );
     filterTextureHandlesMinification.Pop();
 
@@ -561,6 +571,8 @@ LUA_BINDING_BEGIN( Renders, PushFilterMagnification, "library", "Push a magnific
     // TODO: This doesn't work
     CMatRenderContextPtr pRenderContext( materials );
     ITexture *screenTexture = pRenderContext->GetFrameBufferCopyTexture( 0 );
+    if ( !g_pShaderApi )
+        return 0;
     ShaderAPITextureHandle_t hTexture = g_pShaderApi->CreateTexture(
         screenTexture->GetActualWidth(),
         screenTexture->GetActualHeight(),
@@ -582,6 +594,10 @@ LUA_BINDING_END()
 
 LUA_BINDING_BEGIN( Renders, PopFilterMagnification, "library", "Pop a magnification filter. (Non-functional; help wanted)", "client" )
 {
+#ifdef LUA_SDK
+    if ( !g_pShaderApi || filterTextureHandlesMagnification.Count() == 0 )
+        return 0;
+#endif
     g_pShaderApi->DeleteTexture( filterTextureHandlesMagnification.Top() );
     filterTextureHandlesMagnification.Pop();
 
@@ -611,16 +627,205 @@ LUA_BINDING_BEGIN( Renders, GetViewEntity, "library", "Returns the entity the cl
 }
 LUA_BINDING_END( "Entity", "The view entity." )
 
+#ifdef LUA_SDK
+static IMaterial *g_pLuaBoundMaterial = NULL;
+#endif
+
 LUA_BINDING_BEGIN( Renders, SetMaterial, "library", "Binds a material for use in the next render operations", "client" )
 {
     IMaterial *pMaterial = LUA_BINDING_ARGUMENT( luaL_checkmaterial, 1, "material" );
 
     CMatRenderContextPtr pRenderContext( materials );
     pRenderContext->Bind( pMaterial );
+#ifdef LUA_SDK
+    // Remembered for render.DrawScreenQuad; GetCurrentMaterial() is unreliable on the queued render context
+    g_pLuaBoundMaterial = pMaterial;
+#endif
 
     return 0;
 }
 LUA_BINDING_END()
+
+#ifdef LUA_SDK
+// GMod render.* functions used by halo.lua, render.lua and the post-process scripts
+
+// A NULL render target means "the back buffer" (render.GetRenderTarget() returns NULL while
+// drawing straight to the screen), so these have to accept it instead of raising an error.
+static ITexture *LuaOptRenderTarget( lua_State *L, int narg )
+{
+    if ( lua_isnoneornil( L, narg ) )
+        return NULL;
+
+    lua_ITexture **ppTexture = ( lua_ITexture ** )luaL_checkudata( L, narg, LUA_ITEXTUREMETANAME );
+    return ppTexture ? *ppTexture : NULL;
+}
+
+LUA_BINDING_BEGIN( Renders, SetRenderTarget, "library", "Sets the active render target.", "client" )
+{
+    ITexture *pTexture = LUA_BINDING_ARGUMENT( LuaOptRenderTarget, 1, "texture" );
+    CMatRenderContextPtr pRenderContext( materials );
+    pRenderContext->SetRenderTarget( pTexture );
+    return 0;
+}
+LUA_BINDING_END()
+
+LUA_BINDING_BEGIN( Renders, PushRenderTarget, "library", "Pushes a render target (and viewport) onto the stack.", "client" )
+{
+    ITexture *pTexture = LUA_BINDING_ARGUMENT( LuaOptRenderTarget, 1, "texture" );
+    CMatRenderContextPtr pRenderContext( materials );
+
+    if ( lua_gettop( L ) >= 5 )
+    {
+        int x = LUA_BINDING_ARGUMENT( luaL_checknumber, 2, "x" );
+        int y = LUA_BINDING_ARGUMENT( luaL_checknumber, 3, "y" );
+        int w = LUA_BINDING_ARGUMENT( luaL_checknumber, 4, "width" );
+        int h = LUA_BINDING_ARGUMENT( luaL_checknumber, 5, "height" );
+        pRenderContext->PushRenderTargetAndViewport( pTexture, x, y, w, h );
+    }
+    else
+    {
+        pRenderContext->PushRenderTargetAndViewport( pTexture );
+    }
+    return 0;
+}
+LUA_BINDING_END()
+
+LUA_BINDING_BEGIN( Renders, PopRenderTarget, "library", "Pops the last render target (and viewport) from the stack.", "client" )
+{
+    CMatRenderContextPtr pRenderContext( materials );
+    pRenderContext->PopRenderTargetAndViewport();
+    return 0;
+}
+LUA_BINDING_END()
+
+LUA_BINDING_BEGIN( Renders, UpdateRefractTexture, "library", "Copies the current frame into the refraction texture.", "client" )
+{
+    UpdateRefractTexture( true );
+    return 0;
+}
+LUA_BINDING_END()
+
+LUA_BINDING_BEGIN( Renders, DrawScreenQuad, "library", "Draws the bound material over the whole viewport.", "client" )
+{
+    CMatRenderContextPtr pRenderContext( materials );
+    IMaterial *pMaterial = g_pLuaBoundMaterial ? g_pLuaBoundMaterial : pRenderContext->GetCurrentMaterial();
+
+    if ( pMaterial )
+    {
+        // DrawScreenSpaceQuad draws nothing here (verified in-game); DrawScreenSpaceRectangle works,
+        // so cover the current viewport with it and map the whole texture across it.
+        int x, y, w, h;
+        pRenderContext->GetViewport( x, y, w, h );
+
+        if ( w > 0 && h > 0 )
+            pRenderContext->DrawScreenSpaceRectangle( pMaterial, 0, 0, w, h, 0, 0, w - 1, h - 1, w, h );
+    }
+
+    return 0;
+}
+LUA_BINDING_END()
+
+LUA_BINDING_BEGIN( Renders, DrawScreenQuadEx, "library", "Draws the bound material over a screen rectangle.", "client" )
+{
+    int x = LUA_BINDING_ARGUMENT( luaL_checknumber, 1, "x" );
+    int y = LUA_BINDING_ARGUMENT( luaL_checknumber, 2, "y" );
+    int w = LUA_BINDING_ARGUMENT( luaL_checknumber, 3, "width" );
+    int h = LUA_BINDING_ARGUMENT( luaL_checknumber, 4, "height" );
+
+    CMatRenderContextPtr pRenderContext( materials );
+    IMaterial *pMaterial = g_pLuaBoundMaterial ? g_pLuaBoundMaterial : pRenderContext->GetCurrentMaterial();
+
+    if ( pMaterial && w > 0 && h > 0 )
+        pRenderContext->DrawScreenSpaceRectangle( pMaterial, x, y, w, h, 0, 0, w - 1, h - 1, w, h );
+
+    return 0;
+}
+LUA_BINDING_END()
+
+static IMaterial *GetLuaBlurMaterial( bool bX )
+{
+    static IMaterial *s_pBlur[2] = { NULL, NULL };
+    IMaterial *&pMaterial = s_pBlur[bX ? 0 : 1];
+
+    if ( !pMaterial )
+    {
+        KeyValues *pKeyValues = new KeyValues( bX ? "BlurFilterX" : "BlurFilterY" );
+        pKeyValues->SetString( "$basetexture", "_rt_FullFrameFB1" );
+        pKeyValues->SetInt( "$ignorez", 1 );
+        pKeyValues->SetInt( "$nofog", 1 );
+        pKeyValues->SetFloat( "$bloomamount", 1.0f );
+        pMaterial = materials->CreateMaterial( bX ? "__lua_blurx" : "__lua_blury", pKeyValues );
+        pMaterial->IncrementReferenceCount();
+    }
+
+    return pMaterial;
+}
+
+static ITexture *GetLuaBlurScratch()
+{
+    static ITexture *s_pScratch = NULL;
+
+    if ( !s_pScratch )
+    {
+        g_pMaterialSystem->OverrideRenderTargetAllocation( true );
+        s_pScratch = materials->CreateNamedRenderTargetTextureEx(
+            "_rt_LuaBlurScratch", 1, 1, RT_SIZE_FULL_FRAME_BUFFER,
+            materials->GetBackBufferFormat(), MATERIAL_RT_DEPTH_NONE,
+            TEXTUREFLAGS_CLAMPS | TEXTUREFLAGS_CLAMPT, 0 );
+        g_pMaterialSystem->OverrideRenderTargetAllocation( false );
+
+        if ( s_pScratch )
+            s_pScratch->IncrementReferenceCount();
+    }
+
+    return s_pScratch;
+}
+
+LUA_BINDING_BEGIN( Renders, BlurRenderTarget, "library", "Blurs a render target texture.", "client" )
+{
+    ITexture *pTexture = LUA_BINDING_ARGUMENT( luaL_checkitexture, 1, "texture" );
+    float blurX = LUA_BINDING_ARGUMENT_WITH_DEFAULT( luaL_optnumber, 2, 1, "blurX" );
+    float blurY = LUA_BINDING_ARGUMENT_WITH_DEFAULT( luaL_optnumber, 3, 1, "blurY" );
+    int passes = LUA_BINDING_ARGUMENT_WITH_DEFAULT( luaL_optnumber, 4, 1, "passes" );
+
+    ITexture *pScratch = GetLuaBlurScratch();
+
+    if ( !pTexture || !pScratch )
+        return 0;
+
+    IMaterial *pBlurX = GetLuaBlurMaterial( true );
+    IMaterial *pBlurY = GetLuaBlurMaterial( false );
+
+    int w = pTexture->GetActualWidth();
+    int h = pTexture->GetActualHeight();
+
+    // The blur shaders use a fixed kernel, so approximate GMod's pixel radius with extra iterations
+    int iterations = clamp( passes, 1, 8 ) * clamp( ( int )( MAX( blurX, blurY ) * 0.5f + 0.5f ), 1, 4 );
+
+    CMatRenderContextPtr pRenderContext( materials );
+
+    for ( int i = 0; i < iterations; i++ )
+    {
+        // texture -> scratch (horizontal)
+        pRenderContext->PushRenderTargetAndViewport( pScratch, 0, 0, w, h );
+        bool bFound = false;
+        IMaterialVar *pVar = pBlurX->FindVar( "$basetexture", &bFound, false );
+        if ( bFound ) pVar->SetTextureValue( pTexture );
+        pRenderContext->DrawScreenSpaceRectangle( pBlurX, 0, 0, w, h, 0, 0, w - 1, h - 1, w, h );
+        pRenderContext->PopRenderTargetAndViewport();
+
+        // scratch -> texture (vertical)
+        pRenderContext->PushRenderTargetAndViewport( pTexture, 0, 0, w, h );
+        pVar = pBlurY->FindVar( "$basetexture", &bFound, false );
+        if ( bFound ) pVar->SetTextureValue( pScratch );
+        pRenderContext->DrawScreenSpaceRectangle( pBlurY, 0, 0, w, h, 0, 0, w - 1, h - 1, w, h );
+        pRenderContext->PopRenderTargetAndViewport();
+    }
+
+    return 0;
+}
+LUA_BINDING_END()
+#endif
 
 LUA_BINDING_BEGIN( Renders, DrawSprite, "library", "Draws a sprite", "client" )
 {

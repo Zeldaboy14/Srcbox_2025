@@ -800,6 +800,19 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 #ifdef WITH_ENGINE_PATCHES
 	// Newer (v21) maps: read them as version 20 maps (does nothing if client.dll already did)
 	BSPCompat_Install();
+	
+#ifdef LUA_SDK
+	// Hook CBaseClient::Connect so each connecting player's net channel gets bound to the Lua
+	// network manager (Experiment does this via ApplyDetoursOnDllStartup). Without it the server
+	// never received Lua net messages from clients, nor could it send any.
+	{
+		MH_STATUS mhStatus = MH_Initialize();
+		if ( mhStatus == MH_OK || mhStatus == MH_ERROR_ALREADY_INITIALIZED )
+			ApplyClientConnectDetour();
+		else
+			DevWarning( "Failed to initialize MinHook for the server detours.\n" );
+	}
+#endif
 #endif
 
 	return true;

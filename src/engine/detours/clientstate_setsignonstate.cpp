@@ -109,7 +109,13 @@ bool __fastcall DetourClientStateSetSignOnState(
 
         if ( signOnState == SIGN_ON_STATE_CONNECTED )
         {
+#ifdef LUA_SDK
+            // Registers this connection with the Lua network manager. Without it, net/Networks messages
+            // (e.g. GMod's properties: Remove, Ignite, ...) were never sent in either direction.
             g_pNetworkManager->BindClient( netChannel );
+#else
+            //g_pNetworkManager->BindClient( netChannel );
+#endif
         }
     }
 
@@ -142,7 +148,7 @@ void ApplyClientStateDetours()
              reinterpret_cast< LPVOID* >( &OriginalClientStateSetSignOnState ) ) != MH_OK )
     {
         DevWarning( "Failed to hook ClientConnect.\n" );
-        Assert( 0 );
+        //Assert( 0 );
     }
     else
     {

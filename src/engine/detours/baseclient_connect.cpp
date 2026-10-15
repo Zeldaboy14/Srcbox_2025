@@ -221,7 +221,13 @@ void __fastcall DetourClientConnect(
     info.netChannel = pNetChannel;
     connectedClients.Insert( userID, info );
 
+#ifdef LUA_SDK
+    // Registers this connection with the Lua network manager. Without it, net/Networks messages
+    // (e.g. GMod's properties: Remove, Ignite, ...) were never sent in either direction.
+    g_pNetworkManager->BindClient( userID, pNetChannel );
+#else
     //g_pNetworkManager->BindClient( userID, pNetChannel );
+#endif
 }
 
 #pragma warning( default : 4189 )  // Enable warning about unused variable

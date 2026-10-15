@@ -941,6 +941,56 @@ WEAPON_META.Ammo2 = WEAPON_META.GetSecondaryAmmoCount
 WEAPON_META.SendWeaponAnim = WEAPON_META.SendWeaponAnimation
 
 local PLAYER_META = FindMetaTable("Player")
+
+-- GMod's Kinect API. There is no motion sensor support, so report it as unavailable. Without this,
+-- properties/kinect_controller.lua's Filter errored and aborted building the right-click menu before
+-- menu:Open() ran, leaving the half-built menu in the top-left corner.
+motionsensor = motionsensor or {}
+motionsensor.IsAvailable = motionsensor.IsAvailable or function() return false end
+motionsensor.IsActive = motionsensor.IsActive or function() return false end
+motionsensor.Start = motionsensor.Start or function() return false end
+motionsensor.Stop = motionsensor.Stop or function() end
+motionsensor.GetSkeleton = motionsensor.GetSkeleton or function() return nil end
+motionsensor.GetColourMaterial = motionsensor.GetColourMaterial or function() return nil end
+
+-- GMod's drive system (properties/drive.lua, includes/modules/drive.lua). The engine side of
+-- driving isn't implemented, so this only tracks state per realm so the scripts don't error.
+if (not PLAYER_META.GetDrivingEntity) then
+	function PLAYER_META:GetDrivingEntity()
+		local ent = rawget(self:GetTable() or {}, "__gmodDrivingEntity")
+		return IsValid(ent) and ent or NULL
+	end
+
+	function PLAYER_META:GetDrivingMode()
+		return rawget(self:GetTable() or {}, "__gmodDrivingMode") or 0
+	end
+
+	function PLAYER_META:IsDrivingEntity(ent)
+		local driving = self:GetDrivingEntity()
+
+		if (ent == nil) then
+			return IsValid(driving)
+		end
+
+		return IsValid(driving) and driving == ent
+	end
+
+	function PLAYER_META:SetDrivingEntity(ent, mode)
+		local tab = self:GetTable()
+
+		if (not tab) then
+			return
+		end
+
+		if (IsValid(ent)) then
+			tab.__gmodDrivingEntity = ent
+			tab.__gmodDrivingMode = mode or 0
+		else
+			tab.__gmodDrivingEntity = nil
+			tab.__gmodDrivingMode = nil
+		end
+	end
+end
 PLAYER_META.GetShootPos = PLAYER_META.GetWeaponShootPosition
 PLAYER_META.UserID = PLAYER_META.GetUserId
 PLAYER_META.AccountID = PLAYER_META.GetAccountId
@@ -1183,6 +1233,37 @@ MATERIAL_META.Recompute = MATERIAL_META.RecomputeStateSnapshots
 MATERIAL_META.SetInt = MATERIAL_META.SetInteger
 MATERIAL_META.GetInt = MATERIAL_META.GetInteger
 
+-- GMod's Material:SetString parses numbers/vectors (halo.lua does SetString("$color", "1 1 1") and
+-- SetString("$alpha", "1")). The engine's SetStringValue turns the variable into a string type, which
+-- shaders then read as 0, so route numeric strings to SetFloat/SetVector instead.
+do
+	local originalSetString = MATERIAL_META.SetString
+
+	function MATERIAL_META:SetString(name, value)
+		if (type(value) == "string") then
+			local trimmed = value:gsub("^%s*[%[{]?%s*", ""):gsub("%s*[%]}]?%s*$", "")
+			local numbers = {}
+
+			for part in trimmed:gmatch("%S+") do
+				numbers[#numbers + 1] = tonumber(part)
+
+				if (numbers[#numbers] == nil) then
+					numbers = nil
+					break
+				end
+			end
+
+			if (numbers and #numbers == 1) then
+				return self:SetFloat(name, numbers[1])
+			elseif (numbers and #numbers == 3) then
+				return self:SetVector(name, Vector(numbers[1], numbers[2], numbers[3]))
+			end
+		end
+
+		return originalSetString(self, name, value)
+	end
+end
+
 function MATERIAL_META:Width()
 	local baseTexture = self:GetTexture("$basetexture")
 
@@ -1326,8 +1407,9 @@ else
 	render.EnableClipping = Renders.SetClippingEnabled
 
 	function render.Clear(r, g, b, a, clearDepth, clearStencil)
-		Renders.ClearBuffers(true, clearDepth or false, clearStencil or false)
+		-- The clear colour has to be set before the clear happens
 		Renders.ClearColor(Color(r, g, b, a))
+		Renders.ClearBuffers(true, clearDepth or false, clearStencil or false)
 	end
 
 	function render.ClearDepth(clearStencil)
@@ -1572,9 +1654,18 @@ else
 		end
 	end
 
-	-- TODO: Does this need serious implementing?
+	-- GMod uses this for menus/tooltips that must render above everything else. VGUI has no
+	-- separate "on top" layer, so bring the panel to the front of its siblings instead.
 	function PANEL_META:SetDrawOnTop(isOnTop)
-		print("PANEL_META:SetDrawOnTop: Reminder to implement this function (or not).")
+		self.__gmodDrawOnTop = isOnTop and true or false
+
+		if (isOnTop and self.MoveToFront) then
+			self:MoveToFront()
+		end
+	end
+
+	function PANEL_META:GetDrawOnTop()
+		return self.__gmodDrawOnTop or false
 	end
 
 	-- Maps cursor strings to cursor codes.
@@ -1626,6 +1717,34 @@ else
 	MainEyePos = MainEyePos or render.MainViewOrigin
 	MainEyeAngles = MainEyeAngles or render.MainViewAngles
 	MainEyeVector = MainEyeVector or render.MainViewForward
+
+	-- GMod: while the cursor is over a world-clicker panel (the context menu), the local
+	-- player's aim follows the mouse. properties.lua relies on this for the hover halo.
+	do
+		local playerMeta = FindMetaTable("Player")
+		local originalGetAimVector = playerMeta and playerMeta.GetAimVector
+
+		if (originalGetAimVector and not playerMeta.__gmodWorldClickerAim) then
+			playerMeta.__gmodWorldClickerAim = true
+
+			function playerMeta:GetAimVector(...)
+				if (self == LocalPlayer() and gui and gui.ScreenToVector and vgui.GetHoveredPanel) then
+					local hovered = vgui.GetHoveredPanel()
+
+					if (IsValid(hovered) and hovered.IsWorldClicker and hovered:IsWorldClicker()) then
+						local x, y = input.GetCursorPos()
+						local direction = gui.ScreenToVector(x, y)
+
+						if (direction) then
+							return direction
+						end
+					end
+				end
+
+				return originalGetAimVector(self, ...)
+			end
+		end
+	end
 
 	LocalPlayer = Players.GetLocalPlayer
 

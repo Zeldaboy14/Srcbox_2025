@@ -1,0 +1,6 @@
+"Modulate"
+{
+	"$basetexture" "_rt_FullFrameFB1"
+	"$ignorez" "1"
+	"$nofog" "1"
+}

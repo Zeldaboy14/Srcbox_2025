@@ -60,6 +60,12 @@
 #endif
 
 	
+#ifdef LUA_SDK
+#include <vgui/IInput.h>
+#include <vgui/IPanel.h>
+#include "luamanager.h"
+#include "scripted_controls/scriptedclientluapanel.h"
+#endif
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 		  
@@ -774,6 +780,36 @@ void CViewRender::SetUpViews()
 	if ( bCalcViewModelView )
 	{
 		Assert ( pPlayer != NULL );
+#ifdef LUA_SDK
+		// If the top panel under the cursor IsWorldClicker (context menu), aim the viewmodel at the mouse
+		if ( g_pClientLuaPanel )
+		{
+			int mouseX, mouseY;
+			vgui::input()->GetCursorPos( mouseX, mouseY );
+
+			for ( int i = 0; i < g_pClientLuaPanel->GetChildCount(); i++ )
+			{
+				vgui::Panel *pChild = g_pClientLuaPanel->GetChild( i );
+
+				if ( !pChild )
+					continue;
+
+				vgui::VPANEL hover = pChild->IsWithinTraverse( mouseX, mouseY, false );
+
+				if ( hover )
+				{
+					vgui::Panel *pHover = vgui::ipanel()->GetPanel( hover, vgui::GetControlsModuleName() );
+
+					if ( pHover && pHover->IsWorldClicker() )
+					{
+						Vector aimDirection;
+						ScreenToWorld( mouseX, mouseY, pPlayer->GetFOV(), viewEye.angles, aimDirection, viewEye.width, viewEye.height );
+						VectorAngles( aimDirection, ViewModelAngles );
+					}
+				}
+			}
+		}
+#endif
 		pPlayer->CalcViewModelView ( ViewModelOrigin, ViewModelAngles );
 	}
 

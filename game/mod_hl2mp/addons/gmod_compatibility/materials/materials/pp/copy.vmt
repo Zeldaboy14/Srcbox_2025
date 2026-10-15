@@ -1,0 +1,8 @@
+"UnlitGeneric"
+{
+	"$basetexture" "_rt_FullFrameFB"
+	"$ignorez" "1"
+	"$nofog" "1"
+	"$color" "[1 1 1]"
+	"$alpha" "1"
+}

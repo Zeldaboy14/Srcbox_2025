@@ -190,4 +190,10 @@ public:
 } // namespace vgui
 
 
+#if defined( LUA_SDK ) && defined( CLIENT_DLL )
+// Defined in game/client/c_vguiscreen.cpp
+void ScreenToWorld( int mousex, int mousey, float fov, const QAngle &vecRenderAngles, Vector &vecPickingRay, int nScreenWidth = -1, int nScreenHeight = -1 );
+Vector ScreenToWorld( int mousex, int mousey );
+#endif
+
 #endif // VGUI_IINPUT_H

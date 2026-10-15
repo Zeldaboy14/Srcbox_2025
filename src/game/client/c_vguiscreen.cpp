@@ -375,10 +375,20 @@ Vector ScreenToWorld( int mousex, int mousey )
 {
     CBasePlayer *pPlayer = CBasePlayer::GetLocalPlayer();
     float fov = pPlayer->GetFOV();
+#ifdef LUA_SDK
+    // Use the angles the scene is actually rendered with. GetRenderAngles() on a player is the
+    // animation state's body angles (no pitch, lagging yaw), which aims the picking ray off-target.
+    QAngle vecRenderAngles = MainViewAngles();
+#else
     QAngle vecRenderAngles = pPlayer->GetRenderAngles();
+#endif
 
     Vector vecPickingRay;
+#ifdef LUA_SDK
+    ScreenToWorld( mousex, mousey, fov, vecRenderAngles, vecPickingRay );
+#else
     //ScreenToWorld( mousex, mousey, fov, vecRenderAngles, vecPickingRay );
+#endif
 
     return vecPickingRay;
 }

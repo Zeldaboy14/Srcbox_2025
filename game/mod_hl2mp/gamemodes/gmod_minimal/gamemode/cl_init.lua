@@ -130,5 +130,6 @@ end)
 ConsoleCommands.Add("-menu", function(client, pCmd, args)
 end)
 ]]
-TEST_PANEL = MakeTestPanel("TestPanel (1)")
-TEST_PANEL:MakePopup()
+-- Disabled: this popped a test frame up in the top-left corner on every client load.
+-- TEST_PANEL = MakeTestPanel("TestPanel (1)")
+-- TEST_PANEL:MakePopup()

@@ -87,6 +87,7 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+#undef SSAO
 
 static void testfreezeframe_f( void )
 {
@@ -1105,8 +1106,9 @@ void CViewRender::DrawViewModels( const CViewSetup &viewRender, bool drawViewmod
 	render->Push3DView( viewModelSetup, 0, pRTColor, GetFrustum(), pRTDepth );
 
 #ifdef LUA_SDK
-	LUA_CALL_HOOK_BEGIN("PreDrawViewModels");
-	LUA_CALL_HOOK_END(0, 0);
+	// From Experiment
+	LUA_CALL_HOOK_BEGIN( "PreDrawViewModels" );
+	LUA_CALL_HOOK_END( 0, 0 );
 #endif
 
 #ifdef PORTAL //the depth range hack doesn't work well enough for the portal mod (and messing with the depth hack values makes some models draw incorrectly)
@@ -2324,6 +2326,15 @@ void CViewRender::RenderView( const CViewSetup &viewRender, int nClearFlags, int
 
 	// Draw the 2D graphics
 	render->Push2DView( viewRender, 0, saveRenderTarget, GetFrustum() );
+
+#ifdef LUA_SDK
+	// GMod calls these in the 2D rendering context (halo.lua hooks PostDrawEffects)
+	LUA_CALL_HOOK_BEGIN( "RenderScreenspaceEffects" );
+	LUA_CALL_HOOK_END( 0, 0 );
+
+	LUA_CALL_HOOK_BEGIN( "PostDrawEffects" );
+	LUA_CALL_HOOK_END( 0, 0 );
+#endif
 
 	Render2DEffectsPreHUD( viewRender );
 
@@ -6430,4 +6441,119 @@ void CRefractiveGlassView::Draw()
 
 	pRenderContext->ClearColor4ub( 0, 0, 0, 255 );
 	pRenderContext->Flush();
+}
+
+#include "hl2mp_portal_shared.h"
+#ifdef CLIENT_DLL
+#include "portal/c_prop_portal.h"
+#endif
+
+//-----------------------------------------------------------------------------
+// Purpose: Renders each active, linked TF portal's live "see through" view
+// into its own render target, once per frame, before the main scene draws.
+// C_TFPortal::DrawModel() (c_tf_portal.cpp) then samples that render
+// target as the texture for the portal's inner disc.
+//
+// TECHNIQUE
+// =========
+// Adapted from two existing, unmodified systems already in this same file,
+// not written from scratch:
+//   - DrawOneMonitor() just above: the basic secondary-view-into-a-render-
+//     target sequence (Push3DView / ViewDrawScene / PopView).
+//   - CRefractiveGlassView::PushView() (further down this file): the
+//     custom clip plane technique that keeps geometry behind the exit
+//     surface from bleeding into the render (PushCustomClipPlane /
+//     PopCustomClipPlane on IMatRenderContext). Sign convention (normal
+//     inverted, dist negated, +0.1f bias) copied directly from there.
+//
+// This does NOT use the g_pPortalRender / "#ifdef PORTAL" system a few
+// hundred lines up in DrawMonitors(). That's Valve's own unreleased Portal
+// engine code, gated off and not compiled into this TF build -- untouched,
+// consistent with this project's original constraint against using
+// anything derived from Portal's own engine.
+//
+// HONEST LIMITATION
+// ==================
+// True oblique near-plane clipping -- what Portal's own engine actually
+// uses -- is not exposed anywhere in this public SDK (confirmed: nothing
+// named "oblique" appears anywhere in src/). The custom clip plane used
+// here is a real, working, SDK-native technique, and the render camera
+// also faces OUTWARD along the exit portal's own normal (so wall-backside
+// geometry is behind the camera by construction, not just clipped) --
+// together these should hold up for ordinary rooms. This is NOT
+// mathematically airtight the way true oblique clipping is; unusually
+// thin walls or geometry looping tightly behind a portal's mounting
+// surface could theoretically still show through. Stated plainly rather
+// than papered over.
+//-----------------------------------------------------------------------------
+void CViewRender::DrawTFPortalViews(const CViewSetup& cameraView)
+{
+#ifdef CLIENT_DLL
+	C_TFPortal* pPortal = GetTFPortalList();
+	if (!pPortal)
+		return;
+
+	for (; pPortal != NULL; pPortal = pPortal->m_pNext)
+	{
+		if (!pPortal->IsActive() || pPortal->IsDormant())
+			continue;
+
+		C_TFPortal* pLinked = pPortal->GetLinkedPortal();
+		if (!pLinked || !pLinked->IsActive() || pLinked->IsDormant())
+			continue;
+
+		const char* pRTName = (pPortal->GetPortalColor() == PORTAL_COLOR_BLUE)
+			? "_rt_TFPortalBlue" : "_rt_TFPortalOrange";
+		ITexture* pRenderTarget = materials->FindTexture(pRTName, TEXTURE_GROUP_RENDER_TARGET);
+		if (!pRenderTarget || IsErrorTexture(pRenderTarget))
+			continue;
+
+		// Main camera, transformed from THIS portal's frame into the
+		// LINKED portal's frame -- "as if standing at the linked portal,
+		// looking the corresponding direction". Same transform already
+		// used for player teleportation (tf_portal_shared.cpp), just
+		// applied to the spectator camera instead of the player's body.
+		// Uses the FULL-rotation angle transform (TF_Portal_TransformAnglesFull),
+		// not the zero-roll one used for the player's own eyes -- see that
+		// function's header comment for why they must differ.
+		matrix3x4_t matTransform;
+		TF_Portal_ComputeTransform(pPortal->GetAbsOrigin(), pPortal->GetAbsAngles(),
+			pLinked->GetAbsOrigin(), pLinked->GetAbsAngles(),
+			matTransform);
+
+		CViewSetup portalView = cameraView;
+		TF_Portal_TransformPoint(matTransform, cameraView.origin, portalView.origin);
+		TF_Portal_TransformAnglesFull(matTransform, cameraView.angles, portalView.angles);
+
+		portalView.x = 0;
+		portalView.y = 0;
+		portalView.width = pRenderTarget->GetActualWidth();
+		portalView.height = pRenderTarget->GetActualHeight();
+		portalView.m_flAspectRatio = (float)portalView.width / (float)portalView.height;
+		portalView.fov = cameraView.fov;
+		portalView.m_bOrtho = false;
+		portalView.m_bViewToProjectionOverride = false;
+
+		// Custom clip plane at the LINKED (exit) portal's surface, so
+		// geometry behind that wall doesn't render into this view.
+		Vector vecExitNormal;
+		AngleVectors(pLinked->GetAbsAngles(), &vecExitNormal);
+		float flExitDist = vecExitNormal.Dot(pLinked->GetAbsOrigin());
+
+		Vector4D plane;
+		VectorMultiply(vecExitNormal, -1, plane.AsVector3D());
+		plane.w = -flExitDist + 0.1f;
+
+		Frustum frustum;
+		render->Push3DView(portalView, VIEW_CLEAR_DEPTH | VIEW_CLEAR_COLOR, pRenderTarget, (VPlane*)frustum);
+
+		CMatRenderContextPtr pRenderContext(materials);
+		pRenderContext->PushCustomClipPlane(plane.Base());
+
+		ViewDrawScene(false, SKYBOX_2DSKYBOX_VISIBLE, portalView, 0, VIEW_TF_PORTAL);
+
+		pRenderContext->PopCustomClipPlane();
+		render->PopView(frustum);
+	}
+#endif // TF_CLIENT_DLL
 }

@@ -1243,6 +1243,20 @@ ISourceVirtualReality *g_pSourceVR = NULL;
 //-----------------------------------------------------------------------------
 int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physicsFactory, CGlobalVarsBase *pGlobals )
 {
+	
+#ifdef WITH_ENGINE_PATCHES
+#ifdef LUA_SDK
+	// MinHook must be initialized before any hook is created; nothing else has done it yet at this
+	// point, so the SetSignonState detour (which binds the Lua network channel) silently failed.
+	{
+		MH_STATUS mhStatus = MH_Initialize();
+		if ( mhStatus != MH_OK && mhStatus != MH_ERROR_ALREADY_INITIALIZED )
+			DevWarning( "Failed to initialize MinHook for the client detours.\n" );
+	}
+#endif
+	ApplyClientStateDetours();
+#endif
+
 	InitCRTMemDebug();
 	MathLib_Init( 2.2f, 2.2f, 0.0f, 2.0f );
 

@@ -311,8 +311,14 @@ LUA_BINDING_BEGIN( Inputs, ScreenToWorld, "library", "Convert screen coordinates
 {
     float x = LUA_BINDING_ARGUMENT( luaL_checknumber, 1, "x" );
     float y = LUA_BINDING_ARGUMENT( luaL_checknumber, 2, "y" );
+#ifdef LUA_SDK
+    Vector vecPickingRay = ScreenToWorld( x, y );
+    lua_pushvector( L, vecPickingRay );
+#else
     //Vector vecPickingRay = ScreenToWorld( x, y );
     //lua_pushvector( L, vecPickingRay );
+    lua_pushnil( L );
+#endif
     return 1;
 }
 LUA_BINDING_END( "Vector", "World coordinates vector." )
@@ -326,7 +332,11 @@ LUA_BINDING_BEGIN( Inputs, AimToVector, "library", "Convert aiming angles and sc
     float nScreenWidth = LUA_BINDING_ARGUMENT( luaL_checknumber, 5, "screenWidth" );
     float nScreenHeight = LUA_BINDING_ARGUMENT( luaL_checknumber, 6, "screenHeight" );
     Vector vecPickingRay;
+#ifdef LUA_SDK
+    ScreenToWorld( x, y, fov, vecAngles, vecPickingRay, nScreenWidth, nScreenHeight );
+#else
     //ScreenToWorld( x, y, fov, vecAngles, vecPickingRay, nScreenWidth, nScreenHeight );
+#endif
     lua_pushvector( L, vecPickingRay );
     return 1;
 }

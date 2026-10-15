@@ -752,6 +752,12 @@ LUA_BINDING_BEGIN( Materials, Find, "library", "Finds a material" )
         }
     }
 
+#ifdef LUA_SDK
+    // Keep materials handed to Lua referenced. Otherwise binding them later (render.SetMaterial,
+    // halo.lua's pp/copy and pp/add) warns "bad reference count 0" and they may not be loaded/drawn.
+    if ( pMaterial && !IsErrorMaterial( pMaterial ) )
+        pMaterial->IncrementReferenceCount();
+#endif
     IMaterial **pUserData = ( IMaterial ** )lua_newuserdata( L, sizeof( IMaterial * ) );
     *pUserData = pMaterial;
     luaL_getmetatable( L, LUA_MATERIALMETANAME );
