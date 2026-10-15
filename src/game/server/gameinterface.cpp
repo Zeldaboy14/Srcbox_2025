@@ -118,6 +118,7 @@ extern ConVar tf_mm_servermode;
 
 #ifdef LUA_SDK
 #include "luamanager.h"
+#include "gameinfostore.h"
 #include "luacachefile.h"
 #include "mountaddons.h"
 #include <mountsteamcontent.h>
@@ -621,6 +622,11 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 	s_SteamGameServerAPIContext.Init();
 #endif
 
+#ifdef LUA_SDK
+	delete g_pGameInfoStore;
+	g_pGameInfoStore = NULL;
+#endif
+
 	// init each (seperated for ease of debugging)
 	if ( (engine = (IVEngineServer*)appSystemFactory(INTERFACEVERSION_VENGINESERVER, NULL)) == NULL )
 		return false;
@@ -685,6 +691,10 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 	gpGlobals = pGlobals;
 
 	g_pSharedChangeInfo = engine->GetSharedEdictChangeInfo();
+
+#ifdef LUA_SDK
+	g_pGameInfoStore = new CGameInfoStore();
+#endif
 	
 	MathLib_Init( 2.2f, 2.2f, 0.0f, 2.0f );
 
