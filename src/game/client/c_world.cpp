@@ -76,7 +76,9 @@ C_World::~C_World( void )
 bool C_World::Init( int entnum, int iSerialNum )
 {
 	m_flWaveHeight = 0.0f;
-	ActivityList_Init();
+#ifndef LUA_SDK
+    ActivityList_Init();
+#endif
 	EventList_Init();
 
 	return BaseClass::Init( entnum, iSerialNum );
@@ -84,7 +86,9 @@ bool C_World::Init( int entnum, int iSerialNum )
 
 void C_World::Release()
 {
+#ifndef LUA_SDK
 	ActivityList_Free();
+#endif
 	Term();
 }
 
@@ -127,15 +131,10 @@ void C_World::OnDataChanged( DataUpdateType_t updateType )
 
 void C_World::RegisterSharedActivities( void )
 {
-#ifdef LUA_SDK
-	// BEGIN_LUA_SET_ENUM_LIBRARY( "Activity" );
-#endif
 #ifndef LUA_SDK
 	ActivityList_RegisterSharedActivities();
 #endif
-#ifdef LUA_SDK
-	// END_LUA_SET_ENUM_LIBRARY();
-#endif
+
 	EventList_RegisterSharedEvents();
 }
 
@@ -175,7 +174,9 @@ void C_World::Precache( void )
 	// =================================================
 	//	Activities
 	// =================================================
+#ifndef LUA_SDK
 	ActivityList_Free();
+#endif
 	EventList_Free();
 
 	RegisterSharedActivities();
