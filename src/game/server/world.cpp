@@ -522,7 +522,9 @@ void CWorld::RegisterSharedActivities( void )
 	// most performance efficient option.
 	// BEGIN_LUA_SET_ENUM_LIB( "Activity" );
 #endif
+#ifndef LUA_SDK
 	ActivityList_RegisterSharedActivities();
+#endif
 #ifdef LUA_SDK
 	// END_LUA_SET_ENUM_LIB();
 #endif

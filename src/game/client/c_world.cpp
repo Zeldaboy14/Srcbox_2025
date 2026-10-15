@@ -130,7 +130,9 @@ void C_World::RegisterSharedActivities( void )
 #ifdef LUA_SDK
 	// BEGIN_LUA_SET_ENUM_LIBRARY( "Activity" );
 #endif
+#ifndef LUA_SDK
 	ActivityList_RegisterSharedActivities();
+#endif
 #ifdef LUA_SDK
 	// END_LUA_SET_ENUM_LIBRARY();
 #endif
