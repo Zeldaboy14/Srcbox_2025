@@ -506,9 +506,9 @@ LUA_BINDING_END()
 
 LUA_BINDING_BEGIN( Surfaces, GetFontAscent, "library", "Gets the font ascent" )
 {
-    wchar_t wch[1];
+    wchar_t wch[2];
     g_pVGuiLocalize->ConvertANSIToUnicode( LUA_BINDING_ARGUMENT( luaL_checkstring, 2, "text" ), wch, sizeof( wch ) );
-    lua_pushinteger( L, surface()->GetFontAscent( LUA_BINDING_ARGUMENT( luaL_checkfont, 1, "font" ), wch[1] ) );
+    lua_pushinteger( L, surface()->GetFontAscent( LUA_BINDING_ARGUMENT( luaL_checkfont, 1, "font" ), wch[0] ) );
     return 1;
 }
 LUA_BINDING_END( "integer", "The font ascent" )
