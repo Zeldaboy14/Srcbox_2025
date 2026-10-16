@@ -1,96 +1,118 @@
-// ------------------------------------------------------------
-// MY_PIXELSHADER_PS2X.FXC
+//===================== File of the Srcbox Shader Project (Under LUX) =====================//
 //
-// This file implements an extremely simple pixel shader for
-// the Source Engine.
-// ------------------------------------------------------------
+//	Recreation of Garry's Mod g_sky (g_sky_ps20b), rebuilt from the shipped
+//	shader bytecode. The maths below matches GMod instruction for instruction;
+//	the constants were only repacked into fewer registers.
+//
+//	GMod register	->	here
+//	c0  EyePos			cEyePos (LUX camera position register)
+//	c1  TopColor		c1.rgb		c3  FadeBias		c1.w
+//	c2  BottomColor		c2.rgb		c4  HDRScale		c2.w
+//	c5  SunNormal		c3.xyz		c10 SunSize			c3.w
+//	c9  SunColor		c4.rgb		c7  DuskScale		c4.w
+//	c6  DuskColor		c5.rgb		c8  DuskIntensity	c5.w
+//	c12 1/StarScale		c6.x		c11 StarFade		c6.y
+//	c13 StarPos			c6.z
+//	c30 cLightScale		applied by LUX_Finalise (TONEMAP_SCALE_LINEAR)
+//
+//=========================================================================================//
 
 //==========================================================================//
 //	Declare Static Combos
 //==========================================================================//
-// NONE
-
-//==========================================================================//
-//	Declare Dynamic Combos
-//==========================================================================//
-// NONE
-
-//==========================================================================//
-//	Skipping undesired Combos
-//	The Order of Static Combos and Skips has a drastic Impact on Compile Time!
-//==========================================================================//
-// NONE
+// STATIC:	"STARLAYERS"		"0..3"
 
 //==========================================================================//
 //	Common Definitions
 //==========================================================================//
-
-// Fog is handled somewhere else
+#define TONEMAP_SCALE_LINEAR
 #define NO_FOG
 
-// Consistent with Stock
-//#define TONEMAP_SCALE_NONE
-#define TONEMAP_SCALE_LINEAR
-//#define TONEMAP_SCALE_GAMMA
-
 #include "lux_common_ps_fxc.h"
-#include "lux_common_detailtexture.h"
-#include "lux_common_lightmapped.h"
 
-float4 cFogColor : register(c0); // Now explicitly declared
+const float4 cTopColor_FadeBias			: register(c1);
+const float4 cBottomColor_HDRScale		: register(c2);
+const float4 cSunNormal_SunSize			: register(c3);
+const float4 cSunColor_DuskScale		: register(c4);
+const float4 cDuskColor_DuskIntensity	: register(c5);
+const float4 cStarControls				: register(c6);
 
-// ------------------------------------------------------------
-// This structure defines what inputs we expect to the shader.
-// These will come from the SDK_screenspace_general vertex
-// shader.
-//
-// For now, all we care about is what texture coordinate to
-// sample from.
-// ------------------------------------------------------------
+#define g_f3TopColor		(cTopColor_FadeBias.rgb)
+#define g_f1FadeBias		(cTopColor_FadeBias.w)
+#define g_f3BottomColor		(cBottomColor_HDRScale.rgb)
+#define g_f1HDRScale		(cBottomColor_HDRScale.w)
+#define g_f3SunNormal		(cSunNormal_SunSize.xyz)
+#define g_f1SunSize			(cSunNormal_SunSize.w)
+#define g_f3SunColor		(cSunColor_DuskScale.rgb)
+#define g_f1DuskScale		(cSunColor_DuskScale.w)
+#define g_f3DuskColor		(cDuskColor_DuskIntensity.rgb)
+#define g_f1DuskIntensity	(cDuskColor_DuskIntensity.w)
+#define g_f1StarScale		(cStarControls.x)	// already 1 / $StarScale
+#define g_f1StarFade		(cStarControls.y)
+#define g_f1StarPos			(cStarControls.z)
+
+// lux_common_ps_fxc.h declares s0 as Sampler_BaseTexture; GMod's stars live on s0
+#define Sampler_StarTexture	(Sampler_BaseTexture)
+
 struct PS_INPUT
 {
-	float4 WorldPos_ProjPosZ	: TEXCOORD0;
-    float4 TexCoords1			: TEXCOORD1;
-	float4 TexCoords2			: TEXCOORD2;
-    float3 Normal   : NORMAL;
+	float3 WorldPos		: TEXCOORD0;
 };
 
-// ------------------------------------------------------------
-// This is the main entry point to our pixel shader. We'll
-// return the color red as an output.
-// ------------------------------------------------------------
-float4 main( PS_INPUT i ) : COLOR
+float4 main(PS_INPUT i) : COLOR
 {
+	float3 f3Dir		= ComputeViewDir(i.WorldPos);
+	float  f1AbsZ		= abs(f3Dir.z);
+	float  f1Horizon	= 1.0f - f1AbsZ;
 
-	// TEXCOORD0
-	float3 f3WorldPos = i.WorldPos_ProjPosZ.xyz;
-	float  f1Depth = i.WorldPos_ProjPosZ.w;
-	
-	// TEXCOORD1, TEXCOORD2
-	float2 f2BaseUV = i.TexCoords1.xy;
-	float2 f2DetailTextureUV = i.TexCoords2.xy;
-	
-	//==========================================================================//
-	//	..
-	//==========================================================================//
-	float4 f4BaseTexture = tex2D(Sampler_BaseTexture, f2BaseUV);
-	
-	//==========================================================================//
-	//	Detail Texture. Blendmodes 0 to 9
-	//==========================================================================//
-	
-	// Integer Constants are for use with loops only...
-	int nDetailBlendMode = trunc(2);
+	// Sun direction; a (near) zero $SunNormal disables everything sun-related
+	float f1SunDot = 0.0f;
+	if (length(g_f3SunNormal) >= 0.001f)
+		f1SunDot = dot(normalize(g_f3SunNormal), f3Dir);
 
-	float4 f4DetailTexture = tex2D(Sampler_DetailTexture, f2DetailTextureUV);
-	f4DetailTexture.xyz *= g_f3DetailTextureTint;
-	
-	float3 f3Result = f4BaseTexture.rgb;
-	//float3 f3Result = f4BaseTexture = TextureCombine(f4BaseTexture, f4DetailTexture, 2);
-	
-    return LUX_Finalise(float4(f3Result, 1.0f), f3WorldPos, f1Depth, 1.0f);
-	
-	//return float4(0.0f, 0.0f, 0.0f, 1.0f);
-	//return 0;
-	//return cFogColor;
+	// Gradient. D3D9 pow() works on |x|, so below the horizon mirrors above it
+	float3 f3Sky = lerp(g_f3BottomColor, g_f3TopColor, pow(f1AbsZ, g_f1FadeBias));
+
+	// Dusk: horizon band, pulled towards the sun
+	float f1DuskBase = (f1Horizon * 8.0f + f1SunDot) * (1.0f / 9.0f);
+	if (f1DuskBase > 0.0f)
+	{
+		float f1Dusk = pow(f1DuskBase, 10.0f - 5.0f * g_f1DuskScale) * g_f1DuskIntensity;
+		f3Sky = f3Sky - f3Sky * f1Dusk * 0.5f + g_f3DuskColor * f1Dusk;
+	}
+
+	// Sun glow (additive)
+	if (f1SunDot > 0.0f && g_f1SunSize > 0.0f)
+		f3Sky += g_f3SunColor * pow(f1SunDot, 1.0f / (g_f1SunSize * 0.05f));
+
+	f3Sky *= g_f1HDRScale;
+
+#if (STARLAYERS > 0)
+	// Stars only above the horizon, added after the HDR scale
+	if (f3Dir.z > 0.0f)
+	{
+		float f1Fade = pow(f1AbsZ, 1.0f / g_f1StarFade);
+
+		float2 f2UV;
+		f2UV.x = asin(f3Dir.x) + sin(f3Dir.x) * f1Horizon + g_f1StarPos;
+		f2UV.y = asin(f3Dir.y) + sin(f3Dir.y) * f1Horizon;
+
+		float3 f3Stars = tex2D(Sampler_StarTexture, f2UV * g_f1StarScale).rgb;
+
+	#if (STARLAYERS > 1)
+		f2UV.x -= 1.0f + g_f1StarPos * 0.01f;
+		f3Stars += tex2D(Sampler_StarTexture, f2UV * g_f1StarScale).rgb * 0.5f;
+	#endif
+
+	#if (STARLAYERS > 2)
+		f2UV.x -= 1.0f + g_f1StarPos * 0.02f;
+		f3Stars += tex2D(Sampler_StarTexture, f2UV * g_f1StarScale).rgb * 0.75f;
+	#endif
+
+		f3Sky += f3Stars * f1Fade;
+	}
+#endif
+
+	// LUX_Finalise applies cLightScale.x like GMod does; huge depth for DestAlpha
+	return LUX_Finalise(float4(f3Sky, 1.0f), i.WorldPos, 1e20);
 }

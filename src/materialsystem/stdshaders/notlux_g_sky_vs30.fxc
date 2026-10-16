@@ -1,24 +1,30 @@
+//===================== File of the Srcbox Shader Project (Under LUX) =====================//
+//
+//	Recreation of Garry's Mod g_sky_vs20.
+//
+//	The engine draws the skybox quads in world space, so the vertex position
+//	IS the world position: GMod applies cViewProj only (no model matrix) and
+//	hands the raw position to the pixel shader.
+//
+//=========================================================================================//
+
 #include "lux_common_vs_fxc.h"
 
 struct VS_INPUT
 {
-    float3 position : POSITION;
-    float3 normal   : NORMAL;
-    float2 texcoord : TEXCOORD0;
+	float4 vPos			: POSITION;
 };
 
 struct VS_OUTPUT
 {
-    float4 pos : POSITION;
-	float fogCoord  : FOG;
+	float4 ProjPos		: POSITION;
+	float3 WorldPos		: TEXCOORD0;
 };
 
-VS_OUTPUT main(VS_INPUT IN)
+VS_OUTPUT main(const VS_INPUT v)
 {
-    VS_OUTPUT OUT;
-    //float4 worldPos = mul(cModelViewProj, float4(IN.position, 1.0));
-	float4 worldPos = mul(float4(IN.position, 1.0), cModelViewProj);
-    OUT.pos = worldPos;
-    OUT.fogCoord = worldPos.z / worldPos.w;
-    return OUT;
+	VS_OUTPUT o;
+	o.ProjPos	= mul(float4(v.vPos.xyz, 1.0f), cViewProj);
+	o.WorldPos	= v.vPos.xyz;
+	return o;
 }
