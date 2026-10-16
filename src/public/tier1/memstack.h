@@ -11,6 +11,10 @@
 #pragma once
 #endif
 
+#ifdef LUA_SDK
+#undef MAX_SIZE
+#endif
+
 //-----------------------------------------------------------------------------
 
 typedef unsigned MemoryStackMark_t;

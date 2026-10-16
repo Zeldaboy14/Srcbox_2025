@@ -13,6 +13,10 @@
 
 #include "utlmemory.h"
 
+#ifdef LUA_SDK
+#undef MAX_SIZE
+#endif
+
 // #define TEST_UTLQUEUE
 
 enum QueueIter_t

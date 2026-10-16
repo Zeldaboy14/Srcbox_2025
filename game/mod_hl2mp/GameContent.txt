@@ -1,0 +1,11 @@
+"GameContent"
+{
+	"FileSystem"
+	{
+		"garrysmod"		"4000"
+		"hl2"		"220"
+		"l4d2"		"550"
+		"hl1"		"280"
+		"thestanleyparable"		"221910"
+	}
+}

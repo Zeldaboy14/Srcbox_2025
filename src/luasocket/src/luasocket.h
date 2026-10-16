@@ -24,7 +24,7 @@
 #endif
 #endif
 
-#ifdef HL2MP
+#ifdef GAME_DLL
 #include "../../lua/lua.h"
 #include "../../lua/lauxlib.h"
 #else
