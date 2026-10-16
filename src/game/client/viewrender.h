@@ -78,6 +78,7 @@ enum view_id_t
 	VIEW_INTRO_CAMERA = 6,
 	VIEW_SHADOW_DEPTH_TEXTURE = 7,
 	VIEW_SSAO = 8,
+	VIEW_TF_PORTAL = 9,
 	VIEW_ID_COUNT
 };
 view_id_t CurrentViewID();
@@ -432,6 +433,16 @@ private:
 	void			ViewDrawScene( bool bDrew3dSkybox, SkyboxVisibility_t nSkyboxVisible, const CViewSetup &view, int nClearFlags, view_id_t viewID, bool bDrawViewModel = false, int baseDrawFlags = 0, ViewCustomVisibility_t *pCustomVisibility = NULL );
 
 	void			DrawMonitors( const CViewSetup &cameraView );
+
+	// estranged
+	void			SSAO_DepthPass(const CViewSetup& viewSet);
+	void			DrawEstrangedBokehDepthOfField();
+	void			SSAO_DrawResults();
+
+	// Renders each active, linked TF portal's live view into its render
+	// target. See the implementation in viewrender.cpp for the full
+	// technique writeup and its honest limitations.
+	void			DrawTFPortalViews(const CViewSetup& cameraView);
 
 	bool			DrawOneMonitor( ITexture *pRenderTarget, int cameraNum, C_PointCamera *pCameraEnt, const CViewSetup &cameraView, C_BasePlayer *localPlayer, 
 						int x, int y, int width, int height );
