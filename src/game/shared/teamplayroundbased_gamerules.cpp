@@ -180,7 +180,7 @@ END_DATADESC()
 //-----------------------------------------------------------------------------
 void CTeamplayRoundBasedRulesProxy::InputSetStalemateOnTimelimit( inputdata_t &inputdata )
 {
-	TeamplayRoundBasedRules()->SetStalemateOnTimelimit( inputdata.value.Bool() );
+	if ( TeamplayRoundBasedRules() ) TeamplayRoundBasedRules()->SetStalemateOnTimelimit( inputdata.value.Bool() );
 }
 #endif
 

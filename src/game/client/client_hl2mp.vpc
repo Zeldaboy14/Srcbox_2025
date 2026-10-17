@@ -73,6 +73,8 @@ $Project "Client (HL2MP)"
 			$File	"$SRCDIR\game\shared\srcbox\hooks\bsp_compat.h"
 			$File	"$SRCDIR\game\shared\srcbox\hooks\staticprop_colormod.cpp"
 			$File	"$SRCDIR\game\shared\srcbox\hooks\staticprop_colormod.h"
+			$File	"$SRCDIR\game\shared\srcbox\hooks\gma_mount.cpp"
+			$File	"$SRCDIR\game\shared\srcbox\hooks\gma_mount.h"
 		}
 		$Folder "Portal"
 		{

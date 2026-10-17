@@ -72,16 +72,6 @@ enum stepsoundtimes_t
 	STEPSOUNDTIME_WATER_FOOT,
 };
 
-
-enum SurvivorCharacterType
-{
-	SURVIVOR_NAMVET,
-	SURVIVOR_TEENGIRL,
-	SURVIVOR_BIKER,
-	SURVIVOR_MANAGER,
-	NUM_SURVIVOR_CHARACTERS
-};
-
 void CopySoundNameWithModifierToken( char *pchDest, const char *pchSource, int nMaxLenInChars, const char *pchToken );
 
 // Shared header file for players
@@ -94,7 +84,7 @@ void CopySoundNameWithModifierToken( char *pchDest, const char *pchSource, int n
 
 //extern SurvivorCharacterType GetCharacterFromName(const char* name);
 //extern SurvivorCharacterType GetCharacterFromModel(const char* modelPath);
-extern const char* SurvivorCharacterName(SurvivorCharacterType survivorCharacter);
-extern const char* SurvivorCharacterDisplayName(SurvivorCharacterType survivorCharacter);
+//extern const char* SurvivorCharacterName(SurvivorCharacterType survivorCharacter);
+//extern const char* SurvivorCharacterDisplayName(SurvivorCharacterType survivorCharacter);
 
 #endif // BASEPLAYER_SHARED_H

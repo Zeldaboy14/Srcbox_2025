@@ -6,6 +6,9 @@
 //=============================================================================//
 #include "cbase.h"
 #include "hl2mp_gamerules.h"
+#ifndef CLIENT_DLL
+#include "team_objectiveresource.h"
+#endif
 #include "hl2_gamerules.h"
 #include "viewport_panel_names.h"
 #include "gameeventdefs.h"
@@ -22,6 +25,9 @@
 #include "ltakedamageinfo.h"
 #include "mathlib/lvector.h"
 #endif
+
+extern ConVar srcbox_gamemode_sandbox;
+extern ConVar srcbox_gamemode_hl2;
 
 #ifdef CLIENT_DLL
 	#include "c_hl2mp_player.h"
@@ -132,6 +138,7 @@ static const char *s_PreserveEnts[] =
 	"keyframe_rope",
 	"move_rope",
 	"info_ladder",
+	"info_simpleladder",
 	"player",
 	"point_viewcontrol",
 	"scene_manager",
@@ -140,6 +147,9 @@ static const char *s_PreserveEnts[] =
 	"soundent",
 	"trigger_soundscape",
 	"viewmodel",
+#if 0
+	"hand_viewmodel",
+#endif
 	"predicted_viewmodel",
 	"worldspawn",
 	"point_devshot_camera",
@@ -280,6 +290,13 @@ void CHL2MPRules::CreateStandardEntities( void )
 #endif
 	CBaseEntity::Create( "hl2mp_gamerules", vec3_origin, vec3_angle );
 	Assert( pEnt );
+
+	// Srcbox: TF maps (control points, payload, round timers) expect an objective
+	// resource; TF's gamerules create one, HL2MP's never did
+	if ( !g_pObjectiveResource )
+	{
+		CBaseEntity::Create( "team_objective_resource", vec3_origin, vec3_angle );
+	}
 #endif
 }
 
@@ -1289,6 +1306,8 @@ const char *CHL2MPRules::GetGameDescription( void )
 	LUA_CALL_HOOK_END(0, 1);
 
 	LUA_RETURN_STRING();
+
+	//return "Deathmatch";
 #endif
 
 #if !defined( SRCBOX )
@@ -1449,6 +1468,7 @@ bool CHL2MPRules::ClientCommand( CBaseEntity *pEdict, const CCommand &args )
 // convert a velocity in ft/sec and a mass in grains to an impulse in kg in/s
 #define BULLET_IMPULSE(grains, ftpersec)	((ftpersec)*12*BULLET_MASS_GRAINS_TO_KG(grains)*BULLET_IMPULSE_EXAGGERATION)
 
+ConVar ammo_pistol_max("ammo_pistol_max", "-2", FCVAR_REPLICATED);
 
 CAmmoDef* GetAmmoDef()
 {
@@ -1480,6 +1500,8 @@ CAmmoDef* GetAmmoDef()
 		def.AddAmmoType("CombineCannon", DMG_BULLET, TRACER_LINE, "sk_npc_dmg_gunship_to_plr", "sk_npc_dmg_gunship", NULL, 1.5 * 750 * 12, 0); // hit like a 1.5kg weight at 750 ft/s
 		def.AddAmmoType("AirboatGun", DMG_AIRBOAT, TRACER_LINE, "sk_plr_dmg_airboat", "sk_npc_dmg_airboat", NULL, BULLET_IMPULSE(10, 600), 0);
 		def.AddAmmoType("slam", DMG_BURN, TRACER_NONE, 0, 0, 5, 0, 0);
+
+		def.AddAmmoType("AMMO_TYPE_PISTOL", DMG_BULLET, TRACER_LINE, 0, 0, "ammo_pistol_max", 2400, 0, 10, 14);
 
 		//=====================================================================
 		// STRIDER MINIGUN DAMAGE - Pull up a chair and I'll tell you a tale.

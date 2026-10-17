@@ -69,3 +69,9 @@ end
 function COLOR:ToTable()
 	return { self.r, self.g, self.b, self.a }
 end
+
+--- Returns a copy of this color (GMod Color:Copy)
+--- @return Color
+function COLOR:Copy()
+	return Colors.Create(self.r, self.g, self.b, self.a)
+end

@@ -28,6 +28,11 @@ FORWARD_DECLARE_HANDLE( memhandle_t );
 
 class CBaseAnimating : public CBaseEntity
 {
+#ifdef LUA_SDK
+	// From Experiment: push instances to Lua with the LUA_BASEANIMATINGLIBNAME metatable, so its methods are available
+	LUA_OVERRIDE_SINGLE_LUA_INSTANCE_METATABLE( CBaseAnimating, LUA_BASEANIMATINGLIBNAME )
+#endif
+
 public:
 	DECLARE_CLASS( CBaseAnimating, CBaseEntity );
 

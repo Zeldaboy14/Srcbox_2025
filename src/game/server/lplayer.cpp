@@ -311,7 +311,7 @@ LUA_BINDING_BEGIN(Player, GetIpAddress, "class", "Get the IP address of the play
         // For compatibility with Garry's Mod, we'll return "Error!" as the address for bots
         lua_pushstring(L, "Error!");
     }
-    else if (g_pGameInfoStore->GetPlayerAddress(player, clientAddress, sizeof(clientAddress)))
+    else if (g_pGameInfoStore && g_pGameInfoStore->GetPlayerAddress(player, clientAddress, sizeof(clientAddress)))
     {
         lua_pushstring(L, clientAddress);
     }

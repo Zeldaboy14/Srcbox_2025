@@ -331,3 +331,264 @@ void CEnvSkyPaint::Think( void )
 	SetNextThink( gpGlobals->curtime + 0.1f );
 #endif
 }
+
+//-----------------------------------------------------------------------------
+// Srcbox: "SkyPaint" material proxy (skybox/painted*.vmt, g_sky shader)
+//
+// In GMod this proxy lives in Lua (lua/matproxy/sky_paint.lua) and reads the
+// global g_SkyPaint. Here it is native. Source of the values, in order:
+//   1. Lua global g_SkyPaint, when it is a table that something has written
+//      to (StormFox and other sky addons drive the sky this way)
+//   2. the map's env_skypaint (g_pSkyPaint)
+//   3. the untouched g_SkyPaint table (GMod defaults)
+//-----------------------------------------------------------------------------
+#ifdef CLIENT_DLL
+#include "materialsystem/imaterialproxy.h"
+#include "materialsystem/imaterial.h"
+#include "materialsystem/imaterialvar.h"
+#include "materialsystem/itexture.h"
+#include "texture_group_names.h"
+#ifdef LUA_SDK
+#include "luamanager.h"
+#include "mathlib/lvector.h"
+#include "mathlib/langle.h"
+#endif
+
+struct SkyPaintValues_t
+{
+	Vector	vTop, vBottom, vSunNormal, vSunColor, vDuskColor;
+	float	flFadeBias, flHDRScale, flDuskScale, flDuskIntensity, flSunSize;
+	bool	bDrawStars;
+	int		nStarLayers;
+	QAngle	angStar;	// p = scale, y = fade, r = speed
+	char	szStarTexture[MAX_PATH];
+};
+
+#ifdef LUA_SDK
+// Calls tbl:<method>( idx ) and leaves one result on the stack
+static bool SkyPaint_CallDT( lua_State *pL, int nTable, const char *pszMethod, int nIndex )
+{
+	lua_getfield( pL, nTable, pszMethod );
+	if ( !lua_isfunction( pL, -1 ) )
+	{
+		lua_pop( pL, 1 );
+		return false;
+	}
+	lua_pushvalue( pL, nTable );
+	lua_pushinteger( pL, nIndex );
+	if ( lua_pcall( pL, 2, 1, 0 ) != 0 )
+	{
+		lua_pop( pL, 1 );	// error message
+		return false;
+	}
+	return true;
+}
+
+static void SkyPaint_GetVector( lua_State *pL, int nTable, int nIndex, Vector &out )
+{
+	if ( !SkyPaint_CallDT( pL, nTable, "GetDTVector", nIndex ) )
+		return;
+	if ( lua_isvector( pL, -1 ) )
+		out = lua_tovector( pL, -1 );
+	lua_pop( pL, 1 );
+}
+
+static void SkyPaint_GetFloat( lua_State *pL, int nTable, int nIndex, float &out )
+{
+	if ( !SkyPaint_CallDT( pL, nTable, "GetDTFloat", nIndex ) )
+		return;
+	if ( lua_isnumber( pL, -1 ) )
+		out = (float) lua_tonumber( pL, -1 );
+	lua_pop( pL, 1 );
+}
+
+// Fills values from the Lua g_SkyPaint table. bOnlyIfWritten skips a table that
+// still has SrcboxUntouched set (our stand-in, nothing has driven it yet).
+static bool SkyPaint_FromLua( SkyPaintValues_t &v, bool bOnlyIfWritten )
+{
+	lua_State *pL = L;
+	if ( !pL )
+		return false;
+
+	int nTop = lua_gettop( pL );
+	lua_getglobal( pL, "g_SkyPaint" );
+	if ( !lua_istable( pL, -1 ) )
+	{
+		lua_settop( pL, nTop );
+		return false;
+	}
+	int nTable = lua_gettop( pL );
+
+	if ( bOnlyIfWritten )
+	{
+		lua_getfield( pL, nTable, "SrcboxUntouched" );
+		bool bUntouched = lua_toboolean( pL, -1 ) != 0;
+		lua_pop( pL, 1 );
+		if ( bUntouched )
+		{
+			lua_settop( pL, nTop );
+			return false;
+		}
+	}
+
+	SkyPaint_GetVector( pL, nTable, 0, v.vTop );
+	SkyPaint_GetVector( pL, nTable, 1, v.vBottom );
+	SkyPaint_GetVector( pL, nTable, 2, v.vSunNormal );
+	SkyPaint_GetVector( pL, nTable, 3, v.vSunColor );
+	SkyPaint_GetVector( pL, nTable, 4, v.vDuskColor );
+	SkyPaint_GetFloat( pL, nTable, 0, v.flFadeBias );
+	SkyPaint_GetFloat( pL, nTable, 1, v.flHDRScale );
+	SkyPaint_GetFloat( pL, nTable, 2, v.flDuskScale );
+	SkyPaint_GetFloat( pL, nTable, 3, v.flDuskIntensity );
+	SkyPaint_GetFloat( pL, nTable, 4, v.flSunSize );
+
+	if ( SkyPaint_CallDT( pL, nTable, "GetDTBool", 0 ) )
+	{
+		v.bDrawStars = lua_toboolean( pL, -1 ) != 0;
+		lua_pop( pL, 1 );
+	}
+	if ( SkyPaint_CallDT( pL, nTable, "GetDTInt", 0 ) )
+	{
+		if ( lua_isnumber( pL, -1 ) )
+			v.nStarLayers = (int) lua_tointeger( pL, -1 );
+		lua_pop( pL, 1 );
+	}
+	if ( SkyPaint_CallDT( pL, nTable, "GetDTAngle", 0 ) )
+	{
+		if ( lua_isangle( pL, -1 ) )
+			v.angStar = lua_toangle( pL, -1 );
+		lua_pop( pL, 1 );
+	}
+	if ( SkyPaint_CallDT( pL, nTable, "GetDTString", 0 ) )
+	{
+		if ( lua_isstring( pL, -1 ) )
+			Q_strncpy( v.szStarTexture, lua_tostring( pL, -1 ), sizeof( v.szStarTexture ) );
+		lua_pop( pL, 1 );
+	}
+
+	lua_settop( pL, nTop );
+	return true;
+}
+#endif // LUA_SDK
+
+static void SkyPaint_FromEntity( SkyPaintValues_t &v, C_EnvSkyPaint *pSky )
+{
+	v.vTop				= pSky->m_vTopColor;
+	v.vBottom			= pSky->m_vBottomColor;
+	v.vSunNormal		= pSky->m_vSunNormal;
+	v.vSunColor			= pSky->m_vSunColor;
+	v.vDuskColor		= pSky->m_vDuskColor;
+	v.flFadeBias		= pSky->m_flFadeBias;
+	v.flHDRScale		= pSky->m_flHDRScale;
+	v.flDuskScale		= pSky->m_flDuskScale;
+	v.flDuskIntensity	= pSky->m_flDuskIntensity;
+	v.flSunSize			= pSky->m_flSunSize;
+	v.bDrawStars		= pSky->m_bDrawStars;
+	v.nStarLayers		= pSky->m_nStarLayers;
+	v.angStar			= pSky->m_vStarParams;
+	Q_strncpy( v.szStarTexture, pSky->m_szStarTexture, sizeof( v.szStarTexture ) );
+}
+
+class CSkyPaintProxy : public IMaterialProxy
+{
+public:
+	CSkyPaintProxy() : m_pMaterial( NULL ), m_pStarTexture( NULL ) { m_szStarTexture[0] = 0; }
+
+	virtual bool Init( IMaterial *pMaterial, KeyValues *pKeyValues )
+	{
+		m_pMaterial = pMaterial;
+		return true;
+	}
+
+	virtual void OnBind( void *pC_BaseEntity )
+	{
+		SkyPaintValues_t v;
+		bool bHave = false;
+#ifdef LUA_SDK
+		bHave = SkyPaint_FromLua( v, true );
+#endif
+		if ( !bHave && g_pSkyPaint )
+		{
+			SkyPaint_FromEntity( v, g_pSkyPaint );
+			bHave = true;
+		}
+#ifdef LUA_SDK
+		if ( !bHave )
+			bHave = SkyPaint_FromLua( v, false );
+#endif
+		if ( !bHave )
+			return;	// keep the vmt's own values, like GMod does
+
+		SetVec( "$topcolor", v.vTop );
+		SetVec( "$bottomcolor", v.vBottom );
+		SetVec( "$duskcolor", v.vDuskColor );
+		SetFloat( "$duskscale", v.flDuskScale );
+		SetFloat( "$duskintensity", v.flDuskIntensity );
+		SetFloat( "$fadebias", v.flFadeBias );
+		SetFloat( "$hdrscale", v.flHDRScale );
+		SetVec( "$sunnormal", v.vSunNormal );
+		SetVec( "$suncolor", v.vSunColor );
+		SetFloat( "$sunsize", v.flSunSize );
+
+		if ( !v.bDrawStars )
+		{
+			SetInt( "$starlayers", 0 );
+			return;
+		}
+
+		SetInt( "$starlayers", v.nStarLayers );
+		SetFloat( "$starscale", v.angStar.x );
+		SetFloat( "$starfade", v.angStar.y );
+		SetFloat( "$starpos", v.angStar.z * gpGlobals->realtime );
+		SetStarTexture( v.szStarTexture );
+	}
+
+	virtual void Release() { delete this; }
+	virtual IMaterial *GetMaterial() { return m_pMaterial; }
+
+private:
+	IMaterialVar *Var( const char *pszName )
+	{
+		bool bFound = false;
+		IMaterialVar *pVar = m_pMaterial->FindVar( pszName, &bFound, false );
+		return bFound ? pVar : NULL;
+	}
+	void SetVec( const char *pszName, const Vector &vec )
+	{
+		if ( IMaterialVar *pVar = Var( pszName ) )
+			pVar->SetVecValue( vec.x, vec.y, vec.z );
+	}
+	void SetFloat( const char *pszName, float fl )
+	{
+		if ( IMaterialVar *pVar = Var( pszName ) )
+			pVar->SetFloatValue( fl );
+	}
+	void SetInt( const char *pszName, int n )
+	{
+		if ( IMaterialVar *pVar = Var( pszName ) )
+			pVar->SetIntValue( n );
+	}
+	void SetStarTexture( const char *pszName )
+	{
+		if ( !pszName || !pszName[0] )
+			return;
+		if ( Q_stricmp( pszName, m_szStarTexture ) )
+		{
+			Q_strncpy( m_szStarTexture, pszName, sizeof( m_szStarTexture ) );
+			m_pStarTexture = materials->FindTexture( pszName, TEXTURE_GROUP_SKYBOX, false );
+			if ( m_pStarTexture && m_pStarTexture->IsError() )
+				m_pStarTexture = NULL;
+		}
+		if ( !m_pStarTexture )
+			return;
+		if ( IMaterialVar *pVar = Var( "$startexture" ) )
+			pVar->SetTextureValue( m_pStarTexture );
+	}
+
+	IMaterial	*m_pMaterial;
+	ITexture	*m_pStarTexture;
+	char		m_szStarTexture[MAX_PATH];
+};
+
+EXPOSE_INTERFACE( CSkyPaintProxy, IMaterialProxy, "SkyPaint" IMATERIAL_PROXY_INTERFACE_VERSION );
+#endif // CLIENT_DLL

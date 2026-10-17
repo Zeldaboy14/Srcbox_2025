@@ -963,6 +963,22 @@ static void CalcVirtualAnimation( virtualmodel_t *pVModel, const CStudioHdr *pSt
 	// FIXME: change encoding so that bone -1 is never the case
 	while (panim && panim->bone < 255)
 	{
+		// Srcbox: a track for a bone the animation's model doesn't have means the
+		// animation data doesn't belong to this model (an $includemodel resolved to
+		// a different game's file of the same name, or anim data from an older/newer
+		// format). masterBone would be read past its end; stop instead.
+		if ( panim->bone >= pAnimStudioHdr->numbones || panim->bone >= pAnimGroup->masterBone.Count() )
+		{
+			static const studiohdr_t *s_pLastBadAnimHdr = NULL;
+			if ( s_pLastBadAnimHdr != pAnimStudioHdr )
+			{
+				s_pLastBadAnimHdr = pAnimStudioHdr;
+				Warning( "Model %s: animation %s (from %s) has a track for bone %d, but that model has %d bones; skipping it\n",
+					pStudioHdr->pszName(), animdesc.pszName(), pAnimStudioHdr->pszName(), (int)panim->bone, pAnimStudioHdr->numbones );
+			}
+			break;
+		}
+
 		int j = pAnimGroup->masterBone[panim->bone];
 		if ( j >= 0 && ( pStudioHdr->boneFlags(j) & boneMask ) )
 		{

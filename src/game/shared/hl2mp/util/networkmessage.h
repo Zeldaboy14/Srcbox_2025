@@ -44,6 +44,10 @@ class CBaseNetMessage : public INetMessage
 
     virtual const char* ToString( void ) const;  // returns a human readable string about message content
 
+    // Called by the engine before processing; returning false drops the message
+    // ("msg rejected") and aborts the rest of the packet
+    virtual bool BIncomingMessageForProcessing( double dblNetTime, int numBytes );
+
     virtual size_t GetSize() const;
 
    protected:

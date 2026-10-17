@@ -20,9 +20,15 @@ function MODULE.Remove(id)
 	MODULE.registeredTimers[id] = nil
 end
 
+-- A counter, not tostring({}): the throwaway table is freed immediately and the next one often
+-- gets the same address, so back-to-back timer.Simple calls overwrote each other's timers
+-- (e.g. the spawnmenu creation tabs, which each populate through timer.Simple(0, ...)).
+MODULE.simpleTimerCount = MODULE.simpleTimerCount or 0
+
 function MODULE.Simple(delay, callback)
-	-- Trim the "table: " prefix, getting a nice unique ID
-	local id = "simple_" .. tostring({}):sub(8)
+	MODULE.simpleTimerCount = MODULE.simpleTimerCount + 1
+
+	local id = "simple_" .. MODULE.simpleTimerCount
 	MODULE.Create(id, delay, 1, callback)
 	return id
 end

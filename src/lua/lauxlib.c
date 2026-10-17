@@ -834,6 +834,14 @@ static const char *getS (lua_State *L, void *ud, size_t *size) {
 LUALIB_API int luaL_loadbufferx (lua_State *L, const char *buff, size_t size,
                                 const char *name, const char *mode) {
   LoadS ls;
+  /* Srcbox: skip a UTF-8 byte order mark, like luaL_loadfilex does. Addon files
+  ** are loaded from memory, and with UTF-8 identifiers allowed (LUA_UCID) the
+  ** mark would otherwise become part of the first name in the file. */
+  if (size >= 3 && (unsigned char)buff[0] == 0xEF &&
+      (unsigned char)buff[1] == 0xBB && (unsigned char)buff[2] == 0xBF) {
+    buff += 3;
+    size -= 3;
+  }
   ls.s = buff;
   ls.size = size;
   return lua_load(L, getS, &ls, name, mode);

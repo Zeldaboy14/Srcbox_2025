@@ -344,6 +344,13 @@ BEGIN_DATADESC( CBasePlayer )
 	DEFINE_FIELD( m_flStepSoundTime, FIELD_FLOAT ),
 #ifdef LUA_SDK
 	DEFINE_FIELD( m_hHandsEntity, FIELD_EHANDLE ),
+	DEFINE_FIELD( m_nLuaOverrides, FIELD_INTEGER ),
+	DEFINE_FIELD( m_vecLuaHullMin, FIELD_VECTOR ),
+	DEFINE_FIELD( m_vecLuaHullMax, FIELD_VECTOR ),
+	DEFINE_FIELD( m_vecLuaDuckHullMin, FIELD_VECTOR ),
+	DEFINE_FIELD( m_vecLuaDuckHullMax, FIELD_VECTOR ),
+	DEFINE_FIELD( m_vecLuaViewOffset, FIELD_VECTOR ),
+	DEFINE_FIELD( m_vecLuaViewOffsetDucked, FIELD_VECTOR ),
 #endif
 	DEFINE_ARRAY( m_szNetname, FIELD_CHARACTER, MAX_PLAYER_NAME_LENGTH ),
 
@@ -531,6 +538,30 @@ void CBasePlayer::CreateViewModel( int index /*=0*/ )
 		m_hViewModel.Set( index, vm );
 	}
 }
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+#ifdef OLD_HAND_VIEWMODELS
+void CBasePlayer::CreateHandModel(int index, int iOtherVm)
+{
+	Assert(index >= 0 && index < MAX_VIEWMODELS && iOtherVm >= 0 && iOtherVm < MAX_VIEWMODELS);
+
+	if (GetViewModel(index))
+		return;
+
+	CBaseViewModel* vm = (CBaseViewModel*)CreateEntityByName("hand_viewmodel");
+	if (vm)
+	{
+		vm->SetAbsOrigin(GetAbsOrigin());
+		vm->SetOwner(this);
+		vm->SetIndex(index);
+		DispatchSpawn(vm);
+		vm->FollowEntity(GetViewModel(iOtherVm), true);
+		m_hViewModel.Set(index, vm);
+	}
+}
+#endif
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -2127,6 +2158,10 @@ void CBasePlayer::ShowViewPortPanel( const char * name, bool bShow, KeyValues *d
 void CBasePlayer::PlayerDeathThink(void)
 {
 	float flForward;
+
+#ifdef USE_OLD_HAND_VIEWMODEL
+	GetViewModel(1)->SetModel(""); // FIX: Removes hand model when the player is dead
+#endif
 
 	SetNextThink( gpGlobals->curtime + 0.1f );
 
@@ -4705,11 +4740,11 @@ void CBasePlayer::PostThink()
 			VPROF_SCOPE_BEGIN( "CBasePlayer::PostThink-Bounds" );
 			if ( GetFlags() & FL_DUCKING )
 			{
-				SetCollisionBounds( VEC_DUCK_HULL_MIN, VEC_DUCK_HULL_MAX );
+				SetCollisionBounds( GetHullMinFor( true, false ), GetHullMaxFor( true, false ) );
 			}
 			else
 			{
-				SetCollisionBounds( VEC_HULL_MIN, VEC_HULL_MAX );
+				SetCollisionBounds( GetHullMinFor( false, false ), GetHullMaxFor( false, false ) );
 			}
 			VPROF_SCOPE_END();
 
@@ -5165,7 +5200,7 @@ void CBasePlayer::Spawn( void )
 
 	m_Local.m_bDucked = false;// This will persist over round restart if you hold duck otherwise. 
 	m_Local.m_bDucking = false;
-    SetViewOffset( VEC_VIEW_SCALED( this ) );
+    SetViewOffset( GetViewOffsetFor( false ) );
 	Precache();
 	
 	m_bitsDamageType = 0;
@@ -5197,6 +5232,9 @@ void CBasePlayer::Spawn( void )
 	enginesound->SetPlayerDSP( user, 0, false );
 
 	CreateViewModel();
+#if 0
+	CreateHandModel(); // hand viewmodel
+#endif
 
 	SetCollisionGroup( COLLISION_GROUP_PLAYER );
 
@@ -5413,13 +5451,13 @@ int CBasePlayer::Restore( IRestore &restore )
 	{
 		// Use the crouch HACK
 		FixPlayerCrouchStuck( this );
-		UTIL_SetSize(this, VEC_DUCK_HULL_MIN, VEC_DUCK_HULL_MAX);
+		UTIL_SetSize(this, GetHullMinFor( true, false ), GetHullMaxFor( true, false ));
 		m_Local.m_bDucked = true;
 	}
 	else
 	{
 		m_Local.m_bDucked = false;
-		UTIL_SetSize(this, VEC_HULL_MIN, VEC_HULL_MAX);
+		UTIL_SetSize(this, GetHullMinFor( false, false ), GetHullMaxFor( false, false ));
 	}
 
 	// We need to get at m_vecAbsOrigin as it was restored but can't let it be
@@ -5811,7 +5849,7 @@ bool CBasePlayer::GetInVehicle( IServerVehicle *pVehicle, int nRole )
 	// We cannot be ducking -- do all this before SetPassenger because it
 	// saves our view offset for restoration when we exit the vehicle.
 	RemoveFlag( FL_DUCKING );
-	SetViewOffset( VEC_VIEW_SCALED( this ) );
+	SetViewOffset( GetViewOffsetFor( false ) );
 	m_Local.m_bDucked = false;
 	m_Local.m_bDucking  = false;
 	m_Local.m_flDucktime = 0.0f;
@@ -7743,27 +7781,26 @@ void CBasePlayer::Weapon_Equip( CBaseCombatWeapon *pWeapon)
 	}
 }
 
-
+#ifndef LUA_SDK
 //=========================================================
 // HasNamedPlayerItem Does the player already have this item?
 //=========================================================
-// Temporarily disabled because of compiler errors. -Saint
-// =========================================================
-//CBaseEntity *CBasePlayer::HasNamedPlayerItem( const char *pszItemName )
-//{
-//	for ( int i = 0 ; i < WeaponCount() ; i++ )
-//	{
-//		if ( !GetWeapon(i) )
-//			continue;
-//
-//		if ( FStrEq( pszItemName, GetWeapon(i)->GetClassname() ) )
-//		{
-//			return GetWeapon(i);
-//		}
-//	}
-//
-//	return NULL;
-//}
+CBaseEntity *CBasePlayer::HasNamedPlayerItem( const char *pszItemName )
+{
+	for ( int i = 0 ; i < WeaponCount() ; i++ )
+	{
+		if ( !GetWeapon(i) )
+			continue;
+
+		if ( FStrEq( pszItemName, GetWeapon(i)->GetClassname() ) )
+		{
+			return GetWeapon(i);
+		}
+	}
+
+	return NULL;
+}
+#endif
 
 #if defined USES_ECON_ITEMS
 //-----------------------------------------------------------------------------
@@ -8409,7 +8446,17 @@ void SendProxy_CropFlagsToPlayerFlagBitsLength( const SendProp *pProp, const voi
 #endif // USES_ECON_ITEMS
 
 #ifdef LUA_SDK
+		// From Experiment: the client needs this for ply:GetHands() (GMod viewmodel hands)
 		SendPropEHandle( SENDINFO( m_hHandsEntity ) ),
+
+		// Srcbox: Lua hull / view offset overrides, needed for prediction
+		SendPropInt( SENDINFO( m_nLuaOverrides ), 4, SPROP_UNSIGNED ),
+		SendPropVector( SENDINFO( m_vecLuaHullMin ), 0, SPROP_NOSCALE ),
+		SendPropVector( SENDINFO( m_vecLuaHullMax ), 0, SPROP_NOSCALE ),
+		SendPropVector( SENDINFO( m_vecLuaDuckHullMin ), 0, SPROP_NOSCALE ),
+		SendPropVector( SENDINFO( m_vecLuaDuckHullMax ), 0, SPROP_NOSCALE ),
+		SendPropVector( SENDINFO( m_vecLuaViewOffset ), 0, SPROP_NOSCALE ),
+		SendPropVector( SENDINFO( m_vecLuaViewOffsetDucked ), 0, SPROP_NOSCALE ),
 #endif
 
 		// Data that only gets sent to the local player.
@@ -8716,7 +8763,7 @@ void CBasePlayer::RefreshCollisionBounds( void )
 	BaseClass::RefreshCollisionBounds();
 
 	InitVCollision( GetAbsOrigin(), GetAbsVelocity() );
-	SetViewOffset( VEC_VIEW_SCALED( this ) );
+	SetViewOffset( GetViewOffsetFor( false ) );
 }
 
 //-----------------------------------------------------------------------------
@@ -8731,8 +8778,8 @@ void CBasePlayer::InitVCollision( const Vector &vecAbsOrigin, const Vector &vecA
 	if ( sv_turbophysics.GetBool() )
 		return;
 	
-	CPhysCollide *pModel = PhysCreateBbox( VEC_HULL_MIN_SCALED( this ), VEC_HULL_MAX_SCALED( this ) );
-	CPhysCollide *pCrouchModel = PhysCreateBbox( VEC_DUCK_HULL_MIN_SCALED( this ), VEC_DUCK_HULL_MAX_SCALED( this ) );
+	CPhysCollide *pModel = PhysCreateBbox( GetHullMinFor( false ), GetHullMaxFor( false ) );
+	CPhysCollide *pCrouchModel = PhysCreateBbox( GetHullMinFor( true ), GetHullMaxFor( true ) );
 
 	SetupVPhysicsShadow( vecAbsOrigin, vecAbsVelocity, pModel, "player_stand", pCrouchModel, "player_crouch" );
 }

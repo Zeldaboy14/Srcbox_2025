@@ -44,8 +44,25 @@ DWORD_PTR FindPattern( HMODULE module, const char *pattern, const char *mask )
 //-----------------------------------------------------------------------------
 // VTF 7.5 support (Alien Swarm / L4D2 / Portal 2 / CS:GO textures)
 //
-// Allows one to use VTF 7.5 support on the TF2 SDK. Does not work on 32bit builds (yet),
-// or Source SDK 2013 (SP)
+// A 7.5 file has the same header as 7.4. The only format change is that
+// cubemaps no longer store the spheremap face, so they hold 6 faces instead of 7.
+// The TF2 SDK's x64 materialsystem.dll needs three changes in its vtf code:
+//
+//  1. CVTFTexture::ReadHeader rejects any minor version above 4
+//     ("*** Encountered VTF file with an invalid minor version!").
+//     -> accept 5, reading the same 80-byte header as 7.2-7.4.
+//  2. CVTFTexture::LoadImageData reads only 6 cubemap faces for 7.0 files
+//     (which had no spheremap either). -> do the same for 7.5.
+//  3. CVTFTexture::ImageFileInfo (file offsets used for mip-skipped / partial
+//     loads) has the same 7.0-only check. -> do the same for 7.5.
+//
+// The major version is always 7 at these points (ReadHeader rejects anything else),
+// so the patched code only tests the minor version: (minor - 1) > 3 unsigned means
+// 0 or 5, the two versions whose cubemaps have 6 faces.
+//
+// Each patch checks every original byte before writing, so a different
+// materialsystem.dll build is left untouched. Each patch also stops matching
+// once applied, so calling this twice is harmless.
 //-----------------------------------------------------------------------------
 struct VTFBytePatch_t
 {
@@ -161,6 +178,7 @@ void ApplyDetoursOnDllStartup()
     }
 
 #if defined( CLIENT_DLL )
+    ApplyVTFPatch();
 
 #elif defined( GAME_DLL )
     // HandleCheckPasswordDetour();

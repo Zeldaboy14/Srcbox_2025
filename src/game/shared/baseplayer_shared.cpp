@@ -393,14 +393,7 @@ const Vector CBasePlayer::GetPlayerMins( void ) const
 	}
 	else
 	{
-		if ( GetFlags() & FL_DUCKING )
-		{
-			return VEC_DUCK_HULL_MIN_SCALED( this );
-		}
-		else
-		{
-			return VEC_HULL_MIN_SCALED( this );
-		}
+		return GetHullMinFor( ( GetFlags() & FL_DUCKING ) != 0 );
 	}
 }
 
@@ -417,14 +410,7 @@ const Vector CBasePlayer::GetPlayerMaxs( void ) const
 	}
 	else
 	{
-		if ( GetFlags() & FL_DUCKING )
-		{
-			return VEC_DUCK_HULL_MAX_SCALED( this );
-		}
-		else
-		{
-			return VEC_HULL_MAX_SCALED( this );
-		}
+		return GetHullMaxFor( ( GetFlags() & FL_DUCKING ) != 0 );
 	}
 }
 
@@ -848,6 +834,7 @@ void CBasePlayer::SetAnimationExtension( const char *pExtension )
 	Q_strncpy( m_szAnimExtension, pExtension, sizeof(m_szAnimExtension) );
 }
 
+#ifdef LUA_SDK
 //=========================================================
 // HasNamedPlayerItem Does the player already have this item?
 //=========================================================
@@ -866,6 +853,7 @@ CBaseEntity* CBasePlayer::HasNamedPlayerItem(const char* pszItemName)
 
 	return NULL;
 }
+#endif
 
 //-----------------------------------------------------------------------------
 // Purpose: Set the weapon to switch to when the player uses the 'lastinv' command
@@ -2005,9 +1993,9 @@ void CBasePlayer::SharedSpawn()
 	SetSequence( SelectWeightedSequence( ACT_IDLE ) );
 
 	if ( GetFlags() & FL_DUCKING ) 
-		SetCollisionBounds( VEC_DUCK_HULL_MIN, VEC_DUCK_HULL_MAX );
+		SetCollisionBounds( GetHullMinFor( true, false ), GetHullMaxFor( true, false ) );
 	else
-		SetCollisionBounds( VEC_HULL_MIN, VEC_HULL_MAX );
+		SetCollisionBounds( GetHullMinFor( false, false ), GetHullMaxFor( false, false ) );
 
 	// dont let uninitialized value here hurt the player
 	m_Local.m_flFallVelocity = 0;
@@ -2261,24 +2249,102 @@ bool fogparams_t::operator !=( const fogparams_t& other ) const
 	return false;
 }
 
-//terror
-
-//const char* SurvivorCharacterName(SurvivorCharacterType survivorCharacter)
-const char* SurvivorCharacterName(SurvivorCharacterType survivorCharacter)
+//-----------------------------------------------------------------------------
+// Srcbox: hull / view offsets with optional per-player Lua overrides.
+// bScaled = false matches the old unscaled VEC_HULL_* uses (collision bounds).
+//-----------------------------------------------------------------------------
+Vector CBasePlayer::GetHullMinFor( bool bDucked, bool bScaled ) const
 {
-	if (survivorCharacter == SURVIVOR_TEENGIRL)
-		return "TeenGirl";
-
-	if (survivorCharacter == SURVIVOR_NAMVET)
-		return "NamVet";
-
-	if (survivorCharacter == SURVIVOR_BIKER)
-		return "Biker";
-
-	if (survivorCharacter == SURVIVOR_MANAGER)
-		return "Manager";
-
-	//return "Unknown";
-	return "Coach";
+#ifdef LUA_SDK
+	if ( bDucked && ( m_nLuaOverrides & LUA_OVERRIDE_HULLDUCK ) )
+		return m_vecLuaDuckHullMin;
+	if ( !bDucked && ( m_nLuaOverrides & LUA_OVERRIDE_HULL ) )
+		return m_vecLuaHullMin;
+#endif
+	if ( !bScaled )
+		return bDucked ? VEC_DUCK_HULL_MIN : VEC_HULL_MIN;
+	return bDucked ? VEC_DUCK_HULL_MIN_SCALED( this ) : VEC_HULL_MIN_SCALED( this );
 }
+
+Vector CBasePlayer::GetHullMaxFor( bool bDucked, bool bScaled ) const
+{
+#ifdef LUA_SDK
+	if ( bDucked && ( m_nLuaOverrides & LUA_OVERRIDE_HULLDUCK ) )
+		return m_vecLuaDuckHullMax;
+	if ( !bDucked && ( m_nLuaOverrides & LUA_OVERRIDE_HULL ) )
+		return m_vecLuaHullMax;
+#endif
+	if ( !bScaled )
+		return bDucked ? VEC_DUCK_HULL_MAX : VEC_HULL_MAX;
+	return bDucked ? VEC_DUCK_HULL_MAX_SCALED( this ) : VEC_HULL_MAX_SCALED( this );
+}
+
+Vector CBasePlayer::GetViewOffsetFor( bool bDucked ) const
+{
+#ifdef LUA_SDK
+	if ( bDucked && ( m_nLuaOverrides & LUA_OVERRIDE_VIEWDUCK ) )
+		return m_vecLuaViewOffsetDucked;
+	if ( !bDucked && ( m_nLuaOverrides & LUA_OVERRIDE_VIEW ) )
+		return m_vecLuaViewOffset;
+#endif
+	return bDucked ? VEC_DUCK_VIEW_SCALED( this ) : VEC_VIEW_SCALED( this );
+}
+
+#ifdef LUA_SDK
+void CBasePlayer::SetLuaHull( bool bDucked, const Vector &vecMins, const Vector &vecMaxs )
+{
+	if ( bDucked )
+	{
+		m_vecLuaDuckHullMin = vecMins;
+		m_vecLuaDuckHullMax = vecMaxs;
+		m_nLuaOverrides = m_nLuaOverrides | LUA_OVERRIDE_HULLDUCK;
+	}
+	else
+	{
+		m_vecLuaHullMin = vecMins;
+		m_vecLuaHullMax = vecMaxs;
+		m_nLuaOverrides = m_nLuaOverrides | LUA_OVERRIDE_HULL;
+	}
+
+	if ( ( ( GetFlags() & FL_DUCKING ) != 0 ) == bDucked )
+		SetCollisionBounds( vecMins, vecMaxs );
+
+#ifndef CLIENT_DLL
+	if ( VPhysicsGetObject() )
+		InitVCollision( GetAbsOrigin(), GetAbsVelocity() );
+#endif
+}
+
+void CBasePlayer::ResetLuaHull( void )
+{
+	m_nLuaOverrides = m_nLuaOverrides & ~( LUA_OVERRIDE_HULL | LUA_OVERRIDE_HULLDUCK );
+
+	bool bDucked = ( GetFlags() & FL_DUCKING ) != 0;
+	SetCollisionBounds( GetHullMinFor( bDucked, false ), GetHullMaxFor( bDucked, false ) );
+
+#ifndef CLIENT_DLL
+	if ( VPhysicsGetObject() )
+		InitVCollision( GetAbsOrigin(), GetAbsVelocity() );
+#endif
+}
+
+void CBasePlayer::SetLuaViewOffset( bool bDucked, const Vector &vecOffset )
+{
+	if ( bDucked )
+	{
+		m_vecLuaViewOffsetDucked = vecOffset;
+		m_nLuaOverrides = m_nLuaOverrides | LUA_OVERRIDE_VIEWDUCK;
+	}
+	else
+	{
+		m_vecLuaViewOffset = vecOffset;
+		m_nLuaOverrides = m_nLuaOverrides | LUA_OVERRIDE_VIEW;
+	}
+
+	// Apply right away when it is the offset currently in use
+	// (mid-duck transitions are handled by the movement code)
+	if ( !m_Local.m_bDucking && m_Local.m_bDucked == bDucked )
+		SetViewOffset( vecOffset );
+}
+#endif // LUA_SDK
 

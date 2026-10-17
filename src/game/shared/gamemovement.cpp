@@ -713,7 +713,7 @@ bool CGameMovement::CheckInterval( IntervalType_t type )
 //-----------------------------------------------------------------------------
 Vector CGameMovement::GetPlayerMins( bool ducked ) const
 {
-	return ducked ? VEC_DUCK_HULL_MIN_SCALED( player ) : VEC_HULL_MIN_SCALED( player );
+	return ducked ? player->GetHullMinFor( true ) : player->GetHullMinFor( false );
 }
 
 //-----------------------------------------------------------------------------
@@ -723,7 +723,7 @@ Vector CGameMovement::GetPlayerMins( bool ducked ) const
 //-----------------------------------------------------------------------------
 Vector CGameMovement::GetPlayerMaxs( bool ducked ) const
 {	
-	return ducked ? VEC_DUCK_HULL_MAX_SCALED( player ) : VEC_HULL_MAX_SCALED( player );
+	return ducked ? player->GetHullMaxFor( true ) : player->GetHullMaxFor( false );
 }
 
 //-----------------------------------------------------------------------------
@@ -739,7 +739,7 @@ Vector CGameMovement::GetPlayerMins( void ) const
 	}
 	else
 	{
-		return player->m_Local.m_bDucked  ? VEC_DUCK_HULL_MIN_SCALED( player ) : VEC_HULL_MIN_SCALED( player );
+		return player->m_Local.m_bDucked  ? player->GetHullMinFor( true ) : player->GetHullMinFor( false );
 	}
 }
 
@@ -756,7 +756,7 @@ Vector CGameMovement::GetPlayerMaxs( void ) const
 	}
 	else
 	{
-		return player->m_Local.m_bDucked  ? VEC_DUCK_HULL_MAX_SCALED( player ) : VEC_HULL_MAX_SCALED( player );
+		return player->m_Local.m_bDucked  ? player->GetHullMaxFor( true ) : player->GetHullMaxFor( false );
 	}
 }
 
@@ -767,7 +767,7 @@ Vector CGameMovement::GetPlayerMaxs( void ) const
 //-----------------------------------------------------------------------------
 Vector CGameMovement::GetPlayerViewOffset( bool ducked ) const
 {
-	return ducked ? VEC_DUCK_VIEW_SCALED( player ) : VEC_VIEW_SCALED( player );
+	return ducked ? player->GetViewOffsetFor( true ) : player->GetViewOffsetFor( false );
 }
 
 #if 0
@@ -4092,15 +4092,15 @@ bool CGameMovement::CanUnduck()
 	{
 		for ( i = 0; i < 3; i++ )
 		{
-			newOrigin[i] += ( VEC_DUCK_HULL_MIN_SCALED( player )[i] - VEC_HULL_MIN_SCALED( player )[i] );
+			newOrigin[i] += ( player->GetHullMinFor( true )[i] - player->GetHullMinFor( false )[i] );
 		}
 	}
 	else
 	{
 		// If in air an letting go of crouch, make sure we can offset origin to make
 		//  up for uncrouching
-		Vector hullSizeNormal = VEC_HULL_MAX_SCALED( player ) - VEC_HULL_MIN_SCALED( player );
-		Vector hullSizeCrouch = VEC_DUCK_HULL_MAX_SCALED( player ) - VEC_DUCK_HULL_MIN_SCALED( player );
+		Vector hullSizeNormal = player->GetHullMaxFor( false ) - player->GetHullMinFor( false );
+		Vector hullSizeCrouch = player->GetHullMaxFor( true ) - player->GetHullMinFor( true );
 		Vector viewDelta = ( hullSizeNormal - hullSizeCrouch );
 		viewDelta.Negate();
 		VectorAdd( newOrigin, viewDelta, newOrigin );
@@ -4131,15 +4131,15 @@ void CGameMovement::FinishUnDuck( void )
 	{
 		for ( i = 0; i < 3; i++ )
 		{
-			newOrigin[i] += ( VEC_DUCK_HULL_MIN_SCALED( player )[i] - VEC_HULL_MIN_SCALED( player )[i] );
+			newOrigin[i] += ( player->GetHullMinFor( true )[i] - player->GetHullMinFor( false )[i] );
 		}
 	}
 	else
 	{
 		// If in air an letting go of crouch, make sure we can offset origin to make
 		//  up for uncrouching
-		Vector hullSizeNormal = VEC_HULL_MAX_SCALED( player ) - VEC_HULL_MIN_SCALED( player );
-		Vector hullSizeCrouch = VEC_DUCK_HULL_MAX_SCALED( player ) - VEC_DUCK_HULL_MIN_SCALED( player );
+		Vector hullSizeNormal = player->GetHullMaxFor( false ) - player->GetHullMinFor( false );
+		Vector hullSizeCrouch = player->GetHullMaxFor( true ) - player->GetHullMinFor( true );
 		Vector viewDelta = ( hullSizeNormal - hullSizeCrouch );
 		viewDelta.Negate();
 		VectorAdd( newOrigin, viewDelta, newOrigin );
@@ -4193,8 +4193,8 @@ void CGameMovement::FinishUnDuckJump( trace_t &trace )
 	VectorCopy( mv->GetAbsOrigin(), vecNewOrigin );
 
 	//  Up for uncrouching.
-	Vector hullSizeNormal = VEC_HULL_MAX_SCALED( player ) - VEC_HULL_MIN_SCALED( player );
-	Vector hullSizeCrouch = VEC_DUCK_HULL_MAX_SCALED( player ) - VEC_DUCK_HULL_MIN_SCALED( player );
+	Vector hullSizeNormal = player->GetHullMaxFor( false ) - player->GetHullMinFor( false );
+	Vector hullSizeCrouch = player->GetHullMaxFor( true ) - player->GetHullMinFor( true );
 	Vector viewDelta = ( hullSizeNormal - hullSizeCrouch );
 
 	float flDeltaZ = viewDelta.z;
@@ -4240,14 +4240,14 @@ void CGameMovement::FinishDuck( void )
 		for ( int i = 0; i < 3; i++ )
 		{
 			Vector org = mv->GetAbsOrigin();
-			org[ i ]-= ( VEC_DUCK_HULL_MIN_SCALED( player )[i] - VEC_HULL_MIN_SCALED( player )[i] );
+			org[ i ]-= ( player->GetHullMinFor( true )[i] - player->GetHullMinFor( false )[i] );
 			mv->SetAbsOrigin( org );
 		}
 	}
 	else
 	{
-		Vector hullSizeNormal = VEC_HULL_MAX_SCALED( player ) - VEC_HULL_MIN_SCALED( player );
-		Vector hullSizeCrouch = VEC_DUCK_HULL_MAX_SCALED( player ) - VEC_DUCK_HULL_MIN_SCALED( player );
+		Vector hullSizeNormal = player->GetHullMaxFor( false ) - player->GetHullMinFor( false );
+		Vector hullSizeCrouch = player->GetHullMaxFor( true ) - player->GetHullMinFor( true );
 		Vector viewDelta = ( hullSizeNormal - hullSizeCrouch );
 		Vector out;
    		VectorAdd( mv->GetAbsOrigin(), viewDelta, out );
@@ -4276,8 +4276,8 @@ void CGameMovement::StartUnDuckJump( void )
 
 	player->SetViewOffset( GetPlayerViewOffset( true ) );
 
-	Vector hullSizeNormal = VEC_HULL_MAX_SCALED( player ) - VEC_HULL_MIN_SCALED( player );
-	Vector hullSizeCrouch = VEC_DUCK_HULL_MAX_SCALED( player ) - VEC_DUCK_HULL_MIN_SCALED( player );
+	Vector hullSizeNormal = player->GetHullMaxFor( false ) - player->GetHullMinFor( false );
+	Vector hullSizeCrouch = player->GetHullMaxFor( true ) - player->GetHullMinFor( true );
 	Vector viewDelta = ( hullSizeNormal - hullSizeCrouch );
 	Vector out;
 	VectorAdd( mv->GetAbsOrigin(), viewDelta, out );

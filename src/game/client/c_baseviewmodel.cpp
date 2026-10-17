@@ -34,6 +34,10 @@
 
 
 // memdbgon must be the last include file in a .cpp file!!!
+#ifdef LUA_SDK
+#include "luamanager.h"
+#endif
+
 #include "tier0/memdbgon.h"
 
 #if defined( CSTRIKE_DLL ) || defined( LUA_SDK )
@@ -214,7 +218,7 @@ bool C_BaseViewModel::Interpolate( float currentTime )
 
 bool C_BaseViewModel::ShouldFlipViewModel()
 {
-#ifdef CSTRIKE_DLL || defined ( LUA_SDK )
+#if defined( CSTRIKE_DLL ) || defined( LUA_SDK )
 	// If cl_righthand is set, then we want them all right-handed.
 	CBaseCombatWeapon *pWeapon = m_hWeapon.Get();
 	if ( pWeapon )

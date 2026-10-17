@@ -125,7 +125,7 @@ LUA_BINDING_BEGIN( CheckButton, __index, "class", "Metamethod that is called whe
 {
     CheckButton *pCheckButton = LUA_BINDING_ARGUMENT( lua_tocheckbutton, 1, "checkButton" );
     LUA_METATABLE_INDEX_CHECK_VALID( L, PanelIsValid );
-    LUA_METATABLE_INDEX_CHECK( L, pCheckButton );
+    LUA_METATABLE_INDEX_CHECK_PANEL( L, pCheckButton );
 
     // const char *field = LUA_BINDING_ARGUMENT( luaL_checkstring, 2, "field" );
 

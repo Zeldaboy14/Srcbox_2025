@@ -97,7 +97,11 @@ void LuaWebConnectionHandle::CallSuccessCallback( EHTTPStatusCode statusCode, co
 
 void LuaWebConnectionHandle::CallFailureCallback( const char *message )
 {
+#ifdef LUA_SDK
+    if ( !lua_isrefvalid( m_L, m_FailureCallback ) )
+#else
     if ( !lua_isrefvalid( m_L, m_SuccessCallback ) )
+#endif
     {
         DevWarning( "Lua WebConnection Request failed with error: %s", message );
         return;
@@ -140,9 +144,17 @@ void CLuaWebConnectionManager::OnHTTPHeader( HTTPRequestHeadersReceived_t *pCall
 
     if ( size == 0 )
     {
+#ifdef LUA_SDK
+        // No Content-Length (a chunked response): it's only a size hint, the
+        // buffer grows as the data comes. This used to delete the handle but
+        // leave it in the map, so the data/complete callbacks used it after it
+        // was freed and PurgeAllRequests deleted it again at level shutdown.
+        return;
+#else
         DevWarning( "Content-Length header was not found in WebConnections request!\n" );
         delete call;
         return;
+#endif
     }
 
     uint8 *pData = new uint8[size + 1];
@@ -366,9 +378,23 @@ LUA_BINDING_BEGIN( WebConnections, RequestHttpMethod, "library", "Performs an HT
         failureCallbackRef = luaL_ref( L, LUA_REGISTRYINDEX );
     }
 
+#ifdef LUA_SDK
+    // Keep the main thread, not L: a request made from a coroutine outlives it
+    // once the coroutine is collected, and the handle's later luaL_unref (on
+    // completion or in PurgeAllRequests at level shutdown) read the freed
+    // state. The registry, and so the callback refs, belongs to the main state.
+    lua_rawgeti( L, LUA_REGISTRYINDEX, LUA_RIDX_MAINTHREAD );
+    lua_State *pMainThread = lua_tothread( L, -1 );
+    lua_pop( L, 1 );
+    if ( !pMainThread )
+        pMainThread = L;
+#else
+    lua_State *pMainThread = L;
+#endif
+
     LuaWebConnectionHandle *callback = new LuaWebConnectionHandle(
         hRequest,
-        L,
+        pMainThread,
         successCallbackRef,
         failureCallbackRef );
 

@@ -1074,7 +1074,7 @@ void CTeamTrainWatcher::PlayCaptureAlert( CTeamControlPoint *pPoint, bool bFinal
 
 	if ( TeamplayRoundBasedRules() )
 	{
-		TeamplayRoundBasedRules()->PlayTrainCaptureAlert( pPoint, bFinalPointInMap );
+		if ( TeamplayRoundBasedRules() ) TeamplayRoundBasedRules()->PlayTrainCaptureAlert( pPoint, bFinalPointInMap );
 	}
 }
 
@@ -1164,12 +1164,12 @@ void CTeamTrainWatcher::WatcherThink( void )
 			{
 				if ( m_iTrainSpeedLevel == 0 && iOldTrainSpeedLevel != 0 )
 				{
-					TeamplayRoundBasedRules()->HaveAllPlayersSpeakConceptIfAllowed( MP_CONCEPT_CART_STOP );
+					if ( TeamplayRoundBasedRules() ) TeamplayRoundBasedRules()->HaveAllPlayersSpeakConceptIfAllowed( MP_CONCEPT_CART_STOP );
 					m_flNextSpeakForwardConceptTime = 0;
 				}
 				else if ( m_iTrainSpeedLevel < 0 && iOldTrainSpeedLevel == 0 )
 				{
-					TeamplayRoundBasedRules()->HaveAllPlayersSpeakConceptIfAllowed( MP_CONCEPT_CART_MOVING_BACKWARD );
+					if ( TeamplayRoundBasedRules() ) TeamplayRoundBasedRules()->HaveAllPlayersSpeakConceptIfAllowed( MP_CONCEPT_CART_MOVING_BACKWARD );
 					m_flNextSpeakForwardConceptTime = 0;
 				}
 			}

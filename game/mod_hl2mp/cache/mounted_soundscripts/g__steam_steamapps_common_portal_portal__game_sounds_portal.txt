@@ -1,0 +1,418 @@
+"Portal.room1_Radio"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"0.800000"
+	"soundlevel"		"SNDLVL_60dB"
+	"wave"		"ambient/music/looping_radio_mix.wav"
+}
+"Portal.room1_TickTock"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"0.800000"
+	"soundlevel"		"SNDLVL_75dB"
+	"wave"		"ambient/machines/ticktock1.wav"
+}
+"Portal.room1_Clock"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"1.000000"
+	"soundlevel"		"SNDLVL_100dB"
+	"wave"		"ambient/machines/tick1.wav"
+}
+"Portal.toilet_flush"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"0.900000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_80dB"
+	"wave"		"ambient/machines/usetoilet_flush1.wav"
+}
+"Portal.toilet_thank"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"0.900000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_80dB"
+	"wave"		"ambient/machines/usetoilet_thank.wav"
+}
+"Portal.fluorescent_light_hum"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"0.300000"
+	"soundlevel"		"SNDLVL_50dB"
+	"wave"		"ambient/machines/fluorescent_hum_1.wav"
+}
+"Portal.fluorescent_light_hum2"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"0.300000"
+	"soundlevel"		"SNDLVL_50dB"
+	"wave"		"ambient/machines/fluorescent_hum_2.wav"
+}
+"Portal.elevator_ding"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"plats/elevbell1.wav"
+}
+"Portal.horizontal_lift_move"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"0.800000"
+	"pitch"		"100"
+	"soundlevel"		"SNDLVL_80DB"
+	"wave"		"ambient/machines/beam_platform_loop1.wav"
+}
+"Portal.fire_pit"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"1.000000"
+	"soundlevel"		"SNDLVL_60DB"
+	"wave"		"ambient/fire/fire_big_loop1.wav"
+}
+"Portal.doorclose"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1.000000"
+	"soundlevel"		"SNDLVL_90dB"
+	"pitch"		"90,110"
+	"wave"		"doors/door_metal_thin_close2.wav"
+}
+"Portal.elevator_start"
+{
+	"channel"		"CHAN_BODY"
+	"volume"		"0.800000"
+	"pitch"		"95,100"
+	"soundlevel"		"SNDLVL_90dB"
+	"wave"		"ambient/machines/wall_move5.wav"
+}
+"Portal.elevator_chime"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"0.400000"
+	"soundlevel"		"SNDLVL_80db"
+	"pitch"		"100"
+	"wave"		"ambient/alarms/portal_elevator_chime.wav"
+}
+"Portal.button_down"
+{
+	"channel"		"CHAN_ITEM"
+	"volume"		"0.700000"
+	"soundlevel"		"SNDLVL_75dB"
+	"pitch"		"90"
+	"wave"		"buttons/button3.wav"
+}
+"Portal.button_up"
+{
+	"channel"		"CHAN_ITEM"
+	"volume"		"0.900000"
+	"soundlevel"		"SNDLVL_75dB"
+	"pitch"		"80"
+	"wave"		"buttons/button10.wav"
+}
+"Portal.stair_clack"
+{
+	"channel"		"CHAN_BODY"
+	"volume"		"0.850000"
+	"soundlevel"		"SNDLVL_90dB"
+	"pitch"		"90,110"
+	"wave"		"doors/door_metal_medium_open1.wav"
+}
+"Portal.giant_piston"
+{
+	"channel"		"CHAN_BODY"
+	"volume"		"0.700000"
+	"soundlevel"		"SNDLVL_100dB"
+	"pitch"		"65,80"
+	"wave"		"plats/hall_elev_stop.wav"
+}
+"Portal.giant_fan"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"0.700000"
+	"soundlevel"		"SNDLVL_75db"
+	"wave"		"ambient/machines/fan4.wav"
+}
+"Portal.moving_pistons"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"1.000000"
+	"pitch"		"75"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"vehicles/Crane/crane_idle_loop3.wav"
+}
+"Portal.tube_suck"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"0.900000"
+	"soundlevel"		"SNDLVL_75dB"
+	"wave"		"ambient/wind/tube_suck.wav"
+}
+"Portalgun.pedestal_rotate_loop"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"0.900000"
+	"soundlevel"		"SNDLVL_55db"
+	"wave"		"ambient/machines/portalgun_rotate_loop1.wav"
+}
+"Portalgun.pedestal_rotate"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"0.500000"
+	"soundlevel"		"SNDLVL_90db"
+	"wave"		"ambient/machines/portalgun_rotate1.wav"
+}
+"UpdateItem.Static"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"1.000000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_70dB"
+	"wave"		"ambient/dinosaur_noise.wav"
+}
+"UpdateItem.Dinosaur01"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"1.000000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_70dB"
+	"wave"		"ambient/dinosaur1.wav"
+}
+"UpdateItem.Dinosaur02"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"1.000000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_70dB"
+	"wave"		"ambient/dinosaur2.wav"
+}
+"UpdateItem.Dinosaur03"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"1.000000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_70dB"
+	"wave"		"ambient/dinosaur3.wav"
+}
+"UpdateItem.Dinosaur04"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"1.000000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_70dB"
+	"wave"		"ambient/dinosaur4.wav"
+}
+"UpdateItem.Dinosaur05"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"1.000000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_70dB"
+	"wave"		"ambient/dinosaur5.wav"
+}
+"UpdateItem.Dinosaur06"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"1.000000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_70dB"
+	"wave"		"ambient/dinosaur6.wav"
+}
+"UpdateItem.Dinosaur07"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"1.000000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_70dB"
+	"wave"		"ambient/dinosaur7.wav"
+}
+"UpdateItem.Dinosaur08"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"1.000000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_70dB"
+	"wave"		"ambient/dinosaur8.wav"
+}
+"UpdateItem.Dinosaur09"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"1.000000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_70dB"
+	"wave"		"ambient/dinosaur9.wav"
+}
+"UpdateItem.Dinosaur10"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"1.000000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_70dB"
+	"wave"		"ambient/dinosaur10.wav"
+}
+"UpdateItem.Dinosaur11"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"1.000000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_70dB"
+	"wave"		"ambient/dinosaur11.wav"
+}
+"UpdateItem.Dinosaur12"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"1.000000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_70dB"
+	"wave"		"ambient/dinosaur12.wav"
+}
+"UpdateItem.Dinosaur13"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"1.000000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_70dB"
+	"wave"		"ambient/dinosaur13.wav"
+}
+"UpdateItem.Dinosaur14"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"1.000000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_70dB"
+	"wave"		"ambient/dinosaur14.wav"
+}
+"UpdateItem.Dinosaur15"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"1.000000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_70dB"
+	"wave"		"ambient/dinosaur15.wav"
+}
+"UpdateItem.Dinosaur16"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"1.000000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_70dB"
+	"wave"		"ambient/dinosaur16.wav"
+}
+"UpdateItem.Dinosaur17"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"1.000000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_70dB"
+	"wave"		"ambient/dinosaur17.wav"
+}
+"UpdateItem.Dinosaur18"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"1.000000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_70dB"
+	"wave"		"ambient/dinosaur18.wav"
+}
+"UpdateItem.Dinosaur19"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"1.000000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_70dB"
+	"wave"		"ambient/dinosaur19.wav"
+}
+"UpdateItem.Dinosaur20"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"1.000000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_70dB"
+	"wave"		"ambient/dinosaur20.wav"
+}
+"UpdateItem.Dinosaur21"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"1.000000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_70dB"
+	"wave"		"ambient/dinosaur21.wav"
+}
+"UpdateItem.Dinosaur22"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"1.000000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_70dB"
+	"wave"		"ambient/dinosaur22.wav"
+}
+"UpdateItem.Dinosaur23"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"1.000000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_70dB"
+	"wave"		"ambient/dinosaur23.wav"
+}
+"UpdateItem.Dinosaur24"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"1.000000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_70dB"
+	"wave"		"ambient/dinosaur24.wav"
+}
+"UpdateItem.Dinosaur25"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"1.000000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_70dB"
+	"wave"		"ambient/dinosaur25.wav"
+}
+"UpdateItem.Dinosaur26"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"1.000000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_70dB"
+	"wave"		"ambient/dinosaur26.wav"
+}
+"UpdateItem.Fizzle"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1.000000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_70dB"
+	"rndwave"
+	{
+		"wave"		"ambient/dinosaur_fizzle.wav"
+		"wave"		"ambient/dinosaur_fizzle2.wav"
+		"wave"		"ambient/dinosaur_fizzle3.wav"
+	}
+}
+"outro.bodydrag"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"0.700000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_70dB"
+	"wave"		"ambient/machines/body_drag_01.wav"
+}
+"outro.approach"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"0.700000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_70dB"
+	"wave"		"ambient/machines/p1_drag_intro_01.wav"
+}
+"Portal.PartyEscortAssociate"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1.000000"
+	"soundlevel"		"SNDLVL_100dB"
+	"wave"		"npc/PartyEscort.wav"
+}

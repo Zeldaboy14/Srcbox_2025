@@ -111,6 +111,10 @@ END_DATADESC()
 
 CBaseTeamObjectiveResource *g_pObjectiveResource = NULL;
 
+// Srcbox: games without their own objective resource (HL2MP) create this one so
+// TF control points, payload carts and round timers have somewhere to network to
+LINK_ENTITY_TO_CLASS( team_objective_resource, CBaseTeamObjectiveResource );
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------

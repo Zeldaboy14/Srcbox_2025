@@ -1,0 +1,56 @@
+//========= Srcbox ============================================================//
+//
+// Purpose: Garry's Mod addons (.gma) mounted in place, without extracting
+//          them (see gma_mount.cpp)
+//
+//=============================================================================//
+
+#ifndef GMA_MOUNT_H
+#define GMA_MOUNT_H
+#ifdef _WIN32
+#pragma once
+#endif
+
+struct _WIN32_FIND_DATAW;
+
+// What a path under the mount folder is
+enum GMAPathKind_t
+{
+	GMA_PATH_OUTSIDE,	// not under the mount folder: the real file system's business
+	GMA_PATH_ROOT,		// the mount folder itself (a real, empty directory)
+	GMA_PATH_DIRECTORY,	// a folder inside the mounted addons
+	GMA_PATH_FILE,		// a file inside a mounted addon
+	GMA_PATH_MISSING,	// under the mount folder, but in no addon
+};
+
+struct GMAFileInfo_t
+{
+	const wchar_t		*m_pszArchive;	// the .gma it is in
+	long long			m_nOffset;		// where its bytes start in the .gma
+	long long			m_nSize;
+	unsigned long long	m_nWriteTime;	// FILETIME of the .gma
+};
+
+// For bsp_compat's file hooks. Paths are any form Windows accepts.
+GMAPathKind_t GMAMount_Lookup( const wchar_t *pszPath, GMAFileInfo_t *pInfo );
+const wchar_t *GMAMount_GetRoot();
+
+// Folder listings under the mount folder. FindFirst sets *pbHandled to false
+// for patterns outside it; otherwise it returns the find handle, or NULL with
+// the Windows error set.
+void *GMAMount_FindFirst( const wchar_t *pszPattern, _WIN32_FIND_DATAW *pData, bool *pbHandled );
+bool GMAMount_IsFind( void *pFind );
+bool GMAMount_FindNext( void *pFind, _WIN32_FIND_DATAW *pData );
+void GMAMount_FindClose( void *pFind );
+
+// Finds the addons and adds the mount folder to the GAME search path. Called by
+// BSPCompat_Install in the DLL that owns the file hooks, once they are in.
+void GMAMount_Init();
+void GMAMount_Shutdown();
+
+// Garry's Mod's cfg/mount.cfg: "mountcfg" { "<name>" "<folder>" }. Each folder's
+// VPKs and then the folder itself are added to GAME (last). -mountcfgfile <file> reads cfg/<file> instead. Call before
+// GMAMount_Init, so a Garry's Mod folder mounted this way is found too.
+void MountCfg_Init();
+
+#endif // GMA_MOUNT_H

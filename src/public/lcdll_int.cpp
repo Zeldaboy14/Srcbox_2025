@@ -382,7 +382,7 @@ LUA_BINDING_END( "boolean", "True if the client is drawing a loading image, fals
 
 LUA_BINDING_BEGIN( Engines, IsDedicatedServer, "library", "Check if the server is dedicated. Internally this is getting this information from the server_spawn event." )
 {
-    lua_pushboolean( L, g_pGameInfoStore->IsDedicatedServer() );
+    lua_pushboolean( L, g_pGameInfoStore ? g_pGameInfoStore->IsDedicatedServer() : false );
 
     return 1;
 }

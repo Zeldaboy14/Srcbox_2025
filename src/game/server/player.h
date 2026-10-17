@@ -272,14 +272,17 @@ public:
 	static CBasePlayer		*CreatePlayer( const char *className, edict_t *ed );
 
 	virtual void			CreateViewModel( int viewmodelindex = 0 );
+#ifdef OLD_HAND_VIEWMODELS
+	virtual void	        CreateHandModel(int viewmodelindex = 1, int iOtherVm = 0);
+#endif
 	CBaseViewModel			*GetViewModel( int viewmodelindex = 0, bool bObserverOK = true );
 	CBaseAnimating			*GetHands();
     void SetHands			( CBaseAnimating *pHandsModel );
 	void					HideViewModels( void );
 	void					DestroyViewModels( void );
-
 #ifdef LUA_SDK
-	CNetworkHandle(CBaseEntity, m_hHandsEntity);
+	// Networked (from Experiment) so the client's ply:GetHands() can find the gmod_hands entity
+	CNetworkHandle( CBaseEntity, m_hHandsEntity );
 #else
 	EHANDLE					m_hHandsEntity;
 #endif
@@ -398,6 +401,32 @@ public:
 	virtual const Vector	GetPlayerMins( void ) const; // uses local player
 	virtual const Vector	GetPlayerMaxs( void ) const; // uses local player
 
+	// Srcbox: hull / view offsets. Defaults come from the gamerules view vectors;
+	// Lua can override them per player (GMod's SetHull/SetHullDuck/SetViewOffset*).
+	Vector					GetHullMinFor( bool bDucked, bool bScaled = true ) const;
+	Vector					GetHullMaxFor( bool bDucked, bool bScaled = true ) const;
+	Vector					GetViewOffsetFor( bool bDucked ) const;
+#ifdef LUA_SDK
+	enum
+	{
+		LUA_OVERRIDE_HULL			= ( 1 << 0 ),
+		LUA_OVERRIDE_HULLDUCK		= ( 1 << 1 ),
+		LUA_OVERRIDE_VIEW			= ( 1 << 2 ),
+		LUA_OVERRIDE_VIEWDUCK		= ( 1 << 3 ),
+	};
+	void					SetLuaHull( bool bDucked, const Vector &vecMins, const Vector &vecMaxs );
+	void					ResetLuaHull( void );
+	void					SetLuaViewOffset( bool bDucked, const Vector &vecOffset );
+
+	CNetworkVar( int, m_nLuaOverrides );
+	CNetworkVector( m_vecLuaHullMin );
+	CNetworkVector( m_vecLuaHullMax );
+	CNetworkVector( m_vecLuaDuckHullMin );
+	CNetworkVector( m_vecLuaDuckHullMax );
+	CNetworkVector( m_vecLuaViewOffset );
+	CNetworkVector( m_vecLuaViewOffsetDucked );
+#endif
+
 
 	void					VelocityPunch( const Vector &vecForce );
 	void					ViewPunch( const QAngle &angleOffset );
@@ -467,7 +496,8 @@ public:
 	void					RumbleEffect( unsigned char index, unsigned char rumbleData, unsigned char rumbleFlags );
 	
 	// Player is moved across the transition by other means
-	virtual int				ObjectCaps( void ) { return BaseClass::ObjectCaps() & ~FCAP_ACROSS_TRANSITION; }
+	//virtual int				ObjectCaps( void ) { return BaseClass::ObjectCaps() & ~FCAP_ACROSS_TRANSITION; }
+	virtual int				ObjectCaps( void ) { return BaseClass::ObjectCaps() | FCAP_ACROSS_TRANSITION; }
 	virtual void			Precache( void );
 	bool					IsOnLadder( void );
 	virtual void			ExitLadder() {}
@@ -1605,8 +1635,8 @@ bool ForEachPlayer( Functor &func )
 		if( !player->IsConnected() )
 			continue;
 
-		if (func( player ) == false)
-			return false;
+		//if (func( player ) == false)
+			//return false;
 	}
 
 	return true;

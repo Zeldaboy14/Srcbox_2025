@@ -1,0 +1,6 @@
+// Garry's Mod addons (.gma) Srcbox should NOT mount.
+// One workshop id (the folder name under workshop\content\4000) or .gma file
+// name per line. Launch with -gmalist to print every mounted addon's number and id.
+//
+// Example:
+// 2773737445   // Seamless Portals

@@ -10,9 +10,15 @@
 #include "datacache/imdlcache.h"
 #include "tier3/tier3.h"
 #include "base64.h"
+#include "decals.h"
+#include "itempents.h"
 
 #ifdef CLIENT_DLL
 #include "cdll_util.h"
+#include "c_recipientfilter.h"
+#include "iefx.h"
+#else
+#include "recipientfilter.h"
 #endif
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -410,6 +416,61 @@ LUA_BINDING_BEGIN( Utilities, ShouldShowBlood, "library", "Check if blood of the
     return 1;
 }
 LUA_BINDING_END( "boolean", "True if blood should be shown" )
+
+// Srcbox: decals (GMod's util.Decal / util.DecalEx). The trace starts at 'start'
+// and goes to 'end'; the optional 4th argument is an entity to ignore.
+static bool LuaDecal_Trace( lua_State *L, trace_t &tr )
+{
+    Vector vecStart = luaL_checkvector( L, 2 );
+    Vector vecEnd = luaL_checkvector( L, 3 );
+    CBaseEntity *pIgnore = lua_isnoneornil( L, 4 ) ? NULL : lua_toentity( L, 4 );
+
+    UTIL_TraceLine( vecStart, vecEnd, MASK_SOLID, pIgnore, COLLISION_GROUP_NONE, &tr );
+
+    return tr.fraction < 1.0f && tr.m_pEnt && !tr.allsolid;
+}
+
+static void LuaDecal_Apply( trace_t &tr, int decalIndex )
+{
+    if ( decalIndex < 0 )
+        return;
+
+    CBroadcastRecipientFilter filter;
+    te->Decal( filter, 0.0f, &tr.endpos, &tr.startpos, tr.GetEntityIndex(), tr.hitbox, decalIndex );
+}
+
+LUA_BINDING_BEGIN( Utilities, Decal, "library", "Traces from start to end and places a decal from decals.txt by name (name, start, end, ignoreEntity)." )
+{
+    const char *pszName = LUA_BINDING_ARGUMENT( luaL_checkstring, 1, "decalName" );
+    trace_t tr;
+
+    if ( LuaDecal_Trace( L, tr ) )
+        LuaDecal_Apply( tr, decalsystem->GetDecalIndexForName( pszName ) );
+
+    return 0;
+}
+LUA_BINDING_END()
+
+LUA_BINDING_BEGIN( Utilities, DecalMaterial, "library", "Traces from start to end and places a decal using a material path (material, start, end, ignoreEntity)." )
+{
+    const char *pszMaterial = LUA_BINDING_ARGUMENT( luaL_checkstring, 1, "material" );
+    trace_t tr;
+
+    if ( !LuaDecal_Trace( L, tr ) )
+        return 0;
+
+#ifdef CLIENT_DLL
+    char szMaterial[MAX_PATH];
+    V_strncpy( szMaterial, pszMaterial, sizeof( szMaterial ) );
+    int decalIndex = effects->Draw_DecalIndexFromName( szMaterial );
+#else
+    int decalIndex = engine->PrecacheDecal( pszMaterial, true );
+#endif
+
+    LuaDecal_Apply( tr, decalIndex );
+    return 0;
+}
+LUA_BINDING_END()
 
 LUALIB_API int luaopen_Util_shared( lua_State *L )
 {

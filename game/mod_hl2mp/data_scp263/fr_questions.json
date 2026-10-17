@@ -1,0 +1,202 @@
+[
+	{
+		"correct_answer": "d",
+		"question": "Dans quel Site est contenu SCP-682 ?",
+		"response_a": "Site 12",
+		"response_b": "Site 20",
+		"response_c": "Site 32",
+		"response_d": "Aucun de ceux évoqué"
+	},
+	{
+		"correct_answer": "a",
+		"question": "Que signifie un Scénario de Classe XK ?",
+		"response_a": "Fin du monde",
+		"response_b": "Destruction de la réalité",
+		"response_c": "Fin de l'Humanité",
+		"response_d": "Fin de la Civilisation"
+	},
+	{
+		"correct_answer": "d",
+		"question": "Qu'est donc SCP 420-J",
+		"response_a": "Un poisson alien",
+		"response_b": "Une statue avec un chapeau mexicain",
+		"response_c": "Un ancien président français anormal",
+		"response_d": "Un énorme pétard"
+	},
+	{
+		"correct_answer": "a",
+		"question": "À qui obéit le comité d'éthique ?",
+		"response_a": "Le conseil O5",
+		"response_b": "Les représentants du conseil 05",
+		"response_c": "L'administrateur du site dans lequel ils opèrent",
+		"response_d": "Le Superviseur"
+	},
+	{
+		"correct_answer": "c",
+		"question": "Quel est la mission principale de la FIM Lambda-5",
+		"response_a": "L'exploration de zone anormal",
+		"response_b": "La gestion des attaques terroristes anormal",
+		"response_c": "Le confinement d'anomalies",
+		"response_d": "L'entrainement des agents de terrain"
+	},
+	{
+		"correct_answer": "a",
+		"question": "Dans quelle circonstance doit être appelé la FIM Lambda-5 ?",
+		"response_a": "Lors d'un code MAGENTA",
+		"response_b": "Lors d'un code NOIR",
+		"response_c": "Lors d'une Initiatives de Réponse Automatisée de type RA-1",
+		"response_d": "Lors d'une rébellion des membres de Classe-D"
+	},
+	{
+		"correct_answer": "d",
+		"question": "Pourquoi le comité d'éthique existe-t-il ?",
+		"response_a": "Ils n'ont pas d'utilité, ils sont inutile",
+		"response_b": "Pour protéger les membres de la fondation",
+		"response_c": "Pour sauver le personnel de Classe-D",
+		"response_d": "Pour poser les limites à la fondation"
+	},
+	{
+		"correct_answer": "c",
+		"question": "Si une révolte du personnel éclate quel Fim doit intervenir ?",
+		"response_a": "La Alpha-1",
+		"response_b": "La Omega-1",
+		"response_c": "La Thau-5",
+		"response_d": "La Omicron Rhô"
+	},
+	{
+		"correct_answer": "a",
+		"question": "Qui est Bobble/Pompon le Clown ?",
+		"response_a": "Un clown visible uniquement par les enfants",
+		"response_b": "SCP-2094",
+		"response_c": "Un clown de cirque d'élevage",
+		"response_d": "SCP-2912-3"
+	},
+	{
+		"correct_answer": "a",
+		"question": "Quelle est la procédure standard selon la Fondation pour contenir les SCP ?",
+		"response_a": "Les confiner dans une cellule de confinement conforme à leur dangerosité et à leurs besoins spécifiques.",
+		"response_b": "Les confiner et tenter de les détruires",
+		"response_c": "Les étudier et les comprendre avant de les confiner",
+		"response_d": "Les faire apparaître dans la lumière"
+	},
+	{
+		"correct_answer": "b",
+		"question": "Quel est la figure la plus importante du groupe d'intérêt 'L'Église du Dieu Brisé' ?",
+		"response_a": "SCP-914",
+		"response_b": "Robert Bumaro",
+		"response_c": "Un épouventail mécanique vivant",
+		"response_d": "SCP-2217"
+	},
+	{
+		"correct_answer": "d",
+		"question": "Quel est la procédure 110-Montauk ?",
+		"response_a": "Une procédure extrêmement violente qui consiste à ████████ SCP-231-7",
+		"response_b": "Raconter une histoire à SCP-231-7",
+		"response_c": "Réaliser un sacrifice au nom du Roi écarlate",
+		"response_d": "Personne ne sais"
+	},
+	{
+		"correct_answer": "c",
+		"question": "Et maintenant, on est ... ?",
+		"response_a": "Pas Cool",
+		"response_b": "Bien",
+		"response_c": "Cool",
+		"response_d": "Thaumiel"
+	},
+	{
+		"correct_answer": "a",
+		"question": "Cinq ans, dix mois, vingt-huit jours",
+		"response_a": "Rouge",
+		"response_b": "Vert",
+		"response_c": "Jaune",
+		"response_d": "Violet"
+	},
+	{
+		"correct_answer": "c",
+		"question": "Celui dont on ne dois pas prononcer le nom",
+		"response_a": "SCP-2521",
+		"response_b": "Lui",
+		"response_c": "●●|●●●●●|●●|●",
+		"response_d": "●●|●|●●●|●●"
+	},
+	{
+		"correct_answer": "d",
+		"question": "La Procédure 220-Calabasas ...",
+		"response_a": "Empeche le déconfinement de SCP-106",
+		"response_b": "Est un protocole d'urgence lors d'un scénario de classe PK",
+		"response_c": "Un mélange de pratique ésotérique des principals religions monothéiste",
+		"response_d": "Est inutile"
+	},
+	{
+		"correct_answer": "b",
+		"question": "Le magasin est désormais fermé, veuillez quitter le bâtiment",
+		"response_a": "SCP-2030",
+		"response_b": "SCP-3008-2",
+		"response_c": "KLEPPSTAD",
+		"response_d": "SKUBB"
+	},
+	{
+		"correct_answer": "c",
+		"question": "Je produit de charmant meuble très causy d'origine entièrement naturel, je suis ?",
+		"response_a": "Un magasin de meuble",
+		"response_b": "SCP-3008",
+		"response_c": "SCP-002",
+		"response_d": "SCP-1025"
+	},
+	{
+		"correct_answer": "b",
+		"question": "Ce n'est pas rond",
+		"response_a": "SCP-5000",
+		"response_b": "SCP-055",
+		"response_c": "C'est carré",
+		"response_d": "SCP-002"
+	},
+	{
+		"correct_answer": "d",
+		"question": "Que fais ████████ ?",
+		"response_a": "●●|●●●●●|●●|●",
+		"response_b": "Il est vivant",
+		"response_c": "Il est mort",
+		"response_d": "████████"
+	},
+	{
+		"correct_answer": "b",
+		"question": "Quel est la seul classe d'agents permettant de se souvenir de choses ?",
+		"response_a": "Classe A",
+		"response_b": "Classe W",
+		"response_c": "Classe D",
+		"response_d": "Classe G"
+	},
+	{
+		"correct_answer": "a",
+		"question": "Et voilà. Une Hawaïenne, une Extra-Viande, c'est bien ça, messieurs ?",
+		"response_a": "Ruiz Duchamp",
+		"response_b": "Le Sculpteur",
+		"response_c": "L'Agrafeur",
+		"response_d": "L’Homme"
+	},
+	{
+		"correct_answer": "c",
+		"question": "Il a le plus grand cirque anormale du monde, il est ... ?",
+		"response_a": "Dr Bright",
+		"response_b": "Dr. Clef",
+		"response_c": "Herman Fuller ",
+		"response_d": "Le Découpeur"
+	},
+	{
+		"correct_answer": "d",
+		"question": "Quel est la classe d'agents permettant de faire entrer dans un état d'amnésie temporaire ?",
+		"response_a": "Classe C",
+		"response_b": "Classe D",
+		"response_c": "Classe G",
+		"response_d": "Classe I"
+	},
+	{
+		"correct_answer": "a",
+		"question": "SUICIDE TOI ! WOWWII ! SUICID TWA ! WOWWII ! Wowwii ...",
+		"response_a": "Personne meurt",
+		"response_b": "Est-ce ainsi que la rationalité cherche à exister, peux être devrions nous plus mûrement y réfléchir dans un cadre plus serein, non ?",
+		"response_c": "wowwii tu té suicider",
+		"response_d": "15:18:20"
+	}
+]

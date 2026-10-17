@@ -1,0 +1,1785 @@
+"npc_vortigaunt.above"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/above.wav"
+}
+"npc_vortigaunt.abovefm"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/abovefm.wav"
+}
+"npc_vortigaunt.advancefm"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.750000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/advancefm.wav"
+}
+"NPC_Vortigaunt.Aftershock"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"0.800000"
+	"pitch"		"90, 110"
+	"soundlevel"		"SNDLVL_100dB"
+	"rndwave"
+	{
+		"wave"		"npc/vort/vort_aftershocks1.wav"
+		"wave"		"npc/vort/vort_aftershocks2.wav"
+		"wave"		"npc/vort/vort_aftershocks3.wav"
+	}
+}
+"npc_vortigaunt.alert"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/alert.wav"
+}
+"npc_vortigaunt.alert_antlions"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_90dB"
+	"wave"		"*vo/npc/vortigaunt/warefm.wav"
+}
+"npc_vortigaunt.alert_beholdantrhino"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_90dB"
+	"wave"		"*vo/npc/vortigaunt/alert_beholdantrhino.wav"
+}
+"npc_vortigaunt.alert_gunships"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_90dB"
+	"wave"		"*vo/npc/vortigaunt/alert_gunships.wav"
+}
+"npc_vortigaunt.alert_gunshipshigh"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_90dB"
+	"wave"		"*vo/npc/vortigaunt/alert_gunshipshigh.wav"
+}
+"npc_vortigaunt.alert_man"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/alert_man.wav"
+}
+"npc_vortigaunt.alert_rollers"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_90dB"
+	"wave"		"*vo/npc/vortigaunt/alert_rollers.wav"
+}
+"npc_vortigaunt.alert_scanners"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_90dB"
+	"wave"		"*vo/npc/vortigaunt/alert_scanners.wav"
+}
+"npc_vortigaunt.alert_soldiers"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_90dB"
+	"wave"		"*vo/npc/vortigaunt/alert_soldiers.wav"
+}
+"npc_vortigaunt.alert_strider"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_90dB"
+	"wave"		"*vo/npc/vortigaunt/alert_strider.wav"
+}
+"npc_vortigaunt.approaches"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/approaches.wav"
+}
+"npc_vortigaunt.asound"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/asound.wav"
+}
+"npc_vortigaunt.behind"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/behind.wav"
+}
+"npc_vortigaunt.behindfm"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/behindfm.wav"
+}
+"npc_vortigaunt.behindyou"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.750000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/behindyou.wav"
+}
+"npc_vortigaunt.below"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/below.wav"
+}
+"npc_vortigaunt.belowfm"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.900000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/belowfm.wav"
+}
+"npc_vortigaunt.beware"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/beware.wav"
+}
+"npc_vortigaunt.byvort"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/byvort.wav"
+}
+"npc_vortigaunt.cautionfm02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.850000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/cautionfm02.wav"
+}
+"npc_vortigaunt.choicemade"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"*vo/npc/vortigaunt/choicemade.wav"
+}
+"npc_vortigaunt.claimvort"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_90dB"
+	"wave"		"*vo/npc/vortigaunt/claimvort.wav"
+}
+"npc_vortigaunt.cordcut"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/cordcut.wav"
+}
+"NPC_Vortigaunt.DispelImpact"
+{
+	"channel"		"CHAN_WEAPON"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"npc/vort/vort_dispell.wav"
+}
+"NPC_Vortigaunt.DispelStart"
+{
+	"channel"		"CHAN_WEAPON"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_GUNFIRE"
+	"wave"		"npc/vort/vort_dispell.wav"
+}
+"npc_vortigaunt.donthesitate"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/donthesitate.wav"
+}
+"npc_vortigaunt.downhere"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.750000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/downhere.wav"
+}
+"npc_vortigaunt.downthere"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/downthere.wav"
+}
+"npc_vortigaunt.enough"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_90dB"
+	"wave"		"*vo/npc/vortigaunt/enough.wav"
+}
+"NPC_Vortigaunt.Explode"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"0.900000"
+	"pitch"		"100, 110"
+	"soundlevel"		"SNDLVL_120dB"
+	"rndwave"
+	{
+		"wave"		"npc/vort/vort_explode1.wav"
+		"wave"		"npc/vort/vort_explode2.wav"
+	}
+}
+"npc_vortigaunt.fearnotfm"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/fearnotfm.wav"
+}
+"npc_vortigaunt.finished"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.750000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/finished.wav"
+}
+"npc_vortigaunt.fittingend"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/fittingend.wav"
+}
+"npc_vortigaunt.fmaccompany"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/fmaccompany.wav"
+}
+"npc_vortigaunt.fmadvance"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/fmadvance.wav"
+}
+"npc_vortigaunt.fmmustcaution"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/fmmustcaution.wav"
+}
+"npc_vortigaunt.fmmustnotfear"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/fmmustnotfear.wav"
+}
+"npc_vortigaunt.fmsilent"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/fmsilent.wav"
+}
+"npc_vortigaunt.forbearfm"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.750000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/forbearfm.wav"
+}
+"npc_vortigaunt.forcause"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_90dB"
+	"wave"		"*vo/npc/vortigaunt/forcause.wav"
+}
+"npc_vortigaunt.hark"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/hark.wav"
+}
+"npc_vortigaunt.hastefm"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.900000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/hastefm.wav"
+}
+"npc_vortigaunt.heal01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.750000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/heal01.wav"
+}
+"npc_vortigaunt.heal02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.750000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/heal02.wav"
+}
+"npc_vortigaunt.heal03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.750000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/heal03.wav"
+}
+"npc_vortigaunt.heal04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.750000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/heal04.wav"
+}
+"npc_vortigaunt.heal05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.750000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/heal05.wav"
+}
+"npc_vortigaunt.healscanharm"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.750000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/healscanharm.wav"
+}
+"npc_vortigaunt.hurryonfm"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/hurryonfm.wav"
+}
+"npc_vortigaunt.lookwell"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/lookwell.wav"
+}
+"npc_vortigaunt.losesight"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/losesight.wav"
+}
+"npc_vortigaunt.obstruction"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/obstruction.wav"
+}
+"npc_vortigaunt.onepasses"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/onepasses.wav"
+}
+"npc_vortigaunt.onesurvives"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/onesurvives.wav"
+}
+"npc_vortigaunt.overthere"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/overthere.wav"
+}
+"npc_vortigaunt.preparetomerge"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.750000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_90dB"
+	"wave"		"*vo/npc/vortigaunt/preparetomerge.wav"
+}
+"npc_vortigaunt.proceedfm"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/proceedfm.wav"
+}
+"npc_vortigaunt.recsilence"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/recsilence.wav"
+}
+"npc_vortigaunt.regrettable02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.750000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/regrettable02.wav"
+}
+"npc_vortigaunt.reload01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/reload01.wav"
+}
+"npc_vortigaunt.reload02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/reload02.wav"
+}
+"npc_vortigaunt.reload03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.900000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/reload03.wav"
+}
+"npc_vortigaunt.rememberus02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/rememberus02.wav"
+}
+"npc_vortigaunt.silence"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/silence.wav"
+}
+"npc_vortigaunt.thatsound"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/thatsound.wav"
+}
+"npc_vortigaunt.there"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/there.wav"
+}
+"npc_vortigaunt.unclear"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/unclear.wav"
+}
+"npc_vortigaunt.unfinished01a"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.720000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/unfinished01a.wav"
+}
+"npc_vortigaunt.unfinished01b"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/unfinished01b.wav"
+}
+"npc_vortigaunt.unfinished02a"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.720000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/unfinished02a.wav"
+}
+"npc_vortigaunt.unfinished02b"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.570000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/unfinished02b.wav"
+}
+"npc_vortigaunt.unfinished03a"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.720000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/unfinished03a.wav"
+}
+"npc_vortigaunt.unfinished03b"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/unfinished03b.wav"
+}
+"npc_vortigaunt.untethered"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/untethered.wav"
+}
+"npc_vortigaunt.upthere"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/upthere.wav"
+}
+"npc_vortigaunt.utmostprotect"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/utmostprotect.wav"
+}
+"npc_vortigaunt.veillifted"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/veillifted.wav"
+}
+"npc_vortigaunt.vmourn01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vmourn01.wav"
+}
+"npc_vortigaunt.vmourn02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vmourn02.wav"
+}
+"npc_vortigaunt.vmourn03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vmourn03.wav"
+}
+"npc_vortigaunt.vmourn04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vmourn04.wav"
+}
+"npc_vortigaunt.vmourn05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vmourn05.wav"
+}
+"npc_vortigaunt.vmourn06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vmourn06.wav"
+}
+"npc_vortigaunt.vmourn07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vmourn07.wav"
+}
+"npc_vortigaunt.vmourn08"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vmourn08.wav"
+}
+"npc_vortigaunt.vmourn09"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vmourn09.wav"
+}
+"npc_vortigaunt.vmourn10"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vmourn10.wav"
+}
+"npc_vortigaunt.vmourn11"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vmourn11.wav"
+}
+"npc_vortigaunt.vmourn12"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vmourn12.wav"
+}
+"npc_vortigaunt.voidlaysclaim"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_90dB"
+	"wave"		"*vo/npc/vortigaunt/voidlaysclaim.wav"
+}
+"npc_vortigaunt.vort_attack01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_90dB"
+	"wave"		"*vo/npc/vortigaunt/vort_attack01.wav"
+}
+"npc_vortigaunt.vort_attack02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_90dB"
+	"wave"		"*vo/npc/vortigaunt/vort_attack02.wav"
+}
+"npc_vortigaunt.vort_attack03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_90dB"
+	"wave"		"*vo/npc/vortigaunt/vort_attack03.wav"
+}
+"npc_vortigaunt.vort_attack04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_90dB"
+	"wave"		"*vo/npc/vortigaunt/vort_attack04.wav"
+}
+"npc_vortigaunt.vort_attack05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_90dB"
+	"wave"		"*vo/npc/vortigaunt/vort_attack05.wav"
+}
+"npc_vortigaunt.vort_attack06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_90dB"
+	"wave"		"*vo/npc/vortigaunt/vort_attack06.wav"
+}
+"npc_vortigaunt.vort_attack07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_90dB"
+	"wave"		"*vo/npc/vortigaunt/vort_attack07.wav"
+}
+"npc_vortigaunt.vort_attack08"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_90dB"
+	"wave"		"*vo/npc/vortigaunt/vort_attack08.wav"
+}
+"npc_vortigaunt.vort_attack09"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_90dB"
+	"wave"		"*vo/npc/vortigaunt/vort_attack09.wav"
+}
+"npc_vortigaunt.vort_attack10"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_90dB"
+	"wave"		"*vo/npc/vortigaunt/vort_attack10.wav"
+}
+"npc_vortigaunt.vort_attack11"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_90dB"
+	"wave"		"*vo/npc/vortigaunt/vort_attack11.wav"
+}
+"npc_vortigaunt.vort_attack12"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_90dB"
+	"wave"		"*vo/npc/vortigaunt/vort_attack12.wav"
+}
+"npc_vortigaunt.vort_attack13"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_90dB"
+	"wave"		"*vo/npc/vortigaunt/vort_attack13.wav"
+}
+"npc_vortigaunt.vort_attack14"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_90dB"
+	"wave"		"*vo/npc/vortigaunt/vort_attack14.wav"
+}
+"npc_vortigaunt.vort_attack15"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_90dB"
+	"wave"		"*vo/npc/vortigaunt/vort_attack15.wav"
+}
+"npc_vortigaunt.vort_attack16"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_90dB"
+	"wave"		"*vo/npc/vortigaunt/vort_attack16.wav"
+}
+"npc_vortigaunt.vort_attack17"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_90dB"
+	"wave"		"*vo/npc/vortigaunt/vort_attack17.wav"
+}
+"npc_vortigaunt.vort_attack18"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_90dB"
+	"wave"		"*vo/npc/vortigaunt/vort_attack18.wav"
+}
+"npc_vortigaunt.vort_attack19"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_90dB"
+	"wave"		"*vo/npc/vortigaunt/vort_attack19.wav"
+}
+"npc_vortigaunt.vort_attack20"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_90dB"
+	"wave"		"*vo/npc/vortigaunt/vort_attack20.wav"
+}
+"npc_vortigaunt.vort_attack21"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_90dB"
+	"wave"		"*vo/npc/vortigaunt/vort_attack21.wav"
+}
+"npc_vortigaunt.vort_attack22"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_90dB"
+	"wave"		"*vo/npc/vortigaunt/vort_attack22.wav"
+}
+"npc_vortigaunt.vort_attack23"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_90dB"
+	"wave"		"*vo/npc/vortigaunt/vort_attack23.wav"
+}
+"npc_vortigaunt.vort_call01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_call01.wav"
+}
+"npc_vortigaunt.vort_call02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_call02.wav"
+}
+"npc_vortigaunt.vort_call03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_call03.wav"
+}
+"npc_vortigaunt.vort_call04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_call04.wav"
+}
+"npc_vortigaunt.vort_call05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_call05.wav"
+}
+"npc_vortigaunt.vort_call06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_call06.wav"
+}
+"npc_vortigaunt.vort_call07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_call07.wav"
+}
+"npc_vortigaunt.vort_call08"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_call08.wav"
+}
+"npc_vortigaunt.vort_call09"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_call09.wav"
+}
+"npc_vortigaunt.vort_call10"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_call10.wav"
+}
+"npc_vortigaunt.vort_call11"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_call11.wav"
+}
+"npc_vortigaunt.vort_call12"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_call12.wav"
+}
+"npc_vortigaunt.vort_call13"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_call13.wav"
+}
+"npc_vortigaunt.vort_call14"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_call14.wav"
+}
+"npc_vortigaunt.vort_call15"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_call15.wav"
+}
+"npc_vortigaunt.vort_call16"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_call16.wav"
+}
+"npc_vortigaunt.vort_call17"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_call17.wav"
+}
+"npc_vortigaunt.vort_call18"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_call18.wav"
+}
+"npc_vortigaunt.vort_call19"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_call19.wav"
+}
+"npc_vortigaunt.vort_chant01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_chant01.wav"
+}
+"npc_vortigaunt.vort_chant02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_chant02.wav"
+}
+"npc_vortigaunt.vort_chant03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_chant03.wav"
+}
+"npc_vortigaunt.vort_chant04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_chant04.wav"
+}
+"npc_vortigaunt.vort_chant05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_chant05.wav"
+}
+"npc_vortigaunt.vort_chant06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_chant06.wav"
+}
+"npc_vortigaunt.vort_chant07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_chant07.wav"
+}
+"npc_vortigaunt.vort_chant08"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_chant08.wav"
+}
+"npc_vortigaunt.vort_chant09"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_chant09.wav"
+}
+"npc_vortigaunt.vort_chant10"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_chant10.wav"
+}
+"npc_vortigaunt.vort_chant11"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_chant11.wav"
+}
+"npc_vortigaunt.vort_chant12"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_chant12.wav"
+}
+"npc_vortigaunt.vort_chant13"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_chant13.wav"
+}
+"npc_vortigaunt.vort_chant14"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_chant14.wav"
+}
+"npc_vortigaunt.vort_chant15"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_chant15.wav"
+}
+"npc_vortigaunt.vort_chant16"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_chant16.wav"
+}
+"npc_vortigaunt.vort_chant17"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_chant17.wav"
+}
+"npc_vortigaunt.vort_chant18"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_chant18.wav"
+}
+"npc_vortigaunt.vort_chant19"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_chant19.wav"
+}
+"npc_vortigaunt.vort_chant20"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_chant20.wav"
+}
+"npc_vortigaunt.vort_chant21"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_chant21.wav"
+}
+"npc_vortigaunt.vort_chant22"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_chant22.wav"
+}
+"npc_vortigaunt.vort_chant23"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_chant23.wav"
+}
+"npc_vortigaunt.vort_chant24"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_chant24.wav"
+}
+"npc_vortigaunt.vort_doublekill"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.750000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_doublekill.wav"
+}
+"npc_vortigaunt.vort_excellent"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.750000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_excellent.wav"
+}
+"npc_vortigaunt.vort_excellentshooting"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.750000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_excellentshooting.wav"
+}
+"npc_vortigaunt.vort_excellentshot"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.750000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_excellentshot.wav"
+}
+"npc_vortigaunt.vort_exceptional"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.750000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_exceptional.wav"
+}
+"npc_vortigaunt.vort_fmishelpful"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.750000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_fmishelpful.wav"
+}
+"npc_vortigaunt.vort_fmisinvcomp"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.750000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_fmisinvcomp.wav"
+}
+"npc_vortigaunt.vort_fmthankyou"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.750000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_fmthankyou.wav"
+}
+"npc_vortigaunt.vort_forbearfm"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_forbearfm.wav"
+}
+"npc_vortigaunt.vort_goodfightwithus"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.750000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_goodfightwithus.wav"
+}
+"npc_vortigaunt.vort_goodtogether"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.750000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_goodtogether.wav"
+}
+"npc_vortigaunt.vort_healscanharm"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_healscanharm.wav"
+}
+"npc_vortigaunt.vort_killsformidable"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.750000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_skillsformidable.wav"
+}
+"npc_vortigaunt.vort_mant01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_mant01.wav"
+}
+"npc_vortigaunt.vort_mant02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_mant02.wav"
+}
+"npc_vortigaunt.vort_mant03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_mant03.wav"
+}
+"npc_vortigaunt.vort_mant04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_mant04.wav"
+}
+"npc_vortigaunt.vort_mant05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_mant05.wav"
+}
+"npc_vortigaunt.vort_mant06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_mant06.wav"
+}
+"npc_vortigaunt.vort_mant07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_mant07.wav"
+}
+"npc_vortigaunt.vort_mant08"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_mant08.wav"
+}
+"npc_vortigaunt.vort_mant09"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_mant09.wav"
+}
+"npc_vortigaunt.vort_mant10"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_mant10.wav"
+}
+"npc_vortigaunt.vort_mant11"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_mant11.wav"
+}
+"npc_vortigaunt.vort_mant12"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_mant12.wav"
+}
+"npc_vortigaunt.vort_mant13"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_mant13.wav"
+}
+"npc_vortigaunt.vort_mant14"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_mant14.wav"
+}
+"npc_vortigaunt.vort_mant15"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_mant15.wav"
+}
+"npc_vortigaunt.vort_mant16"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_mant16.wav"
+}
+"npc_vortigaunt.vort_mant17"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_mant17.wav"
+}
+"npc_vortigaunt.vort_mant18"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_mant18.wav"
+}
+"npc_vortigaunt.vort_outstanding"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.750000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_outstanding.wav"
+}
+"npc_vortigaunt.vort_pain01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_pain01.wav"
+}
+"npc_vortigaunt.vort_pain02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_pain02.wav"
+}
+"npc_vortigaunt.vort_pain03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_pain03.wav"
+}
+"npc_vortigaunt.vort_pain04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_pain04.wav"
+}
+"npc_vortigaunt.vort_pain05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_pain05.wav"
+}
+"npc_vortigaunt.vort_pain06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_pain06.wav"
+}
+"npc_vortigaunt.vort_pain07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_pain07.wav"
+}
+"npc_vortigaunt.vort_pain08"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_pain08.wav"
+}
+"npc_vortigaunt.vort_pain09"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_pain09.wav"
+}
+"npc_vortigaunt.vort_pain10"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_pain10.wav"
+}
+"npc_vortigaunt.vort_pain11"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_pain11.wav"
+}
+"npc_vortigaunt.vort_pain12"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_pain12.wav"
+}
+"npc_vortigaunt.vort_pain13"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_pain13.wav"
+}
+"npc_vortigaunt.vort_pain14"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_pain14.wav"
+}
+"npc_vortigaunt.vort_pain15"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_pain15.wav"
+}
+"npc_vortigaunt.vort_pain16"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_pain16.wav"
+}
+"npc_vortigaunt.vort_quiteadisplay"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.750000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_uiteadisplay.wav"
+}
+"npc_vortigaunt.vort_reputationdeserved"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.750000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_reputationdeserved.wav"
+}
+"npc_vortigaunt.vort_skillsquestionable"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_skillsquestionable.wav"
+}
+"npc_vortigaunt.vort_thankyoufm"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.750000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_thankyoufm.wav"
+}
+"npc_vortigaunt.vort_thankyoutrouble"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.750000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_thankyoutrouble.wav"
+}
+"npc_vortigaunt.vort_tofm"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.750000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_tofm.wav"
+}
+"npc_vortigaunt.vort_weaponwell"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.750000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_weaponwell.wav"
+}
+"npc_vortigaunt.vort_welldonefm"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.750000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vort_welldonefm.wav"
+}
+"npc_vortigaunt.vortfails"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/vortfails.wav"
+}
+"npc_vortigaunt.wavernotfm"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/weforgive.wav"
+}
+"npc_vortigaunt.weareone"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/weareone.wav"
+}
+"npc_vortigaunt.wefinish"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.900000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_90dB"
+	"wave"		"*vo/npc/vortigaunt/wefinish.wav"
+}
+"npc_vortigaunt.weforgive"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/weforgive.wav"
+}
+"npc_vortigaunt.wegowillingly"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.800000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/vortigaunt/wegowillingly.wav"
+}

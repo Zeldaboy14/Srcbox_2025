@@ -342,7 +342,11 @@ CConsolePanel::~CConsolePanel()
 {
     ClearCompletionList();
     m_CommandHistory.Purge();
-    g_pCVar->RemoveConsoleDisplayFunc( this );
+    // On shutdown this panel can be destroyed after the cvar interface has been disconnected
+    if ( g_pCVar )
+    {
+        g_pCVar->RemoveConsoleDisplayFunc( this );
+    }
 }
 
 //-----------------------------------------------------------------------------

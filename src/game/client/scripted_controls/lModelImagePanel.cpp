@@ -708,7 +708,7 @@ LUA_BINDING_BEGIN( ModelImagePanel, __index, "class", "Metamethod called when a 
     lua_ModelImagePanel *pModelImagePanel = LUA_BINDING_ARGUMENT( lua_tomodelimagepanel, 1, "modelImagePanel" );
 
     LUA_METATABLE_INDEX_CHECK_VALID( L, PanelIsValid );
-    LUA_METATABLE_INDEX_CHECK( L, pModelImagePanel );
+    LUA_METATABLE_INDEX_CHECK_PANEL( L, pModelImagePanel );
 
     // const char *field = LUA_BINDING_ARGUMENT( luaL_checkstring, 2, "field" );
 

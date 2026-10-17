@@ -27,6 +27,11 @@
 #include "filesystem.h"
 #include "staticprop_colormod.h"
 #include "bsp_compat.h"
+#include "materialsystem/imaterial.h"
+#include "materialsystem/imaterialvar.h"
+#include "materialsystem/imaterialsystem.h"
+#include "texture_group_names.h"
+#include "studio.h"
 
 #include "MinHook.h"
 #undef CreateEvent
@@ -679,6 +684,95 @@ CON_COMMAND( r_staticprop_colormod_info, "Shows what the static prop color code 
 	Msg( "  r_staticprop_colormod: %d\n", r_staticprop_colormod.GetInt() );
 	Msg( "  static prop draws seen: %d, tinted: %d\n", s_nDrawCalls, s_nTintedCalls );
 	Msg( "  props matched to the map: %d, not matched: %d\n", s_nResolvedProps, s_nUnmatchedProps );
+}
+
+// Lists the materials of every tinted model: whether each will mask the color by
+// its base texture's alpha ($blendtintbybasealpha), and which file it came from.
+CON_COMMAND( r_staticprop_colormod_materials, "Lists the materials of tinted static prop models (optional: a model name filter)" )
+{
+	const char *pszFilter = ( args.ArgC() > 1 ) ? args[1] : NULL;
+
+	for ( int d = 0; d < s_PropDict.Count(); d++ )
+	{
+		const char *pszModel = s_PropDict[d].Get();
+		if ( pszFilter && !V_stristr( pszModel, pszFilter ) )
+			continue;
+
+		// the distinct colors this model is tinted with
+		CUtlVector< color32 > colors;
+		for ( int i = 0; i < s_PropColors.Count(); i++ )
+		{
+			const color32 &c = s_PropColors[i].m_Color;
+			if ( s_PropColors[i].m_nDictIndex != d || ( c.r == 255 && c.g == 255 && c.b == 255 ) )
+				continue;
+			bool bSeen = false;
+			for ( int k = 0; k < colors.Count() && !bSeen; k++ )
+				bSeen = ( colors[k].r == c.r && colors[k].g == c.g && colors[k].b == c.b );
+			if ( !bSeen )
+				colors.AddToTail( c );
+		}
+		if ( !colors.Count() )
+			continue;
+
+		Msg( "%s:", pszModel );
+		for ( int k = 0; k < colors.Count() && k < 6; k++ )
+			Msg( " (%d %d %d)", colors[k].r, colors[k].g, colors[k].b );
+		Msg( "%s\n", colors.Count() > 6 ? " ..." : "" );
+
+		char szModel[MAX_PATH];
+		V_strncpy( szModel, pszModel, sizeof( szModel ) );
+		V_FixSlashes( szModel, '/' );
+		const int nIndex = modelinfo->GetModelIndex( szModel );
+		const model_t *pModel = ( nIndex >= 0 ) ? modelinfo->GetModel( nIndex ) : NULL;
+		if ( !pModel )
+			pModel = modelinfo->FindOrLoadModel( szModel );	// static prop models aren't in the precache table
+		if ( !pModel )
+		{
+			Msg( "    (model not loaded)\n" );
+			continue;
+		}
+
+		// The model's textures, resolved like the engine does: the first $cdmaterials
+		// folder that has the material wins
+		const studiohdr_t *pStudio = modelinfo->GetStudiomodel( pModel );
+		if ( !pStudio )
+		{
+			Msg( "    (no studio header)\n" );
+			continue;
+		}
+		Msg( "    %d textures, %d skin families\n", pStudio->numtextures, pStudio->numskinfamilies );
+
+		for ( int m = 0; m < pStudio->numtextures; m++ )
+		{
+			IMaterial *pMaterial = NULL;
+			for ( int cd = 0; cd < pStudio->numcdtextures && !pMaterial; cd++ )
+			{
+				char szName[MAX_PATH];
+				V_ComposeFileName( pStudio->pCdtexture( cd ), pStudio->pTexture( m )->pszName(), szName, sizeof( szName ) );
+				IMaterial *pTry = materials->FindMaterial( szName, TEXTURE_GROUP_MODEL, false );
+				if ( pTry && !pTry->IsErrorMaterial() )
+					pMaterial = pTry;
+			}
+			if ( !pMaterial )
+			{
+				Msg( "    %s: not found in any $cdmaterials folder\n", pStudio->pTexture( m )->pszName() );
+				continue;
+			}
+
+			bool bFound = false;
+			IMaterialVar *pBlend = pMaterial->FindVar( "$blendtintbybasealpha", &bFound, false );
+			const char *pszBlend = ( bFound && pBlend ) ? ( pBlend->GetIntValue() ? "on" : "off" ) : "not set";
+
+			char szVmt[MAX_PATH], szPath[MAX_PATH];
+			V_snprintf( szVmt, sizeof( szVmt ), "materials/%s.vmt", pMaterial->GetName() );
+			if ( !filesystem->RelativePathToFullPath( szVmt, "GAME", szPath, sizeof( szPath ) ) )
+				V_strncpy( szPath, "?", sizeof( szPath ) );
+
+			Msg( "    %s  [%s] blendtint %s%s%s\n        from %s\n", pMaterial->GetName(), pMaterial->GetShaderName(), pszBlend,
+				pMaterial->GetMaterialVarFlag( MATERIAL_VAR_SELFILLUM ) ? ", selfillum (disables blendtint)" : "",
+				pMaterial->IsErrorMaterial() ? ", ERROR MATERIAL" : "", szPath );
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------

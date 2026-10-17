@@ -1,0 +1,100 @@
+"VGUI_button.release"
+{
+	"channel"		"CHAN_ITEM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"UI/buttonclickrelease.wav"
+}
+"VGUI_button.rollover"
+{
+	"channel"		"CHAN_ITEM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"UI/buttonrollover.wav"
+}
+"Menu.Select"
+{
+	"channel"		"CHAN_ITEM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"UI/menu_horror01.wav"
+}
+"Menu.Cancel"
+{
+	"channel"		"CHAN_ITEM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"UI/buttonclickrelease.wav"
+}
+"Menu.Scroll"
+{
+	"channel"		"CHAN_ITEM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"UI/menu_click04.wav"
+}
+"Menu.PopupScroll"
+{
+	"channel"		"CHAN_ITEM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"UI/buttonrollover.wav"
+}
+"Menu.SideScroll"
+{
+	"channel"		"CHAN_ITEM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"UI/menu_click01.wav"
+}
+"Menu.StartGame"
+{
+	"channel"		"CHAN_ITEM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"UI/critical_event_1.wav"
+}
+"Menu.Timer"
+{
+	"channel"		"CHAN_ITEM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"UI/beep07.wav"
+}
+"Default.Reload"
+{
+	"channel"		"CHAN_AUTO"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"common/null.wav"
+}
+"Default.RearRight"
+{
+	"channel"		"CHAN_ITEM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"common/rearright.wav"
+}
+"Default.Right"
+{
+	"channel"		"CHAN_ITEM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"common/right.wav"
+}
+"npc.blank"
+{
+	"channel"		"CHAN_STATIC"
+	"soundlevel"		"94"
+	"wave"		"npc/blank.wav"
+}
+"Achievement.Earned"
+{
+	"channel"		"CHAN_STATIC"
+	"soundlevel"		"94"
+	"wave"		"UI/pickup_misc42.wav"
+}
+"Christmas.GiftDrop"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"1"
+	"soundlevel"		"SNDLVL_95dB"
+	"pitch"		"PITCH_NORM"
+	"wave"		"UI/gift_drop.wav"
+}
+"Christmas.GiftPickup"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"1"
+	"soundlevel"		"SNDLVL_75dB"
+	"pitch"		"PITCH_NORM"
+	"wave"		"UI/littlereward.wav"
+}

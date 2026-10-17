@@ -41,9 +41,10 @@ public:
 	virtual INetChannel		*GetNetChannel( void ) const = 0;
 	virtual const char		*ToString( void ) const = 0; // returns a human readable string about message content
 
-#ifndef LUA_SDK
+	// Srcbox: the engine calls this (vtable slot 12) on every incoming message and
+	// drops the message when it returns false. It must stay in the interface, or the
+	// engine ends up calling GetSize() in its place.
 	virtual bool	BIncomingMessageForProcessing( double dblNetTime, int numBytes ) = 0;
-#endif
 
 	virtual size_t			GetSize() const = 0;
 };

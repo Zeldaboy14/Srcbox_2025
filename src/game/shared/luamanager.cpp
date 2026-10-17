@@ -267,6 +267,93 @@ static int luasrc_include( lua_State *L )
     return returnedValueCount;
 }
 
+//-----------------------------------------------------------------------------
+// Srcbox: compile a chunk of code the way include() does - through the custom
+// loader's PreProcessFile when one is active (GMod syntax like != // continue
+// is turned into Lua 5.4 there). Leaves the function or an error on the stack.
+//-----------------------------------------------------------------------------
+static bool luasrc_find_file( lua_State *L, const char *fileName, char *fullPath, size_t fullPathSize );
+
+static int luasrc_load_preprocessed( lua_State *L, const char *code, size_t length, const char *chunkName, const char *preprocessName )
+{
+    if ( hasLoaderBeenActivated && loaderLuaState )
+    {
+        lua_getfield( loaderLuaState, -1, "PreProcessFile" );
+        lua_pushlstring( loaderLuaState, code, length );
+        lua_pushstring( loaderLuaState, preprocessName );
+
+        if ( lua_pcall( loaderLuaState, 2, 1, 0 ) == LUA_OK && lua_isstring( loaderLuaState, -1 ) )
+        {
+            size_t processedLength = 0;
+            const char *processed = lua_tolstring( loaderLuaState, -1, &processedLength );
+            int result = luaL_loadbuffer( L, processed, processedLength, chunkName );
+            lua_pop( loaderLuaState, 1 );
+            return result;
+        }
+
+        lua_pop( loaderLuaState, 1 );  // error message or non-string result; fall back to the raw code
+    }
+
+    return luaL_loadbuffer( L, code, length, chunkName );
+}
+
+// GMod: CompileString( code, identifier, handleError = true )
+// Returns the compiled function. On a syntax error: reports it and returns nil,
+// or with handleError = false returns the error message instead.
+static int luasrc_CompileString( lua_State *L )
+{
+    size_t length = 0;
+    const char *code = luaL_checklstring( L, 1, &length );
+    const char *identifier = luaL_optstring( L, 2, "CompileString" );
+    bool handleError = lua_isnoneornil( L, 3 ) ? true : ( lua_toboolean( L, 3 ) != 0 );
+
+    char chunkName[MAX_PATH];
+    Q_snprintf( chunkName, sizeof( chunkName ), "=%s", identifier );
+
+    if ( luasrc_load_preprocessed( L, code, length, chunkName, identifier ) != LUA_OK )
+    {
+        if ( handleError )
+        {
+            SHOW_LUA_ERROR( "%s\n", lua_tostring( L, -1 ) );
+            lua_pop( L, 1 );
+            lua_pushnil( L );
+        }
+
+        return 1;  // nil, or the error message
+    }
+
+    return 1;
+}
+
+// GMod: CompileFile( path ) - compiles a file from the Lua search paths without running it
+static int luasrc_CompileFile( lua_State *L )
+{
+    const char *fileName = luaL_checkstring( L, 1 );
+
+    char fullPath[MAX_PATH];
+    luasrc_find_file( L, fileName, fullPath, sizeof( fullPath ) );
+
+    CUtlBuffer buffer( 0, 0, CUtlBuffer::TEXT_BUFFER );
+    if ( !filesystem->ReadFile( fullPath, CONTENT_SEARCH_PATH, buffer ) )
+    {
+        SHOW_LUA_ERROR( "CompileFile: couldn't read '%s'\n", fileName );
+        lua_pushnil( L );
+        return 1;
+    }
+
+    char chunkName[MAX_PATH];
+    Q_snprintf( chunkName, sizeof( chunkName ), "@%s", fullPath );
+
+    if ( luasrc_load_preprocessed( L, ( const char * )buffer.Base(), buffer.TellPut(), chunkName, fullPath ) != LUA_OK )
+    {
+        SHOW_LUA_ERROR( "%s\n", lua_tostring( L, -1 ) );
+        lua_pop( L, 1 );
+        lua_pushnil( L );
+    }
+
+    return 1;
+}
+
 /// <summary>
 /// Lets users run Lua code from a string.
 /// </summary>
@@ -278,7 +365,8 @@ static int luasrc_RunString( lua_State *L )
     const char *identifier = luaL_optstring( L, 2, "RunString" );
     bool handleErrors = luaL_optboolean( L, 3, true );  // If false, will return the error message instead of throwing an error
 
-    int iError = luaL_loadbuffer( L, code, strlen( code ), identifier );
+    // Srcbox: through the loader too, so GMod syntax works in RunString
+    int iError = luasrc_load_preprocessed( L, code, strlen( code ), identifier, identifier );
 
     if ( iError != 0 )
     {
@@ -823,6 +911,8 @@ static const luaL_Reg base_funcs[] = {
     { "type", luasrc_type },
     { "Include", luasrc_include },
     { "RunString", luasrc_RunString },
+    { "CompileString", luasrc_CompileString },
+    { "CompileFile", luasrc_CompileFile },
     { "InheritGamemode", luasrc_InheritGamemode },
     { "LuaLogToFile", luasrc_LuaLogToFile },
     { NULL, NULL } };
@@ -1163,7 +1253,7 @@ void luasrc_init_gameui( void )
 void luasrc_shutdown_gameui( void )
 {
     // Safe to call when the GameUI state was never created or is already closed
-    if (!LGameUI)
+    if ( !LGameUI )
         return;
 
     ResetGameUIConCommandDatabase();
@@ -1191,6 +1281,35 @@ static void luasrc_init_post_includes( lua_State *L )
     lua_setfield( L, -2, "LoadFromDirectory" );
     lua_pop( L, 1 );  // Pop the weapons library
 }
+
+#ifdef LUA_SDK
+// Srcbox: GMod sets GAMEMODE before scripted weapons and entities are loaded, and
+// addons read it at file scope (e.g. to wrap GAMEMODE.DrawPhysgunBeam). Expose the
+// loaded gamemode table early; luasrc_SetGamemode still does the real activation.
+static void luasrc_ExposeGamemodeEarly( const char *gamemodeName )
+{
+    int top = lua_gettop( L );
+
+    lua_getglobal( L, LUA_GAMEMODESLIBNAME );
+
+    if ( lua_istable( L, -1 ) )
+    {
+        lua_getfield( L, -1, "Get" );
+
+        if ( lua_isfunction( L, -1 ) )
+        {
+            lua_pushstring( L, gamemodeName );
+
+            if ( luasrc_pcall( L, 1, 1 ) == 0 && lua_istable( L, -1 ) )
+            {
+                lua_setglobal( L, "GAMEMODE" );
+            }
+        }
+    }
+
+    lua_settop( L, top );
+}
+#endif
 
 void luasrc_init( void )
 {
@@ -1255,6 +1374,10 @@ void luasrc_init( void )
     luasrc_LoadGamemode( LUA_BASE_GAMEMODE );
     luasrc_LoadGamemode( gamemode.GetString() );
 
+#ifdef LUA_SDK
+    luasrc_ExposeGamemodeEarly( gamemode.GetString() );
+#endif
+
     LoadWeaponsFromPath();
     LoadEntitiesFromPath();
     // LoadEffectsFromPath();
@@ -1280,6 +1403,10 @@ void luasrc_init( void )
         // Don't waste time setting up further, we will kick the host client in ClientConnect
         return;
     }
+
+#ifdef LUA_SDK
+    luasrc_ExposeGamemodeEarly( gamemode.GetString() );
+#endif
 
     LoadWeaponsFromPath();
     LoadEntitiesFromPath();
@@ -1476,6 +1603,69 @@ static int luasrc_traceback( lua_State *L )
 /// Uses the provided file path (relative) to find the file. Uses all search
 /// paths to find the file.
 /// </summary>
+//-----------------------------------------------------------------------------
+// Srcbox: GMod resolves includes inside one merged lua/ tree (the game, every
+// addon, mounted .gma files, and a gamemode's entities/ folder). This returns
+// the folder of a loaded file relative to that tree, e.g.
+//   ...\\gamemodes\\sandbox\\entities\\weapons\\gmod_tool\\stool.lua -> weapons\\gmod_tool
+//   ...\\cache\\gma_mount\\lua\\stormfox\\lib\\x.lua                -> stormfox\\lib
+//-----------------------------------------------------------------------------
+static bool luasrc_get_lua_relative_dir( const char *filePath, char *out, size_t outSize )
+{
+    char path[MAX_PATH];
+    Q_strncpy( path, filePath, sizeof( path ) );
+    Q_FixSlashes( path, '\\' );
+
+    char lower[MAX_PATH];
+    Q_strncpy( lower, path, sizeof( lower ) );
+    Q_strlower( lower );
+
+    // The last "\\lua\\" wins, then a gamemode's "\\entities\\"
+    const char *markers[] = { "\\lua\\", "\\entities\\" };
+    for ( int i = 0; i < ARRAYSIZE( markers ); i++ )
+    {
+        const char *found = NULL;
+        for ( const char *p = Q_strstr( lower, markers[i] ); p; p = Q_strstr( p + 1, markers[i] ) )
+            found = p;
+
+        if ( !found )
+            continue;
+
+        const char *relative = path + ( found - lower ) + Q_strlen( markers[i] );
+        Q_strncpy( out, relative, outSize );
+        Q_StripFilename( out ); // keep only the folder
+
+        // Q_StripFilename leaves the name alone when there is no folder part
+        if ( !Q_stricmp( out, relative ) )
+            out[0] = '\0';
+
+        return true;
+    }
+
+    return false;
+}
+
+// Tries "lua\\<folder>\\<fileName>" on GAME and gives back the full path if it exists
+static bool luasrc_try_lua_tree( const char *folder, const char *fileName, char *fullPath, size_t fullPathSize )
+{
+    char relative[MAX_PATH];
+    if ( folder && folder[0] )
+        Q_snprintf( relative, sizeof( relative ), "lua\\%s\\%s", folder, fileName );
+    else
+        Q_snprintf( relative, sizeof( relative ), "lua\\%s", fileName );
+
+    Q_FixSlashes( relative, '\\' );
+    V_FixDoubleSlashes( relative );
+
+    if ( !filesystem->FileExists( relative, CONTENT_SEARCH_PATH ) )
+        return false;
+
+    if ( !filesystem->RelativePathToFullPath( relative, CONTENT_SEARCH_PATH, fullPath, fullPathSize ) )
+        Q_strncpy( fullPath, relative, fullPathSize );
+
+    return true;
+}
+
 static bool luasrc_find_file( lua_State *L, const char *fileName, char *fullPath, size_t fullPathSize )
 {
     // If the find is already an absolute path, just copy it
@@ -1553,8 +1743,10 @@ static bool luasrc_find_file( lua_State *L, const char *fileName, char *fullPath
             Q_strncpy( includePath, includePath + 2, sizeof( includePath ) - 2 );
         }
 
-        char searchPath[MAX_PATH * 25];  // TODO: How do we know how many paths there are? This is a guess.
-        filesystem->GetSearchPath_safe( "GAME", true, searchPath );
+        // Srcbox: with mount.cfg, mounted games and .gma files the GAME search path
+        // easily outgrows MAX_PATH * 25 and got cut off; use a much larger buffer
+        static char searchPath[MAX_PATH * 256];
+        filesystem->GetSearchPath( "GAME", true, searchPath, sizeof( searchPath ) );
 
         char *searchContext;
         char *token = strtok_s( searchPath, ";", &searchContext );
@@ -1578,6 +1770,22 @@ static bool luasrc_find_file( lua_State *L, const char *fileName, char *fullPath
     }
 
     free( includePaths );
+
+    // Srcbox: GMod-style lookup in the merged lua/ tree. Relative to the including
+    // file's folder first (so the tool gun's include( "stools/x.lua" ) finds addon
+    // tools in <addon>/lua/weapons/gmod_tool/stools/), then from the tree's root.
+    if ( !fileIncludingStack.empty() )
+    {
+        char luaDir[MAX_PATH];
+        if ( luasrc_get_lua_relative_dir( fileIncludingStack.top().c_str(), luaDir, sizeof( luaDir ) ) &&
+             luasrc_try_lua_tree( luaDir, fileName, fullPath, fullPathSize ) )
+        {
+            return true;
+        }
+    }
+
+    if ( luasrc_try_lua_tree( NULL, fileName, fullPath, fullPathSize ) )
+        return true;
 
     // If the file was not found, just copy the file name
     Q_strncpy( fullPath, fileName, fullPathSize );
@@ -1680,8 +1888,10 @@ LUA_API int luasrc_dofile_with_loader( lua_State *L, const char *filePath )
         char relativePath[MAX_PATH];
 
         // Go through all search paths and find one that this file is in. Then trim that path from the file name.
-        char searchPath[MAX_PATH * 25];  // TODO: How do we know how many paths there are? This is a guess.
-        filesystem->GetSearchPath_safe( "GAME", true, searchPath );
+        // Srcbox: with mount.cfg, mounted games and .gma files the GAME search path
+        // easily outgrows MAX_PATH * 25 and got cut off; use a much larger buffer
+        static char searchPath[MAX_PATH * 256];
+        filesystem->GetSearchPath( "GAME", true, searchPath, sizeof( searchPath ) );
 
         char *searchContext;
         char *token = strtok_s( searchPath, ";", &searchContext );

@@ -1,0 +1,96 @@
+"Portal.song1"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"0.500000"
+	"pitch"		"100"
+	"soundlevel"		"SNDLVL_NONE"
+	"wave"		"*#music/portal_subject_name_here.mp3"
+}
+"Portal.song2"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"0.450000"
+	"pitch"		"100"
+	"soundlevel"		"SNDLVL_NONE"
+	"wave"		"*#music/portal_taste_of_blood.mp3"
+}
+"Portal.song3"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"0.450000"
+	"pitch"		"100"
+	"soundlevel"		"SNDLVL_NONE"
+	"wave"		"*#music/portal_android_hell.mp3"
+}
+"Portal.song4"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"0.550000"
+	"pitch"		"100"
+	"soundlevel"		"SNDLVL_NONE"
+	"wave"		"*#music/portal_self_esteem_fund.mp3"
+}
+"Portal.song5"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"0.400000"
+	"pitch"		"100"
+	"soundlevel"		"SNDLVL_NONE"
+	"wave"		"*#music/portal_procedural_jiggle_bone.mp3"
+}
+"Portal.room9_OFortuna"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"0.700000"
+	"pitch"		"100"
+	"soundlevel"		"SNDLVL_NONE"
+	"wave"		"*#music/portal_4000_degrees_kelvin.mp3"
+}
+"Portal.song7"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"0.450000"
+	"pitch"		"100"
+	"soundlevel"		"SNDLVL_NONE"
+	"wave"		"*#music/portal_stop_what_you_are_doing.mp3"
+}
+"Portal.song8"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"0.450000"
+	"pitch"		"100"
+	"soundlevel"		"SNDLVL_NONE"
+	"wave"		"*#music/portal_party_escort.mp3"
+}
+"Portal.song9"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"1.000000"
+	"pitch"		"100"
+	"soundlevel"		"SNDLVL_NONE"
+	"wave"		"*#music/portal_youre_not_a_good_person.mp3"
+}
+"Portal.song10"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"0.400000"
+	"pitch"		"100"
+	"soundlevel"		"SNDLVL_NONE"
+	"wave"		"*#music/portal_no_cake_for_you.mp3"
+}
+"Portal.song11"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"0.450000"
+	"pitch"		"100"
+	"soundlevel"		"SNDLVL_NONE"
+	"wave"		"*#music/portal_you_cant_escape_you_know.mp3"
+}
+"Portal.song_credits"
+{
+	"channel"		"CHAN_STATIC"
+	"volume"		"0.500000"
+	"pitch"		"100"
+	"soundlevel"		"SNDLVL_NONE"
+	"wave"		"*#music/portal_still_alive.mp3"
+}

@@ -1,0 +1,8 @@
+"Bot.FellOff"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"pitch"		"PITCH_NORM"
+	"wave"		"bot/aw_hell.wav"
+}

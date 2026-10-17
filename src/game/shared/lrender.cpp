@@ -26,6 +26,13 @@
 #endif
 #endif
 
+#ifdef CLIENT_DLL
+#include "c_pixel_visibility.h"
+#endif
+
+// Srcbox: GMod mesh library, IMesh, ParticleEmitter and render.GetSunInfo (client)
+#include "lgmod_render_ext.inl"
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -78,6 +85,51 @@ LUA_BINDING_BEGIN( Renders, SpawnBeam, "library", "Spawns a temporary beam entit
 }
 LUA_BINDING_END()
 
+#endif
+
+#ifdef CLIENT_DLL
+//-----------------------------------------------------------------------------
+// Srcbox: GMod's render.GetLightColor and util.GetPixelVisibleHandle /
+// util.PixelVisible (mapped to these in the GMod compatibility layer).
+//-----------------------------------------------------------------------------
+LUA_BINDING_BEGIN( Renders, GetLightColor, "library", "Get the lighting at a point in the world (world lights and lightmap).", "client" )
+{
+    Vector vecPosition = LUA_BINDING_ARGUMENT( luaL_checkvector, 1, "position" );
+    lua_pushvector( L, engine->GetLightForPoint( vecPosition, true ) );
+    return 1;
+}
+LUA_BINDING_END( "Vector", "The light colour at that point." )
+
+// pixelvis handles are plain ints the engine fills in on first use; Lua gets an
+// index into this list (never shrunk, they are tiny and reused per addon)
+static CUtlVector< pixelvis_handle_t > s_LuaPixelVisHandles;
+
+LUA_BINDING_BEGIN( Renders, GetPixelVisibleHandle, "library", "Create a handle for Renders.PixelVisible.", "client" )
+{
+    int nIndex = s_LuaPixelVisHandles.AddToTail( 0 );
+    lua_pushinteger( L, nIndex + 1 );
+    return 1;
+}
+LUA_BINDING_END( "integer", "The handle." )
+
+LUA_BINDING_BEGIN( Renders, PixelVisible, "library", "How much of a sphere at a position is visible on screen (0-1), using an occlusion query.", "client" )
+{
+    Vector vecPosition = LUA_BINDING_ARGUMENT( luaL_checkvector, 1, "position" );
+    float flRadius = LUA_BINDING_ARGUMENT( luaL_checknumber, 2, "radius" );
+    int nHandle = ( int )LUA_BINDING_ARGUMENT( luaL_checkinteger, 3, "handle" ) - 1;
+
+    if ( !s_LuaPixelVisHandles.IsValidIndex( nHandle ) )
+    {
+        lua_pushnumber( L, 0 );
+        return 1;
+    }
+
+    pixelvis_queryparams_t params;
+    params.Init( vecPosition, flRadius );
+    lua_pushnumber( L, PixelVisibility_FractionVisible( params, &s_LuaPixelVisHandles[nHandle] ) );
+    return 1;
+}
+LUA_BINDING_END( "number", "Visible fraction, 0 to 1." )
 #endif
 
 LUA_BINDING_BEGIN( Renders, GetRenderTarget, "library", "Get the currently active render target.", "client" )
@@ -139,9 +191,26 @@ LUA_BINDING_BEGIN( Renders, CullMode, "library", "Sets the cull mode that decide
 }
 LUA_BINDING_END()
 
+LUA_BINDING_BEGIN( Renders, FindTexture, "library", "Finds an existing texture (e.g. a named render target). Returns nil when it doesn't exist.", "client" )
+{
+    const char *name = LUA_BINDING_ARGUMENT( luaL_checkstring, 1, "name" );
+    const char *group = LUA_BINDING_ARGUMENT_WITH_DEFAULT( luaL_optstring, 2, TEXTURE_GROUP_RENDER_TARGET, "textureGroup" );
+    ITexture *pTexture = materials->FindTexture( name, group, false );
+
+    if ( !pTexture || pTexture->IsError() )
+    {
+        lua_pushnil( L );
+        return 1;
+    }
+
+    lua_pushitexture( L, pTexture );
+    return 1;
+}
+LUA_BINDING_END( "Texture", "The texture, or nil." )
+
 LUA_BINDING_BEGIN( Renders, GetScreenEffectTexture, "library", "Get the screen effect texture.", "client" )
 {
-    lua_ITexture *pTexture = GetFullFrameFrameBufferTexture( LUA_BINDING_ARGUMENT( luaL_checknumber, 1, "textureIndex" ) );
+    lua_ITexture *pTexture = GetFullFrameFrameBufferTexture( LUA_BINDING_ARGUMENT_WITH_DEFAULT( luaL_optnumber, 1, 0, "textureIndex" ) );
     lua_pushitexture( L, pTexture );
     return 1;
 }
@@ -669,6 +738,36 @@ LUA_BINDING_BEGIN( Renders, SetRenderTarget, "library", "Sets the active render 
 }
 LUA_BINDING_END()
 
+//-----------------------------------------------------------------------------
+// Srcbox: render targets pushed from Lua that were never popped (an addon that
+// errors between PushRenderTarget and PopRenderTarget). Left alone, every later
+// frame draws into that texture: a black screen while the game keeps running.
+// LuaRender_RecoverLeakedRenderTargets runs at the start of each frame, outside
+// any Lua code, and pops whatever is still on the stack.
+//-----------------------------------------------------------------------------
+static int s_nLuaRenderTargetDepth = 0;
+
+void LuaRender_RecoverLeakedRenderTargets()
+{
+    if ( s_nLuaRenderTargetDepth <= 0 )
+        return;
+
+    static int s_nReports = 0;
+    if ( s_nReports < 5 )
+    {
+        Warning( "[Lua] %d render target(s) pushed by Lua were never popped (a script errored mid-render?); popping them\n", s_nLuaRenderTargetDepth );
+        if ( ++s_nReports == 5 )
+            Warning( "[Lua] Further leaked render target reports are muted\n" );
+    }
+
+    CMatRenderContextPtr pRenderContext( materials );
+    while ( s_nLuaRenderTargetDepth > 0 )
+    {
+        pRenderContext->PopRenderTargetAndViewport();
+        s_nLuaRenderTargetDepth--;
+    }
+}
+
 LUA_BINDING_BEGIN( Renders, PushRenderTarget, "library", "Pushes a render target (and viewport) onto the stack.", "client" )
 {
     ITexture *pTexture = LUA_BINDING_ARGUMENT( LuaOptRenderTarget, 1, "texture" );
@@ -686,6 +785,7 @@ LUA_BINDING_BEGIN( Renders, PushRenderTarget, "library", "Pushes a render target
     {
         pRenderContext->PushRenderTargetAndViewport( pTexture );
     }
+    s_nLuaRenderTargetDepth++;
     return 0;
 }
 LUA_BINDING_END()
@@ -694,9 +794,63 @@ LUA_BINDING_BEGIN( Renders, PopRenderTarget, "library", "Pops the last render ta
 {
     CMatRenderContextPtr pRenderContext( materials );
     pRenderContext->PopRenderTargetAndViewport();
+    if ( s_nLuaRenderTargetDepth > 0 )
+        s_nLuaRenderTargetDepth--;
     return 0;
 }
 LUA_BINDING_END()
+
+//-----------------------------------------------------------------------------
+// Srcbox: GMod's render.CapturePixels / render.ReadPixel. CapturePixels copies
+// the current render target to memory; ReadPixel reads one pixel of that copy.
+//-----------------------------------------------------------------------------
+static CUtlVector< unsigned char > s_CapturedPixels;
+static int s_nCapturedWidth = 0;
+static int s_nCapturedHeight = 0;
+
+LUA_BINDING_BEGIN( Renders, CapturePixels, "library", "Copy the current render target's pixels to memory, for Renders.ReadPixel.", "client" )
+{
+    CMatRenderContextPtr pRenderContext( materials );
+
+    int nWidth = 0, nHeight = 0;
+    pRenderContext->GetRenderTargetDimensions( nWidth, nHeight );
+
+    if ( nWidth <= 0 || nHeight <= 0 )
+    {
+        s_nCapturedWidth = s_nCapturedHeight = 0;
+        return 0;
+    }
+
+    s_CapturedPixels.SetCount( nWidth * nHeight * 4 );
+    pRenderContext->ReadPixels( 0, 0, nWidth, nHeight, s_CapturedPixels.Base(), IMAGE_FORMAT_RGBA8888 );
+    s_nCapturedWidth = nWidth;
+    s_nCapturedHeight = nHeight;
+    return 0;
+}
+LUA_BINDING_END()
+
+LUA_BINDING_BEGIN( Renders, ReadPixel, "library", "Read a pixel captured by Renders.CapturePixels.", "client" )
+{
+    int x = ( int )LUA_BINDING_ARGUMENT( luaL_checknumber, 1, "x" );
+    int y = ( int )LUA_BINDING_ARGUMENT( luaL_checknumber, 2, "y" );
+
+    if ( x < 0 || y < 0 || x >= s_nCapturedWidth || y >= s_nCapturedHeight )
+    {
+        lua_pushinteger( L, 0 );
+        lua_pushinteger( L, 0 );
+        lua_pushinteger( L, 0 );
+        lua_pushinteger( L, 0 );
+        return 4;
+    }
+
+    const unsigned char *pPixel = s_CapturedPixels.Base() + ( y * s_nCapturedWidth + x ) * 4;
+    lua_pushinteger( L, pPixel[0] );
+    lua_pushinteger( L, pPixel[1] );
+    lua_pushinteger( L, pPixel[2] );
+    lua_pushinteger( L, pPixel[3] );
+    return 4;
+}
+LUA_BINDING_END( "integer", "Red", "integer", "Green", "integer", "Blue", "integer", "Alpha" )
 
 LUA_BINDING_BEGIN( Renders, UpdateRefractTexture, "library", "Copies the current frame into the refraction texture.", "client" )
 {
@@ -964,6 +1118,10 @@ LUA_BINDING_END()
 LUALIB_API int luaopen_render( lua_State *L )
 {
     LUA_REGISTRATION_COMMIT_LIBRARY( Renders );
+
+#if defined( CLIENT_DLL ) && defined( LUA_SDK )
+    luaopen_RenderExtensions( L );
+#endif
 
 #ifdef CLIENT_DLL
     LUA_SET_ENUM_LIB_BEGIN( L, "CULL_MODE" );

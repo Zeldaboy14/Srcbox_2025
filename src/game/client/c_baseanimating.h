@@ -90,6 +90,11 @@ typedef unsigned int			ClientSideAnimationListHandle_t;
 
 class C_BaseAnimating : public C_BaseEntity, private IModelLoadCallback
 {
+#ifdef LUA_SDK
+	// From Experiment: push instances to Lua with the LUA_BASEANIMATINGLIBNAME metatable, so its methods are available
+	LUA_OVERRIDE_SINGLE_LUA_INSTANCE_METATABLE( C_BaseAnimating, LUA_BASEANIMATINGLIBNAME )
+#endif
+
 public:
 	DECLARE_CLASS( C_BaseAnimating, C_BaseEntity );
 	DECLARE_CLIENTCLASS();

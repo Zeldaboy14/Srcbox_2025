@@ -5,6 +5,12 @@
 // $NoKeywords: $
 //===========================================================================//
 #include "cbase.h"
+#ifdef LUA_SDK
+void LuaRender_RecoverLeakedRenderTargets();
+#endif
+#ifdef LUA_SDK
+#include "gameinfostore.h"
+#endif
 #include <crtmemdebug.h>
 #include "vgui_int.h"
 #include "clientmode.h"
@@ -141,6 +147,9 @@
 #include "abuse_report.h"
 #endif
 
+//#include "../../hooks/hook.h"
+//#include "../../hooks/hooks.h"
+
 #ifdef USES_ECON_ITEMS
 #include "econ_item_system.h"
 #endif // USES_ECON_ITEMS
@@ -232,6 +241,8 @@ DLL_IMPORT HANDLE STDCALL GetCurrentProcess(void);
 #include "hooks/bsp_compat.h"
 #endif
 
+#include "gameui/menu_background.h"	// CAnimatedBackgroundMovie::ReleaseAllVideos
+#include "gameui/vgui/nb_header_footer.h"	// g_pBackgroundMovie
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -353,6 +364,7 @@ static void PatchVphysicsSaveRestore()
 static void PatchLocalBackdoor()
 {
 	mem::module executable_engine = mem::module::named("engine.dll");
+	mem::module materialsystem = mem::module::named("materialsystem.dll");
 
 	mem::pointer ptr_CBaseServer__Clear_signon = mem::scan(mem::pattern("75 4A 48 8B 07"), executable_engine);
 	mem::pointer ptr_LocalTransfer_TransferEntity = mem::scan(mem::pattern("48 89 5C 24 ? 48 89 74 24 ? 48 89 7C 24 ? 55 41 54 41 55 41 56 41 57 48 8D AC 24 ? ? ? ? B8"), executable_engine);
@@ -403,25 +415,35 @@ static void PatchLocalBackdoor()
 		write.fill(0x90);
 	}
 
+	// ConditionalTesting
+	// Shut the material system up about conditional tests on L4D2 particle materials
+	mem::pointer ptr_ConditionalTesting = mem::scan(mem::pattern("75 6E 72 65 63 6F 67 6E 69 7A 65 64 20 63 6F 6E 64 69 74 69 6F 6E 61 6C 20 74 65 73 74 20 25 73 20 69 6E 20 25 73"), materialsystem);
+
+	if (ptr_ConditionalTesting)
+	{
+		mem::protect write({ ptr_ConditionalTesting, 38 });
+		write.fill(0x00);
+	}
+
 	// CanTSaveMultiplayer
 	// In Half-Life 2: Deathmatch, the engine checks if your on MP, and doesn't let saving work on changelevel2. This fixs it.
-	mem::pointer ptr_CanTSaveMultiplayer = mem::scan(mem::pattern("48 8D 0D A8 CD 1F 00 FF 15 72 9C 1A 00 33 C0 48 83 C4 28 C3"), executable_engine);
+	//mem::pointer ptr_CanTSaveMultiplayer = mem::scan(mem::pattern("48 8D 0D A8 CD 1F 00 FF 15 72 9C 1A 00 33 C0 48 83 C4 28 C3"), executable_engine);
 
-	if (ptr_CanTSaveMultiplayer)
-	{
-		mem::protect write({ ptr_CanTSaveMultiplayer, 7 });
-		write.fill(0x90);
-	}
+	//if (ptr_CanTSaveMultiplayer)
+	//{
+	//	mem::protect write({ ptr_CanTSaveMultiplayer, 7 });
+	//	write.fill(0x90);
+	//}
 
 	// Is_MapValid
 	// Map related check. Prevents older maps. Check 1.
-	mem::pointer ptr_Is_MapValid = mem::scan(mem::pattern("E9 1C 02 00 00 48 8D 55 E7 48 8D 0D FD"), executable_engine);
+/*	mem::pointer ptr_Is_MapValid = mem::scan(mem::pattern("E9 1C 02 00 00 48 8D 55 E7 48 8D 0D FD"), executable_engine);
 
 	if (ptr_Is_MapValid)
 	{
 		mem::protect write({ ptr_Is_MapValid, 5 });
 		write.fill(0x90);
-	}
+	}*/
 
 	// 48 8D 0D 38 76 29 00
 
@@ -442,6 +464,207 @@ static void PatchLocalBackdoor()
 			memcpy(ptr.as<void*>(), payload, sizeof(payload));
 		}
 	}
+
+	// Map Version
+	// Use map version 21, rather then map ver 20.
+	// Also change minimum back to 17, per beta hl2
+	/*mem::pointer ptr_aMapVer = mem::scan(mem::pattern("40 ED 83 F8 01 77 2A 41 B8 04 01 00 00 48 8D"), executable_engine);
+
+	if (ptr_aMapVer)
+	{
+		//byte payload[] = { 0x40, 0xEF, 0x83, 0xF8, 0x02, 0x77, 0x2A, 0x41, 0xB8, 0x04, 0x01, 0x00, 0x00, 0x48, 0x8D };
+		byte payload[] = { 0x40, 0xEF, 0x83, 0xF8, 0x04, 0x77, 0x2A, 0x41, 0xB8, 0x04, 0x01, 0x00, 0x00, 0x48, 0x8D };
+		mem::region rgn_aMapVer = { ptr_aMapVer, 0x4A2 };
+		std::vector< mem::pointer > vec_aMapVer = mem::scan_all(mem::pattern("40 ED 83 F8 01 77 2A 41 B8 04 01 00 00 48 8D"), rgn_aMapVer);
+		for (mem::pointer ptr : vec_aMapVer)
+		{
+			mem::protect write({ ptr, sizeof(payload) });
+			memcpy(ptr.as<void*>(), payload, sizeof(payload));
+		}
+	}
+
+	// Host_Error: CModelLoader::Init map ver check
+	// Use map version 21, rather then map ver 20.
+	mem::pointer ptr_aHostError_MapInit = mem::scan(mem::pattern("83 C0 ED 83 F8 01 77 52 41"), executable_engine);
+
+	if (ptr_aHostError_MapInit)
+	{
+		//byte payload[] = { 0x83, 0xC0, 0xEF, 0x83, 0xF8, 0x02, 0x77, 0x52, 0x41 };
+		byte payload[] = { 0x83, 0xC0, 0xEF, 0x83, 0xF8, 0x04, 0x77, 0x52, 0x41 };
+		mem::region rgn_aHostError_MapInit = { ptr_aHostError_MapInit, 0x4A2 };
+		std::vector< mem::pointer > vec_aHostError_MapInit = mem::scan_all(mem::pattern("83 C0 Ed 83 F8 01 77 52 41"), rgn_aHostError_MapInit);
+		for (mem::pointer ptr : vec_aHostError_MapInit)
+		{
+			mem::protect write({ ptr, sizeof(payload) });
+			memcpy(ptr.as<void*>(), payload, sizeof(payload));
+		}
+	}*/
+
+	//E8 86 83  EA FF A8 03 74 0C
+
+	// CMod_LoadTextures: funny lump size check
+	// Use 0x0D instead of 0x0C for loadtexture lump error. This is specifically for L4D2
+	/*mem::pointer ptr_aLumpsize_CMod_LoadTextures = mem::scan(mem::pattern("2C DD F8 FF BA 2B 00 00"), executable_engine);
+
+	if (ptr_aLumpsize_CMod_LoadTextures)
+	{
+		byte payload[] = { 0x2C, 0xDD, 0xF8, 0xFF, 0xBA, 0x2B, 0x00, 0x00, 0x00 };
+		mem::region rgn_aLumpsize_CMod_LoadTextures = { ptr_aLumpsize_CMod_LoadTextures, 0x4A2 };
+		std::vector< mem::pointer > vec_aLumpsize_CMod_LoadTextures = mem::scan_all(mem::pattern("2C DD F8 FF BA 2B 00 00"), rgn_aLumpsize_CMod_LoadTextures);
+		for (mem::pointer ptr : vec_aLumpsize_CMod_LoadTextures)
+		{
+			mem::protect write({ ptr, sizeof(payload) });
+			memcpy(ptr.as<void*>(), payload, sizeof(payload));
+		}
+	}*/
+
+	//matrix3x4_t modelToWorld;
+	//DrawModelInfo_t drawInfo;
+	//StudioRenderConfig_t CStudioRenderContext;
+
+	mem::module material_system = mem::module::named("materialsystem.dll");
+
+	// MaxRenderTargert
+	// Update Rendertarget Max
+	mem::pointer ptr_MaxRenderTarget = mem::scan(mem::pattern("F0 E8 8E AF DD FF 8B 1B 8B F8 E8 C5 B5 DD FF 8B CE 8B E8 F7 D1 23 FB 23 E9 23 FE 0B EF 8B CD E8 C5 63 DE FF 83 E5 1F 8B CD E8 39"), material_system);
+
+	if (ptr_MaxRenderTarget)
+	{
+		byte payload[] = { 0xF0, 0xE8, 0xDE, 0xAF, 0xDD, 0xFF, 0x8B, 0x1B, 0x8B, 0xF8, 0xE8, 0x15, 0xB6, 0xDD, 0xFF, 0x8B, 0xCE, 0x8B, 0xE8, 0xF7, 0xD1, 0x23, 0xFB, 0x23, 0xE9, 0x23, 0xFE, 0x0B, 0xEF, 0x8B, 0xCD, 0xE8, 0x15, 0x64, 0xDE, 0xFF, 0x83, 0xE5, 0x1F, 0x8B, 0xCD, 0xE8, 0x89 };
+		mem::region rgn_MaxRenderTarget = { ptr_MaxRenderTarget, 0x4A2 };
+		std::vector< mem::pointer > vec_Render = mem::scan_all(mem::pattern("F0 E8 8E AF DD FF 8B 1B 8B F8 E8 C5 B5 DD FF 8B CE 8B E8 F7 D1 23 FB 23 E9 23 FE 0B EF 8B CD E8 C5 63 DE FF 83 E5 1F 8B CD E8 39"), rgn_MaxRenderTarget);
+		for (mem::pointer ptr : vec_Render)
+		{
+			mem::protect write({ ptr, sizeof(payload) });
+			memcpy(ptr.as<void*>(), payload, sizeof(payload));
+		}
+	}
+
+	// VTFMinorVersion: VTF 7.5 support is patched in ApplyVTFPatch() (engine/engine_patches.cpp).
+	// (The scan that used to be here wrote back the same bytes it searched for, so it did nothing.)
+
+#if 0 
+	DEFINE_HOOK(CStudioRenderContext__DrawModelStaticProp, void, __fastcall, CStudioRenderContext * This, const DrawModelInfo_t & drawInfo, const matrix3x4_t & modelToWorld, int flags)
+	{
+		CStaticProp* pStaticProp = static_cast<CStaticProp*>(static_cast<IClientRenderable*>(drawInfo.m_pClientEntity));
+		const StaticPropExt_t& propExt = GetPropExt(pStaticProp);
+
+		This->SetColorModulation(propExt.m_vecDiffuseModulation.Base());
+
+		Orig_CStudioRenderContext__DrawModelStaticProp(This, drawInfo, modelToWorld, flags);
+	}
+	DEFINE_HOOK(void, CStudioRenderContext__DrawStaticPropShadows, CStudioRenderContext * This, const DrawModelInfo_t & drawInfo, const matrix3x4_t & modelToWorld, int flags)
+	{
+		CStaticProp* pStaticProp = static_cast<CStaticProp*>(static_cast<IClientRenderable*>(drawInfo.m_pClientEntity));
+		const StaticPropExt_t& propExt = GetPropExt(pStaticProp);
+
+		This->SetColorModulation(propExt.m_vecDiffuseModulation.Base());
+
+		Orig_CStudioRenderContext__DrawStaticPropShadows(This, drawInfo, modelToWorld, flags);
+	}
+#endif
+}
+
+#endif
+
+#ifdef USE_FICOOL_VTF_PATCH
+// Get handle using Windows API wrapped or module loader
+CSysModule* hMaterialSystem = Sys_LoadModule("materialsystem");
+uintptr_t materialsystem_address = reinterpret_cast<uintptr_t>(hMaterialSystem);
+
+#include <windows.h>
+#include <cstdint>
+
+// 1. Packed structure representing a 5-byte JMP + 1-byte NOP (6 bytes total)
+#pragma pack(push, 1)
+struct AsmJumpPadded_t {
+	uint8_t jmpOpcode;     // 0xE9
+	int32_t relativeAddr;  // 32-bit signed offset
+	uint8_t nopOpcode;     // 0x90
+};
+#pragma pack(pop)
+
+// 2. Calculate x86 relative jump distance: Target - (Src + 5)
+inline int32_t CalcRelativeJmp(void* src, void* dst) {
+	return static_cast<int32_t>(
+		reinterpret_cast<uintptr_t>(dst) - (reinterpret_cast<uintptr_t>(src) + 5)
+		);
+}
+
+// 3. Memory protection wrapper to overwrite memory safely
+template <typename T>
+bool PatchMemory(void* destination, const T& data) {
+	DWORD oldProtect;
+	if (VirtualProtect(destination, sizeof(T), PAGE_EXECUTE_READWRITE, &oldProtect)) {
+		*reinterpret_cast<T*>(destination) = data;
+		VirtualProtect(destination, sizeof(T), oldProtect, &oldProtect);
+
+		// Flush CPU instruction cache so updated bytes execute immediately
+		FlushInstructionCache(GetCurrentProcess(), destination, sizeof(T));
+		return true;
+	}
+	return false;
+}
+
+static void* PatchVTFVersion75_Hook_Ret = nullptr;
+void __declspec(naked) PatchVTFVersion75_Hook()
+{
+	__asm
+	{
+		mov eax, dword ptr[eax + 8]
+		cmp eax, 5
+		jz  orig
+		cmp eax, 4
+		orig:
+		jmp[PatchVTFVersion75_Hook_Ret]
+	}
+}
+
+bool PatchVTFVersion75()
+{
+	//byte* p = materialsystem_address + 0xCFE0 + 0xA;
+	byte* p = reinterpret_cast<byte*>(materialsystem_address + 0xCFE0 + 0xA);
+	// mov eax, [eax+8]
+	if (*p == 0x8B && *(p + 1) == 0x40 && *(p + 2) == 0x08)
+	{
+		PatchVTFVersion75_Hook_Ret = p + 0x6;
+		AsmJumpPadded_t Patch = { /*jmp*/ 0xE9, CalcRelativeJmp(p, PatchVTFVersion75_Hook_Ret), 0x90 };
+		PatchMemory<AsmJumpPadded_t>(p, Patch);
+		return true;
+	}
+
+	return false;
+}
+
+#endif
+
+#ifdef USEME
+
+#include <windows.h>
+#include <psapi.h> // Provides MODULEINFO and GetModuleInformation
+#include <cstdint>
+#include "MinHook.h"
+
+// Signature scan helper
+uintptr_t FindPattern(HMODULE module, const char* pattern, const char* mask) {
+	MODULEINFO modInfo;
+	GetModuleInformation(GetCurrentProcess(), module, &modInfo, sizeof(MODULEINFO));
+
+	uintptr_t start = reinterpret_cast<uintptr_t>(module);
+	uintptr_t size = modInfo.SizeOfImage;
+	size_t patternLen = strlen(mask);
+
+	for (uintptr_t i = 0; i < size - patternLen; ++i) {
+		bool found = true;
+		for (size_t j = 0; j < patternLen; ++j) {
+			if (mask[j] != '?' && *reinterpret_cast<uint8_t*>(start + i + j) != static_cast<uint8_t>(pattern[j])) {
+				found = false;
+				break;
+			}
+		}
+		if (found) return start + i;
+	}
+	return 0;
 }
 
 #endif
@@ -486,6 +709,9 @@ IReplayPerformanceController *g_pReplayPerformanceController = NULL;
 IEngineReplay *g_pEngineReplay = NULL;
 IEngineClientReplay *g_pEngineClientReplay = NULL;
 IReplaySystem *g_pReplay = NULL;
+#endif
+#ifdef MAPBASE
+IVEngineServer* serverengine = NULL;
 #endif
 
 #if defined(GAMEPADUI)
@@ -644,9 +870,6 @@ const bool IsaSteamDeck()
 	if (CommandLine()->FindParm("-nogamepadui"))
 		return false;
 
-	//if (CommandLine()->FindParm("-oldgameui"))
-		//return false;
-
 	const char* pszSteamDeckEnv = getenv("SteamDeck");
 	if (pszSteamDeckEnv && *pszSteamDeckEnv)
 		return atoi(pszSteamDeckEnv) != 0;
@@ -654,6 +877,9 @@ const bool IsaSteamDeck()
 	return false;
 }
 #endif
+
+#include "c_hl2mp_player.h"
+#include "shareddefs.h" // Add this at the top of the file, near other includes
 
 //-----------------------------------------------------------------------------
 // Purpose: interface for gameui to modify voice bans
@@ -746,6 +972,50 @@ public:
 	const char *GetOperationString()
 	{
 		return UTIL_GetActiveOperationString();
+	}
+
+	// START L4D
+
+#define TEAM_SURVIVOR TEAM_REBELS
+
+#define SURVIVOR_NAMVET 1
+#define SURVIVOR_TEENGIRL 2
+#define SURVIVOR_BIKER 3
+#define SURVIVOR_MANAGER 4
+
+	// CharacterID handling
+	virtual int GetCharacterId_NamVet(void)
+	{
+		return SURVIVOR_NAMVET;
+	}
+
+	virtual int GetCharacterId_TeenGirl(void)
+	{
+		return SURVIVOR_TEENGIRL;
+	}
+	virtual int GetCharacterId_Biker(void)
+	{
+		return SURVIVOR_BIKER;
+	}
+
+	virtual int GetCharacterId_Manager(void)
+	{
+		return SURVIVOR_MANAGER;
+	}
+
+	virtual bool GetPlayerCharacterIdByUserId(int userid, int& characterid)
+	{
+		C_HL2MP_Player* pPlayer = ToHL2MPPlayer(UTIL_PlayerByUserId(userid));
+		if (pPlayer)
+		{
+			if (pPlayer->GetTeamNumber() == 1)
+			{
+				//characterid = pPlayer->GetCharacter();
+				characterid = 1;
+				return true;
+			}
+		}
+		return false;
 	}
 };
 
@@ -1139,8 +1409,14 @@ const char *GetMaterialNameFromIndex( int nIndex )
 //-----------------------------------------------------------------------------
 void PrecacheParticleSystem( const char *pParticleSystemName )
 {
+#ifdef USE_NEW_PARTICLE_SYSTEM
+	int nIndex = g_pStringTableParticleEffectNames->AddString( false, pParticleSystemName );
+	g_pParticleSystemMgr->PrecacheParticleSystem( nIndex, pParticleSystemName );
+	//return nIndex;
+#else
 	g_pStringTableParticleEffectNames->AddString( false, pParticleSystemName );
 	g_pParticleSystemMgr->PrecacheParticleSystem( pParticleSystemName );
+#endif
 }
 
 
@@ -1237,13 +1513,15 @@ extern IGameSystem *ViewportClientSystem();
 //-----------------------------------------------------------------------------
 ISourceVirtualReality *g_pSourceVR = NULL;
 
+//#include "../../../../engine/engine_patchs.h"
+
 // Purpose: Called when the DLL is first loaded.
 // Input  : engineFactory - 
 // Output : int
 //-----------------------------------------------------------------------------
 int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physicsFactory, CGlobalVarsBase *pGlobals )
 {
-	
+
 #ifdef WITH_ENGINE_PATCHES
 #ifdef LUA_SDK
 	// MinHook must be initialized before any hook is created; nothing else has done it yet at this
@@ -1257,6 +1535,10 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 	ApplyClientStateDetours();
 #endif
 
+#ifdef _WIN32
+	//SetWindowTextA((HWND)GetAppWindow(), "Experiment");
+#endif
+
 	InitCRTMemDebug();
 	MathLib_Init( 2.2f, 2.2f, 0.0f, 2.0f );
 
@@ -1267,7 +1549,7 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 	//else if (CommandLine()->FindParm("-gamepadui")) {
 		// don't load client for this either. load the newer gamepadui
 	} else {
-		static class DllOverride {
+		/*static class DllOverride {
 		public:
 			DllOverride() {
 				Sys_LoadInterface("filesystem_stdio.dll", FILESYSTEM_INTERFACE_VERSION, nullptr, (void**)&g_pFullFileSystem);
@@ -1275,7 +1557,7 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 				pGameDir = VarArgs("%s/bin/x64", pGameDir);
 				g_pFullFileSystem->AddSearchPath(pGameDir, "EXECUTABLE_PATH", PATH_ADD_TO_HEAD);
 			}
-		} g_DllOverride;
+		} g_DllOverride;*/
 	}
 #endif
 
@@ -1306,7 +1588,7 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 	if ( (engine = (IVEngineClient *)appSystemFactory( VENGINE_CLIENT_INTERFACE_VERSION, NULL )) == NULL )
 		return false;
 	if ( (modelrender = (IVModelRender *)appSystemFactory( VENGINE_HUDMODEL_INTERFACE_VERSION, NULL )) == NULL )
-		return false;
+		return  false;
 	if ( (effects = (IVEfx *)appSystemFactory( VENGINE_EFFECTS_INTERFACE_VERSION, NULL )) == NULL )
 		return false;
 	if ( (enginetrace = (IEngineTrace *)appSystemFactory( INTERFACEVERSION_ENGINETRACE_CLIENT, NULL )) == NULL )
@@ -1357,13 +1639,23 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 #endif
 
 #ifdef LUA_SDK
-	g_pShaderApi = (IShaderAPI*)appSystemFactory(SHADERAPI_INTERFACE_VERSION, NULL);
+	// Used by the Lua Renders filter bindings (from Experiment); was declared but never assigned
+	g_pShaderApi = (IShaderAPI *)appSystemFactory( SHADERAPI_INTERFACE_VERSION, NULL );
 #endif
 
 #if defined( REPLAY_ENABLED )
 	if ( IsPC() && (g_pEngineReplay = (IEngineReplay *)appSystemFactory( ENGINE_REPLAY_INTERFACE_VERSION, NULL )) == NULL )
 		return false;
 	if ( IsPC() && (g_pEngineClientReplay = (IEngineClientReplay *)appSystemFactory( ENGINE_REPLAY_CLIENT_INTERFACE_VERSION, NULL )) == NULL )
+		return false;
+#endif
+
+#ifdef MAPBASE
+	// Implements the server engine interface on the client.
+	// I'm extremely confused as to how this is even possible, but Saul Rennison's worldlight did it.
+	// If it's really this possible, why wasn't it available before?
+	// Hopefully there's no SP-only magic going on here, because I want to use this for RPC.
+	if ( (serverengine = (IVEngineServer*)appSystemFactory(INTERFACEVERSION_VENGINESERVER, NULL )) == NULL )
 		return false;
 #endif
 
@@ -1386,7 +1678,7 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 		return false;
 	}
 
-#if defined( EXPERIMENT_SOURCE )
+#if defined( LUA_SDK )
 	// NOTE: This is the earliest useful point we can start showing a loading indicator in the game.
 	// however, shortly after the menu is already available. So we should probably let HTML handle
 	// the loading and updating screens.
@@ -1403,6 +1695,9 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 
 	// Finally, load all of the player's addons.
 	MountAddons();
+
+#elif !defined LUA_SDK || !defined TF
+	MountExtraContent();
 #endif
 
 	if ( CommandLine()->FindParm( "-textmode" ) )
@@ -1430,7 +1725,8 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 
 	g_pcv_ThreadMode = g_pCVar->FindVar( "host_thread_mode" );
 
-#ifdef EXPERIMENT_SOURCE
+// Srcbox: Lua's Engines.IsDedicatedServer/GetServerName/... read this on the client
+#if defined( EXPERIMENT_SOURCE ) || defined( LUA_SDK )
 	g_pGameInfoStore = new CGameInfoStore();
 #endif
 
@@ -1570,11 +1866,11 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 #ifndef TF_CLIENT_DLL
 	PatchVphysicsSaveRestore();
 	PatchLocalBackdoor();
-	//LoadDetours();
 	ApplyVTFPatch();
 #ifdef WITH_ENGINE_PATCHES
-	StaticPropColorMod_Install(appSystemFactory);
+	StaticPropColorMod_Install( appSystemFactory );
 #endif
+	//LoadDetours();
 #endif
 
 	// Discord RPC
@@ -1605,10 +1901,6 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 	}
 
 	return true;
-
-#if defined HL2MP
-	MountExtraContent();
-#endif
 }
 
 bool CHLClient::ReplayInit( CreateInterfaceFn fnReplayFactory )
@@ -1745,6 +2037,7 @@ void CHLClient::Shutdown( void )
 #ifdef WITH_ENGINE_PATCHES
 	BSPCompat_Shutdown();
 #endif
+
     if (g_pAchievementsAndStatsInterface)
     {
         g_pAchievementsAndStatsInterface->ReleasePanel();
@@ -1755,6 +2048,9 @@ void CHLClient::Shutdown( void )
 	delete g_pSixenseInput;
 	g_pSixenseInput = NULL;
 #endif
+
+	// (Removed a second luasrc_shutdown_gameui() call here: it closed the GameUI Lua state before VGui
+	// shut down, and the real call after VGui_Shutdown() below then ran lua_close( NULL ) and crashed.)
 
 	C_BaseAnimating::ShutdownBoneSetupThreadPool();
 	ClientWorldFactoryShutdown();
@@ -1788,6 +2084,7 @@ void CHLClient::Shutdown( void )
 #endif // GAMEPADUI
 	
 	gHUD.Shutdown();
+
 	VGui_Shutdown();
 
 #ifdef LUA_SDK
@@ -1795,7 +2092,7 @@ void CHLClient::Shutdown( void )
 	luasrc_shutdown_gameui();
 #endif
 
-#ifdef EXPERIMENT_SOURCE
+#if defined( EXPERIMENT_SOURCE ) || defined( LUA_SDK )
 	delete g_pGameInfoStore;
 	g_pGameInfoStore = NULL;
 #endif
@@ -2102,6 +2399,11 @@ void CHLClient::DecodeUserCmdFromBuffer( bf_read& buf, int slot )
 void CHLClient::View_Render( vrect_t *rect )
 {
 	VPROF( "View_Render" );
+
+#ifdef LUA_SDK
+	// Also right before drawing, for anything that ran after FRAME_RENDER_START
+	LuaRender_RecoverLeakedRenderTargets();
+#endif
 
 	// UNDONE: This gets hit at startup sometimes, investigate - will cause NaNs in calcs inside Render()
 	if ( rect->width == 0 || rect->height == 0 )
@@ -2449,7 +2751,7 @@ void CHLClient::LevelShutdown( void )
 	DestroyCreatedTextureIds();
 	CPngTextureRegen::ReleaseAllTextureData();
 #endif
-	UncacheAllMaterials();
+	//UncacheAllMaterials();
 
 #ifdef _XBOX
 	ReleaseRenderTargets();
@@ -2546,7 +2848,11 @@ void OnMaterialStringTableChanged( void *object, INetworkStringTable *stringTabl
 void OnParticleSystemStringTableChanged( void *object, INetworkStringTable *stringTable, int stringNumber, const char *newString, void const *newData )
 {
 	// Make sure this puppy is precached
+#ifdef USE_NEW_PARTICLE_SYSTEM
+	g_pParticleSystemMgr->PrecacheParticleSystem( stringNumber, newString );
+#else
 	g_pParticleSystemMgr->PrecacheParticleSystem( newString );
+#endif
 	RequestCacheUsedMaterials();
 }
 
@@ -2692,10 +2998,10 @@ bool CHLClient::DispatchUserMessage( int msg_type, bf_read &msg_data )
 void SimulateEntities()
 {
 #ifdef LUA_SDK
-	if (L)
+	if ( L )
 	{
-		LUA_CALL_HOOK_BEGIN("Tick", "Called right before simulating entities, every frame.");
-		LUA_CALL_HOOK_END(0, 0);
+		LUA_CALL_HOOK_BEGIN( "Tick", "Called right before simulating entities, every frame." );
+		LUA_CALL_HOOK_END( 0, 0 );
 	}
 #endif
 
@@ -2982,6 +3288,11 @@ void CHLClient::FrameStageNotify( ClientFrameStage_t curStage )
 
 			// Last thing before rendering, run simulation.
 			OnRenderStart();
+
+#ifdef LUA_SDK
+			// Pop render targets a failed Lua script (thinks, timers) left pushed, before this frame draws
+			LuaRender_RecoverLeakedRenderTargets();
+#endif
 		}
 		break;
 		

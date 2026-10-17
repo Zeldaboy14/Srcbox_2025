@@ -116,6 +116,7 @@ public:
 	void NoteWeaponFired( void );
 
 	void ResetAnimation( void );
+	void FinishRestoredSpawn( void );	// after a level transition / save load (instead of Spawn)
 	void SetPlayerModel( void );
 	void SetPlayerTeamModel( void );
 	Activity TranslateTeamActivity( Activity ActToTranslate );

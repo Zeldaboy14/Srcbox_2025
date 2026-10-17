@@ -131,6 +131,227 @@ void Hack_FixEscapeChars( char *str )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------
+// Srcbox: soundscripts from mounted games.
+//
+// The sound emitter only reads the first scripts/game_sounds_manifest.txt it
+// finds (ours), so the soundscripts of mounted games (TF2, CS:S, Portal, ...)
+// never load. Here every folder on the GAME path is opened on its own, its
+// manifest is read, and the entries of its scripts that don't exist yet are
+// written to cache/mounted_soundscripts/ and added as sound overrides. Existing
+// sounds are never replaced. Overrides are cleared on level shutdown, so they are
+// re-added every level; the scan itself only runs once per process.
+//-----------------------------------------------------------------------------
+static ConVar snd_mount_soundscripts( "snd_mount_soundscripts", "1", FCVAR_ARCHIVE, "Load the soundscripts of mounted games (only adds sounds that don't exist yet). Takes effect on the next map." );
+
+#define MOUNTED_SOUNDSCRIPT_PATHID "SRCBOX_SNDSCRIPT_SCAN"
+#define MOUNTED_SOUNDSCRIPT_DIR "cache/mounted_soundscripts"
+
+struct MountedSoundScript_t
+{
+    CUtlString m_File;         // generated file, relative to the mod
+    CUtlString m_MarkerSound;  // one sound in it, to tell whether it is already added
+    bool m_bPreload;
+};
+
+static CUtlVector< MountedSoundScript_t > s_MountedSoundScripts;
+static bool s_bMountedSoundScriptsScanned = false;
+
+static void MountedSoundScripts_GroupKey( const char *pszEntry, char *pszOut, int nOutSize )
+{
+    V_strncpy( pszOut, pszEntry, nOutSize );
+    V_FixSlashes( pszOut, '/' );
+    V_StripTrailingSlash( pszOut );
+
+    // A pack file belongs to the folder it is in
+    if ( V_stristr( pszOut, ".vpk" ) )
+        V_StripFilename( pszOut );
+
+    V_strlower( pszOut );
+}
+
+static void MountedSoundScripts_ProcessScript( const char *pszScript, bool bPreload, const char *pszGroupName, CUtlDict< bool, int > &addedNames )
+{
+    KeyValues *pScript = new KeyValues( "SoundScript" );
+
+    if ( !pScript->LoadFromFile( filesystem, pszScript, MOUNTED_SOUNDSCRIPT_PATHID ) )
+    {
+        pScript->deleteThis();
+        return;
+    }
+
+    CUtlBuffer buffer( 0, 0, CUtlBuffer::TEXT_BUFFER );
+    CUtlString marker;
+    int nAdded = 0;
+
+    // A soundscript is a list of top level entries, linked as peers
+    for ( KeyValues *pEntry = pScript; pEntry; pEntry = pEntry->GetNextKey() )
+    {
+        const char *pszName = pEntry->GetName();
+
+        if ( !pszName || !pszName[0] || pszName[0] == '#' || !pEntry->GetFirstSubKey() )
+            continue;
+
+        if ( soundemitterbase->GetSoundIndex( pszName ) != soundemitterbase->InvalidIndex() )
+            continue;
+
+        if ( addedNames.Find( pszName ) != addedNames.InvalidIndex() )
+            continue;
+
+        addedNames.Insert( pszName, true );
+        pEntry->RecursiveSaveToFile( buffer, 0 );
+
+        if ( marker.IsEmpty() )
+            marker = pszName;
+
+        nAdded++;
+    }
+
+    pScript->deleteThis();
+
+    if ( !nAdded )
+        return;
+
+    char szScriptBase[MAX_PATH];
+    V_FileBase( pszScript, szScriptBase, sizeof( szScriptBase ) );
+
+    char szOutFile[MAX_PATH];
+    V_snprintf( szOutFile, sizeof( szOutFile ), "%s/%s__%s.txt", MOUNTED_SOUNDSCRIPT_DIR, pszGroupName, szScriptBase );
+
+    if ( !filesystem->WriteFile( szOutFile, "MOD", buffer ) )
+    {
+        Warning( "Mounted soundscripts: couldn't write %s\n", szOutFile );
+        return;
+    }
+
+    MountedSoundScript_t script;
+    script.m_File = szOutFile;
+    script.m_MarkerSound = marker;
+    script.m_bPreload = bPreload;
+    s_MountedSoundScripts.AddToTail( script );
+
+    DevMsg( "Mounted soundscripts: %d new sounds from %s (%s)\n", nAdded, pszScript, pszGroupName );
+}
+
+static void MountedSoundScripts_Scan()
+{
+    s_bMountedSoundScriptsScanned = true;
+
+    static char szSearchPaths[MAX_PATH * 512];
+    if ( filesystem->GetSearchPath( "GAME", true, szSearchPaths, sizeof( szSearchPaths ) ) <= 0 )
+        return;
+
+    // Group the search path entries by the folder they live in (a game's folder and its .vpk files)
+    CUtlVector< CUtlString > groupKeys;
+    CUtlVector< CUtlVector< CUtlString > * > groupEntries;
+
+    for ( char *pszEntry = strtok( szSearchPaths, ";" ); pszEntry; pszEntry = strtok( NULL, ";" ) )
+    {
+        if ( !pszEntry[0] )
+            continue;
+
+        char szKey[MAX_PATH];
+        MountedSoundScripts_GroupKey( pszEntry, szKey, sizeof( szKey ) );
+
+        int nGroup = -1;
+        for ( int i = 0; i < groupKeys.Count(); i++ )
+        {
+            if ( !V_stricmp( groupKeys[i].Get(), szKey ) )
+            {
+                nGroup = i;
+                break;
+            }
+        }
+
+        if ( nGroup < 0 )
+        {
+            nGroup = groupKeys.AddToTail( CUtlString( szKey ) );
+            groupEntries.AddToTail( new CUtlVector< CUtlString >() );
+        }
+
+        groupEntries[nGroup]->AddToTail( CUtlString( pszEntry ) );
+    }
+
+    filesystem->CreateDirHierarchy( MOUNTED_SOUNDSCRIPT_DIR, "MOD" );
+
+    CUtlDict< bool, int > addedNames;
+
+    for ( int nGroup = 0; nGroup < groupKeys.Count(); nGroup++ )
+    {
+        // Skip our own output folder
+        if ( V_stristr( groupKeys[nGroup].Get(), "mounted_soundscripts" ) )
+            continue;
+
+        filesystem->RemoveSearchPaths( MOUNTED_SOUNDSCRIPT_PATHID );
+
+        CUtlVector< CUtlString > &entries = *groupEntries[nGroup];
+        for ( int i = 0; i < entries.Count(); i++ )
+            filesystem->AddSearchPath( entries[i].Get(), MOUNTED_SOUNDSCRIPT_PATHID, PATH_ADD_TO_TAIL );
+
+        KeyValues *pManifest = new KeyValues( "game_sounds_manifest" );
+
+        if ( pManifest->LoadFromFile( filesystem, "scripts/game_sounds_manifest.txt", MOUNTED_SOUNDSCRIPT_PATHID ) )
+        {
+            // A short, file-name safe name for the group: its last two folders
+            char szGroupName[MAX_PATH];
+            V_strncpy( szGroupName, groupKeys[nGroup].Get(), sizeof( szGroupName ) );
+            for ( char *c = szGroupName; *c; c++ )
+            {
+                if ( *c == '/' || *c == '\\' || *c == ':' || *c == ' ' || *c == '.' )
+                    *c = '_';
+            }
+            const char *pszGroupName = szGroupName;
+            int nLength = V_strlen( szGroupName );
+            if ( nLength > 40 )
+                pszGroupName = szGroupName + nLength - 40;
+
+            for ( KeyValues *pItem = pManifest->GetFirstSubKey(); pItem; pItem = pItem->GetNextKey() )
+            {
+                const char *pszKey = pItem->GetName();
+                const char *pszFile = pItem->GetString();
+
+                if ( !pszFile || !pszFile[0] )
+                    continue;
+
+                bool bPreload = !V_stricmp( pszKey, "preload_file" );
+                if ( !bPreload && V_stricmp( pszKey, "precache_file" ) )
+                    continue;
+
+                MountedSoundScripts_ProcessScript( pszFile, bPreload, pszGroupName, addedNames );
+            }
+        }
+
+        pManifest->deleteThis();
+    }
+
+    filesystem->RemoveSearchPaths( MOUNTED_SOUNDSCRIPT_PATHID );
+    groupEntries.PurgeAndDeleteElements();
+
+    if ( s_MountedSoundScripts.Count() )
+        Msg( "Mounted soundscripts: %d script files with new sounds from mounted games\n", s_MountedSoundScripts.Count() );
+}
+
+static void MountedSoundScripts_Apply()
+{
+    if ( !snd_mount_soundscripts.GetBool() || !soundemitterbase )
+        return;
+
+    if ( !s_bMountedSoundScriptsScanned )
+        MountedSoundScripts_Scan();
+
+    for ( int i = 0; i < s_MountedSoundScripts.Count(); i++ )
+    {
+        const MountedSoundScript_t &script = s_MountedSoundScripts[i];
+
+        // Client and server share the sound emitter in a listen server; add once
+        if ( soundemitterbase->GetSoundIndex( script.m_MarkerSound.Get() ) != soundemitterbase->InvalidIndex() )
+            continue;
+
+        soundemitterbase->AddSoundOverrides( script.m_File.Get(), script.m_bPreload );
+    }
+}
+
 class CSoundEmitterSystem : public CBaseGameSystem
 {
 public:
@@ -313,6 +534,9 @@ public:
 			soundemitterbase->AddSoundOverrides( scriptfile );
 		}
 #endif
+
+		// Srcbox: soundscripts from mounted games (after the map's own overrides)
+		MountedSoundScripts_Apply();
 
 #if !defined( CLIENT_DLL )
 		for ( int i=soundemitterbase->First(); i != soundemitterbase->InvalidIndex(); i=soundemitterbase->Next( i ) )
@@ -1488,6 +1712,11 @@ void CBaseEntity::EmitCloseCaption( IRecipientFilter& filter, int entindex, char
 //-----------------------------------------------------------------------------
 bool CBaseEntity::PrecacheSound( const char *name )
 {
+	// Srcbox: the engine Host_Errors on an empty name ("PrecacheSound: Bad string")
+	// and drops the game. Addons (e.g. a sound.Add script with sound = "") hit it.
+	if ( !name || !name[0] )
+		return false;
+
 	if ( IsPC() && !g_bPermitDirectSoundPrecache )
 	{
 		Warning( "Direct precache of %s\n", name );

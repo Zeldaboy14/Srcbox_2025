@@ -354,7 +354,7 @@ LUA_BINDING_BEGIN( Html, __index, "class", "Metamethod called when a non-existen
 {
     HTML *pHTML = LUA_BINDING_ARGUMENT( lua_tohtml, 1, "html" );
     LUA_METATABLE_INDEX_CHECK_VALID( L, PanelIsValid );
-    LUA_METATABLE_INDEX_CHECK( L, pHTML );
+    LUA_METATABLE_INDEX_CHECK_PANEL( L, pHTML );
 
     // const char *field = LUA_BINDING_ARGUMENT( luaL_checkstring, 2, "field" );
 

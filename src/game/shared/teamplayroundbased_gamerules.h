@@ -628,7 +628,15 @@ bool FindInList( const char **pStrings, const char *pToFind );
 
 inline CTeamplayRoundBasedRules* TeamplayRoundBasedRules()
 {
+#ifdef HL2MP
+	// Srcbox: HL2MP's rules derive from CTeamplayRules, not the round based rules.
+	// A static_cast handed TF entities (control points, round timers, ...) a bogus
+	// pointer on those maps; return NULL instead so callers can check.
+	return dynamic_cast<CTeamplayRoundBasedRules*>(g_pGameRules);
+#else
+	// TF2: the gamerules always are round based
 	return static_cast<CTeamplayRoundBasedRules*>(g_pGameRules);
+#endif
 }
 
 #endif // TEAMPLAYROUNDBASED_GAMERULES_H

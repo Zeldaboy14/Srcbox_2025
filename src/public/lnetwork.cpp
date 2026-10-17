@@ -483,9 +483,19 @@ LUA_BINDING_END( "integer", "The integer read." )
 LUA_BINDING_BEGIN( MessageReader, ReadString, "class", "Reads a string." )
 {
     bf_read *bf = LUA_BINDING_ARGUMENT( luaL_checkbf_read, 1, "reader" );
-    char str[2048];
-    bf->ReadString( str, sizeof( str ) );
-    lua_pushstring( L, str );
+
+    // Srcbox: a fixed 2048 byte buffer cut longer strings (JSON tables sent by
+    // addons) short and left the rest of the string to be misread as the next
+    // values. Size the buffer to what's left in the message instead.
+    int nMaxLength = bf->GetNumBytesLeft() + 1;
+
+    if ( nMaxLength < 2 )
+        nMaxLength = 2;
+
+    CUtlMemory< char > buffer;
+    buffer.EnsureCapacity( nMaxLength );
+    bf->ReadString( buffer.Base(), nMaxLength );
+    lua_pushstring( L, buffer.Base() );
     return 1;
 }
 LUA_BINDING_END( "string", "The string read." )

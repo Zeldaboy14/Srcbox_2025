@@ -1,0 +1,103 @@
+"Default.FlareImpact"
+{
+	"soundlevel"		"SNDLVL_75dB"
+	"volume"		"0.700000"
+	"pitch"		"PITCH_NORM"
+	"rndwave"
+	{
+		"wave"		"physics/concrete/concrete_impact_flare1.wav"
+		"wave"		"physics/concrete/concrete_impact_flare2.wav"
+		"wave"		"physics/concrete/concrete_impact_flare3.wav"
+		"wave"		"physics/concrete/concrete_impact_flare4.wav"
+	}
+}
+"Popcan.Scrape"
+{
+	"soundlevel"		"SNDLVL_75dB"
+	"volume"		"0.300000"
+	"pitch"		"130,140"
+	"wave"		"physics/plastic/plastic_box_scrape_smooth_loop2.wav"
+}
+"cleats_dirt.StepLeft"
+{
+	"soundlevel"		"SNDLVL_96dB"
+	"pitch"		"95,105"
+	"volume"		"0.720000"
+	"rndwave"
+	{
+		"wave"		"player\footsteps\cleats_dirt_01.wav"
+		"wave"		"player\footsteps\cleats_dirt_02.wav"
+	}
+}
+"cleats_dirt.StepRight"
+{
+	"soundlevel"		"SNDLVL_96dB"
+	"pitch"		"95,105"
+	"volume"		"0.720000"
+	"rndwave"
+	{
+		"wave"		"player\footsteps\cleats_dirt_03.wav"
+		"wave"		"player\footsteps\cleats_dirt_04.wav"
+	}
+}
+"cleats_conc.StepLeft"
+{
+	"soundlevel"		"SNDLVL_96dB"
+	"pitch"		"95,105"
+	"volume"		"0.720000"
+	"rndwave"
+	{
+		"wave"		"player\footsteps\cleats_conc_02.wav"
+		"wave"		"player\footsteps\cleats_conc_01.wav"
+	}
+}
+"cleats_conc.StepRight"
+{
+	"soundlevel"		"SNDLVL_96dB"
+	"pitch"		"95,105"
+	"volume"		"0.720000"
+	"rndwave"
+	{
+		"wave"		"player\footsteps\cleats_conc_04.wav"
+		"wave"		"player\footsteps\cleats_conc_03.wav"
+	}
+}
+"PegLeg.StepRight"
+{
+	"soundlevel"		"SNDLVL_96dB"
+	"pitch"		"95,105"
+	"volume"		"1"
+	"rndwave"
+	{
+		"wave"		"items\pegleg_01.wav"
+		"wave"		"items\pegleg_02.wav"
+	}
+}
+"Chest.Step"
+{
+	"soundlevel"		"SNDLVL_96dB"
+	"pitch"		"95,105"
+	"volume"		"1"
+	"rndwave"
+	{
+		"wave"		"\weapons\knife_open1.wav"
+		"wave"		"\weapons\knife_open2.wav"
+		"wave"		"\weapons\knife_open8.wav"
+		"wave"		"\weapons\knife_open7.wav"
+	}
+}
+"Octopus.StepCommon"
+{
+	"soundlevel"		"SNDLVL_96dB"
+	"pitch"		"95,105"
+	"volume"		"0.800000"
+	"rndwave"
+	{
+		"wave"		"misc/octosteps/octosteps_01.wav"
+		"wave"		"misc/octosteps/octosteps_02.wav"
+		"wave"		"misc/octosteps/octosteps_03.wav"
+		"wave"		"misc/octosteps/octosteps_04.wav"
+		"wave"		"misc/octosteps/octosteps_05.wav"
+		"wave"		"misc/octosteps/octosteps_06.wav"
+	}
+}

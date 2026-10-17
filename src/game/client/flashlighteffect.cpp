@@ -171,11 +171,6 @@ private:
 	bool m_bSkipPlayers;
 };
 
-void C_BasePlayer::GetFlashlightOffset(const Vector& vecForward, const Vector& vecRight, const Vector& vecUp, Vector* pVecOffset) const
-{
-	*pVecOffset = r_flashlightoffsety.GetFloat() * vecUp + r_flashlightoffsetx.GetFloat() * vecRight + r_flashlightoffsetz.GetFloat() * vecForward;
-}
-
 
 //-----------------------------------------------------------------------------
 // Purpose: Do the headlight
@@ -223,7 +218,6 @@ void CFlashlightEffect::UpdateLightNew(const Vector &vecPos, const Vector &vecFo
 	}
 
 	Vector vecOffset;
-	pPlayer->GetFlashlightOffset(vecForward, vecRight, vecUp, &vecOffset);
 	Vector vOrigin = vecPos + flOffsetY * vecUp;
 
 	// Not on ladder...trace a hull

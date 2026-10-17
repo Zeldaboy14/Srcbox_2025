@@ -156,6 +156,11 @@ private:
 // Hacky
 class CBaseCombatWeapon : public BASECOMBATWEAPON_DERIVED_FROM
 {
+#ifdef LUA_SDK
+	// From Experiment: push instances to Lua with the LUA_BASECOMBATWEAPONLIBNAME metatable, so its methods are available
+	LUA_OVERRIDE_SINGLE_LUA_INSTANCE_METATABLE( CBaseCombatWeapon, LUA_BASECOMBATWEAPONLIBNAME )
+#endif
+
 public:
 	DECLARE_CLASS( CBaseCombatWeapon, BASECOMBATWEAPON_DERIVED_FROM );
 	DECLARE_NETWORKCLASS();

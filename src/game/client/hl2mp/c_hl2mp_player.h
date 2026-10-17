@@ -95,6 +95,11 @@ enum
 //=============================================================================
 class C_HL2MP_Player : public C_BaseHLPlayer
 {
+#ifdef LUA_SDK
+	// From Experiment: push instances to Lua with the LUA_EXPERIMENTPLAYERLIBNAME metatable, so its methods are available
+	LUA_OVERRIDE_SINGLE_LUA_INSTANCE_METATABLE( C_HL2MP_Player, LUA_EXPERIMENTPLAYERLIBNAME )
+#endif
+
     public:
     DECLARE_CLASS( C_HL2MP_Player, C_BaseHLPlayer );
 

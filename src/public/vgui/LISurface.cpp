@@ -428,7 +428,16 @@ LUA_BINDING_BEGIN( Surfaces, DrawTexturedPolygon, "library", "Draws a textured p
         float y = ( float )luaL_checknumber( L, -1 );
         lua_pop( L, 1 );
 
-        vert[i].Init( Vector2D( x, y ) );
+        // Srcbox: GMod's surface.DrawPoly vertices carry texture coordinates too
+        lua_getfield( L, -1, "u" );
+        float u = ( float )luaL_optnumber( L, -1, 0 );
+        lua_pop( L, 1 );
+
+        lua_getfield( L, -1, "v" );
+        float v = ( float )luaL_optnumber( L, -1, 0 );
+        lua_pop( L, 1 );
+
+        vert[i].Init( Vector2D( x, y ), Vector2D( u, v ) );
         lua_pop( L, 1 );
     }
 
@@ -584,6 +593,11 @@ LUA_BINDING_BEGIN( Surfaces, GetTextSize, "library", "Gets the text size" )
     wchar_t *wbuf = static_cast< wchar_t * >( _alloca( bufSize ) );
     if ( wbuf )
     {
+#ifdef LUA_SDK
+        // The text was never copied into wbuf, so this measured uninitialized stack memory
+        // (usually an empty string: height 0, which broke markup.Parse in the spawn menu)
+        g_pVGuiLocalize->ConvertANSIToUnicode( sz, wbuf, bufSize );
+#endif
         surface()->GetTextSize( LUA_BINDING_ARGUMENT( luaL_checkfont, 1, "font" ), wbuf, wide, tall );
     }
     lua_pushinteger( L, wide );

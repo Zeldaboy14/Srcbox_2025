@@ -1,10 +1,12 @@
 #include "cbase.h"
+#include "eventqueue.h"
 #include "luamanager.h"
 #include "luasrclib.h"
 #include "lbaseentity_shared.h"
 #include "ltakedamageinfo.h"
 #include "mathlib/lvector.h"
 #include "items.h"
+#include "ai_basenpc.h"
 #include <lrecipientfilter.h>
 #include "../lua/lauxlib.h"
 #include <physconstraint.h>
@@ -357,6 +359,53 @@ LUA_BINDING_BEGIN( Entity, RemoveDeferred, "class", "Sets the entity invisible, 
 {
     lua_CBaseEntity *pEntity = LUA_BINDING_ARGUMENT( luaL_checkentity, 1, "entity" );
     pEntity->RemoveDeferred();
+    return 0;
+}
+LUA_BINDING_END()
+
+// Srcbox: GMod's Entity:Fire( input, param, delay, activator, caller ) - queues an
+// input through the entity I/O system, like a map output would
+LUA_BINDING_BEGIN( Entity, GetMoveDelay, "class", "NPCs: seconds left before the NPC may start moving again (0 for other entities)." )
+{
+    lua_CBaseEntity *pEntity = LUA_BINDING_ARGUMENT( luaL_checkentity, 1, "entity" );
+    CAI_BaseNPC *pNPC = pEntity->MyNPCPointer();
+
+    lua_pushnumber( L, pNPC ? MAX( 0.0f, pNPC->m_flMoveWaitFinished - gpGlobals->curtime ) : 0.0f );
+    return 1;
+}
+LUA_BINDING_END( "number", "The move delay." )
+
+LUA_BINDING_BEGIN( Entity, SetMoveDelay, "class", "NPCs: stops the NPC from moving for the given number of seconds." )
+{
+    lua_CBaseEntity *pEntity = LUA_BINDING_ARGUMENT( luaL_checkentity, 1, "entity" );
+    CAI_BaseNPC *pNPC = pEntity->MyNPCPointer();
+
+    if ( pNPC )
+        pNPC->DelayMoveStart( LUA_BINDING_ARGUMENT( luaL_checknumber, 2, "delay" ) );
+
+    return 0;
+}
+LUA_BINDING_END()
+
+LUA_BINDING_BEGIN( Entity, Fire, "class", "Fire an input on the entity, optionally delayed (GMod compatible)." )
+{
+    lua_CBaseEntity *pEntity = LUA_BINDING_ARGUMENT( luaL_checkentity, 1, "entity" );
+    const char *pszInput = LUA_BINDING_ARGUMENT( luaL_checkstring, 2, "input" );
+
+    const char *pszParam = "";
+    if ( lua_isboolean( L, 3 ) )
+        pszParam = lua_toboolean( L, 3 ) ? "1" : "0";
+    else if ( lua_isstring( L, 3 ) )
+        pszParam = lua_tostring( L, 3 );
+
+    float flDelay = lua_isnumber( L, 4 ) ? ( float )lua_tonumber( L, 4 ) : 0.0f;
+    CBaseEntity *pActivator = lua_isnoneornil( L, 5 ) ? NULL : lua_toentity( L, 5 );
+    CBaseEntity *pCaller = lua_isnoneornil( L, 6 ) ? NULL : lua_toentity( L, 6 );
+
+    variant_t value;
+    value.SetString( AllocPooledString( pszParam ) );
+    g_EventQueue.AddEvent( pEntity, pszInput, value, flDelay, pActivator, pCaller );
+
     return 0;
 }
 LUA_BINDING_END()

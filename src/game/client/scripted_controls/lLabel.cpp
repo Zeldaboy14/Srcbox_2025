@@ -313,7 +313,7 @@ LUA_BINDING_BEGIN( Label, __index, "class", "Metamethod that is called when a no
 {
     lua_Label *pLabel = LUA_BINDING_ARGUMENT( lua_tolabel, 1, "label" );
     LUA_METATABLE_INDEX_CHECK_VALID( L, PanelIsValid );
-    LUA_METATABLE_INDEX_CHECK( L, pLabel );
+    LUA_METATABLE_INDEX_CHECK_PANEL( L, pLabel );
 
     // const char *field = LUA_BINDING_ARGUMENT( luaL_checkstring, 2, "field" );
 

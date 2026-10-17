@@ -17,6 +17,12 @@
 #include <limits.h>
 
 
+/* Srcbox: LuaJIT (GMod) accepts UTF-8 bytes in identifiers, e.g. "Past\xc3\xa8que = true".
+** Addons rely on it, so do the same. */
+#ifndef LUA_UCID
+#define LUA_UCID
+#endif
+
 #if defined (LUA_UCID)		/* accept UniCode IDentifiers? */
 /* consider all non-ascii codepoints to be alphabetic */
 #define NONA		0x01

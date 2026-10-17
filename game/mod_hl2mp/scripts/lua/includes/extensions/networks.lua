@@ -118,6 +118,14 @@ local typeIdMap = {
 	["Color"] = NET_TYPE_COLOR,
 	["Vector"] = NET_TYPE_VECTOR,
 	["Angle"] = NET_TYPE_ANGLE,
+
+	-- type() gives an entity's own class name
+	["Entity"] = NET_TYPE_ENTITY,
+	["Player"] = NET_TYPE_ENTITY,
+	["Weapon"] = NET_TYPE_ENTITY,
+	["NPC"] = NET_TYPE_ENTITY,
+	["NextBot"] = NET_TYPE_ENTITY,
+	["Vehicle"] = NET_TYPE_ENTITY,
 }
 
 local function toTypeId(data)
@@ -194,6 +202,16 @@ local writeFunctions = {
 	[NET_TYPE_COLOR] = MESSAGE_WRITER_META.WriteColor,
 	[NET_TYPE_VECTOR] = MESSAGE_WRITER_META.WriteVector,
 	[NET_TYPE_ANGLE] = MESSAGE_WRITER_META.WriteAngle,
+
+	-- A valid bit first: NULL entities (e.g. SetNW2Entity(key, NULL)) are sent too
+	[NET_TYPE_ENTITY] = function(writer, entity)
+		local isValid = IsValid(entity)
+		writer:WriteBool(isValid)
+
+		if (isValid) then
+			writer:WriteEntity(entity)
+		end
+	end,
 }
 
 --- Writes any type of data, with a type identifier
@@ -275,6 +293,14 @@ local readFunctions = {
 	[NET_TYPE_COLOR] = MESSAGE_READER_META.ReadColor,
 	[NET_TYPE_VECTOR] = MESSAGE_READER_META.ReadVector,
 	[NET_TYPE_ANGLE] = MESSAGE_READER_META.ReadAngle,
+
+	[NET_TYPE_ENTITY] = function(reader)
+		if (not reader:ReadBool()) then
+			return NULL
+		end
+
+		return reader:ReadEntity()
+	end,
 }
 
 --- Reads any type of data, by reading the type identifier first
@@ -322,8 +348,17 @@ end
 --- @param unreliable boolean # Ignored, always reliable
 --- @return MessageWriter?
 function Networks.Start(messageName, unreliable)
+	-- Check the name before touching any state: an error here used to leave a
+	-- half-started message behind, and every later Networks.Start then failed
+	-- with "called multiple times" for the rest of the session.
+	if (type(messageName) ~= "string") then
+		error("bad argument #1 to 'Start' (string expected, got " .. type(messageName) .. ")", 2)
+	end
+
+	-- Like GMod's net.Start: an unsent earlier message is simply discarded
 	if (currentOutgoingMessageWriter) then
-		error("Networks.Start was called multiple times without sending the earlier message(s).")
+		printDebug("Networks.Start: discarding an earlier message that was never sent")
+		Networks.Cancel()
 	end
 
 	currentOutgoingMessageWriter = MessageWriters.Create()
@@ -446,9 +481,15 @@ function Networks.HandleIncomingMessage(messageTypeId, bufferReader, sender)
 
 	currentIncomingMessageReader = bufferReader
 
-	callback(bufferReader:GetNumBytesLeft(), sender)
+	-- Always clear the reader, even when the callback errors; the error is still
+	-- passed on so it gets reported
+	local succeeded, err = xpcall(callback, debug.traceback, bufferReader:GetNumBytesLeft(), sender)
 
 	currentIncomingMessageReader = nil
+
+	if (not succeeded) then
+		error(err, 0)
+	end
 end
 
 --- Registers a callback for a message

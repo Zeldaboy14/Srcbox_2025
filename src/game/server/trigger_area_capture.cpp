@@ -724,7 +724,7 @@ void CTriggerAreaCapture::HandleRespawnTimeAdjustments( int oldTeam, int newTeam
 		// reverse the adjust made when the old team captured this point (if we made one)
 		if ( m_TeamData[oldTeam].iSpawnAdjust != 0 )
 		{
-			TeamplayRoundBasedRules()->AddTeamRespawnWaveTime( oldTeam, -m_TeamData[oldTeam].iSpawnAdjust );
+			if ( TeamplayRoundBasedRules() ) TeamplayRoundBasedRules()->AddTeamRespawnWaveTime( oldTeam, -m_TeamData[oldTeam].iSpawnAdjust );
 		}
 	}
 
@@ -732,7 +732,7 @@ void CTriggerAreaCapture::HandleRespawnTimeAdjustments( int oldTeam, int newTeam
 	{
 		if ( m_TeamData[newTeam].iSpawnAdjust != 0 )
 		{
-			TeamplayRoundBasedRules()->AddTeamRespawnWaveTime( newTeam, m_TeamData[newTeam].iSpawnAdjust );
+			if ( TeamplayRoundBasedRules() ) TeamplayRoundBasedRules()->AddTeamRespawnWaveTime( newTeam, m_TeamData[newTeam].iSpawnAdjust );
 		}
 	}
 }
@@ -885,7 +885,7 @@ void CTriggerAreaCapture::EndCapture( int team )
 	// play any special cap sounds. need to do this before we update the owner of the point.
 	if ( TeamplayRoundBasedRules() )
 	{
-		TeamplayRoundBasedRules()->PlaySpecialCapSounds( m_nOwningTeam, m_hPoint.Get() );
+		if ( TeamplayRoundBasedRules() ) TeamplayRoundBasedRules()->PlaySpecialCapSounds( m_nOwningTeam, m_hPoint.Get() );
 	}
 
 	//there may have been more than one capper, but only report this one.

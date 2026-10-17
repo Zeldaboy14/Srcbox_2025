@@ -622,11 +622,6 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 	s_SteamGameServerAPIContext.Init();
 #endif
 
-#ifdef LUA_SDK
-	delete g_pGameInfoStore;
-	g_pGameInfoStore = NULL;
-#endif
-
 	// init each (seperated for ease of debugging)
 	if ( (engine = (IVEngineServer*)appSystemFactory(INTERFACEVERSION_VENGINESERVER, NULL)) == NULL )
 		return false;
@@ -687,12 +682,27 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 	if ( !soundemitterbase->Connect( appSystemFactory ) )
 		return false;
 
+#if defined( LUA_SDK )
+	// Andrew; then mount everything the user wants to use.
+	InitializeGameContentMounting();
+
+	// Finally, load all of the player's addons.
+	MountAddons();
+
+	// Fixes the issue where the external ip is not matching the local ip.
+	// TODO: Check if still needed - https://github.com/Planimeter/hl2sb-src/blob/7a4c675bbf43f0053a1cb2536ceae0c8365c3433/src/game/server/ticketfix.cpp#L45
+	// PatchTicketValidation();
+#elif !defined LUA_SDK || !defined TF
+	MountExtraContent();
+#endif
+
 	// cache the globals
 	gpGlobals = pGlobals;
 
 	g_pSharedChangeInfo = engine->GetSharedEdictChangeInfo();
 
 #ifdef LUA_SDK
+	// Lua's Engines.GetServerName/etc. read this on the server too (the client creates its own)
 	g_pGameInfoStore = new CGameInfoStore();
 #endif
 	
@@ -712,10 +722,18 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 	InitializeCvars();
 	
 	// Initialize the particle system
+#ifdef USE_NEW_PARTICLE_SYSTEM
+	bool bPrecacheParticles = IsPC();
+	if ( !g_pParticleSystemMgr->Init( g_pParticleSystemQuery, bPrecacheParticles ) )
+	{
+		return false;
+	}
+#else
 	if ( !g_pParticleSystemMgr->Init( g_pParticleSystemQuery ) )
 	{
 		return false;
 	}
+#endif
 
 	sv_cheats = g_pCVar->FindVar( "sv_cheats" );
 	if ( !sv_cheats )
@@ -735,10 +753,6 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 	g_pGameSaveRestoreBlockSet->AddBlockHandler( GetCommentarySaveRestoreBlockHandler() );
 	g_pGameSaveRestoreBlockSet->AddBlockHandler( GetEventQueueSaveRestoreBlockHandler() );
 	g_pGameSaveRestoreBlockSet->AddBlockHandler( GetAchievementSaveRestoreBlockHandler() );
-
-#if defined HL2MP
-	MountExtraContent();
-#endif
 
 	// The string system must init first + shutdown last
 	IGameSystem::Add( GameStringSystem() );
@@ -800,7 +814,7 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 #ifdef WITH_ENGINE_PATCHES
 	// Newer (v21) maps: read them as version 20 maps (does nothing if client.dll already did)
 	BSPCompat_Install();
-	
+
 #ifdef LUA_SDK
 	// Hook CBaseClient::Connect so each connecting player's net channel gets bound to the Lua
 	// network manager (Experiment does this via ApplyDetoursOnDllStartup). Without it the server
@@ -871,6 +885,11 @@ void CServerGameDLL::DLLShutdown( void )
 	s_SteamAPIContext.Clear(); // Steam API context shutdown
 	s_SteamGameServerAPIContext.Clear();
 #endif	
+
+#ifdef LUA_SDK
+	delete g_pGameInfoStore;
+	g_pGameInfoStore = NULL;
+#endif
 
 	gameeventmanager = NULL;
 	
@@ -1515,8 +1534,10 @@ void CServerGameDLL::LevelShutdown( void )
 	// Josh: Uncache all the particle systems on level shutdown
 	// otherwise we leak them constantly on changelevel in the
 	// particle precache stringtable list.
+#ifndef USE_NEW_PARTICLE_SYSTEM
 	g_pParticleSystemMgr->UncacheAllParticleSystems();
 	g_pParticleSystemMgr->RecreateDictionary();
+#endif
 
 	g_nCurrentChapterIndex = -1;
 

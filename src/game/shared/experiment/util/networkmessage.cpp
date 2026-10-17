@@ -44,6 +44,12 @@ size_t CBaseNetMessage::GetSize() const
     return m_ExpectedSize;
 }
 
+bool CBaseNetMessage::BIncomingMessageForProcessing( double dblNetTime, int numBytes )
+{
+    // No rate limiting for Lua messages
+    return true;
+}
+
 /// <summary>
 /// If messageTypeId is -1 then this is simply used to register a listener
 /// </summary>
@@ -70,6 +76,7 @@ const char* CDynamicWriteNetworkMessage::GetData() const
 void CDynamicWriteNetworkMessage::SetBuffer( const char* buffer, int bufferLength )
 {
     m_nBufferLength = bufferLength;
+    m_ExpectedSize = 8 + bufferLength;
     m_pBuffer = ( const char* )malloc( bufferLength );
     Q_memcpy( ( void* )m_pBuffer, buffer, bufferLength );
 }
@@ -140,7 +147,8 @@ bool CDynamicWriteNetworkMessage::ReadFromBuffer( bf_read& buffer )
     SetBuffer( temp, m_nBufferLength );
     free( temp );
 
-    m_ExpectedSize = buffer.GetNumBytesRead();
+    // The size of this message (type id + length + data), not the whole packet
+    m_ExpectedSize = 8 + m_nBufferLength;
 
     return !buffer.IsOverflowed();
 }

@@ -146,6 +146,9 @@ end
 
 vgui.Register("ixMenuButton", PANEL, "DButton")
 
+-- Disabled: these test widgets were created on every client load. The docked ixMenuButton took
+-- the top strip of the screen and pushed the context/spawn menu bars down.
+--[[
 -- Let's try a simple DLabel first:
 local label = vgui.Create("DLabel")
 label:SetText("test")
@@ -163,3 +166,4 @@ button:DockMargin(0, 0, 0, 5)
 button.DoClick = function()
 	print("Clicked")
 end
+]]

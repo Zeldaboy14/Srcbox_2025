@@ -44,8 +44,12 @@
 //
 // Hooked (KernelBase): CreateFileW/A, ReadFile, SetFilePointer(Ex),
 // GetFileSize(Ex), GetFileInformationByHandle(Ex), CloseHandle,
-// GetFileAttributes(Ex)W/A. Untracked handles pass straight through. Files
-// inside VPKs aren't opened as files and aren't redirected.
+// GetFileAttributes(Ex)W/A, FindFirstFileExW/A, FindNextFileW/A, FindClose.
+// Untracked handles pass straight through. Files inside VPKs aren't opened as
+// files and aren't redirected.
+//
+// The same hooks serve Garry's Mod addons (.gma) mounted in place; see
+// gma_mount.cpp.
 //
 //=============================================================================//
 
@@ -53,6 +57,9 @@
 #include "tier1/utlbuffer.h"
 #include "bsp_compat.h"
 #include "mdl_compat.h"
+#include "gma_mount.h"
+#include "tier1/checksum_crc.h"
+#include "tier0/icommandline.h"
 
 #include "MinHook.h"
 #undef CreateEvent
@@ -165,8 +172,76 @@ static void ReadLumpTable( const int *pLumpInts, bool bL4D2Order, BCLump_t *pLum
 }
 
 //-----------------------------------------------------------------------------
+// World lights v1 (100 bytes) -> v0 (88): drops shadow_cast_offset (bytes 36-47)
+//-----------------------------------------------------------------------------
+static void ConvertWorldLightsV1( const unsigned char *pSrc, int nCount, unsigned char *pDst )
+{
+	for ( int k = 0; k < nCount; k++ )
+	{
+		const unsigned char *pFrom = pSrc + k * BC_WORLDLIGHT_V1_SIZE;
+		unsigned char *pTo = pDst + k * BC_WORLDLIGHT_V0_SIZE;
+		memcpy( pTo, pFrom, 36 );
+		memcpy( pTo + 36, pFrom + 48, BC_WORLDLIGHT_V1_SIZE - 48 );
+	}
+}
+
+//-----------------------------------------------------------------------------
 // Static props -> TF2 v10 (72 bytes)
 //-----------------------------------------------------------------------------
+
+// The layout of one serialized prop of this lump version and size: where its
+// color is, and whether its flags are 32-bit (Black Mesa). False for the
+// layouts the engine reads itself (v4-v6, TF2's own 72-byte v7 and v10).
+static bool GetStaticPropLayout( int nVersion, int nStride, const unsigned char *pProps, int nProps, int &nColorOfs, bool &bFlags32 )
+{
+	nColorOfs = -1;
+	bFlags32 = false;
+	if ( ( nVersion == 7 || nVersion == 8 ) && nStride == 68 )
+		nColorOfs = 64;		// L4D
+	else if ( nVersion == 9 && nStride == 72 )
+		nColorOfs = 64;		// L4D2 / ASW / Portal 2
+	else if ( nVersion == 10 && nStride == 76 )
+		nColorOfs = 64;		// CS:GO
+	else if ( nVersion == 11 && nStride >= 80 )
+	{
+		// CS:GO keeps the color at 64; Black Mesa has 32-bit flags at 64 and the
+		// color at 72. Vote on which offset holds an opaque alpha.
+		int nAlpha64 = 0, nAlpha72 = 0;
+		for ( int i = 0; i < nProps; i++ )
+		{
+			nAlpha64 += ( pProps[i * nStride + 67] == 255 );
+			nAlpha72 += ( pProps[i * nStride + 75] == 255 );
+		}
+		nColorOfs = ( nAlpha72 > nAlpha64 ) ? 72 : 64;
+		bFlags32 = ( nColorOfs == 72 );
+	}
+	else
+	{
+		return false;
+	}
+	return true;
+}
+
+// One prop in any of the layouts above -> TF2's 72 bytes
+static void ConvertStaticProp( const unsigned char *pSrc, bool bFlags32, unsigned char *pDst )
+{
+	memset( pDst, 0, BC_STATICPROP_TF2_SIZE );
+
+	// origin, angles, proptype, firstleaf, leafcount, solid: 0-30
+	memcpy( pDst, pSrc, 31 );
+	// skin, fade min/max, lighting origin, forced fade scale: 32-59
+	memcpy( pDst + 32, pSrc + 32, 28 );
+	// 60-63: min/max DX level = 0 (no limit). The source CPU/GPU levels have no TF2 equivalent.
+
+	unsigned int nFlags = bFlags32 ? *(const unsigned int *)( pSrc + 64 ) : pSrc[31];
+	// keep FADES, USE_LIGHTING_ORIGIN, IGNORE_NORMALS, NO_SHADOW, NO_PER_VERTEX_LIGHTING,
+	// NO_SELF_SHADOWING; NO_DRAW is computed at load and 0x20 is unused in these
+	// formats (TF2: screen space fade). No per-texel lightmaps in these maps.
+	nFlags = ( nFlags & 0xDB ) | 0x100;
+	memcpy( pDst + 64, &nFlags, 4 );
+	// 68-71: lightmap resolution = 0
+}
+
 static bool ConvertStaticProps( const unsigned char *pData, int nLen, int nVersion, CUtlBuffer &out, CUtlVector< color32 > &colors )
 {
 	CUtlBuffer in( pData, nLen, CUtlBuffer::READ_ONLY );
@@ -193,31 +268,10 @@ static bool ConvertStaticProps( const unsigned char *pData, int nLen, int nVersi
 	const int nStride = nRemaining / nProps;
 	const unsigned char *pProps = pData + nHeadLen;
 
-	int nColorOfs = -1;
-	bool bFlags32 = false;
-	if ( ( nVersion == 7 || nVersion == 8 ) && nStride == 68 )
-		nColorOfs = 64;		// L4D
-	else if ( nVersion == 9 && nStride == 72 )
-		nColorOfs = 64;		// L4D2 / ASW / Portal 2
-	else if ( nVersion == 10 && nStride == 76 )
-		nColorOfs = 64;		// CS:GO
-	else if ( nVersion == 11 && nStride >= 80 )
-	{
-		// CS:GO keeps the color at 64; Black Mesa has 32-bit flags at 64 and the
-		// color at 72. Vote on which offset holds an opaque alpha.
-		int nAlpha64 = 0, nAlpha72 = 0;
-		for ( int i = 0; i < nProps; i++ )
-		{
-			nAlpha64 += ( pProps[i * nStride + 67] == 255 );
-			nAlpha72 += ( pProps[i * nStride + 75] == 255 );
-		}
-		nColorOfs = ( nAlpha72 > nAlpha64 ) ? 72 : 64;
-		bFlags32 = ( nColorOfs == 72 );
-	}
-	else
-	{
+	int nColorOfs;
+	bool bFlags32;
+	if ( !GetStaticPropLayout( nVersion, nStride, pProps, nProps, nColorOfs, bFlags32 ) )
 		return false;	// v4-v6 and TF2's own v10 are read by the engine as they are
-	}
 
 	out.Put( pData, nHeadLen );
 	colors.SetCount( nProps );
@@ -226,22 +280,7 @@ static bool ConvertStaticProps( const unsigned char *pData, int nLen, int nVersi
 	{
 		const unsigned char *pSrc = pProps + i * nStride;
 		unsigned char dst[BC_STATICPROP_TF2_SIZE];
-		memset( dst, 0, sizeof( dst ) );
-
-		// origin, angles, proptype, firstleaf, leafcount, solid: 0-30
-		memcpy( dst, pSrc, 31 );
-		// skin, fade min/max, lighting origin, forced fade scale: 32-59
-		memcpy( dst + 32, pSrc + 32, 28 );
-		// 60-63: min/max DX level = 0 (no limit). The source CPU/GPU levels have no TF2 equivalent.
-
-		unsigned int nFlags = bFlags32 ? *(const unsigned int *)( pSrc + 64 ) : pSrc[31];
-		// keep FADES, USE_LIGHTING_ORIGIN, IGNORE_NORMALS, NO_SHADOW, NO_PER_VERTEX_LIGHTING,
-		// NO_SELF_SHADOWING; NO_DRAW is computed at load and 0x20 is unused in these
-		// formats (TF2: screen space fade). No per-texel lightmaps in these maps.
-		nFlags = ( nFlags & 0xDB ) | 0x100;
-		memcpy( dst + 64, &nFlags, 4 );
-		// 68-71: lightmap resolution = 0
-
+		ConvertStaticProp( pSrc, bFlags32, dst );
 		out.Put( dst, sizeof( dst ) );
 		memcpy( &colors[i], pSrc + nColorOfs, sizeof( color32 ) );
 	}
@@ -1015,13 +1054,7 @@ static BCVirtualMap_t *BuildVirtualMap( BCReadFn_t pfnRead, void *pContext, bc_i
 			const int nCount = lump.m_nLen / BC_WORLDLIGHT_V1_SIZE;
 			CUtlVector< unsigned char > lights;
 			lights.SetCount( nCount * BC_WORLDLIGHT_V0_SIZE );
-			for ( int k = 0; k < nCount; k++ )
-			{
-				const unsigned char *pSrc = data.Base() + k * BC_WORLDLIGHT_V1_SIZE;
-				unsigned char *pDst = lights.Base() + k * BC_WORLDLIGHT_V0_SIZE;
-				memcpy( pDst, pSrc, 36 );
-				memcpy( pDst + 36, pSrc + 48, BC_WORLDLIGHT_V1_SIZE - 48 );
-			}
+			ConvertWorldLightsV1( data.Base(), nCount, lights.Base() );
 			AddPatch( pMap, lump.m_nOfs, lights.Base(), lights.Count(), lump.m_nLen );
 			lump.m_nLen = lights.Count();
 			lump.m_nVersion = 0;
@@ -1194,6 +1227,11 @@ typedef DWORD ( WINAPI *GetFileAttributesW_t )( LPCWSTR );
 typedef DWORD ( WINAPI *GetFileAttributesA_t )( LPCSTR );
 typedef BOOL ( WINAPI *GetFileAttributesExW_t )( LPCWSTR, GET_FILEEX_INFO_LEVELS, LPVOID );
 typedef BOOL ( WINAPI *GetFileAttributesExA_t )( LPCSTR, GET_FILEEX_INFO_LEVELS, LPVOID );
+typedef HANDLE ( WINAPI *FindFirstFileExW_t )( LPCWSTR, FINDEX_INFO_LEVELS, LPVOID, FINDEX_SEARCH_OPS, LPVOID, DWORD );
+typedef HANDLE ( WINAPI *FindFirstFileA_t )( LPCSTR, LPWIN32_FIND_DATAA );
+typedef BOOL ( WINAPI *FindNextFileW_t )( HANDLE, LPWIN32_FIND_DATAW );
+typedef BOOL ( WINAPI *FindNextFileA_t )( HANDLE, LPWIN32_FIND_DATAA );
+typedef BOOL ( WINAPI *FindClose_t )( HANDLE );
 
 static CreateFileW_t					s_pfnCreateFileW;
 static CreateFileA_t					s_pfnCreateFileA;
@@ -1209,6 +1247,11 @@ static GetFileAttributesW_t				s_pfnGetFileAttributesW;
 static GetFileAttributesA_t				s_pfnGetFileAttributesA;
 static GetFileAttributesExW_t			s_pfnGetFileAttributesExW;
 static GetFileAttributesExA_t			s_pfnGetFileAttributesExA;
+static FindFirstFileExW_t				s_pfnFindFirstFileExW;
+static FindFirstFileA_t					s_pfnFindFirstFileA;
+static FindNextFileW_t					s_pfnFindNextFileW;
+static FindNextFileA_t					s_pfnFindNextFileA;
+static FindClose_t						s_pfnFindClose;
 
 // Views, one per (file, size, write time); kept for the life of the process
 struct BCCachedMap_t
@@ -1226,6 +1269,8 @@ struct BCTrackedHandle_t
 	HANDLE			m_hReader;	// our own synchronous handle on the same file
 	BCVirtualMap_t	*m_pMap;
 	bc_int64		m_nPosition;
+	bc_int64		m_nBaseOffset;	// > 0: a file inside a .gma, at this offset of it
+	bool			m_bOwnsMap;		// m_pMap belongs to this handle
 };
 
 static SRWLOCK								s_Lock = SRWLOCK_INIT;
@@ -1432,6 +1477,31 @@ static CUtlVector< BCModelEntry_t * >	s_Models;
 static CUtlVector< BCVtxEntry_t * >		s_Vtxs;
 
 // The entry for the model at szBase + ".mdl", or NULL if there's no such file
+// -heapcheck (the engine's own switch: it checks the heap every frame): also
+// check it right before and after each model conversion here, and name the
+// model if the heap breaks while bsp_compat is working on it.
+static void CheckHeap( const char *pszWhen, const wchar_t *szFile )
+{
+	static int s_nHeapCheck = -1;
+	if ( s_nHeapCheck < 0 )
+		s_nHeapCheck = CommandLine()->FindParm( "-heapcheck" ) ? 1 : 0;
+	if ( !s_nHeapCheck )
+		return;
+	const int nResult = g_pMemAlloc->heapchk();
+	if ( nResult != -2 /* _HEAPOK */ )
+	{
+		static bool s_bReported = false;
+		if ( !s_bReported )
+		{
+			s_bReported = true;
+			char szName[MAX_PATH];
+			WideCharToMultiByte( CP_UTF8, 0, szFile, -1, szName, sizeof( szName ), NULL, NULL );
+			Warning( "HEAP CORRUPT (%d) %s %s\n", nResult, pszWhen, szName );
+			DebuggerBreakIfDebugging();
+		}
+	}
+}
+
 static BCModelEntry_t *GetModelEntry( const wchar_t *szBase )
 {
 	wchar_t szMdl[MAX_PATH];
@@ -1486,6 +1556,7 @@ static BCModelEntry_t *GetModelEntry( const wchar_t *szBase )
 			}
 		}
 
+		CheckHeap( "before converting", szMdl );
 		MDLCompat::CConvert37 *pConvert = new MDLCompat::CConvert37( data.Base(), data.Count() );
 		MDLCompat::CByteBuf mdl, vvd;
 		char szError[256];
@@ -1495,6 +1566,7 @@ static BCModelEntry_t *GetModelEntry( const wchar_t *szBase )
 			pEntry->m_pVvdView = MakeMemoryView( vvd.Base(), vvd.Size() );
 			pEntry->m_pConvert = pConvert;
 			pConvert->ReleaseWorkData();
+			CheckHeap( "after converting", szMdl );
 			DevMsg( "MDL v37: %s is read as a version 48 model\n", szName );
 		}
 		else
@@ -1560,6 +1632,7 @@ static BCVirtualMap_t *GetVtxView( const BCModelEntry_t *pModel, const wchar_t *
 	pEntry->m_pModel = pModel;
 
 	CUtlVector< unsigned char > data;
+	CheckHeap( "before the VTX of", szSource );
 	if ( ReadFileStart( szSource, data, 0x10000000 ) && data.Count() >= 4 )
 	{
 		char szName[MAX_PATH];
@@ -1581,6 +1654,7 @@ static BCVirtualMap_t *GetVtxView( const BCModelEntry_t *pModel, const wchar_t *
 		}
 	}
 
+	CheckHeap( "after the VTX of", szSource );
 	AcquireSRWLockExclusive( &s_Lock );
 	s_Vtxs.AddToTail( pEntry );
 	ReleaseSRWLockExclusive( &s_Lock );
@@ -1624,7 +1698,7 @@ static BCVirtualMap_t *GetModelFileView( const wchar_t *szPath, bool bExists, wc
 	}
 }
 
-static void AddTrackedHandle( HANDLE hFile, HANDLE hReader, BCVirtualMap_t *pMap )
+static void AddTrackedHandle( HANDLE hFile, HANDLE hReader, BCVirtualMap_t *pMap, bc_int64 nBaseOffset = 0, bool bOwnsMap = false )
 {
 	AcquireSRWLockExclusive( &s_Lock );
 	BCTrackedHandle_t &tracked = s_TrackedHandles[s_TrackedHandles.AddToTail()];
@@ -1632,6 +1706,8 @@ static void AddTrackedHandle( HANDLE hFile, HANDLE hReader, BCVirtualMap_t *pMap
 	tracked.m_hReader = hReader;
 	tracked.m_pMap = pMap;
 	tracked.m_nPosition = 0;
+	tracked.m_nBaseOffset = nBaseOffset;
+	tracked.m_bOwnsMap = bOwnsMap;
 	InterlockedIncrement( &s_nTrackedHandles );
 	ReleaseSRWLockExclusive( &s_Lock );
 }
@@ -1777,9 +1853,180 @@ static void TrackIfMap( HANDLE hFile, LPCWSTR pszPath, DWORD nAccess, DWORD nFla
 	AddTrackedHandle( hFile, hReader, pMap );
 }
 
+//-----------------------------------------------------------------------------
+// Garry's Mod addons (gma_mount.cpp): files under the mount folder are served
+// from inside their .gma. Nothing under it can be written.
+//-----------------------------------------------------------------------------
+// -gmadebug: every file operation on mounted addon files, to <mod>/cache/gma_debug.log
+static HANDLE	s_hGMALog = INVALID_HANDLE_VALUE;
+static SRWLOCK	s_GMALogLock = SRWLOCK_INIT;
+
+static void GMALog( const char *pszFormat, ... )
+{
+	if ( s_hGMALog == INVALID_HANDLE_VALUE )
+		return;
+	const DWORD nError = GetLastError();
+	char szLine[1024];
+	va_list args;
+	va_start( args, pszFormat );
+	int nLen = _vsnprintf_s( szLine, sizeof( szLine ), _TRUNCATE, pszFormat, args );
+	va_end( args );
+	if ( nLen < 0 )
+		nLen = (int)strlen( szLine );
+	AcquireSRWLockExclusive( &s_GMALogLock );
+	DWORD nWritten;
+	WriteFile( s_hGMALog, szLine, (DWORD)nLen, &nWritten, NULL );
+	ReleaseSRWLockExclusive( &s_GMALogLock );
+	SetLastError( nError );
+}
+
+static void OpenGMALog()
+{
+	if ( !CommandLine()->FindParm( "-gmadebug" ) || !GMAMount_GetRoot()[0] )
+		return;
+	wchar_t szLog[MAX_PATH];
+	wcsncpy_s( szLog, GMAMount_GetRoot(), _TRUNCATE );
+	wchar_t *pSlash = wcsrchr( szLog, L'\\' );
+	if ( !pSlash )
+		return;
+	wcscpy_s( pSlash + 1, MAX_PATH - ( pSlash + 1 - szLog ), L"gma_debug.log" );
+	s_hGMALog = s_pfnCreateFileW( szLog, GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL );
+	GMALog( "gma debug log, thread %u\n", GetCurrentThreadId() );
+}
+
+static void CloseGMALog()
+{
+	if ( s_hGMALog != INVALID_HANDLE_VALUE )
+	{
+		s_pfnCloseHandle( s_hGMALog );
+		s_hGMALog = INVALID_HANDLE_VALUE;
+	}
+}
+
+struct BCWindow_t
+{
+	HANDLE		m_hReader;
+	bc_int64	m_nBase;
+};
+
+static bool WindowRead( void *pContext, bc_int64 nOffset, void *pDest, int nSize )
+{
+	const BCWindow_t *pWindow = (const BCWindow_t *)pContext;
+	return ReaderRead( pWindow->m_hReader, pWindow->m_nBase + nOffset, pDest, nSize );
+}
+
+static bool IsOpenOnly( DWORD nAccess, DWORD nDisposition )
+{
+	return !IsWriteAccess( nAccess ) && ( nDisposition == OPEN_EXISTING || nDisposition == OPEN_ALWAYS );
+}
+
+// Returns false if the path isn't the mount's to answer (the real call should run)
+static bool OpenGMAPath( LPCWSTR pszPath, DWORD nAccess, DWORD nShare, LPSECURITY_ATTRIBUTES pSecurity,
+	DWORD nDisposition, DWORD nFlagsAndAttributes, HANDLE hTemplate, HANDLE *phFile )
+{
+	GMAFileInfo_t info;
+	const GMAPathKind_t nKind = GMAMount_Lookup( pszPath, &info );
+	if ( nKind == GMA_PATH_OUTSIDE || nKind == GMA_PATH_ROOT )
+		return false;
+
+	GMALog( "OPEN kind=%d acc=%08x share=%x disp=%u flags=%08x tid=%u %ls\n", (int)nKind, nAccess, nShare, nDisposition, nFlagsAndAttributes, GetCurrentThreadId(), pszPath );
+	*phFile = INVALID_HANDLE_VALUE;
+	if ( !IsOpenOnly( nAccess, nDisposition ) )
+	{
+		SetLastError( ERROR_ACCESS_DENIED );
+		return true;
+	}
+
+	if ( nKind == GMA_PATH_MISSING )
+	{
+		SetLastError( ERROR_FILE_NOT_FOUND );
+		return true;
+	}
+
+	if ( nKind == GMA_PATH_DIRECTORY )
+	{
+		// a folder handle (stat and the like): the real, empty mount folder stands in
+		if ( !( nFlagsAndAttributes & FILE_FLAG_BACKUP_SEMANTICS ) )
+		{
+			SetLastError( ERROR_ACCESS_DENIED );
+			return true;
+		}
+		*phFile = s_pfnCreateFileW( GMAMount_GetRoot(), nAccess, nShare | FILE_SHARE_READ, pSecurity, OPEN_EXISTING, nFlagsAndAttributes, hTemplate );
+		return true;
+	}
+
+	// a file: a handle on its .gma, read through a window onto its bytes
+	HANDLE hFile = s_pfnCreateFileW( info.m_pszArchive, nAccess, nShare | FILE_SHARE_READ, pSecurity, OPEN_EXISTING,
+		nFlagsAndAttributes & ~FILE_FLAG_DELETE_ON_CLOSE, hTemplate );
+	if ( hFile == INVALID_HANDLE_VALUE )
+		return true;
+	HANDLE hReader = s_pfnCreateFileW( info.m_pszArchive, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+		NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL );
+	if ( hReader == INVALID_HANDLE_VALUE )
+	{
+		DWORD nError = GetLastError();
+		s_pfnCloseHandle( hFile );
+		SetLastError( nError );
+		return true;
+	}
+
+	BCVirtualMap_t *pView = new BCVirtualMap_t;
+	pView->m_nOriginalSize = info.m_nSize;
+	pView->m_nVirtualSize = info.m_nSize;
+	AddTrackedHandle( hFile, hReader, pView, info.m_nOffset, true );
+	GMALog( "  -> h=%p reader=%p size=%lld base=%lld archive=%ls\n", hFile, hReader, info.m_nSize, info.m_nOffset, info.m_pszArchive );
+	*phFile = hFile;
+	SetLastError( NO_ERROR );
+	return true;
+}
+
+// Attributes of a path under the mount folder. Returns false if it isn't the mount's to answer.
+static bool GetGMAAttributes( LPCWSTR pszPath, WIN32_FILE_ATTRIBUTE_DATA *pData, BOOL *pbResult )
+{
+	GMAFileInfo_t info;
+	const GMAPathKind_t nKind = GMAMount_Lookup( pszPath, &info );
+	if ( nKind == GMA_PATH_OUTSIDE || nKind == GMA_PATH_ROOT )
+		return false;
+
+	GMALog( "ATTR kind=%d %ls\n", (int)nKind, pszPath );
+	if ( nKind == GMA_PATH_MISSING )
+	{
+		*pbResult = FALSE;
+		SetLastError( ERROR_FILE_NOT_FOUND );
+		return true;
+	}
+
+	memset( pData, 0, sizeof( *pData ) );
+	if ( nKind == GMA_PATH_DIRECTORY )
+	{
+		pData->dwFileAttributes = FILE_ATTRIBUTE_DIRECTORY;
+	}
+	else
+	{
+		pData->dwFileAttributes = FILE_ATTRIBUTE_ARCHIVE;
+		pData->ftLastWriteTime.dwLowDateTime = (DWORD)( info.m_nWriteTime & 0xFFFFFFFF );
+		pData->ftLastWriteTime.dwHighDateTime = (DWORD)( info.m_nWriteTime >> 32 );
+		pData->ftCreationTime = pData->ftLastAccessTime = pData->ftLastWriteTime;
+		pData->nFileSizeHigh = (DWORD)( (unsigned long long)info.m_nSize >> 32 );
+		pData->nFileSizeLow = (DWORD)( info.m_nSize & 0xFFFFFFFF );
+	}
+	*pbResult = TRUE;
+	SetLastError( NO_ERROR );
+	return true;
+}
+
+static bool ToWide( LPCSTR pszPath, wchar_t *szOut )
+{
+	return pszPath && MultiByteToWideChar( CP_ACP, 0, pszPath, -1, szOut, MAX_PATH ) > 0;
+}
+
 static HANDLE WINAPI Hook_CreateFileW( LPCWSTR pszPath, DWORD nAccess, DWORD nShare, LPSECURITY_ATTRIBUTES pSecurity,
 	DWORD nDisposition, DWORD nFlagsAndAttributes, HANDLE hTemplate )
 {
+	HANDLE hGMA;
+	if ( OpenGMAPath( pszPath, nAccess, nShare, pSecurity, nDisposition, nFlagsAndAttributes, hTemplate, &hGMA ) )
+		return hGMA;
+
 	HANDLE hFile = s_pfnCreateFileW( pszPath, nAccess, nShare, pSecurity, nDisposition, nFlagsAndAttributes, hTemplate );
 	DWORD nError = GetLastError();	// keep what the real call reported (e.g. ERROR_ALREADY_EXISTS)
 	if ( hFile != INVALID_HANDLE_VALUE )
@@ -1799,6 +2046,11 @@ static HANDLE WINAPI Hook_CreateFileW( LPCWSTR pszPath, DWORD nAccess, DWORD nSh
 static HANDLE WINAPI Hook_CreateFileA( LPCSTR pszPath, DWORD nAccess, DWORD nShare, LPSECURITY_ATTRIBUTES pSecurity,
 	DWORD nDisposition, DWORD nFlagsAndAttributes, HANDLE hTemplate )
 {
+	wchar_t szWide[MAX_PATH];
+	HANDLE hGMA;
+	if ( ToWide( pszPath, szWide ) && OpenGMAPath( szWide, nAccess, nShare, pSecurity, nDisposition, nFlagsAndAttributes, hTemplate, &hGMA ) )
+		return hGMA;
+
 	HANDLE hFile = s_pfnCreateFileA( pszPath, nAccess, nShare, pSecurity, nDisposition, nFlagsAndAttributes, hTemplate );
 	if ( hFile == INVALID_HANDLE_VALUE && pszPath )
 	{
@@ -1848,7 +2100,18 @@ static BOOL WINAPI Hook_ReadFile( HANDLE hFile, LPVOID pBuffer, DWORD nToRead, L
 		return s_pfnReadFile( hFile, pBuffer, nToRead, pnRead, pOverlapped );
 
 	bc_int64 nOffset = pOverlapped ? ( ( (bc_int64)pOverlapped->OffsetHigh << 32 ) | pOverlapped->Offset ) : tracked.m_nPosition;
-	int nRead = VirtualRead( tracked.m_pMap, ReaderRead, tracked.m_hReader, nOffset, pBuffer, (int)MIN( nToRead, (DWORD)0x7FFFFFFF ) );
+	int nRead;
+	if ( tracked.m_nBaseOffset > 0 )
+	{
+		BCWindow_t window = { tracked.m_hReader, tracked.m_nBaseOffset };
+		nRead = VirtualRead( tracked.m_pMap, WindowRead, &window, nOffset, pBuffer, (int)MIN( nToRead, (DWORD)0x7FFFFFFF ) );
+		GMALog( "READ h=%p ofs=%lld want=%u got=%d ov=%d ev=%p pnRead=%d crc=%08x tid=%u\n", hFile, nOffset, nToRead, nRead, pOverlapped != NULL,
+			pOverlapped ? pOverlapped->hEvent : NULL, pnRead != NULL, nRead > 0 ? CRC32_ProcessSingleBuffer( pBuffer, nRead ) : 0, GetCurrentThreadId() );
+	}
+	else
+	{
+		nRead = VirtualRead( tracked.m_pMap, ReaderRead, tracked.m_hReader, nOffset, pBuffer, (int)MIN( nToRead, (DWORD)0x7FFFFFFF ) );
+	}
 
 	// like Windows, a read moves the file pointer (overlapped handles don't use it)
 	AcquireSRWLockExclusive( &s_Lock );
@@ -1898,6 +2161,8 @@ static bool SeekTracked( HANDLE hFile, bc_int64 nDistance, DWORD nMethod, bc_int
 			*pNewPos = nNew;
 			bOK = true;
 		}
+		if ( tracked.m_nBaseOffset > 0 )
+			GMALog( "SEEK h=%p dist=%lld method=%u -> %lld\n", hFile, nDistance, nMethod, nNew );
 	}
 	ReleaseSRWLockExclusive( &s_Lock );
 	return bOK;
@@ -1946,9 +2211,15 @@ static bool GetTrackedSize( HANDLE hFile, bc_int64 *pnSize )
 		return false;
 	AcquireSRWLockShared( &s_Lock );
 	int nTracked = FindTracked( hFile );
+	bool bGMA = false;
 	if ( nTracked >= 0 )
+	{
 		*pnSize = s_TrackedHandles[nTracked].m_pMap->m_nVirtualSize;
+		bGMA = s_TrackedHandles[nTracked].m_nBaseOffset > 0;
+	}
 	ReleaseSRWLockShared( &s_Lock );
+	if ( bGMA )
+		GMALog( "SIZE h=%p -> %lld\n", hFile, *pnSize );
 	return nTracked >= 0;
 }
 
@@ -2003,17 +2274,23 @@ static BOOL WINAPI Hook_CloseHandle( HANDLE hObject )
 	if ( s_nTrackedHandles )
 	{
 		HANDLE hReader = NULL;
+		BCVirtualMap_t *pOwnedMap = NULL;
 		AcquireSRWLockExclusive( &s_Lock );
 		int nTracked = FindTracked( hObject );
 		if ( nTracked >= 0 )
 		{
+			if ( s_TrackedHandles[nTracked].m_nBaseOffset > 0 )
+				GMALog( "CLOSE h=%p\n", hObject );
 			hReader = s_TrackedHandles[nTracked].m_hReader;
+			if ( s_TrackedHandles[nTracked].m_bOwnsMap )
+				pOwnedMap = s_TrackedHandles[nTracked].m_pMap;
 			s_TrackedHandles.FastRemove( nTracked );
 			InterlockedDecrement( &s_nTrackedHandles );
 		}
 		ReleaseSRWLockExclusive( &s_Lock );
 		if ( hReader )
 			s_pfnCloseHandle( hReader );
+		delete pOwnedMap;
 	}
 	return s_pfnCloseHandle( hObject );
 }
@@ -2025,6 +2302,9 @@ static BOOL WINAPI Hook_CloseHandle( HANDLE hObject )
 //-----------------------------------------------------------------------------
 static BOOL WINAPI Hook_GetFileAttributesExW( LPCWSTR pszPath, GET_FILEEX_INFO_LEVELS nLevel, LPVOID pInfo )
 {
+	BOOL bGMA;
+	if ( nLevel == GetFileExInfoStandard && pInfo && GetGMAAttributes( pszPath, (WIN32_FILE_ATTRIBUTE_DATA *)pInfo, &bGMA ) )
+		return bGMA;
 	BOOL bResult = s_pfnGetFileAttributesExW( pszPath, nLevel, pInfo );
 	if ( nLevel != GetFileExInfoStandard || !pInfo || !IsModelPath( pszPath ) )
 		return bResult;
@@ -2047,6 +2327,10 @@ static BOOL WINAPI Hook_GetFileAttributesExW( LPCWSTR pszPath, GET_FILEEX_INFO_L
 
 static BOOL WINAPI Hook_GetFileAttributesExA( LPCSTR pszPath, GET_FILEEX_INFO_LEVELS nLevel, LPVOID pInfo )
 {
+	wchar_t szWide[MAX_PATH];
+	BOOL bGMA;
+	if ( nLevel == GetFileExInfoStandard && pInfo && ToWide( pszPath, szWide ) && GetGMAAttributes( szWide, (WIN32_FILE_ATTRIBUTE_DATA *)pInfo, &bGMA ) )
+		return bGMA;
 	BOOL bResult = s_pfnGetFileAttributesExA( pszPath, nLevel, pInfo );
 	wchar_t szPath[MAX_PATH];
 	if ( nLevel != GetFileExInfoStandard || !pInfo || !pszPath || !MultiByteToWideChar( CP_ACP, 0, pszPath, -1, szPath, MAX_PATH ) || !IsModelPath( szPath ) )
@@ -2070,6 +2354,10 @@ static BOOL WINAPI Hook_GetFileAttributesExA( LPCSTR pszPath, GET_FILEEX_INFO_LE
 
 static DWORD WINAPI Hook_GetFileAttributesW( LPCWSTR pszPath )
 {
+	WIN32_FILE_ATTRIBUTE_DATA gmaData;
+	BOOL bGMA;
+	if ( GetGMAAttributes( pszPath, &gmaData, &bGMA ) )
+		return bGMA ? gmaData.dwFileAttributes : INVALID_FILE_ATTRIBUTES;
 	DWORD nAttributes = s_pfnGetFileAttributesW( pszPath );
 	if ( nAttributes != INVALID_FILE_ATTRIBUTES || !IsModelPath( pszPath ) )
 		return nAttributes;
@@ -2086,6 +2374,11 @@ static DWORD WINAPI Hook_GetFileAttributesW( LPCWSTR pszPath )
 
 static DWORD WINAPI Hook_GetFileAttributesA( LPCSTR pszPath )
 {
+	wchar_t szWide[MAX_PATH];
+	WIN32_FILE_ATTRIBUTE_DATA gmaData;
+	BOOL bGMA;
+	if ( ToWide( pszPath, szWide ) && GetGMAAttributes( szWide, &gmaData, &bGMA ) )
+		return bGMA ? gmaData.dwFileAttributes : INVALID_FILE_ATTRIBUTES;
 	DWORD nAttributes = s_pfnGetFileAttributesA( pszPath );
 	wchar_t szPath[MAX_PATH];
 	if ( nAttributes != INVALID_FILE_ATTRIBUTES || !pszPath || !MultiByteToWideChar( CP_ACP, 0, pszPath, -1, szPath, MAX_PATH ) || !IsModelPath( szPath ) )
@@ -2102,6 +2395,527 @@ static DWORD WINAPI Hook_GetFileAttributesA( LPCSTR pszPath )
 }
 
 //-----------------------------------------------------------------------------
+// Folder listings under the Garry's Mod addon mount (gma_mount.cpp)
+//-----------------------------------------------------------------------------
+static void FindDataToA( const WIN32_FIND_DATAW &w, WIN32_FIND_DATAA *pA )
+{
+	pA->dwFileAttributes = w.dwFileAttributes;
+	pA->ftCreationTime = w.ftCreationTime;
+	pA->ftLastAccessTime = w.ftLastAccessTime;
+	pA->ftLastWriteTime = w.ftLastWriteTime;
+	pA->nFileSizeHigh = w.nFileSizeHigh;
+	pA->nFileSizeLow = w.nFileSizeLow;
+	pA->dwReserved0 = pA->dwReserved1 = 0;
+	WideCharToMultiByte( CP_ACP, 0, w.cFileName, -1, pA->cFileName, sizeof( pA->cFileName ), NULL, NULL );
+	pA->cAlternateFileName[0] = 0;
+}
+
+static HANDLE WINAPI Hook_FindFirstFileExW( LPCWSTR pszPattern, FINDEX_INFO_LEVELS nLevel, LPVOID pData, FINDEX_SEARCH_OPS nSearchOp, LPVOID pFilter, DWORD nFlags )
+{
+	if ( pData && ( nLevel == FindExInfoStandard || nLevel == FindExInfoBasic ) )
+	{
+		bool bHandled;
+		void *pFind = GMAMount_FindFirst( pszPattern, (WIN32_FIND_DATAW *)pData, &bHandled );
+		if ( bHandled )
+		{
+			GMALog( "FIND %ls -> %p\n", pszPattern, pFind );
+			return pFind ? (HANDLE)pFind : INVALID_HANDLE_VALUE;
+		}
+	}
+	return s_pfnFindFirstFileExW( pszPattern, nLevel, pData, nSearchOp, pFilter, nFlags );
+}
+
+static HANDLE WINAPI Hook_FindFirstFileA( LPCSTR pszPattern, LPWIN32_FIND_DATAA pData )
+{
+	wchar_t szWide[MAX_PATH];
+	if ( pData && ToWide( pszPattern, szWide ) )
+	{
+		bool bHandled;
+		WIN32_FIND_DATAW data;
+		void *pFind = GMAMount_FindFirst( szWide, &data, &bHandled );
+		if ( bHandled )
+		{
+			if ( !pFind )
+				return INVALID_HANDLE_VALUE;
+			FindDataToA( data, pData );
+			return (HANDLE)pFind;
+		}
+	}
+	return s_pfnFindFirstFileA( pszPattern, pData );
+}
+
+static BOOL WINAPI Hook_FindNextFileW( HANDLE hFind, LPWIN32_FIND_DATAW pData )
+{
+	if ( GMAMount_IsFind( hFind ) )
+		return GMAMount_FindNext( hFind, pData ) ? TRUE : FALSE;
+	return s_pfnFindNextFileW( hFind, pData );
+}
+
+static BOOL WINAPI Hook_FindNextFileA( HANDLE hFind, LPWIN32_FIND_DATAA pData )
+{
+	if ( GMAMount_IsFind( hFind ) )
+	{
+		WIN32_FIND_DATAW data;
+		if ( !GMAMount_FindNext( hFind, &data ) )
+			return FALSE;
+		FindDataToA( data, pData );
+		return TRUE;
+	}
+	return s_pfnFindNextFileA( hFind, pData );
+}
+
+static BOOL WINAPI Hook_FindClose( HANDLE hFind )
+{
+	if ( GMAMount_IsFind( hFind ) )
+	{
+		GMAMount_FindClose( hFind );
+		return TRUE;
+	}
+	return s_pfnFindClose( hFind );
+}
+
+//-----------------------------------------------------------------------------
+// Native engine support (method A, after the BSPX plugin)
+//
+// The redirect above only sees maps opened as files. Maps inside VPKs (Black
+// Mesa ships every map that way) reach the engine untouched, so engine.dll is
+// taught the parts of those maps it doesn't know:
+//  - static props: the reader in CStaticPropMgr only sends lump versions 7 and
+//    10 through its 72-byte CUtlBuffer::Get; the patch sends 7-11 there, and
+//    while that reader runs a CUtlBuffer::Get detour reads each prop in its real
+//    layout and hands back the TF2 one. The layout comes from the lump itself
+//    (bytes left / prop count), so TF2's own 72-byte v7 and v10 props, and maps
+//    the redirect already converted, pass through untouched. BSPX read every
+//    v10 lump as CS:GO's 76 bytes, which broke TF2's own maps.
+//  - world lights: Mod_LoadWorldlights reads version 1 lumps (100 bytes, Black
+//    Mesa / L4D2 / ASW) as version 0 (88)
+//  - version 21: CRC_MapFile, MD5_MapFile and CMapLoadHelper::Init /
+//    InitFromMemory accept 19-21 instead of 19-20, and once the header is read
+//    an L4D2 lump table ({ version, fileofs, filelen, fourCC }) is put back in
+//    the v20 order and the lumps the TF2 engine doesn't know are emptied. These
+//    are only applied when that header fix is in place.
+// Not taken from BSPX: its DispInfo_LoadDisplacements patch raises the 2048
+// displacement limit, but the engine reads them into a fixed 2048-entry array
+// on the stack; a map with more would overwrite the stack.
+// Not handled natively: the 'thin' brushside byte of ASW/P2/CS:GO maps in VPKs.
+//
+// Signatures and offsets are from the TF2 SDK's x64 engine.dll. Each signature
+// must match exactly once and each patch checks the bytes it replaces, so a
+// different engine build skips what it doesn't recognize instead of corrupting it.
+//-----------------------------------------------------------------------------
+#ifdef PLATFORM_64BITS
+
+// Code patterns: hex bytes, '?' for any byte
+static bool BCParsePattern( const char *pszPattern, unsigned char *pBytes, bool *pWild, int nMax, int &nLen )
+{
+	nLen = 0;
+	for ( const char *p = pszPattern; *p; )
+	{
+		if ( *p == ' ' ) { p++; continue; }
+		if ( nLen >= nMax )
+			return false;
+		if ( *p == '?' )
+		{
+			pWild[nLen] = true;
+			pBytes[nLen++] = 0;
+			while ( *p == '?' ) p++;
+			continue;
+		}
+		char sz[3] = { p[0], p[1], 0 };
+		if ( !p[1] )
+			return false;
+		pWild[nLen] = false;
+		pBytes[nLen++] = (unsigned char)strtoul( sz, NULL, 16 );
+		p += 2;
+	}
+	return nLen > 0;
+}
+
+// The one place in the module's code that matches, or NULL (none, or more than one)
+static unsigned char *BCFindPattern( HMODULE hModule, const char *pszPattern )
+{
+	unsigned char bytes[64];
+	bool wild[64];
+	int nLen;
+	if ( !hModule || !BCParsePattern( pszPattern, bytes, wild, ARRAYSIZE( bytes ), nLen ) )
+		return NULL;
+
+	unsigned char *pBase = (unsigned char *)hModule;
+	IMAGE_DOS_HEADER *pDos = (IMAGE_DOS_HEADER *)pBase;
+	IMAGE_NT_HEADERS *pNt = (IMAGE_NT_HEADERS *)( pBase + pDos->e_lfanew );
+	IMAGE_SECTION_HEADER *pSection = IMAGE_FIRST_SECTION( pNt );
+
+	unsigned char *pFound = NULL;
+	for ( int s = 0; s < pNt->FileHeader.NumberOfSections; s++, pSection++ )
+	{
+		if ( !( pSection->Characteristics & IMAGE_SCN_MEM_EXECUTE ) )
+			continue;
+
+		unsigned char *pStart = pBase + pSection->VirtualAddress;
+		const size_t nSize = MAX( pSection->Misc.VirtualSize, pSection->SizeOfRawData );
+		if ( nSize < (size_t)nLen )
+			continue;
+
+		unsigned char *pEnd = pStart + nSize - nLen;
+		for ( unsigned char *p = pStart; p <= pEnd; p++ )
+		{
+			if ( p[0] != bytes[0] )
+				continue;
+			int i = 1;
+			while ( i < nLen && ( wild[i] || p[i] == bytes[i] ) )
+				i++;
+			if ( i < nLen )
+				continue;
+			if ( pFound )
+				return NULL;	// not unique
+			pFound = p;
+		}
+	}
+	return pFound;
+}
+
+#define BCSIG_GAMELUMPVERSION		"44 8B 0D ? ? ? ? 41 83 E9 01 49 63 D1"
+#define BCSIG_UTLBUFFER_GET			"45 85 C0 0F 8E ? ? ? ? 48 89 5C 24 ? 48 89 74 24"
+#define BCSIG_UNSERIALIZE_PROPS		"48 89 54 24 ? 55 56 57 41 56 48 8D AC 24"
+#define BCSIG_LOAD_WORLDLIGHTS		"40 56 41 56 41 57 48 83 EC 50 4C 8B 05 ? ? ? ? 33 F6 44 0F B6 FA 4C 8B F1"
+#define BCSIG_CRC_MAPFILE			"48 89 5C 24 ? 48 89 6C 24 ? 56 57 41 56 48 81 EC 30 08 00 00"
+#define BCSIG_MD5_MAPFILE			"48 89 5C 24 ? 48 89 74 24 ? 48 89 7C 24 ? 55 41 56 41 57 48 8D AC 24 ? ? ? ? 48 81 EC 90 08 00 00"
+#define BCSIG_MAPLOADHELPER_INIT	"48 89 5C 24 ? 57 48 83 EC 30 8B 05"
+#define BCSIG_MAPLOADHELPER_INITMEM	"48 89 5C 24 ? 48 89 6C 24 ? 56 48 83 EC 30 83 7C 24 ? 00"
+
+// engine.dll's CUtlBuffer (the same layout as tier1's; checked against CUtlBuffer::Get)
+struct BCEngineUtlBuffer_t
+{
+	unsigned char	*m_pMemory;			// 0x00
+	int				m_nAllocationCount;	// 0x08
+	int				m_nGrowSize;		// 0x0C
+	int				m_Get;				// 0x10
+	int				m_Put;				// 0x14
+	unsigned char	m_Error;			// 0x18
+	unsigned char	m_Flags;
+	unsigned char	m_Reserved;
+	unsigned char	m_Pad;
+	int				m_nTab;				// 0x1C
+	int				m_nMaxPut;			// 0x20
+	int				m_nOffset;			// 0x24
+};
+
+// engine.dll's CMapLoadHelper (checked against its constructor)
+struct BCEngineMapLoadHelper_t
+{
+	int				m_nLumpSize;		// 0x00
+	int				m_nLumpOffset;		// 0x04
+	int				m_nLumpVersion;		// 0x08
+	int				m_nPad;
+	unsigned char	*m_pRawData;		// 0x10
+	unsigned char	*m_pData;			// 0x18, what LumpBase() returns
+	unsigned char	*m_pUncompressedData;	// 0x20
+	int				m_nLumpID;			// 0x28
+};
+
+typedef int ( *BCGameLumpVersionFn_t )( int nLumpID );
+typedef void ( *BCUtlBufferGetFn_t )( void *pBuffer, void *pMem, int nSize );
+typedef void ( *BCUnserializePropsFn_t )( void *pThis, void *pBuffer );
+typedef void ( *BCLoadWorldlightsFn_t )( void *pLoadHelper, bool bIsHDR );
+typedef void ( *BCMapLoadInitFn_t )( void *pArg1, void *pArg2, void *pArg3, void *pArg4 );
+
+static BCGameLumpVersionFn_t	s_pfnGameLumpVersion = NULL;
+static BCUtlBufferGetFn_t		s_pfnUtlBufferGet = NULL;
+static BCUnserializePropsFn_t	s_pfnUnserializeProps = NULL;
+static BCLoadWorldlightsFn_t	s_pfnLoadWorldlights = NULL;
+static BCMapLoadInitFn_t		s_pfnMapLoadInit = NULL;
+static BCMapLoadInitFn_t		s_pfnMapLoadInitFromMemory = NULL;
+
+// The engine's map header (s_MapHeader: ident, version, 64 lumps, map revision)
+static int *s_pEngineMapHeader = NULL;
+
+// Set while the engine reads the static props of a map that needs converting
+static volatile DWORD	s_nPropReaderThread = 0;
+static int				s_nPropStride = 0;
+static bool				s_bPropFlags32 = false;
+
+static void Detour_UtlBufferGet( void *pBuffer, void *pMem, int nSize )
+{
+	if ( nSize == BC_STATICPROP_TF2_SIZE && s_nPropReaderThread && s_nPropReaderThread == GetCurrentThreadId() )
+	{
+		unsigned char src[128];
+		memset( src, 0, sizeof( src ) );
+		s_pfnUtlBufferGet( pBuffer, src, s_nPropStride );
+		ConvertStaticProp( src, s_bPropFlags32, (unsigned char *)pMem );
+		return;
+	}
+	s_pfnUtlBufferGet( pBuffer, pMem, nSize );
+}
+
+// Reads the prop count and the prop structs; the buffer is at the count
+static void Detour_UnserializeProps( void *pThis, void *pBuffer )
+{
+	const BCEngineUtlBuffer_t *pBuf = (const BCEngineUtlBuffer_t *)pBuffer;
+	const int nVersion = s_pfnGameLumpVersion( BC_GAMELUMP_SPRP );
+	const int nPos = pBuf->m_Get - pBuf->m_nOffset;
+	const int nEnd = pBuf->m_nMaxPut - pBuf->m_nOffset;
+
+	if ( nVersion >= 7 && nVersion <= 11 && pBuf->m_pMemory && nPos >= 0 && nEnd - nPos >= 4 )
+	{
+		const int nProps = *(const int *)( pBuf->m_pMemory + nPos );
+		const int nBytes = nEnd - nPos - 4;
+		if ( nProps > 0 && nBytes > 0 && ( nBytes % nProps ) == 0 )
+		{
+			const int nStride = nBytes / nProps;
+			int nColorOfs;
+			bool bFlags32;
+			if ( nStride <= 128 && GetStaticPropLayout( nVersion, nStride, pBuf->m_pMemory + nPos + 4, nProps, nColorOfs, bFlags32 ) )
+			{
+				s_nPropStride = nStride;
+				s_bPropFlags32 = bFlags32;
+				s_nPropReaderThread = GetCurrentThreadId();
+				DevMsg( "BSP: reading %d static props from lump version %d (%d bytes each)%s\n",
+					nProps, nVersion, nStride, bFlags32 ? ", Black Mesa layout" : "" );
+			}
+		}
+		else if ( nProps > 0 && nVersion != 7 && nVersion != 10 )
+		{
+			Warning( "BSP: static prop lump version %d: %d props in %d bytes, can't tell their size\n", nVersion, nProps, nBytes );
+		}
+	}
+
+	s_pfnUnserializeProps( pThis, pBuffer );
+	s_nPropReaderThread = 0;
+}
+
+static void Detour_LoadWorldlights( void *pLoadHelper, bool bIsHDR )
+{
+	BCEngineMapLoadHelper_t *pHelper = (BCEngineMapLoadHelper_t *)pLoadHelper;
+	if ( pHelper->m_nLumpVersion == 1 && pHelper->m_pData && pHelper->m_nLumpSize > 0 &&
+		 ( pHelper->m_nLumpSize % BC_WORLDLIGHT_V1_SIZE ) == 0 )
+	{
+		const int nCount = pHelper->m_nLumpSize / BC_WORLDLIGHT_V1_SIZE;
+		CUtlVector< unsigned char > lights;
+		lights.SetCount( nCount * BC_WORLDLIGHT_V0_SIZE );
+		ConvertWorldLightsV1( pHelper->m_pData, nCount, lights.Base() );
+
+		// The engine copies the lump out; point it at the converted one for the call
+		unsigned char *pData = pHelper->m_pData;
+		const int nSize = pHelper->m_nLumpSize;
+		pHelper->m_pData = lights.Base();
+		pHelper->m_nLumpSize = lights.Count();
+		pHelper->m_nLumpVersion = 0;
+		s_pfnLoadWorldlights( pLoadHelper, bIsHDR );
+		pHelper->m_pData = pData;
+		pHelper->m_nLumpSize = nSize;
+		pHelper->m_nLumpVersion = 1;
+		return;
+	}
+	s_pfnLoadWorldlights( pLoadHelper, bIsHDR );
+}
+
+// After the engine read a version 21 header: the v20 lump order, unknown lumps emptied
+static void FixEngineMapHeader()
+{
+	int *pHeader = s_pEngineMapHeader;
+	if ( !pHeader || pHeader[0] != BC_IDENT || pHeader[1] != 21 )
+		return;
+
+	// The entity lump is never empty and never inside the header, so its offset
+	// tells the orders apart: v20 { fileofs, filelen, ... }, L4D2 { version, fileofs, ... }
+	const int *pEnt = pHeader + 2;
+	const bool bL4D2Order = ( pEnt[0] < BC_HEADER_SIZE && pEnt[1] >= BC_HEADER_SIZE );
+
+	BCLump_t lumps[BC_HEADER_LUMPS];
+	ReadLumpTable( pHeader + 2, bL4D2Order, lumps );
+	for ( int i = 0; i < BC_HEADER_LUMPS; i++ )
+	{
+		int *p = pHeader + 2 + i * 4;
+		if ( IsDroppedLump( i ) )
+		{
+			p[0] = p[1] = p[2] = p[3] = 0;
+			continue;
+		}
+		p[0] = lumps[i].m_nOfs;
+		p[1] = lumps[i].m_nLen;
+		p[2] = lumps[i].m_nVersion;
+		p[3] = lumps[i].m_nUncompressed;
+	}
+	DevMsg( "BSP: version 21 map header read natively%s\n", bL4D2Order ? " (L4D2 lump order)" : "" );
+}
+
+static void Detour_MapLoadInit( void *pArg1, void *pArg2, void *pArg3, void *pArg4 )
+{
+	s_pfnMapLoadInit( pArg1, pArg2, pArg3, pArg4 );
+	FixEngineMapHeader();
+}
+
+static void Detour_MapLoadInitFromMemory( void *pArg1, void *pArg2, void *pArg3, void *pArg4 )
+{
+	s_pfnMapLoadInitFromMemory( pArg1, pArg2, pArg3, pArg4 );
+	FixEngineMapHeader();
+}
+
+struct BCEnginePatch_t
+{
+	const char			*m_pszName;
+	unsigned char		*m_pFunction;
+	int					m_nOffset;
+	const char			*m_pOriginal;
+	const char			*m_pPatched;
+	int					m_nLen;
+	unsigned char		*m_pApplied;	// where it went, for shutdown
+};
+
+static BCEnginePatch_t s_EnginePatches[] =
+{
+	{ "CStaticPropMgr: lump versions 7-11",		NULL, 0xCF,  "\x83\xF9\x03\x74\x28", "\x83\xF9\x05\x78\x28", 5 },	// cmp ecx,3 / je  ->  cmp ecx,5 / js
+	{ "CRC_MapFile: version 21",				NULL, 0xBC,  "\x83\xF8\x01", "\x83\xF8\x02", 3 },	// cmp eax,1 -> 2 (version - 19)
+	{ "MD5_MapFile: version 21",				NULL, 0xF6,  "\x83\xF8\x01", "\x83\xF8\x02", 3 },
+	{ "CMapLoadHelper::Init: version 21",		NULL, 0x162, "\x83\xF8\x01", "\x83\xF8\x02", 3 },
+	{ "CMapLoadHelper::InitFromMemory: version 21", NULL, 0x17D, "\x83\xF8\x01", "\x83\xF8\x02", 3 },
+};
+enum { BCPATCH_PROPS, BCPATCH_CRC, BCPATCH_MD5, BCPATCH_INIT, BCPATCH_INITMEM };
+
+static bool ApplyEnginePatch( BCEnginePatch_t &patch )
+{
+	if ( !patch.m_pFunction )
+		return false;
+	unsigned char *pAddress = patch.m_pFunction + patch.m_nOffset;
+	if ( memcmp( pAddress, patch.m_pOriginal, patch.m_nLen ) != 0 )
+	{
+		Warning( "BSP: %s: unexpected code, not patched\n", patch.m_pszName );
+		return false;
+	}
+
+	DWORD nProtect;
+	if ( !VirtualProtect( pAddress, patch.m_nLen, PAGE_EXECUTE_READWRITE, &nProtect ) )
+		return false;
+	memcpy( pAddress, patch.m_pPatched, patch.m_nLen );
+	VirtualProtect( pAddress, patch.m_nLen, nProtect, &nProtect );
+	FlushInstructionCache( GetCurrentProcess(), pAddress, patch.m_nLen );
+	patch.m_pApplied = pAddress;
+	return true;
+}
+
+static void RevertEnginePatch( BCEnginePatch_t &patch )
+{
+	unsigned char *pAddress = patch.m_pApplied;
+	patch.m_pApplied = NULL;
+	if ( !pAddress || memcmp( pAddress, patch.m_pPatched, patch.m_nLen ) != 0 )
+		return;
+
+	DWORD nProtect;
+	if ( VirtualProtect( pAddress, patch.m_nLen, PAGE_EXECUTE_READWRITE, &nProtect ) )
+	{
+		memcpy( pAddress, patch.m_pOriginal, patch.m_nLen );
+		VirtualProtect( pAddress, patch.m_nLen, nProtect, &nProtect );
+		FlushInstructionCache( GetCurrentProcess(), pAddress, patch.m_nLen );
+	}
+}
+
+static void *s_EngineHookTargets[8];
+static int s_nEngineHookTargets = 0;
+
+static bool CreateEngineHook( unsigned char *pTarget, void *pDetour, void **ppOriginal, const char *pszName )
+{
+	if ( !pTarget )
+	{
+		Warning( "BSP: %s not found in engine.dll\n", pszName );
+		return false;
+	}
+	if ( MH_CreateHook( pTarget, pDetour, ppOriginal ) != MH_OK )
+	{
+		Warning( "BSP: couldn't hook %s\n", pszName );
+		return false;
+	}
+	if ( MH_EnableHook( pTarget ) != MH_OK )
+	{
+		MH_RemoveHook( pTarget );
+		Warning( "BSP: couldn't enable the %s hook\n", pszName );
+		return false;
+	}
+	s_EngineHookTargets[s_nEngineHookTargets++] = pTarget;
+	return true;
+}
+
+static bool InstallEngineSupport()
+{
+	HMODULE hEngine = GetModuleHandleA( "engine.dll" );
+	if ( !hEngine )
+		return false;
+
+	s_pfnGameLumpVersion = (BCGameLumpVersionFn_t)BCFindPattern( hEngine, BCSIG_GAMELUMPVERSION );
+	unsigned char *pGet = BCFindPattern( hEngine, BCSIG_UTLBUFFER_GET );
+	unsigned char *pProps = BCFindPattern( hEngine, BCSIG_UNSERIALIZE_PROPS );
+	unsigned char *pLights = BCFindPattern( hEngine, BCSIG_LOAD_WORLDLIGHTS );
+	unsigned char *pInit = BCFindPattern( hEngine, BCSIG_MAPLOADHELPER_INIT );
+	unsigned char *pInitMem = BCFindPattern( hEngine, BCSIG_MAPLOADHELPER_INITMEM );
+
+	s_EnginePatches[BCPATCH_PROPS].m_pFunction = pProps;
+	s_EnginePatches[BCPATCH_CRC].m_pFunction = BCFindPattern( hEngine, BCSIG_CRC_MAPFILE );
+	s_EnginePatches[BCPATCH_MD5].m_pFunction = BCFindPattern( hEngine, BCSIG_MD5_MAPFILE );
+	s_EnginePatches[BCPATCH_INIT].m_pFunction = pInit;
+	s_EnginePatches[BCPATCH_INITMEM].m_pFunction = pInitMem;
+
+	// static props: the version patch only goes in with both hooks, or the newer
+	// lumps would be read as TF2 props unconverted
+	bool bProps = false;
+	if ( !s_pfnGameLumpVersion )
+	{
+		Warning( "BSP: Mod_GameLumpVersion not found in engine.dll\n" );
+	}
+	else if ( CreateEngineHook( pGet, (void *)&Detour_UtlBufferGet, (void **)&s_pfnUtlBufferGet, "CUtlBuffer::Get" ) )
+	{
+		if ( CreateEngineHook( pProps, (void *)&Detour_UnserializeProps, (void **)&s_pfnUnserializeProps, "CStaticPropMgr::UnserializeModels" ) )
+			bProps = ApplyEnginePatch( s_EnginePatches[BCPATCH_PROPS] );
+	}
+
+	const bool bLights = CreateEngineHook( pLights, (void *)&Detour_LoadWorldlights, (void **)&s_pfnLoadWorldlights, "Mod_LoadWorldlights" );
+
+	// version 21: only with the header fix, or an L4D2 lump table would be read as it is
+	bool bV21 = false;
+	if ( pInit && pInitMem && pInit[0x2C] == 0x48 && pInit[0x2D] == 0x8D && pInit[0x2E] == 0x0D )
+	{
+		// lea rcx, s_MapHeader (the memset at the top of CMapLoadHelper::Init)
+		s_pEngineMapHeader = (int *)( pInit + 0x2C + 7 + *(const int *)( pInit + 0x2F ) );
+		if ( CreateEngineHook( pInit, (void *)&Detour_MapLoadInit, (void **)&s_pfnMapLoadInit, "CMapLoadHelper::Init" ) &&
+			 CreateEngineHook( pInitMem, (void *)&Detour_MapLoadInitFromMemory, (void **)&s_pfnMapLoadInitFromMemory, "CMapLoadHelper::InitFromMemory" ) )
+		{
+			bV21 = ApplyEnginePatch( s_EnginePatches[BCPATCH_INIT] );
+			bV21 &= ApplyEnginePatch( s_EnginePatches[BCPATCH_INITMEM] );
+			// the map CRC/MD5 refuse v21 maps otherwise; not fatal if they don't match
+			ApplyEnginePatch( s_EnginePatches[BCPATCH_CRC] );
+			ApplyEnginePatch( s_EnginePatches[BCPATCH_MD5] );
+		}
+	}
+	else
+	{
+		Warning( "BSP: CMapLoadHelper::Init not recognized, version 21 maps in VPKs won't load\n" );
+	}
+
+	DevMsg( "BSP: engine support: static props %s, world lights %s, version 21 %s\n",
+		bProps ? "on" : "OFF", bLights ? "on" : "OFF", bV21 ? "on" : "OFF" );
+	return s_nEngineHookTargets > 0;
+}
+
+static void RemoveEngineSupport()
+{
+	for ( int i = 0; i < ARRAYSIZE( s_EnginePatches ); i++ )
+		RevertEnginePatch( s_EnginePatches[i] );
+
+	for ( int i = 0; i < s_nEngineHookTargets; i++ )
+	{
+		MH_DisableHook( s_EngineHookTargets[i] );
+		MH_RemoveHook( s_EngineHookTargets[i] );
+	}
+	s_nEngineHookTargets = 0;
+	s_nPropReaderThread = 0;
+}
+
+#else
+
+static bool InstallEngineSupport() { return false; }
+static void RemoveEngineSupport() {}
+
+#endif // PLATFORM_64BITS
+
+//-----------------------------------------------------------------------------
 // Install / shutdown. client.dll and server.dll both call these; the first to
 // install owns the hooks (marked with an environment variable in this process).
 //-----------------------------------------------------------------------------
@@ -2113,6 +2927,7 @@ struct BCHook_t
 	void		*m_pDetour;
 	void		**m_ppOriginal;
 	void		*m_pTarget;
+	bool		m_bOptional;	// only for the addon mount: if it can't be hooked, the rest still goes in
 };
 
 static BCHook_t s_Hooks[] =
@@ -2131,9 +2946,15 @@ static BCHook_t s_Hooks[] =
 	{ "GetFileAttributesA",				(void *)&Hook_GetFileAttributesA,			(void **)&s_pfnGetFileAttributesA },
 	{ "GetFileAttributesExW",			(void *)&Hook_GetFileAttributesExW,			(void **)&s_pfnGetFileAttributesExW },
 	{ "GetFileAttributesExA",			(void *)&Hook_GetFileAttributesExA,			(void **)&s_pfnGetFileAttributesExA },
+	{ "FindFirstFileExW",				(void *)&Hook_FindFirstFileExW,				(void **)&s_pfnFindFirstFileExW, NULL, true },
+	{ "FindFirstFileA",					(void *)&Hook_FindFirstFileA,				(void **)&s_pfnFindFirstFileA, NULL, true },
+	{ "FindNextFileW",					(void *)&Hook_FindNextFileW,				(void **)&s_pfnFindNextFileW, NULL, true },
+	{ "FindNextFileA",					(void *)&Hook_FindNextFileA,				(void **)&s_pfnFindNextFileA, NULL, true },
+	{ "FindClose",						(void *)&Hook_FindClose,					(void **)&s_pfnFindClose, NULL, true },
 };
 
 static bool s_bOwnsHooks = false;
+static bool s_bAddonHooks = true;	// the folder listing hooks the addon mount needs
 
 static void RemoveHooks()
 {
@@ -2146,6 +2967,51 @@ static void RemoveHooks()
 			s_Hooks[i].m_pTarget = NULL;
 		}
 	}
+}
+
+// The Windows file API redirect (loose map and model files)
+static bool InstallFileHooks()
+{
+	// The real implementations are in KernelBase (kernel32's exports forward there);
+	// fall back to kernel32 on systems without it.
+	HMODULE hKernelBase = GetModuleHandleA( "kernelbase.dll" );
+	HMODULE hKernel32 = GetModuleHandleA( "kernel32.dll" );
+
+	for ( int i = 0; i < ARRAYSIZE( s_Hooks ); i++ )
+	{
+		BCHook_t &hook = s_Hooks[i];
+		void *pTarget = hKernelBase ? (void *)GetProcAddress( hKernelBase, hook.m_pszFunction ) : NULL;
+		if ( !pTarget && hKernel32 )
+			pTarget = (void *)GetProcAddress( hKernel32, hook.m_pszFunction );
+
+		if ( !pTarget || MH_CreateHook( pTarget, hook.m_pDetour, hook.m_ppOriginal ) != MH_OK )
+		{
+			if ( hook.m_bOptional )
+			{
+				s_bAddonHooks = false;
+				continue;
+			}
+			Warning( "BSP v21: couldn't hook %s, newer maps won't load\n", hook.m_pszFunction );
+			RemoveHooks();
+			return false;
+		}
+		hook.m_pTarget = pTarget;
+	}
+
+	// The originals must all be in place before any detour can run
+	for ( int i = 0; i < ARRAYSIZE( s_Hooks ); i++ )
+	{
+		if ( !s_Hooks[i].m_pTarget )
+			continue;	// an optional one that didn't go in
+		if ( MH_EnableHook( s_Hooks[i].m_pTarget ) != MH_OK )
+		{
+			Warning( "BSP v21: couldn't enable the %s hook, newer maps won't load\n", s_Hooks[i].m_pszFunction );
+			RemoveHooks();
+			return false;
+		}
+	}
+
+	return true;
 }
 
 void BSPCompat_Install()
@@ -2163,40 +3029,28 @@ void BSPCompat_Install()
 		return;
 	}
 
-	// The real implementations are in KernelBase (kernel32's exports forward there);
-	// fall back to kernel32 on systems without it.
-	HMODULE hKernelBase = GetModuleHandleA( "kernelbase.dll" );
-	HMODULE hKernel32 = GetModuleHandleA( "kernel32.dll" );
-
-	for ( int i = 0; i < ARRAYSIZE( s_Hooks ); i++ )
-	{
-		BCHook_t &hook = s_Hooks[i];
-		void *pTarget = hKernelBase ? (void *)GetProcAddress( hKernelBase, hook.m_pszFunction ) : NULL;
-		if ( !pTarget && hKernel32 )
-			pTarget = (void *)GetProcAddress( hKernel32, hook.m_pszFunction );
-
-		if ( !pTarget || MH_CreateHook( pTarget, hook.m_pDetour, hook.m_ppOriginal ) != MH_OK )
-		{
-			Warning( "BSP v21: couldn't hook %s, newer maps won't load\n", hook.m_pszFunction );
-			RemoveHooks();
-			return;
-		}
-		hook.m_pTarget = pTarget;
-	}
-
-	// The originals must all be in place before any detour can run
-	for ( int i = 0; i < ARRAYSIZE( s_Hooks ); i++ )
-	{
-		if ( MH_EnableHook( s_Hooks[i].m_pTarget ) != MH_OK )
-		{
-			Warning( "BSP v21: couldn't enable the %s hook, newer maps won't load\n", s_Hooks[i].m_pszFunction );
-			RemoveHooks();
-			return;
-		}
-	}
+	// Each works without the other: the redirect for loose files, the engine
+	// support for maps in VPKs
+	const bool bFiles = InstallFileHooks();
+	const bool bEngine = InstallEngineSupport();
+	if ( !bFiles && !bEngine )
+		return;
 
 	s_bOwnsHooks = true;
 	SetEnvironmentVariableA( BSPCOMPAT_INSTALLED_VAR, szProcess );
+
+	// Garry's Mod's cfg/mount.cfg: plain search paths, so it doesn't need the hooks.
+	// First, so a Garry's Mod folder mounted there is found by the addon mount.
+	MountCfg_Init();
+
+	// Garry's Mod addons are served through the file hooks, so they live in this DLL too
+	if ( bFiles && s_bAddonHooks )
+	{
+		GMAMount_Init();
+		OpenGMALog();
+	}
+	else if ( bFiles )
+		Warning( "GMA: couldn't hook the folder listing functions, Garry's Mod addons won't be mounted\n" );
 }
 
 void BSPCompat_Shutdown()
@@ -2204,7 +3058,10 @@ void BSPCompat_Shutdown()
 	if ( !s_bOwnsHooks )
 		return;
 
+	RemoveEngineSupport();
 	RemoveHooks();
+	GMAMount_Shutdown();
+	CloseGMALog();
 	s_bOwnsHooks = false;
 	SetEnvironmentVariableA( BSPCOMPAT_INSTALLED_VAR, NULL );
 

@@ -134,16 +134,46 @@ local dataTypes = {
 	"Angle", "Bool", "Entity", "Float", "Int", "String", "Vector"
 }
 
+-- GMod's default for each type's getter
+local function networkedTypeDefault(dataType)
+	if (dataType == "Int" or dataType == "Float") then
+		return 0
+	elseif (dataType == "Bool") then
+		return false
+	elseif (dataType == "String") then
+		return ""
+	elseif (dataType == "Vector") then
+		return Vector(0, 0, 0)
+	elseif (dataType == "Angle") then
+		return Angle(0, 0, 0)
+	elseif (dataType == "Entity") then
+		return NULL
+	end
+
+	return nil
+end
+
 for _, dataType in ipairs(dataTypes) do
 	ENTITY_META["SetNetworked" .. dataType] = ENTITY_META.SetNetworkedVariable
 	ENTITY_META["SetNetworked2" .. dataType] = ENTITY_META.SetNetworkedVariable
 	ENTITY_META["SetNW" .. dataType] = ENTITY_META.SetNetworkedVariable
 	ENTITY_META["SetNW2" .. dataType] = ENTITY_META.SetNetworkedVariable
 
-	ENTITY_META["GetNetworked" .. dataType] = ENTITY_META.GetNetworkedVariable
-	ENTITY_META["GetNetworked2" .. dataType] = ENTITY_META.GetNetworkedVariable
-	ENTITY_META["GetNW" .. dataType] = ENTITY_META.GetNetworkedVariable
-	ENTITY_META["GetNW2" .. dataType] = ENTITY_META.GetNetworkedVariable
+	-- Like GMod: without a fallback, a typed getter returns its type's zero value
+	-- (GetNWInt -> 0, GetNWBool -> false, ...), never nil. Addons compare and do
+	-- arithmetic on these before anything was set (CPTBase: GetNW2Int < GetNW2Int).
+	local getter = function(self, key, fallback)
+		if (fallback == nil) then
+			fallback = networkedTypeDefault(dataType)
+		end
+
+		return self:GetNetworkedVariable(key, fallback)
+	end
+
+	ENTITY_META["GetNetworked" .. dataType] = getter
+	ENTITY_META["GetNetworked2" .. dataType] = getter
+	ENTITY_META["GetNW" .. dataType] = getter
+	ENTITY_META["GetNW2" .. dataType] = getter
 end
 
 ENTITY_META.SetNetworkedVarProxy = ENTITY_META.SetNetworkedVariableCallback
@@ -229,6 +259,13 @@ else
 		end
 
 		debugPrint("(set) Received networked variables for", entity)
+
+		-- The entity may not exist on this client yet (just created, or not in our
+		-- PVS). The server re-sends the full set on its forced update, so skip it.
+		if (not IsValid(entity)) then
+			debugPrint("(set) Received networked variables for an entity we don't have yet")
+			return
+		end
 
 		for key, value in pairs(networkedVariables) do
 			local oldValue = entity:GetNetworkedVariable(key)

@@ -25,6 +25,9 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+/*
+** access functions (stack -> C)
+*/
 
 LUA_API lua_CBasePlayer *lua_toplayer( lua_State *L, int idx )
 {
@@ -688,6 +691,8 @@ LUA_BINDING_BEGIN( Player, HintMessage, "class", "Hint a message to the player."
     return 0;
 }
 LUA_BINDING_END()
+
+LUALIB_API lua_CExperiment_Player* (luaL_checkexperimentplayer)(lua_State* L, int narg);
 
 LUA_BINDING_BEGIN( Player, IsFlashlightOn, "class", "Check if the flashlight is on for the player." )
 {
@@ -1580,6 +1585,88 @@ LUA_BINDING_END( "integer", "The player's unique ID." )
 /*
 ** Open CBasePlayer object
 */
+//-----------------------------------------------------------------------------
+// Srcbox: GMod hull / view offset API. Shared like in GMod: call it on both
+// realms (or the server only; the values are networked) to keep prediction smooth.
+//-----------------------------------------------------------------------------
+LUA_BINDING_BEGIN( Player, SetViewOffset, "class", "Set the standing view offset (GMod compatible)." )
+{
+    lua_CBasePlayer *player = LUA_BINDING_ARGUMENT( luaL_checkplayer, 1, "player" );
+    player->SetLuaViewOffset( false, LUA_BINDING_ARGUMENT( luaL_checkvector, 2, "offset" ) );
+    return 0;
+}
+LUA_BINDING_END()
+
+LUA_BINDING_BEGIN( Player, SetViewOffsetDucked, "class", "Set the crouched view offset (GMod compatible)." )
+{
+    lua_CBasePlayer *player = LUA_BINDING_ARGUMENT( luaL_checkplayer, 1, "player" );
+    player->SetLuaViewOffset( true, LUA_BINDING_ARGUMENT( luaL_checkvector, 2, "offset" ) );
+    return 0;
+}
+LUA_BINDING_END()
+
+LUA_BINDING_BEGIN( Player, GetViewOffset, "class", "Get the standing view offset (GMod compatible)." )
+{
+    lua_CBasePlayer *player = LUA_BINDING_ARGUMENT( luaL_checkplayer, 1, "player" );
+    lua_pushvector( L, player->GetViewOffsetFor( false ) );
+    return 1;
+}
+LUA_BINDING_END( "Vector", "The standing view offset." )
+
+LUA_BINDING_BEGIN( Player, GetViewOffsetDucked, "class", "Get the crouched view offset (GMod compatible)." )
+{
+    lua_CBasePlayer *player = LUA_BINDING_ARGUMENT( luaL_checkplayer, 1, "player" );
+    lua_pushvector( L, player->GetViewOffsetFor( true ) );
+    return 1;
+}
+LUA_BINDING_END( "Vector", "The crouched view offset." )
+
+LUA_BINDING_BEGIN( Player, SetHull, "class", "Set the standing hull (GMod compatible)." )
+{
+    lua_CBasePlayer *player = LUA_BINDING_ARGUMENT( luaL_checkplayer, 1, "player" );
+    Vector vecMins = LUA_BINDING_ARGUMENT( luaL_checkvector, 2, "mins" );
+    Vector vecMaxs = LUA_BINDING_ARGUMENT( luaL_checkvector, 3, "maxs" );
+    player->SetLuaHull( false, vecMins, vecMaxs );
+    return 0;
+}
+LUA_BINDING_END()
+
+LUA_BINDING_BEGIN( Player, SetHullDuck, "class", "Set the crouched hull (GMod compatible)." )
+{
+    lua_CBasePlayer *player = LUA_BINDING_ARGUMENT( luaL_checkplayer, 1, "player" );
+    Vector vecMins = LUA_BINDING_ARGUMENT( luaL_checkvector, 2, "mins" );
+    Vector vecMaxs = LUA_BINDING_ARGUMENT( luaL_checkvector, 3, "maxs" );
+    player->SetLuaHull( true, vecMins, vecMaxs );
+    return 0;
+}
+LUA_BINDING_END()
+
+LUA_BINDING_BEGIN( Player, GetHull, "class", "Get the standing hull (GMod compatible)." )
+{
+    lua_CBasePlayer *player = LUA_BINDING_ARGUMENT( luaL_checkplayer, 1, "player" );
+    lua_pushvector( L, player->GetHullMinFor( false ) );
+    lua_pushvector( L, player->GetHullMaxFor( false ) );
+    return 2;
+}
+LUA_BINDING_END( "Vector", "Hull mins.", "Vector", "Hull maxs." )
+
+LUA_BINDING_BEGIN( Player, GetHullDuck, "class", "Get the crouched hull (GMod compatible)." )
+{
+    lua_CBasePlayer *player = LUA_BINDING_ARGUMENT( luaL_checkplayer, 1, "player" );
+    lua_pushvector( L, player->GetHullMinFor( true ) );
+    lua_pushvector( L, player->GetHullMaxFor( true ) );
+    return 2;
+}
+LUA_BINDING_END( "Vector", "Crouched hull mins.", "Vector", "Crouched hull maxs." )
+
+LUA_BINDING_BEGIN( Player, ResetHull, "class", "Reset both hulls to the defaults (GMod compatible)." )
+{
+    lua_CBasePlayer *player = LUA_BINDING_ARGUMENT( luaL_checkplayer, 1, "player" );
+    player->ResetLuaHull();
+    return 0;
+}
+LUA_BINDING_END()
+
 LUALIB_API int luaopen_CBasePlayer_shared( lua_State *L )
 {
     LUA_PUSH_NEW_METATABLE( L, LUA_BASEPLAYERMETANAME );

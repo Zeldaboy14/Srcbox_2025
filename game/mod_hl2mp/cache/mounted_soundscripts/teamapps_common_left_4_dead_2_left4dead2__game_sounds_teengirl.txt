@@ -1,0 +1,5000 @@
+"Player.TeenGirl_AnswerLostCall01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.890000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\AnswerLostCall01.wav"
+}
+"Player.TeenGirl_AnswerLostCall02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.900000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\AnswerLostCall02.wav"
+}
+"Player.TeenGirl_AnswerLostCall03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.880000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\AnswerLostCall03.wav"
+}
+"Player.TeenGirl_AnswerLostCall07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.890000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\AnswerLostCall07.wav"
+}
+"Player.TeenGirl_AnswerLostCall09"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.870000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\AnswerLostCall09.wav"
+}
+"Player.TeenGirl_AnswerLostCall10"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.900000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\AnswerLostCall10.wav"
+}
+"Player.TeenGirl_AnswerLostCall11"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.760000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\AnswerLostCall11.wav"
+}
+"Player.TeenGirl_AnswerLostCall12"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.740000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\AnswerLostCall12.wav"
+}
+"Player.TeenGirl_ArriveChopper03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\ArriveChopper03.wav"
+}
+"Player.TeenGirl_ArriveChopper04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\ArriveChopper04.wav"
+}
+"Player.TeenGirl_ArriveGeneric01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ArriveGeneric01.wav"
+}
+"Player.TeenGirl_ArriveGeneric02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.900000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ArriveGeneric02.wav"
+}
+"Player.TeenGirl_ArriveGeneric03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ArriveGeneric03.wav"
+}
+"Player.TeenGirl_ArriveGeneric04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ArriveGeneric04.wav"
+}
+"Player.TeenGirl_ArriveGenericInitial01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.910000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ArriveGenericInitial01.wav"
+}
+"Player.TeenGirl_ArriveGenericInitial02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.900000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ArriveGenericInitial02.wav"
+}
+"Player.TeenGirl_ArrivePlane01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.900000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ArrivePlane01.wav"
+}
+"Player.TeenGirl_ArrivePlane02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.900000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ArrivePlane02.wav"
+}
+"Player.TeenGirl_ArrivePlane03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ArrivePlane03.wav"
+}
+"Player.TeenGirl_ArrivePlaneInitial01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.750000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ArrivePlaneInitial01.wav"
+}
+"Player.TeenGirl_ArrivePlaneInitial02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.900000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ArrivePlaneInitial02.wav"
+}
+"Player.TeenGirl_ArriveTruck03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ArriveTruck03.wav"
+}
+"Player.TeenGirl_ArriveTruck04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ArriveTruck04.wav"
+}
+"Player.TeenGirl_ArriveTruckInitial02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ArriveTruckInitial02.wav"
+}
+"npc.TeenGirl_BACKUP03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\BACKUP03.WAV"
+}
+"npc.TeenGirl_BACKUP05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\BACKUP05.WAV"
+}
+"npc.TeenGirl_CALLFORRESCUE03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\CALLFORRESCUE03.WAV"
+}
+"Player.TeenGirl_CallForRescue04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\CallForRescue04.wav"
+}
+"Player.TeenGirl_CallForRescue05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\CallForRescue05.wav"
+}
+"npc.TeenGirl_CALLFORRESCUE08"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\CALLFORRESCUE08.WAV"
+}
+"npc.TeenGirl_CALLFORRESCUE09"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\CALLFORRESCUE09.WAV"
+}
+"Player.TeenGirl_CallForRescue10"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\CallForRescue10.wav"
+}
+"npc.TeenGirl_CALLFORRESCUE11"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\CALLFORRESCUE11.WAV"
+}
+"npc.TeenGirl_CALLFORRESCUE12"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\CALLFORRESCUE12.WAV"
+}
+"Player.TeenGirl_CallForRescue13"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\CallForRescue13.wav"
+}
+"npc.TeenGirl_CALLFORRESCUE15"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\CALLFORRESCUE15.WAV"
+}
+"npc.TeenGirl_CALLFORRESCUE17"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\CALLFORRESCUE17.WAV"
+}
+"Player.TeenGirl_Choke05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Choke05.wav"
+}
+"Player.TeenGirl_Choke06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Choke06.wav"
+}
+"Player.TeenGirl_Choke07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Choke07.wav"
+}
+"Player.TeenGirl_Choke08"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Choke08.wav"
+}
+"Player.TeenGirl_Choke09"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Choke09.wav"
+}
+"Player.TeenGirl_ContextModifierCalm01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ContextModifierCalm01.wav"
+}
+"Player.TeenGirl_ContextModifierCalm02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.560000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ContextModifierCalm02.wav"
+}
+"Player.TeenGirl_ContextModifierCalm03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.630000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ContextModifierCalm03.wav"
+}
+"Player.TeenGirl_ContextModifierCalm04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.610000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ContextModifierCalm04.wav"
+}
+"Player.TeenGirl_ContextModifierCalm06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.610000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ContextModifierCalm06.wav"
+}
+"Player.TeenGirl_ContextModifierCalm07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ContextModifierCalm07.wav"
+}
+"Player.TeenGirl_ContextModifierCalm08"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.650000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ContextModifierCalm08.wav"
+}
+"Player.TeenGirl_ContextModifierCalm09"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ContextModifierCalm09.wav"
+}
+"Player.TeenGirl_ContextModifierCalm10"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.640000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ContextModifierCalm10.wav"
+}
+"Player.TeenGirl_ContextModifierCalm11"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.570000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ContextModifierCalm11.wav"
+}
+"Player.TeenGirl_ContextModifierCalm12"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.570000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ContextModifierCalm12.wav"
+}
+"Player.TeenGirl_ContextModifierCalm13"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.480000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ContextModifierCalm13.wav"
+}
+"Player.TeenGirl_ContextModifierCalm14"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.570000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ContextModifierCalm14.wav"
+}
+"Player.TeenGirl_ContextModifierCalm15"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ContextModifierCalm15.wav"
+}
+"Player.TeenGirl_ContextModifierCalm16"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ContextModifierCalm16.wav"
+}
+"Player.TeenGirl_ContextModifierCalm17"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ContextModifierCalm17.wav"
+}
+"Player.TeenGirl_ContextModifierCalm18"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.490000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ContextModifierCalm18.wav"
+}
+"Player.TeenGirl_ContextModifierCalm19"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ContextModifierCalm19.wav"
+}
+"Player.TeenGirl_ContextModifierCalm20"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.540000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ContextModifierCalm20.wav"
+}
+"Player.TeenGirl_ContextModifierCalm21"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.560000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ContextModifierCalm21.wav"
+}
+"Player.TeenGirl_ContextModifierCalm22"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ContextModifierCalm22.wav"
+}
+"Player.TeenGirl_ContextModifierCalm23"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.520000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ContextModifierCalm23.wav"
+}
+"Player.TeenGirl_ContextModifierCalm24"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.580000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ContextModifierCalm24.wav"
+}
+"Player.TeenGirl_ContextModifierCalm25"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.560000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ContextModifierCalm25.wav"
+}
+"Player.TeenGirl_ContextModifierLoud01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.810000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\ContextModifierLoud01.wav"
+}
+"Player.TeenGirl_ContextModifierLoud02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.900000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\ContextModifierLoud02.wav"
+}
+"Player.TeenGirl_ContextModifierLoud04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.830000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\ContextModifierLoud04.wav"
+}
+"Player.TeenGirl_ContextModifierLoud05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.990000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\ContextModifierLoud05.wav"
+}
+"Player.TeenGirl_ContextModifierLoud06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\ContextModifierLoud06.wav"
+}
+"Player.TeenGirl_ContextModifierLoud07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\ContextModifierLoud07.wav"
+}
+"Player.TeenGirl_ContextModifierLoud08"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.940000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\ContextModifierLoud08.wav"
+}
+"Player.TeenGirl_ContextModifierLoud09"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\ContextModifierLoud09.wav"
+}
+"Player.TeenGirl_ContextModifierLoud10"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.880000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\ContextModifierLoud10.wav"
+}
+"Player.TeenGirl_ContextModifierLoud11"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.890000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\ContextModifierLoud11.wav"
+}
+"Player.TeenGirl_ContextModifierLoud12"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.850000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\ContextModifierLoud12.wav"
+}
+"Player.TeenGirl_ContextModifierLoud13"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.770000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\ContextModifierLoud13.wav"
+}
+"Player.TeenGirl_ContextModifierLoud14"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.890000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\ContextModifierLoud14.wav"
+}
+"Player.TeenGirl_ContextModifierLoud15"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.870000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\ContextModifierLoud15.wav"
+}
+"Player.TeenGirl_ContextModifierLoud16"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.900000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\ContextModifierLoud16.wav"
+}
+"Player.TeenGirl_ContextModifierLoud17"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.820000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\ContextModifierLoud17.wav"
+}
+"Player.TeenGirl_ContextModifierLoud18"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.840000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\ContextModifierLoud18.wav"
+}
+"Player.TeenGirl_ContextModifierLoud19"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.910000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\ContextModifierLoud19.wav"
+}
+"Player.TeenGirl_ContextModifierLoud20"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.880000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\ContextModifierLoud20.wav"
+}
+"Player.TeenGirl_ContextModifierLoud21"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.870000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\ContextModifierLoud21.wav"
+}
+"Player.TeenGirl_ContextModifierLoud22"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.990000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\ContextModifierLoud22.wav"
+}
+"Player.TeenGirl_ContextModifierLoud23"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.850000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\ContextModifierLoud23.wav"
+}
+"Player.TeenGirl_ContextModifierLoud24"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.560000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\ContextModifierLoud24.wav"
+}
+"Player.TeenGirl_ContextModifierLoud25"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.890000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\ContextModifierLoud25.wav"
+}
+"Player.TeenGirl_DoorBreaking01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.630000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\DoorBreaking01.wav"
+}
+"Player.TeenGirl_DoorBreaking02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\DoorBreaking02.wav"
+}
+"Player.TeenGirl_DoorBreaking03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\DoorBreaking03.wav"
+}
+"Player.TeenGirl_DoorBreaking04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\DoorBreaking04.wav"
+}
+"Player.TeenGirl_DoorBreaking06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\DoorBreaking06.wav"
+}
+"Player.TeenGirl_DoorBreaking14"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.850000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\DoorBreaking14.wav"
+}
+"Player.TeenGirl_DoorBreaking16"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.790000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\DoorBreaking16.wav"
+}
+"Player.TeenGirl_DowninFront03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\DowninFront03.wav"
+}
+"npc.TeenGirl_DOWNINFRONT05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\DOWNINFRONT05.WAV"
+}
+"Player.TeenGirl_EmphaticGoQuiet01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.410000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\EmphaticGoQuiet01.wav"
+}
+"Player.TeenGirl_EmphaticGoQuiet03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.470000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\EmphaticGoQuiet03.wav"
+}
+"Player.TeenGirl_EmphaticGoQuiet06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.460000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\EmphaticGoQuiet06.wav"
+}
+"Player.TeenGirl_EmphaticNo01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\EmphaticNo01.wav"
+}
+"Player.TeenGirl_EmphaticNo04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.570000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\EmphaticNo04.wav"
+}
+"Player.TeenGirl_EmphaticNo05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\EmphaticNo05.wav"
+}
+"Player.TeenGirl_EmphaticNo07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.450000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\EmphaticNo07.wav"
+}
+"Player.TeenGirl_EmphaticNo09"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\EmphaticNo09.wav"
+}
+"Player.TeenGirl_EmphaticNo10"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\EmphaticNo10.wav"
+}
+"Player.TeenGirl_EmphaticNo11"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.530000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\EmphaticNo11.wav"
+}
+"Player.TeenGirl_EmphaticNo12"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\EmphaticNo12.wav"
+}
+"Player.TeenGirl_EmphaticNo13"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.610000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\EmphaticNo13.wav"
+}
+"Player.TeenGirl_EmphaticNo18"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.520000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\EmphaticNo18.wav"
+}
+"Player.TeenGirl_EmphaticNo19"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\EmphaticNo19.wav"
+}
+"Player.TeenGirl_EmphaticNo23"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.460000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\EmphaticNo23.wav"
+}
+"Player.TeenGirl_EmphaticNo26"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.470000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\EmphaticNo26.wav"
+}
+"Player.TeenGirl_EmphaticNo29"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.690000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\EmphaticNo29.wav"
+}
+"Player.TeenGirl_EmphaticNo33"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.590000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\EmphaticNo33.wav"
+}
+"Player.TeenGirl_EmphaticNo36"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.650000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\EmphaticNo36.wav"
+}
+"Player.TeenGirl_EmphaticNo37"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\EmphaticNo37.wav"
+}
+"Player.TeenGirl_EmphaticNo38"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\EmphaticNo38.wav"
+}
+"Player.TeenGirl_EmphaticNo40"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.620000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\EmphaticNo40.wav"
+}
+"Player.TeenGirl_EmphaticNo42"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.610000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\EmphaticNo42.wav"
+}
+"Player.TeenGirl_EmphaticNo44"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.540000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\EmphaticNo44.wav"
+}
+"Player.TeenGirl_EmphaticNo45"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\EmphaticNo45.wav"
+}
+"Player.TeenGirl_EmphaticNo46"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.630000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\EmphaticNo46.wav"
+}
+"Player.TeenGirl_EmphaticNo47"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.640000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\EmphaticNo47.wav"
+}
+"Player.TeenGirl_EmphaticRun01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.890000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\EmphaticRun01.wav"
+}
+"Player.TeenGirl_EmphaticRun03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.740000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\EmphaticRun03.wav"
+}
+"Player.TeenGirl_EmphaticRun05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\EmphaticRun05.wav"
+}
+"Player.TeenGirl_EmphaticRun06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.910000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\EmphaticRun06.wav"
+}
+"Player.TeenGirl_EmphaticRun07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\EmphaticRun07.wav"
+}
+"Player.TeenGirl_EmphaticRun11"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.900000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\EmphaticRun11.wav"
+}
+"Player.TeenGirl_Generic02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.520000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Generic02.wav"
+}
+"Player.TeenGirl_Generic05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.570000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Generic05.wav"
+}
+"Player.TeenGirl_Generic06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.540000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Generic06.wav"
+}
+"Player.TeenGirl_Generic07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.520000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Generic07.wav"
+}
+"Player.TeenGirl_Generic08"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Generic08.wav"
+}
+"npc.TeenGirl_Generic09"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Generic09.wav"
+}
+"Player.TeenGirl_Generic11"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Generic11.wav"
+}
+"npc.TeenGirl_Generic12"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Generic12.wav"
+}
+"npc.TeenGirl_Generic13"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Generic13.wav"
+}
+"npc.TeenGirl_Generic14"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.530000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Generic14.wav"
+}
+"npc.TeenGirl_Generic17"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.630000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Generic17.wav"
+}
+"npc.TeenGirl_Generic21"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Generic21.wav"
+}
+"npc.TeenGirl_Generic22"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Generic22.wav"
+}
+"npc.TeenGirl_Generic23"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.570000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Generic23.wav"
+}
+"npc.TeenGirl_Generic24"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.570000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Generic24.wav"
+}
+"npc.TeenGirl_Generic25"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Generic25.wav"
+}
+"npc.TeenGirl_Generic27"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.580000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Generic27.wav"
+}
+"npc.TeenGirl_GenericDirections01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.640000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GenericDirections01.wav"
+}
+"npc.TeenGirl_GenericDirections02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.650000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GenericDirections02.wav"
+}
+"npc.TeenGirl_GenericDirections04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GenericDirections04.wav"
+}
+"npc.TeenGirl_GenericDirections06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.640000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GenericDirections06.wav"
+}
+"npc.TeenGirl_GenericDirections07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.710000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GenericDirections07.wav"
+}
+"npc.TeenGirl_GenericDirections08"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GenericDirections08.wav"
+}
+"npc.TeenGirl_GenericDirections09"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.640000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GenericDirections09.wav"
+}
+"npc.TeenGirl_GenericDirections10"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GenericDirections10.wav"
+}
+"npc.TeenGirl_GenericDirections11"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GenericDirections11.wav"
+}
+"npc.TeenGirl_GenericDirections12"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.640000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GenericDirections12.wav"
+}
+"npc.TeenGirl_GenericResponse01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GenericResponse01.wav"
+}
+"npc.TeenGirl_GenericResponse02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.440000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GenericResponse02.wav"
+}
+"npc.TeenGirl_GenericResponse03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.460000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GenericResponse03.wav"
+}
+"npc.TeenGirl_GenericResponses01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.560000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GenericResponses01.wav"
+}
+"npc.TeenGirl_GenericResponses03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GenericResponses03.wav"
+}
+"npc.TeenGirl_GenericResponses05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GenericResponses05.wav"
+}
+"npc.TeenGirl_GenericResponses06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.520000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GenericResponses06.wav"
+}
+"npc.TeenGirl_GenericResponses07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GenericResponses07.wav"
+}
+"npc.TeenGirl_GenericResponses09"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.520000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GenericResponses09.wav"
+}
+"npc.TeenGirl_GenericResponses10"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GenericResponses10.wav"
+}
+"npc.TeenGirl_GenericResponses11"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GenericResponses11.wav"
+}
+"npc.TeenGirl_GenericResponses12"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.770000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\GenericResponses12.wav"
+}
+"npc.TeenGirl_GenericResponses13"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.650000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GenericResponses13.wav"
+}
+"npc.TeenGirl_GenericResponses14"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GenericResponses14.wav"
+}
+"npc.TeenGirl_GenericResponses15"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GenericResponses15.wav"
+}
+"npc.TeenGirl_GenericResponses16"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GenericResponses16.wav"
+}
+"npc.TeenGirl_GenericResponses17"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GenericResponses17.wav"
+}
+"npc.TeenGirl_GenericResponses18"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\GenericResponses18.wav"
+}
+"npc.TeenGirl_GenericResponses19"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.980000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\GenericResponses19.wav"
+}
+"npc.TeenGirl_GenericResponses20"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.730000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GenericResponses20.wav"
+}
+"npc.TeenGirl_GenericResponses22"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.780000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\GenericResponses22.wav"
+}
+"npc.TeenGirl_GenericResponses23"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GenericResponses23.wav"
+}
+"npc.TeenGirl_GenericResponses24"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.530000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GenericResponses24.wav"
+}
+"npc.TeenGirl_GenericResponses25"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GenericResponses25.wav"
+}
+"npc.TeenGirl_GenericResponses26"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GenericResponses26.wav"
+}
+"npc.TeenGirl_GenericResponses27"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GenericResponses27.wav"
+}
+"npc.TeenGirl_GenericResponses28"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GenericResponses28.wav"
+}
+"npc.TeenGirl_GenericResponses29"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GenericResponses29.wav"
+}
+"npc.TeenGirl_GenericResponses30"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GenericResponses30.wav"
+}
+"npc.TeenGirl_GenericResponses31"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.850000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\GenericResponses31.wav"
+}
+"npc.TeenGirl_GenericResponses33"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GenericResponses33.wav"
+}
+"npc.TeenGirl_GenericResponses34"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GenericResponses34.wav"
+}
+"npc.TeenGirl_GenericResponses36"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.520000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\GenericResponses36.wav"
+}
+"npc.TeenGirl_GenericResponses38"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.750000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GenericResponses38.wav"
+}
+"npc.TeenGirl_GenericResponses40"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.690000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GenericResponses40.wav"
+}
+"npc.TeenGirl_GenericResponses41"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.570000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GenericResponses41.wav"
+}
+"npc.TeenGirl_GenericResponses42"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GenericResponses42.wav"
+}
+"npc.TeenGirl_GenericResponses43"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GenericResponses43.wav"
+}
+"npc.TeenGirl_GenericResponses44"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GenericResponses44.wav"
+}
+"npc.TeenGirl_GenericResponses45"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.580000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GenericResponses45.wav"
+}
+"npc.TeenGirl_GenericResponses46"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GenericResponses46.wav"
+}
+"npc.TeenGirl_GenericResponses47"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GenericResponses47.wav"
+}
+"npc.TeenGirl_GenericResponses48"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GenericResponses48.wav"
+}
+"npc.TeenGirl_GenericResponses49"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GenericResponses49.wav"
+}
+"npc.TeenGirl_GenericResponses50"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GenericResponses50.wav"
+}
+"npc.TeenGirl_GenericResponses51"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.570000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GenericResponses51.wav"
+}
+"npc.TeenGirl_GOINGTODIE313"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\GOINGTODIE313.WAV"
+}
+"npc.TeenGirl_GOINGTODIE364"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\GOINGTODIE364..WAV"
+}
+"Player.TeenGirl_GoingToDie364"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GoingToDie364.wav"
+}
+"Player.TeenGirl_GoingToDie369"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GoingToDie369.wav"
+}
+"Player.TeenGirl_GoingToDie50"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GoingToDie50.wav"
+}
+"Player.TeenGirl_GoingToDie55"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.400000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GoingToDie55.wav"
+}
+"Player.TeenGirl_GoingToDie56"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.450000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GoingToDie56.wav"
+}
+"Player.TeenGirl_GoingToDie60"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.320000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GoingToDie60.wav"
+}
+"npc.TeenGirl_GoingToDieLight01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GoingToDieLight01.wav"
+}
+"npc.TeenGirl_GoingToDieLight02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GoingToDieLight02.wav"
+}
+"npc.TeenGirl_GoingToDieLight03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GoingToDieLight03.wav"
+}
+"npc.TeenGirl_GoingToDieLight04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GoingToDieLight04.wav"
+}
+"npc.TeenGirl_GoingToDieLight05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GoingToDieLight05.wav"
+}
+"npc.TeenGirl_GoingToDieLight08"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GoingToDieLight08.wav"
+}
+"npc.TeenGirl_GoingToDieLight09"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.580000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GoingToDieLight09.wav"
+}
+"npc.TeenGirl_GoingToDieLight10"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GoingToDieLight10.wav"
+}
+"Player.TeenGirl_GoingToDieQuestion02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.620000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GoingToDieQuestion02.wav"
+}
+"Player.TeenGirl_GoingToDieQuestion05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.470000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GoingToDieQuestion05.wav"
+}
+"Player.TeenGirl_GoingToDieQuestion07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.520000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GoingToDieQuestion07.wav"
+}
+"Player.TeenGirl_GoingToDieReaction01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.510000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GoingToDieReaction01.wav"
+}
+"Player.TeenGirl_GoingToDieReaction02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GoingToDieReaction02.wav"
+}
+"Player.TeenGirl_GoingToDieReaction03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GoingToDieReaction03.wav"
+}
+"Player.TeenGirl_GoingToDieReaction04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.580000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GoingToDieReaction04.wav"
+}
+"Player.TeenGirl_GoingToDieReaction05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.580000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GoingToDieReaction05.wav"
+}
+"Player.TeenGirl_GoingToDieReaction06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.520000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GoingToDieReaction06.wav"
+}
+"Player.TeenGirl_GoingToDieReaction07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GoingToDieReaction07.wav"
+}
+"Player.TeenGirl_GoingToDieReaction09"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.570000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GoingToDieReaction09.wav"
+}
+"npc.TeenGirl_GRABBEDBYSMOKER01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\GRABBEDBYSMOKER01.WAV"
+}
+"npc.TeenGirl_GRABBEDBYSMOKER02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\GRABBEDBYSMOKER02.WAV"
+}
+"npc.TeenGirl_GRABBEDBYSMOKER03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\GRABBEDBYSMOKER03.WAV"
+}
+"npc.TeenGirl_GRABBEDBYSMOKER04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\GRABBEDBYSMOKER04.WAV"
+}
+"Player.TeenGirl_GriefFemaleGeneric01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.380000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GriefFemaleGeneric01.wav"
+}
+"Player.TeenGirl_GriefFemaleGeneric02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.440000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GriefFemaleGeneric02.wav"
+}
+"Player.TeenGirl_GriefFemaleGeneric03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.510000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GriefFemaleGeneric03.wav"
+}
+"Player.TeenGirl_GriefFemaleGeneric04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GriefFemaleGeneric04.wav"
+}
+"Player.TeenGirl_GriefFemaleGeneric05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GriefFemaleGeneric05.wav"
+}
+"Player.TeenGirl_GriefMaleGeneric01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.710000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GriefMaleGeneric01.wav"
+}
+"Player.TeenGirl_GriefMaleGeneric02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GriefMaleGeneric02.wav"
+}
+"Player.TeenGirl_GriefMaleGeneric06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GriefMaleGeneric06.wav"
+}
+"Player.TeenGirl_GriefMaleGeneric07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GriefMaleGeneric07.wav"
+}
+"Player.TeenGirl_GriefMaleGeneric08"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GriefMaleGeneric08.wav"
+}
+"Player.TeenGirl_GriefMaleGeneric09"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GriefMaleGeneric09.wav"
+}
+"Player.TeenGirl_GriefManager09"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.800000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GriefManager09.wav"
+}
+"Player.TeenGirl_GriefManager12"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\GriefManager12.wav"
+}
+"Player.TeenGirl_GriefVet04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\GriefVet04.wav"
+}
+"Player.TeenGirl_HeardHulk10"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.900000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\HeardHulk10.wav"
+}
+"Player.TeenGirl_HeardHulk11"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.880000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\HeardHulk11.wav"
+}
+"Player.TeenGirl_HeardHulk12"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.910000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\HeardHulk12.wav"
+}
+"Player.TeenGirl_HeardHulk13"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.750000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\HeardHulk13.wav"
+}
+"Player.TeenGirl_HeardHulk14"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\HeardHulk14.wav"
+}
+"Player.TeenGirl_HeardHulk16"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.920000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\HeardHulk16.wav"
+}
+"Player.TeenGirl_HeardHulk17"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\HeardHulk17.wav"
+}
+"Player.TeenGirl_HeardHulk19"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\HeardHulk19.wav"
+}
+"Player.TeenGirl_HeardHulk20"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\HeardHulk20.wav"
+}
+"Player.TeenGirl_HordeAttack02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\HordeAttack02.wav"
+}
+"Player.TeenGirl_HordeAttack06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\HordeAttack06.wav"
+}
+"Player.TeenGirl_Hurrah05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.750000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Hurrah05.wav"
+}
+"Player.TeenGirl_Hurrah14"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.650000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Hurrah14.wav"
+}
+"Player.TeenGirl_Hurrah15"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Hurrah15.wav"
+}
+"Player.TeenGirl_Hurrah23"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Hurrah23.wav"
+}
+"Player.TeenGirl_HurryUp07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\HurryUp07.wav"
+}
+"Player.TeenGirl_InsideSafeRoom03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.470000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\InsideSafeRoom03.wav"
+}
+"Player.TeenGirl_InsideSafeRoom04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.630000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\InsideSafeRoom04.wav"
+}
+"Player.TeenGirl_InsideSafeRoom06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.650000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\InsideSafeRoom06.wav"
+}
+"Player.TeenGirl_InsideSafeRoom13"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.750000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\InsideSafeRoom13.wav"
+}
+"npc.TeenGirl_InsideSafeRoom17"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\InsideSafeRoom17.wav"
+}
+"npc.TeenGirl_InsideSafeRoom18"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.750000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\InsideSafeRoom18.wav"
+}
+"npc.TeenGirl_InsideSafeRoom19"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.630000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\InsideSafeRoom19.wav"
+}
+"Player.TeenGirl_LookHere04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\LookHere04.wav"
+}
+"Player.TeenGirl_LostCall02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\LostCall02.wav"
+}
+"Player.TeenGirl_LostCall03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\LostCall03.wav"
+}
+"Player.TeenGirl_LostCall05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.900000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\LostCall05.wav"
+}
+"Player.TeenGirl_LostCall20"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.410000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\LostCall20.wav"
+}
+"Player.TeenGirl_LostCall21"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.520000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\LostCall21.wav"
+}
+"Player.TeenGirl_NameLouis09"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.450000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\NameLouis09.wav"
+}
+"Player.TeenGirl_NameLouis13"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.470000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\NameLouis13.wav"
+}
+"Player.TeenGirl_NameLouis14"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.490000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\NameLouis14.wav"
+}
+"Player.TeenGirl_NameLouis15"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\NameLouis15.wav"
+}
+"Player.TeenGirl_NameLouis16"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.460000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\NameLouis16.wav"
+}
+"Player.TeenGirl_NameLouis17"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.480000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\NameLouis17.wav"
+}
+"Player.TeenGirl_NameLouis18"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\NameLouis18.wav"
+}
+"Player.TeenGirl_NameLouis19"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\NameLouis19.wav"
+}
+"Player.TeenGirl_NameLouis20"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\NameLouis20.wav"
+}
+"Player.TeenGirl_NameLouis21"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.390000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\NameLouis21.wav"
+}
+"Player.TeenGirl_NameLouis23"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\NameLouis23.wav"
+}
+"Player.TeenGirl_NameLouis28"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.830000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\NameLouis28.wav"
+}
+"Player.TeenGirl_NameLouis29"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.880000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\NameLouis29.wav"
+}
+"npc.TeenGirl_NiceOneSarcastic01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\NiceOneSarcastic01.wav"
+}
+"npc.TeenGirl_NiceOneSarcastic02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\NiceOneSarcastic02.wav"
+}
+"npc.TeenGirl_NiceOneSarcastic03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\NiceOneSarcastic03.wav"
+}
+"npc.TeenGirl_NiceOneSarcastic04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\NiceOneSarcastic04.wav"
+}
+"npc.TeenGirl_NiceOneSarcastic05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\NiceOneSarcastic05.wav"
+}
+"Player.TeenGirl_NiceShooting01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\NiceShooting01.wav"
+}
+"Player.TeenGirl_NiceShooting02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\NiceShooting02.wav"
+}
+"Player.TeenGirl_NiceShooting03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\NiceShooting03.wav"
+}
+"Player.TeenGirl_NiceShooting05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\NiceShooting05.wav"
+}
+"Player.TeenGirl_NiceShooting06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\NiceShooting06.wav"
+}
+"Player.TeenGirl_NiceShooting07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\NiceShooting07.wav"
+}
+"Player.TeenGirl_NiceShooting08"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\NiceShooting08.wav"
+}
+"Player.TeenGirl_NiceShooting10"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.750000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\NiceShooting10.wav"
+}
+"Player.TeenGirl_NiceShooting11"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\NiceShooting11.wav"
+}
+"Player.TeenGirl_NiceShooting12"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\NiceShooting12.wav"
+}
+"Player.TeenGirl_NiceShooting13"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.560000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\NiceShooting13.wav"
+}
+"Player.TeenGirl_NiceShot09"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\NiceShot09.wav"
+}
+"Player.TeenGirl_No16"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\No16.wav"
+}
+"npc.TeenGirl_PlayerSuggestHealth06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\PlayerSuggestHealth06.wav"
+}
+"npc.TeenGirl_PlayerSuggestHealth07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\PlayerSuggestHealth07.wav"
+}
+"npc.TeenGirl_PlayerSuggestHealth08"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\PlayerSuggestHealth08.wav"
+}
+"npc.TeenGirl_PlayerSuggestHealth09"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\PlayerSuggestHealth09.wav"
+}
+"npc.TeenGirl_PLAYERSUGGESTHEALTHLOUIS01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.650000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\PLAYERSUGGESTHEALTHLOUIS01.WAV"
+}
+"Player.TeenGirl_PositiveNoise01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.720000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\PositiveNoise01.wav"
+}
+"Player.TeenGirl_PositiveNoise05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.400000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\PositiveNoise05.wav"
+}
+"Player.TeenGirl_PositiveNoise10"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\PositiveNoise10.wav"
+}
+"Player.TeenGirl_PositiveNoise11"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.450000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\PositiveNoise11.wav"
+}
+"Player.TeenGirl_PositiveNoise13"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.400000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\PositiveNoise13.wav"
+}
+"Player.TeenGirl_PositiveNoise15"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\PositiveNoise15.wav"
+}
+"Player.TeenGirl_PositiveNoise16"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.450000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\PositiveNoise16.wav"
+}
+"Player.TeenGirl_PositiveNoise17"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\PositiveNoise17.wav"
+}
+"Player.TeenGirl_PositiveNoise18"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.450000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\PositiveNoise18.wav"
+}
+"Player.TeenGirl_PositiveNoise19"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\PositiveNoise19.wav"
+}
+"Player.TeenGirl_PositiveNoise20"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\PositiveNoise20.wav"
+}
+"Player.TeenGirl_RadioUsedGeneric03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\RadioUsedGeneric03.wav"
+}
+"Player.TeenGirl_RadioUsedGeneric04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\RadioUsedGeneric04.wav"
+}
+"Player.TeenGirl_RadioUsedGeneric05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\RadioUsedGeneric05.wav"
+}
+"Player.TeenGirl_RadioUsedGeneric06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\RadioUsedGeneric06.wav"
+}
+"Player.TeenGirl_RadioUsedGeneric07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\RadioUsedGeneric07.wav"
+}
+"Player.TeenGirl_RadioUsedGeneric08"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\RadioUsedGeneric08.wav"
+}
+"Player.TeenGirl_RadioUsedPlane01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\RadioUsedPlane01.wav"
+}
+"Player.TeenGirl_ReactionApprehensive05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.420000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ReactionApprehensive05.wav"
+}
+"Player.TeenGirl_ReactionApprehensive07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.560000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ReactionApprehensive07.wav"
+}
+"Player.TeenGirl_ReactionApprehensive12"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.540000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ReactionApprehensive12.wav"
+}
+"Player.TeenGirl_ReactionApprehensive17"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.640000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ReactionApprehensive17.wav"
+}
+"Player.TeenGirl_ReactionApprehensive19"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ReactionApprehensive19.wav"
+}
+"Player.TeenGirl_ReactionApprehensive23"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.450000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ReactionApprehensive23.wav"
+}
+"Player.TeenGirl_ReactionApprehensive25"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.450000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ReactionApprehensive25.wav"
+}
+"Player.TeenGirl_ReactionNegative07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ReactionNegative07.wav"
+}
+"Player.TeenGirl_ReactionNegative20"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ReactionNegative20.wav"
+}
+"Player.TeenGirl_ReactionNegative24"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ReactionNegative24.wav"
+}
+"npc.TeenGirl_ReactionNegativeSpecial02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.850000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ReactionNegativeSpecial02.wav"
+}
+"npc.TeenGirl_ReactionNegativeSpecial04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.300000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ReactionNegativeSpecial04.wav"
+}
+"npc.TeenGirl_ReactionNegativeSpecial07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.300000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ReactionNegativeSpecial07.wav"
+}
+"npc.TeenGirl_ReactionNegativeSpecial08"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ReactionNegativeSpecial08.wav"
+}
+"npc.TeenGirl_ReactionNegativeSpecial10"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.470000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ReactionNegativeSpecial10.wav"
+}
+"Player.TeenGirl_ReactionPositive07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ReactionPositive07.wav"
+}
+"Player.TeenGirl_ReactionPositive08"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.850000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ReactionPositive08.wav"
+}
+"Player.TeenGirl_ReactionPositive11"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.470000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ReactionPositive11.wav"
+}
+"Player.TeenGirl_ReactionPositive16"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ReactionPositive16.wav"
+}
+"Player.TeenGirl_ReactionPositive17"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ReactionPositive17.wav"
+}
+"Player.TeenGirl_ReactionPositive18"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ReactionPositive18.wav"
+}
+"Player.TeenGirl_ReactionPositive19"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.520000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ReactionPositive19.wav"
+}
+"Player.TeenGirl_ReactionPositive20"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ReactionPositive20.wav"
+}
+"Player.TeenGirl_ReactionPositive21"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ReactionPositive21.wav"
+}
+"Player.TeenGirl_ReactionPositive22"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ReactionPositive22.wav"
+}
+"Player.TeenGirl_ReactionPositive23"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ReactionPositive23.wav"
+}
+"Player.TeenGirl_ReactionPositive24"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ReactionPositive24.wav"
+}
+"Player.TeenGirl_ReactionPositive25"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ReactionPositive25.wav"
+}
+"Player.TeenGirl_ReactionPositive26"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ReactionPositive26.wav"
+}
+"Player.TeenGirl_ReactionStartled03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ReactionStartled03.wav"
+}
+"Player.TeenGirl_ReactionStartled04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ReactionStartled04.wav"
+}
+"Player.TeenGirl_ReactionStartled06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.800000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ReactionStartled06.wav"
+}
+"Player.TeenGirl_ReactionStartled10"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ReactionStartled10.wav"
+}
+"Player.TeenGirl_ReactionStartled12"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.400000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ReactionStartled12.wav"
+}
+"Player.TeenGirl_ReactionStartled13"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.400000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ReactionStartled13.wav"
+}
+"Player.TeenGirl_ReactionStartled15"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.400000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ReactionStartled15.wav"
+}
+"Player.TeenGirl_ReloadingQuiet01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.350000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ReloadingQuiet01.wav"
+}
+"Player.TeenGirl_ReloadingQuiet02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ReloadingQuiet02.wav"
+}
+"Player.TeenGirl_ReloadingQuiet03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ReloadingQuiet03.wav"
+}
+"Player.TeenGirl_ReloadingQuiet04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ReloadingQuiet04.wav"
+}
+"Player.TeenGirl_ReloadingQuiet05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ReloadingQuiet05.wav"
+}
+"npc.TeenGirl_ReviveFriendA07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ReviveFriendA07.wav"
+}
+"npc.TeenGirl_ReviveFriendB13"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ReviveFriendB13.wav"
+}
+"Player.TeenGirl_SafeSpotAheadReaction07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\SafeSpotAheadReaction07.wav"
+}
+"Player.TeenGirl_SafeSpotAheadReaction11"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.430000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\SafeSpotAheadReaction11.wav"
+}
+"Player.TeenGirl_SawSomething04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.540000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\SawSomething04.wav"
+}
+"Player.TeenGirl_SawSomething07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.660000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\SawSomething07.wav"
+}
+"Player.TeenGirl_SawSomething12"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.570000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\SawSomething12.wav"
+}
+"Player.TeenGirl_SawSomething14"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.400000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\SawSomething14.wav"
+}
+"npc.TeenGirl_SCREAMWHILEPOUNCED02A"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\SCREAMWHILEPOUNCED02A.WAV"
+}
+"npc.TeenGirl_SCREAMWHILEPOUNCED02B"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\SCREAMWHILEPOUNCED02B.WAV"
+}
+"npc.TeenGirl_SCREAMWHILEPOUNCED04A"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\SCREAMWHILEPOUNCED04A.WAV"
+}
+"npc.TeenGirl_SCREAMWHILEPOUNCED04B"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\SCREAMWHILEPOUNCED04B.WAV"
+}
+"Player.TeenGirl_SelfStayTogether01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\SelfStayTogether01.wav"
+}
+"Player.TeenGirl_SelfStayTogether04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\SelfStayTogether04.wav"
+}
+"Player.TeenGirl_SelfUseHealth01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\SelfUseHealth01.wav"
+}
+"Player.TeenGirl_SelfUseHealth02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\SelfUseHealth02.wav"
+}
+"Player.TeenGirl_SelfUseHealth03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\SelfUseHealth03.wav"
+}
+"Player.TeenGirl_SelfUseHealth04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\SelfUseHealth04.wav"
+}
+"Player.TeenGirl_SelfUseHealth07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.480000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\SelfUseHealth07.wav"
+}
+"Player.TeenGirl_SelfUseHealth08"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.450000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\SelfUseHealth08.wav"
+}
+"Player.TeenGirl_SorrySarcastic02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\SorrySarcastic02.wav"
+}
+"npc.TeenGirl_SORRYSARCASTIC03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\SORRYSARCASTIC03.WAV"
+}
+"Player.TeenGirl_SorrySarcastic04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.540000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\SorrySarcastic04.wav"
+}
+"Player.TeenGirl_SorrySarcastic05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\SorrySarcastic05.wav"
+}
+"Player.TeenGirl_SorrySarcastic07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.510000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\SorrySarcastic07.wav"
+}
+"Player.TeenGirl_SorrySarcastic08"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.460000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\SorrySarcastic08.wav"
+}
+"Player.TeenGirl_SorrySarcastic12"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.470000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\SorrySarcastic12.wav"
+}
+"Player.TeenGirl_SorrySarcastic14"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\SorrySarcastic14.wav"
+}
+"Player.TeenGirl_SorrySarcastic15"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\SorrySarcastic15.wav"
+}
+"Player.TeenGirl_SorrySarcastic16"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.440000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\SorrySarcastic16.wav"
+}
+"Player.TeenGirl_SorrySarcastic17"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.620000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\SorrySarcastic17.wav"
+}
+"Player.TeenGirl_SorrySarcastic19"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.520000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\SorrySarcastic19.wav"
+}
+"npc.TeenGirl_SPOT01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.850000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\SPOT01.WAV"
+}
+"npc.TeenGirl_SPOT02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.850000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\SPOT02.WAV"
+}
+"npc.TeenGirl_SPOT03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.850000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\SPOT03.WAV"
+}
+"npc.TeenGirl_SPOT04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.850000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\SPOT04.WAV"
+}
+"npc.TeenGirl_SPOT05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.700000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\SPOT05.WAV"
+}
+"npc.TeenGirl_SPOT06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.850000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\SPOT06.WAV"
+}
+"Player.TeenGirl_SuggestHealthLouis03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.630000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\SuggestHealthLouis03.wav"
+}
+"npc.TeenGirl_Swear01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.720000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Swear01.wav"
+}
+"npc.TeenGirl_Swear03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Swear03.wav"
+}
+"npc.TeenGirl_Swear04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Swear04.wav"
+}
+"npc.TeenGirl_Swear05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Swear05.wav"
+}
+"npc.TeenGirl_Swear07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Swear07.wav"
+}
+"npc.TeenGirl_Swear08"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Swear08.wav"
+}
+"npc.TeenGirl_Swear11"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.350000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Swear11.wav"
+}
+"npc.TeenGirl_Swear15"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Swear15.wav"
+}
+"npc.TeenGirl_Swear16"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.350000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Swear16.wav"
+}
+"npc.TeenGirl_Swear17"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.350000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Swear17.wav"
+}
+"npc.TeenGirl_Swear18"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.450000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Swear18.wav"
+}
+"npc.TeenGirl_Swear19"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.450000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Swear19.wav"
+}
+"npc.TeenGirl_Swear20"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.450000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Swear20.wav"
+}
+"npc.TeenGirl_Swear21"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.450000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Swear21.wav"
+}
+"npc.TeenGirl_SwearCoupDeGrace01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\SwearCoupDeGrace01.wav"
+}
+"npc.TeenGirl_SwearCoupDeGrace02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\SwearCoupDeGrace02.wav"
+}
+"npc.TeenGirl_SwearCoupDeGrace03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\SwearCoupDeGrace03.wav"
+}
+"Player.TeenGirl_TankDeathConfirmation01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\TankDeathConfirmation01.wav"
+}
+"Player.TeenGirl_TankDeathConfirmation03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1.000000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\TankDeathConfirmation03.wav"
+}
+"Player.TeenGirl_TankDeathConfirmation06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1.000000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\TankDeathConfirmation06.wav"
+}
+"Player.TeenGirl_TankDeathConfirmation07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1.000000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\TankDeathConfirmation07.wav"
+}
+"Player.TeenGirl_TankDeathConfirmation09"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1.000000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\TankDeathConfirmation09.wav"
+}
+"Player.TeenGirl_TankDeathConfirmation11"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1.000000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\TankDeathConfirmation11.wav"
+}
+"Player.TeenGirl_Taunt01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Taunt01.wav"
+}
+"Player.TeenGirl_Taunt05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Taunt05.wav"
+}
+"Player.TeenGirl_Taunt06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Taunt06.wav"
+}
+"Player.TeenGirl_Taunt12"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\Taunt12.wav"
+}
+"Player.TeenGirl_Taunt27"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.750000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Taunt27.wav"
+}
+"Player.TeenGirl_Taunt36"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.750000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Taunt36.wav"
+}
+"Player.TeenGirl_TeamKillOnPurpose01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1.000000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\TeamKillOnPurpose01.wav"
+}
+"Player.TeenGirl_TeamKillOnPurpose02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.800000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\TeamKillOnPurpose02.wav"
+}
+"Player.TeenGirl_TeamKillOnPurpose04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\TeamKillOnPurpose04.wav"
+}
+"Player.TeenGirl_TeamKillOnPurpose06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.850000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\TeamKillOnPurpose06.wav"
+}
+"Player.TeenGirl_TeamKillOnPurpose07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.720000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\TeamKillOnPurpose07.wav"
+}
+"Player.TeenGirl_TeamKillOnPurpose08"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.850000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\TeamKillOnPurpose08.wav"
+}
+"Player.TeenGirl_TeamKillOnPurpose11"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.850000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\TeamKillOnPurpose11.wav"
+}
+"Player.TeenGirl_TeamKillOnPurpose12"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.750000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\TeamKillOnPurpose12.wav"
+}
+"npc.TeenGirl_TeenGirl_FriendlyFireFrancis01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.850000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\TeenGirl_FriendlyFireFrancis01.wav"
+}
+"npc.TeenGirl_TeenGirl_FriendlyFireLouis01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.800000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\TeenGirl_FriendlyFireLouis01.wav"
+}
+"npc.TeenGirl_TeenGirl_FriendlyFireLouis02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\TeenGirl_FriendlyFireLouis02.wav"
+}
+"npc.TeenGirl_TeenGirl_FriendlyFireLouis03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\TeenGirl_FriendlyFireLouis03.wav"
+}
+"npc.TeenGirl_TeenGirl_FriendlyFireLouis04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.800000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\TeenGirl_FriendlyFireLouis04.wav"
+}
+"npc.TeenGirl_TeenGirl_FriendlyFireLouis05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.570000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\TeenGirl_FriendlyFireLouis05.wav"
+}
+"npc.TeenGirl_Thanks10"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Thanks10.wav"
+}
+"Player.TeenGirl_ThanksSarcastic01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ThanksSarcastic01.wav"
+}
+"Player.TeenGirl_ThanksSarcastic02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ThanksSarcastic02.wav"
+}
+"Player.TeenGirl_ThanksSarcastic03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ThanksSarcastic03.wav"
+}
+"Player.TeenGirl_ThanksSarcastic04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.490000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ThanksSarcastic04.wav"
+}
+"Player.TeenGirl_ThanksSarcastic05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.490000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ThanksSarcastic05.wav"
+}
+"Player.TeenGirl_ThanksSarcastic06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.530000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ThanksSarcastic06.wav"
+}
+"Player.TeenGirl_ThanksSarcastic07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.630000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ThanksSarcastic07.wav"
+}
+"Player.TeenGirl_ThanksSarcastic08"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ThanksSarcastic08.wav"
+}
+"Player.TeenGirl_ThanksSarcastic09"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.440000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ThanksSarcastic09.wav"
+}
+"Player.TeenGirl_ThanksSarcastic10"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ThanksSarcastic10.wav"
+}
+"Player.TeenGirl_ThanksSarcastic12"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.590000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ThanksSarcastic12.wav"
+}
+"Player.TeenGirl_ThanksSarcastic13"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.510000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ThanksSarcastic13.wav"
+}
+"npc.TeenGirl_Uncertain01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.460000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Uncertain01.wav"
+}
+"npc.TeenGirl_Uncertain02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Uncertain02.wav"
+}
+"npc.TeenGirl_Uncertain03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.480000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Uncertain03.wav"
+}
+"npc.TeenGirl_Uncertain04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Uncertain04.wav"
+}
+"npc.TeenGirl_Uncertain05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Uncertain05.wav"
+}
+"npc.TeenGirl_Uncertain06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Uncertain06.wav"
+}
+"npc.TeenGirl_Uncertain07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Uncertain07.wav"
+}
+"npc.TeenGirl_Uncertain08"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Uncertain08.wav"
+}
+"npc.TeenGirl_Uncertain09"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Uncertain09.wav"
+}
+"npc.TeenGirl_Uncertain10"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Uncertain10.wav"
+}
+"npc.TeenGirl_Uncertain11"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Uncertain11.wav"
+}
+"npc.TeenGirl_Uncertain13"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.420000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Uncertain13.wav"
+}
+"npc.TeenGirl_Uncertain14"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\Uncertain14.wav"
+}
+"npc.TeenGirl_ViolenceAwe04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.850000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ViolenceAwe04.wav"
+}
+"npc.TeenGirl_ViolenceAwe07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.900000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ViolenceAwe07.wav"
+}
+"npc.TeenGirl_ViolenceAwe08"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ViolenceAwe08.wav"
+}
+"npc.TeenGirl_ViolenceAwe09"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.450000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ViolenceAwe09.wav"
+}
+"npc.TeenGirl_ViolenceAwe10"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ViolenceAwe10.wav"
+}
+"npc.TeenGirl_ViolenceAwe14"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ViolenceAwe14.wav"
+}
+"npc.TeenGirl_ViolenceAwe17"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\ViolenceAwe17.wav"
+}
+"Player.TeenGirl_VocalFidgets01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\VocalFidgets01.wav"
+}
+"Player.TeenGirl_WitchChasing01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\WitchChasing01.wav"
+}
+"Player.TeenGirl_WitchChasing02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\WitchChasing02.wav"
+}
+"Player.TeenGirl_WitchChasing03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\WitchChasing03.wav"
+}
+"Player.TeenGirl_WitchChasing04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\WitchChasing04.wav"
+}
+"npc.TeenGirl_WorldAirport0103"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldAirport0103.wav"
+}
+"npc.TeenGirl_WorldAirport0104"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldAirport0104.wav"
+}
+"npc.TeenGirl_WorldAirport0106"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldAirport0106.wav"
+}
+"npc.TeenGirl_WorldAirport0107"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldAirport0107.wav"
+}
+"npc.TeenGirl_WorldAirport0108"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.750000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\WorldAirport0108.wav"
+}
+"npc.TeenGirl_WorldAirport0109"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldAirport0109.wav"
+}
+"npc.TeenGirl_WorldAirport0110"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.800000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\WorldAirport0110.wav"
+}
+"npc.TeenGirl_WorldAirport0111"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.450000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldAirport0111.wav"
+}
+"npc.TeenGirl_WorldAirport0112"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldAirport0112.wav"
+}
+"npc.TeenGirl_WorldAirport0203"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldAirport0203.wav"
+}
+"npc.TeenGirl_WorldAirport0207"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldAirport0207.wav"
+}
+"npc.TeenGirl_WorldAirport0211"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\WorldAirport0211.wav"
+}
+"npc.TeenGirl_WorldAirport0212"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\WorldAirport0212.wav"
+}
+"npc.TeenGirl_WorldAirport0213"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\WorldAirport0213.wav"
+}
+"npc.TeenGirl_WorldAirport0215"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldAirport0215.wav"
+}
+"npc.TeenGirl_WorldAirport0221"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldAirport0221.wav"
+}
+"npc.TeenGirl_WorldAirport0222"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldAirport0222.wav"
+}
+"npc.TeenGirl_WorldAirport0223"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldAirport0223.wav"
+}
+"npc.TeenGirl_WorldAirport0228"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldAirport0228.wav"
+}
+"npc.TeenGirl_WorldAirport0229"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldAirport0229.wav"
+}
+"npc.TeenGirl_WorldAirport0231"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldAirport0231.wav"
+}
+"npc.TeenGirl_WorldAirport0306"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldAirport0306.wav"
+}
+"npc.TeenGirl_WorldAirport0401"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldAirport0401.wav"
+}
+"npc.TeenGirl_WorldAirport0406"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldAirport0406.wav"
+}
+"npc.TeenGirl_WorldAirport0410"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldAirport0410.wav"
+}
+"npc.TeenGirl_WorldAirport0411"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldAirport0411.wav"
+}
+"npc.TeenGirl_WorldAirport0417"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldAirport0417.wav"
+}
+"npc.TeenGirl_WorldAirport0419"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldAirport0419.wav"
+}
+"npc.TeenGirl_WorldAirport0420"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldAirport0420.wav"
+}
+"npc.TeenGirl_WorldAirport0421"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.780000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\WorldAirport0421.wav"
+}
+"npc.TeenGirl_WorldAirport0501"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.630000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldAirport0501.wav"
+}
+"npc.TeenGirl_WorldAirport0502"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.690000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\WorldAirport0502.wav"
+}
+"npc.TeenGirl_WorldAirport0503"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.730000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldAirport0503.wav"
+}
+"npc.TeenGirl_WorldAirport0506"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldAirport0506.wav"
+}
+"npc.TeenGirl_WorldAirport0509"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.480000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldAirport0509.wav"
+}
+"npc.TeenGirl_WorldAirport0510"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldAirport0510.wav"
+}
+"npc.TeenGirl_WorldAirport0511"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldAirport0511.wav"
+}
+"npc.TeenGirl_WorldAirport0512"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldAirport0512.wav"
+}
+"npc.TeenGirl_WorldAirport05NPC01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldAirport05NPC01.wav"
+}
+"npc.TeenGirl_WorldAirport05NPC03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.460000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldAirport05NPC03.wav"
+}
+"npc.TeenGirl_WorldAirport05NPC04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldAirport05NPC04.wav"
+}
+"npc.TeenGirl_WorldAirport05NPC05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.400000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldAirport05NPC05.wav"
+}
+"npc.TeenGirl_WorldAirport05NPC06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.530000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldAirport05NPC06.wav"
+}
+"npc.TeenGirl_WorldAirportIntro01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldAirportIntro01.wav"
+}
+"npc.TeenGirl_WorldAirportIntro02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.630000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldAirportIntro02.wav"
+}
+"npc.TeenGirl_WorldAirportIntro03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.750000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\WorldAirportIntro03.wav"
+}
+"npc.TeenGirl_WorldAirportIntro08"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.420000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldAirportIntro08.wav"
+}
+"npc.TeenGirl_WorldFarmHouse0502"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.800000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\WorldFarmHouse0502.wav"
+}
+"npc.TeenGirl_WorldFarmHouseGeneric01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldFarmHouseGeneric01.wav"
+}
+"npc.TeenGirl_WorldFarmHouseGeneric02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldFarmHouseGeneric02.wav"
+}
+"npc.TeenGirl_WorldHospital0501"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldHospital0501.wav"
+}
+"npc.TeenGirl_WorldHospitalGeneric02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldHospitalGeneric02.wav"
+}
+"npc.TeenGirl_WorldHospitalGeneric05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldHospitalGeneric05.wav"
+}
+"npc.TeenGirl_WorldHospitalGeneric06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.750000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldHospitalGeneric06.wav"
+}
+"npc.TeenGirl_WorldHospitalGeneric07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldHospitalGeneric07.wav"
+}
+"npc.TeenGirl_WorldHospitalGeneric08"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.810000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\WorldHospitalGeneric08.wav"
+}
+"npc.TeenGirl_WorldHospitalGeneric09"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldHospitalGeneric09.wav"
+}
+"npc.TeenGirl_WorldSmallTown0101"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0101.wav"
+}
+"npc.TeenGirl_WorldSmallTown0104"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.640000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0104.wav"
+}
+"npc.TeenGirl_WorldSmallTown0105"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.650000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0105.wav"
+}
+"npc.TeenGirl_WorldSmallTown0106"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.570000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0106.wav"
+}
+"npc.TeenGirl_WorldSmallTown0109"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0109.wav"
+}
+"npc.TeenGirl_WorldSmallTown0111"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0111.wav"
+}
+"npc.TeenGirl_WorldSmallTown0114"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0114.wav"
+}
+"npc.TeenGirl_WorldSmallTown0116"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0116.wav"
+}
+"npc.TeenGirl_WorldSmallTown0117"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.460000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0117.wav"
+}
+"npc.TeenGirl_WorldSmallTown0118"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.570000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0118.wav"
+}
+"npc.TeenGirl_WorldSmallTown0119"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.630000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0119.wav"
+}
+"npc.TeenGirl_WorldSmallTown0120"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.440000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0120.wav"
+}
+"npc.TeenGirl_WorldSmallTown0121"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0121.wav"
+}
+"npc.TeenGirl_WorldSmallTown0122"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0122.wav"
+}
+"npc.TeenGirl_WorldSmallTown0123"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0123.wav"
+}
+"npc.TeenGirl_WorldSmallTown0124"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.560000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0124.wav"
+}
+"npc.TeenGirl_WorldSmallTown0201"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0201.wav"
+}
+"npc.TeenGirl_WorldSmallTown0202"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.570000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0202.wav"
+}
+"npc.TeenGirl_WorldSmallTown0206"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.400000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0206.wav"
+}
+"npc.TeenGirl_WorldSmallTown0207"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0207.wav"
+}
+"npc.TeenGirl_WorldSmallTown0208"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0208.wav"
+}
+"npc.TeenGirl_WorldSmallTown0209"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0209.wav"
+}
+"npc.TeenGirl_WorldSmallTown0211"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0211.wav"
+}
+"npc.TeenGirl_WorldSmallTown0212"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0212.wav"
+}
+"npc.TeenGirl_WorldSmallTown0301"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.450000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0301.wav"
+}
+"npc.TeenGirl_WorldSmallTown0304"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.650000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0304.wav"
+}
+"npc.TeenGirl_WorldSmallTown0305"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.650000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0305.wav"
+}
+"npc.TeenGirl_WorldSmallTown0308"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.420000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0308.wav"
+}
+"npc.TeenGirl_WorldSmallTown0311"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.630000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0311.wav"
+}
+"npc.TeenGirl_WorldSmallTown0312"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.640000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0312.wav"
+}
+"npc.TeenGirl_WorldSmallTown0313"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.590000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0313.wav"
+}
+"npc.TeenGirl_WorldSmallTown0314"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0314.wav"
+}
+"npc.TeenGirl_WorldSmallTown0315"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.420000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0315.wav"
+}
+"npc.TeenGirl_WorldSmallTown0317"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0317.wav"
+}
+"npc.TeenGirl_WorldSmallTown0319"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0319.wav"
+}
+"npc.TeenGirl_WorldSmallTown0323"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0323.wav"
+}
+"npc.TeenGirl_WorldSmallTown0324"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0324.wav"
+}
+"npc.TeenGirl_WorldSmallTown03NPC01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown03NPC01.wav"
+}
+"npc.TeenGirl_WorldSmallTown03NPC02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown03NPC02.wav"
+}
+"npc.TeenGirl_WorldSmallTown03NPC04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown03NPC04.wav"
+}
+"npc.TeenGirl_WorldSmallTown03NPC06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown03NPC06.wav"
+}
+"npc.TeenGirl_WorldSmallTown0401"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0401.wav"
+}
+"npc.TeenGirl_WorldSmallTown0402"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0402.wav"
+}
+"npc.TeenGirl_WorldSmallTown0404"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.560000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0404.wav"
+}
+"npc.TeenGirl_WorldSmallTown0406"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0406.wav"
+}
+"npc.TeenGirl_WorldSmallTown0407"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0407.wav"
+}
+"npc.TeenGirl_WorldSmallTown0408"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.650000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0408.wav"
+}
+"npc.TeenGirl_WorldSmallTown0409"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0409.wav"
+}
+"npc.TeenGirl_WorldSmallTown0501"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0501.wav"
+}
+"npc.TeenGirl_WorldSmallTown0502"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.560000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0502.wav"
+}
+"npc.TeenGirl_WorldSmallTown0503"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.630000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0503.wav"
+}
+"npc.TeenGirl_WorldSmallTown0504"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.640000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0504.wav"
+}
+"npc.TeenGirl_WorldSmallTown0505"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0505.wav"
+}
+"npc.TeenGirl_WorldSmallTown0506"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.850000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0506.wav"
+}
+"npc.TeenGirl_WorldSmallTown0507"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.850000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0507.wav"
+}
+"npc.TeenGirl_WorldSmallTown0508"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.900000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0508.wav"
+}
+"npc.TeenGirl_WorldSmallTown0509"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.850000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0509.wav"
+}
+"npc.TeenGirl_WorldSmallTown0510"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.900000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0510.wav"
+}
+"npc.TeenGirl_WorldSmallTown0511"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.900000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0511.wav"
+}
+"npc.TeenGirl_WorldSmallTown0512"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.900000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0512.wav"
+}
+"npc.TeenGirl_WorldSmallTown0513"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.900000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0513.wav"
+}
+"npc.TeenGirl_WorldSmallTown0514"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.900000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0514.wav"
+}
+"npc.TeenGirl_WorldSmallTown0515"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.900000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0515.wav"
+}
+"npc.TeenGirl_WorldSmallTown0516"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.900000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0516.wav"
+}
+"npc.TeenGirl_WorldSmallTown0517"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.900000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0517.wav"
+}
+"npc.TeenGirl_WorldSmallTown0518"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.910000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0518.wav"
+}
+"npc.TeenGirl_WorldSmallTown0519"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.890000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0519.wav"
+}
+"npc.TeenGirl_WorldSmallTown0520"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.900000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0520.wav"
+}
+"npc.TeenGirl_WorldSmallTown0521"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.900000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0521.wav"
+}
+"npc.TeenGirl_WorldSmallTown0522"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.910000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTown0522.wav"
+}
+"npc.TeenGirl_WorldSmallTownIntro01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.510000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTownIntro01.wav"
+}
+"npc.TeenGirl_WorldSmallTownIntro02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTownIntro02.wav"
+}
+"npc.TeenGirl_WorldSmallTownIntro03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.510000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\WorldSmallTownIntro03.wav"
+}
+"Player.TeenGirl_YouAreWelcome24"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\TeenGirl\YouAreWelcome24.wav"
+}

@@ -519,6 +519,22 @@
         return 1;                                                 \
     }
 
+// Srcbox: GMod lets removed (NULL) panels be removed again without an error
+// ("if ( pnl ) then pnl:Remove() end" is a common pattern), so Remove on an invalid
+// panel is a no-op instead of "attempt to index an invalid Panel".
+inline int LuaNullPanelRemoveNoOp( lua_State *L )
+{
+    return 0;
+}
+
+#define LUA_METATABLE_INDEX_CHECK_PANEL( L, Target )                                             \
+    if ( Target == NULL && lua_type( L, 2 ) == LUA_TSTRING && Q_strcmp( lua_tostring( L, 2 ), "Remove" ) == 0 ) \
+    {                                                                                          \
+        lua_pushcfunction( L, LuaNullPanelRemoveNoOp );                                        \
+        return 1;                                                                              \
+    }                                                                                          \
+    LUA_METATABLE_INDEX_CHECK( L, Target )
+
 #define LUA_METATABLE_INDEX_CHECK( L, Target )                                                                                       \
     /* Invalid panels fail all checks */                                                                                             \
     if ( Target == NULL )                                                                                                            \

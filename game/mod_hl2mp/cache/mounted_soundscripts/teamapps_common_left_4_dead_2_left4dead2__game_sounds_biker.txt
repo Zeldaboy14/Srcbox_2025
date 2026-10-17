@@ -1,0 +1,4712 @@
+"Player.Biker_AnswerLostCall01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.970000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\AnswerLostCall01.wav"
+}
+"Player.Biker_AnswerLostCall02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1.000000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\AnswerLostCall02.wav"
+}
+"npc.Biker_ArriveBoat04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.700000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\ArriveBoat04.wav"
+}
+"npc.Biker_ArriveChopper03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\ArriveChopper03.wav"
+}
+"npc.Biker_ArriveChopper04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\ArriveChopper04.wav"
+}
+"Player.Biker_ArriveGeneric01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1.000000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ArriveGeneric01.wav"
+}
+"Player.Biker_ArriveGeneric02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1.000000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ArriveGeneric02.wav"
+}
+"Player.Biker_ArriveGeneric03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1.000000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ArriveGeneric03.wav"
+}
+"Player.Biker_ArriveGenericInitial01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.950000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ArriveGenericInitial01.wav"
+}
+"Player.Biker_ArriveGenericInitial02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.950000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ArriveGenericInitial02.wav"
+}
+"Player.Biker_ArriveGenericInitial03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.860000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ArriveGenericInitial03.wav"
+}
+"npc.Biker_ArrivePlane03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.870000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\ArrivePlane03.wav"
+}
+"Player.Biker_ArrivePlaneInitial02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.950000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ArrivePlaneInitial02.wav"
+}
+"npc.Biker_Biker_FriendlyFireLouis01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.700000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Biker_FriendlyFireLouis01.wav"
+}
+"npc.Biker_Biker_FriendlyFireLouis02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.810000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Biker_FriendlyFireLouis02.wav"
+}
+"npc.Biker_Biker_FriendlyFireLouis05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.860000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\Biker_FriendlyFireLouis05.wav"
+}
+"npc.Biker_Biker_FriendlyFireLouis07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.780000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Biker_FriendlyFireLouis07.wav"
+}
+"npc.Biker_Biker_FriendlyFireZoey01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.700000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Biker_FriendlyFireZoey01.wav"
+}
+"npc.Biker_Biker_FriendlyFireZoey03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\Biker_FriendlyFireZoey03.wav"
+}
+"npc.Biker_Biker_FriendlyFireZoey04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.790000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\Biker_FriendlyFireZoey04.wav"
+}
+"Player.Biker_CallForRescue05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1.000000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\CallForRescue05.wav"
+}
+"Player.Biker_CallForRescue14"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.460000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\CallForRescue14.wav"
+}
+"Player.Biker_CallForRescue15"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.460000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\CallForRescue15.wav"
+}
+"Player.Biker_ContextModifierCalm01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.620000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ContextModifierCalm01.wav"
+}
+"Player.Biker_ContextModifierCalm02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.620000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ContextModifierCalm02.wav"
+}
+"Player.Biker_ContextModifierCalm03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.480000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ContextModifierCalm03.wav"
+}
+"Player.Biker_ContextModifierCalm04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.420000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ContextModifierCalm04.wav"
+}
+"Player.Biker_ContextModifierCalm05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.520000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ContextModifierCalm05.wav"
+}
+"Player.Biker_ContextModifierCalm06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.360000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ContextModifierCalm06.wav"
+}
+"Player.Biker_ContextModifierCalm07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.470000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ContextModifierCalm07.wav"
+}
+"Player.Biker_ContextModifierCalm08"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ContextModifierCalm08.wav"
+}
+"Player.Biker_ContextModifierCalm09"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.360000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ContextModifierCalm09.wav"
+}
+"Player.Biker_ContextModifierCalm10"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.450000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ContextModifierCalm10.wav"
+}
+"Player.Biker_ContextModifierCalm11"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.440000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ContextModifierCalm11.wav"
+}
+"Player.Biker_ContextModifierCalm12"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.440000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ContextModifierCalm12.wav"
+}
+"Player.Biker_ContextModifierCalm13"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.470000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ContextModifierCalm13.wav"
+}
+"Player.Biker_ContextModifierCalm14"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ContextModifierCalm14.wav"
+}
+"Player.Biker_ContextModifierCalm15"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.480000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ContextModifierCalm15.wav"
+}
+"Player.Biker_ContextModifierCalm16"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.480000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ContextModifierCalm16.wav"
+}
+"Player.Biker_ContextModifierCalm17"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.440000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ContextModifierCalm17.wav"
+}
+"Player.Biker_ContextModifierCalm18"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.480000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ContextModifierCalm18.wav"
+}
+"Player.Biker_ContextModifierCalm19"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.570000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ContextModifierCalm19.wav"
+}
+"Player.Biker_ContextModifierCalm20"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.580000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ContextModifierCalm20.wav"
+}
+"Player.Biker_ContextModifierCalm21"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ContextModifierCalm21.wav"
+}
+"Player.Biker_ContextModifierCalm22"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ContextModifierCalm22.wav"
+}
+"Player.Biker_ContextModifierCalm23"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ContextModifierCalm23.wav"
+}
+"Player.Biker_ContextModifierCalm24"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.440000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ContextModifierCalm24.wav"
+}
+"Player.Biker_ContextModifierCalm25"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.480000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ContextModifierCalm25.wav"
+}
+"Player.Biker_ContextModifierLoud01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.906660"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ContextModifierLoud01.wav"
+}
+"Player.Biker_ContextModifierLoud02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.850000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ContextModifierLoud02.wav"
+}
+"Player.Biker_ContextModifierLoud03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.906660"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ContextModifierLoud03.wav"
+}
+"Player.Biker_ContextModifierLoud04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.906660"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ContextModifierLoud04.wav"
+}
+"Player.Biker_ContextModifierLoud05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.906660"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ContextModifierLoud05.wav"
+}
+"Player.Biker_ContextModifierLoud06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.906660"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ContextModifierLoud06.wav"
+}
+"Player.Biker_ContextModifierLoud07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.906660"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ContextModifierLoud07.wav"
+}
+"Player.Biker_ContextModifierLoud08"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.906660"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ContextModifierLoud08.wav"
+}
+"Player.Biker_ContextModifierLoud09"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.906660"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ContextModifierLoud09.wav"
+}
+"Player.Biker_ContextModifierLoud10"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.906660"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ContextModifierLoud10.wav"
+}
+"Player.Biker_ContextModifierLoud11"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.906660"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ContextModifierLoud11.wav"
+}
+"Player.Biker_ContextModifierLoud12"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.906660"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ContextModifierLoud12.wav"
+}
+"Player.Biker_ContextModifierLoud13"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.906660"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ContextModifierLoud13.wav"
+}
+"Player.Biker_ContextModifierLoud14"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.906660"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ContextModifierLoud14.wav"
+}
+"Player.Biker_ContextModifierLoud15"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.906660"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ContextModifierLoud15.wav"
+}
+"Player.Biker_ContextModifierLoud16"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.906660"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ContextModifierLoud16.wav"
+}
+"Player.Biker_ContextModifierLoud17"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.906660"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ContextModifierLoud17.wav"
+}
+"Player.Biker_ContextModifierLoud18"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.906660"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ContextModifierLoud18.wav"
+}
+"Player.Biker_ContextModifierLoud19"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.906660"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ContextModifierLoud19.wav"
+}
+"Player.Biker_ContextModifierLoud20"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.906660"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ContextModifierLoud20.wav"
+}
+"Player.Biker_ContextModifierLoud21"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.906660"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ContextModifierLoud21.wav"
+}
+"Player.Biker_ContextModifierLoud22"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.906660"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ContextModifierLoud22.wav"
+}
+"Player.Biker_ContextModifierLoud23"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.906660"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ContextModifierLoud23.wav"
+}
+"Player.Biker_ContextModifierLoud24"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.906660"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ContextModifierLoud24.wav"
+}
+"Player.Biker_ContextModifierLoud25"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.906660"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ContextModifierLoud25.wav"
+}
+"Player.Biker_CoverMe07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.450000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\CoverMe07.wav"
+}
+"npc.Biker_DoorBreaking01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.860000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\DoorBreaking01.wav"
+}
+"npc.Biker_DoorBreaking02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.780000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\DoorBreaking02.wav"
+}
+"npc.Biker_DoubleDeathResponse04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.460000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\DoubleDeathResponse04.wav"
+}
+"npc.Biker_EmphaticGoQuiet01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.310000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\EmphaticGoQuiet01.wav"
+}
+"npc.Biker_EmphaticGoQuiet02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.360000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\EmphaticGoQuiet02.wav"
+}
+"npc.Biker_EmphaticGoQuiet03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.320000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\EmphaticGoQuiet03.wav"
+}
+"Player.Biker_EmphaticNo01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.570000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\EmphaticNo01.wav"
+}
+"Player.Biker_EmphaticNo02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\EmphaticNo02.wav"
+}
+"Player.Biker_EmphaticNo03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.640000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\EmphaticNo03.wav"
+}
+"Player.Biker_EmphaticNo04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\EmphaticNo04.wav"
+}
+"Player.Biker_EmphaticNo05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.540000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\EmphaticNo05.wav"
+}
+"Player.Biker_EmphaticNo06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.630000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\EmphaticNo06.wav"
+}
+"Player.Biker_EmphaticNo07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.660000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\EmphaticNo07.wav"
+}
+"Player.Biker_EmphaticNo08"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\EmphaticNo08.wav"
+}
+"Player.Biker_EmphaticRun07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.850000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\EmphaticRun07.wav"
+}
+"npc.Biker_EmphaticRun08"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\EmphaticRun08.wav"
+}
+"Player.Biker_FriendlyFire17"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.906660"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\FriendlyFire17.wav"
+}
+"npc.Biker_FriendlyFire20"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.900000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\FriendlyFire20.wav"
+}
+"Player.Biker_Generic02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.400000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\Generic02.wav"
+}
+"npc.Biker_Generic05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.500000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Generic05.wav"
+}
+"npc.Biker_Generic06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Generic06.wav"
+}
+"npc.Biker_Generic08"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Generic08.wav"
+}
+"npc.Biker_Generic10"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Generic10.wav"
+}
+"npc.Biker_Generic11"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Generic11.wav"
+}
+"npc.Biker_Generic12"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Generic12.wav"
+}
+"npc.Biker_Generic14"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Generic14.wav"
+}
+"npc.Biker_Generic15"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.620000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Generic15.wav"
+}
+"npc.Biker_Generic17"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.590000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Generic17.wav"
+}
+"npc.Biker_Generic18"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Generic18.wav"
+}
+"npc.Biker_Generic21"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.580000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Generic21.wav"
+}
+"npc.Biker_Generic22"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Generic22.wav"
+}
+"npc.Biker_Generic23"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.650000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Generic23.wav"
+}
+"npc.Biker_Generic24"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.630000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Generic24.wav"
+}
+"npc.Biker_Generic25"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Generic25.wav"
+}
+"npc.Biker_Generic27"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.520000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Generic27.wav"
+}
+"npc.Biker_Generic28"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.570000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Generic28.wav"
+}
+"npc.Biker_Generic29"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.620000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Generic29.wav"
+}
+"npc.Biker_Generic31"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.570000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Generic31.wav"
+}
+"npc.Biker_Generic32"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Generic32.wav"
+}
+"npc.Biker_Generic33"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.570000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Generic33.wav"
+}
+"npc.Biker_Generic34"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.610000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Generic34.wav"
+}
+"npc.Biker_Generic35"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.580000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Generic35.wav"
+}
+"npc.Biker_Generic36"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.620000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Generic36.wav"
+}
+"npc.Biker_Generic37"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.610000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Generic37.wav"
+}
+"npc.Biker_Generic38"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Generic38.wav"
+}
+"npc.Biker_Generic39"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Generic39.wav"
+}
+"npc.Biker_Generic40"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Generic40.wav"
+}
+"npc.Biker_Generic41"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.620000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Generic41.wav"
+}
+"npc.Biker_Generic42"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.590000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Generic42.wav"
+}
+"npc.Biker_Generic43"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.610000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Generic43.wav"
+}
+"npc.Biker_Generic44"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.700000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Generic44.wav"
+}
+"npc.Biker_Generic45"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.610000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Generic45.wav"
+}
+"npc.Biker_Generic46"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.610000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Generic46.wav"
+}
+"npc.Biker_Generic47"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Generic47.wav"
+}
+"npc.Biker_Generic48"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.650000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Generic48.wav"
+}
+"npc.Biker_Generic49"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.630000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Generic49.wav"
+}
+"npc.Biker_Generic50"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.620000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Generic50.wav"
+}
+"npc.Biker_Generic51"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Generic51.wav"
+}
+"npc.Biker_Generic52"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.540000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Generic52.wav"
+}
+"npc.Biker_Generic53"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.740000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\Generic53.wav"
+}
+"npc.Biker_Generic54"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.730000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\Generic54.wav"
+}
+"npc.Biker_Generic55"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Generic55.wav"
+}
+"npc.Biker_Generic56"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.770000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\Generic56.wav"
+}
+"npc.Biker_Generic57"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Generic57.wav"
+}
+"npc.Biker_Generic58"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.350000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Generic58.wav"
+}
+"npc.Biker_Generic59"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.330000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Generic59.wav"
+}
+"npc.Biker_Generic61"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.910000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\Generic61.wav"
+}
+"npc.Biker_Generic62"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Generic62.wav"
+}
+"npc.Biker_Generic66"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Generic66.wav"
+}
+"npc.Biker_Generic67"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.520000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Generic67.wav"
+}
+"npc.Biker_Generic69"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.460000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Generic69.wav"
+}
+"npc.Biker_Generic73"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.490000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Generic73.wav"
+}
+"npc.Biker_GenericDirections02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\GenericDirections02.wav"
+}
+"npc.Biker_GenericDirections04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.800000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\GenericDirections04.wav"
+}
+"npc.Biker_GenericDirections06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.700000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\GenericDirections06.wav"
+}
+"npc.Biker_GenericDirections07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.700000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\GenericDirections07.wav"
+}
+"npc.Biker_GenericDirections08"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.700000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\GenericDirections08.wav"
+}
+"npc.Biker_GenericDirections09"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.700000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\GenericDirections09.wav"
+}
+"npc.Biker_GenericDirections10"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.990000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\GenericDirections10.wav"
+}
+"npc.Biker_GenericDirections12"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.670000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\GenericDirections12.wav"
+}
+"npc.Biker_GenericResponses01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.660000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\GenericResponses01.wav"
+}
+"npc.Biker_GenericResponses03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.620000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\GenericResponses03.wav"
+}
+"npc.Biker_GenericResponses05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\GenericResponses05.wav"
+}
+"npc.Biker_GenericResponses06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.630000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\GenericResponses06.wav"
+}
+"npc.Biker_GenericResponses07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\GenericResponses07.wav"
+}
+"npc.Biker_GenericResponses14"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.740000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\GenericResponses14.wav"
+}
+"npc.Biker_GenericResponses15"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.640000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\GenericResponses15.wav"
+}
+"npc.Biker_GenericResponses16"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\GenericResponses16.wav"
+}
+"npc.Biker_GenericResponses17"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.700000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\GenericResponses17.wav"
+}
+"npc.Biker_GenericResponses20"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.700000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\GenericResponses20.wav"
+}
+"npc.Biker_GenericResponses21"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\GenericResponses21.wav"
+}
+"npc.Biker_GenericResponses22"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\GenericResponses22.wav"
+}
+"npc.Biker_GenericResponses23"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\GenericResponses23.wav"
+}
+"npc.Biker_GenericResponses24"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\GenericResponses24.wav"
+}
+"npc.Biker_GettingRevived11"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\GettingRevived11.wav"
+}
+"npc.Biker_GettingRevived12"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.530000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\GettingRevived12.wav"
+}
+"npc.Biker_GoingToDieLight02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.350000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\GoingToDieLight02.wav"
+}
+"npc.Biker_GoingToDieLight03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.640000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\GoingToDieLight03.wav"
+}
+"npc.Biker_GoingToDieLight05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\GoingToDieLight05.wav"
+}
+"npc.Biker_GoingToDieLight06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.330000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\GoingToDieLight06.wav"
+}
+"npc.Biker_GoingToDieLight08"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.620000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\GoingToDieLight08.wav"
+}
+"npc.Biker_GoingToDieLight09"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.630000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\GoingToDieLight09.wav"
+}
+"npc.Biker_GoingToDieLight10"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\GoingToDieLight10.wav"
+}
+"npc.Biker_GoingToDieLight12"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\GoingToDieLight12.wav"
+}
+"npc.Biker_GRABBEDBYSMOKER01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\GRABBEDBYSMOKER01.WAV"
+}
+"npc.Biker_GRABBEDBYSMOKER01B"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\GRABBEDBYSMOKER01B.WAV"
+}
+"npc.Biker_GRABBEDBYSMOKER02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\GRABBEDBYSMOKER02.WAV"
+}
+"npc.Biker_GRABBEDBYSMOKER02B"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\GRABBEDBYSMOKER02B.WAV"
+}
+"Player.Biker_GriefFemaleGeneric01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.380000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\GriefFemaleGeneric01.wav"
+}
+"Player.Biker_GriefFemaleGeneric02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.450000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\GriefFemaleGeneric02.wav"
+}
+"Player.Biker_GriefFemaleGeneric04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.340000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\GriefFemaleGeneric04.wav"
+}
+"Player.Biker_GriefFemaleGeneric05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.340000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\GriefFemaleGeneric05.wav"
+}
+"Player.Biker_GriefFemaleGeneric06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.380000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\GriefFemaleGeneric06.wav"
+}
+"Player.Biker_GriefMaleGeneric01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.350000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\GriefMaleGeneric01.wav"
+}
+"Player.Biker_GriefMaleGeneric02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.400000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\GriefMaleGeneric02.wav"
+}
+"Player.Biker_GriefMaleGeneric03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.420000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\GriefMaleGeneric03.wav"
+}
+"Player.Biker_GriefMaleGeneric04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.440000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\GriefMaleGeneric04.wav"
+}
+"npc.Biker_GriefMaleGeneric05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.300000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\GriefMaleGeneric05.wav"
+}
+"Player.Biker_GriefTeengirl03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.400000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\GriefTeengirl03.wav"
+}
+"npc.Biker_HeardBoomer07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\HeardBoomer07.wav"
+}
+"npc.Biker_HeardBoomer08"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.630000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\HeardBoomer08.wav"
+}
+"npc.Biker_HeardBoomer09"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.660000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\HeardBoomer09.wav"
+}
+"npc.Biker_HeardBoomer10"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\HeardBoomer10.wav"
+}
+"Player.Biker_HeardHulk01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1.000000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\HeardHulk01.wav"
+}
+"Player.Biker_HeardHulk02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1.000000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\HeardHulk02.wav"
+}
+"Player.Biker_HeardHulk03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1.000000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\HeardHulk03.wav"
+}
+"Player.Biker_HeardHulk04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1.000000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\HeardHulk04.wav"
+}
+"Player.Biker_HeardHulk05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.920000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\HeardHulk05.wav"
+}
+"Player.Biker_HeardHulk06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.906660"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\HeardHulk06.wav"
+}
+"npc.Biker_HeardHulk07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\HeardHulk07.wav"
+}
+"npc.Biker_HeardHulk08"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.800000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\HeardHulk08.wav"
+}
+"npc.Biker_HeardHulk09"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.800000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\HeardHulk09.wav"
+}
+"npc.Biker_HeardHulk10"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.830000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\HeardHulk10.wav"
+}
+"npc.Biker_HeardHulk11"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.890000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\HeardHulk11.wav"
+}
+"npc.Biker_HordeAttack01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\HordeAttack01.wav"
+}
+"npc.Biker_HordeAttack02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\HordeAttack02.wav"
+}
+"npc.Biker_HordeAttack03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\HordeAttack03.wav"
+}
+"npc.Biker_HordeAttack04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\HordeAttack04.wav"
+}
+"npc.Biker_HordeAttack05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\HordeAttack05.wav"
+}
+"Player.Biker_HurryUp07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.906660"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\HurryUp07.wav"
+}
+"npc.Biker_InsideSafeRoom01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.650000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\InsideSafeRoom01.wav"
+}
+"npc.Biker_InsideSafeRoom03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.840000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\InsideSafeRoom03.wav"
+}
+"npc.Biker_InsideSafeRoom04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.870000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\InsideSafeRoom04.wav"
+}
+"npc.Biker_InsideSafeRoom07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\InsideSafeRoom07.wav"
+}
+"npc.Biker_InsideSafeRoom08"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\InsideSafeRoom08.wav"
+}
+"npc.Biker_InsideSafeRoom09"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\InsideSafeRoom09.wav"
+}
+"npc.Biker_InsideSafeRoom11"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.660000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\InsideSafeRoom11.wav"
+}
+"npc.Biker_InsideSafeRoom12"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.620000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\InsideSafeRoom12.wav"
+}
+"npc.Biker_InsideSafeRoom13"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.640000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\InsideSafeRoom13.wav"
+}
+"npc.Biker_InsideSafeRoom14"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.510000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\InsideSafeRoom14.wav"
+}
+"npc.Biker_InsideSafeRoom15"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.960000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\InsideSafeRoom15.wav"
+}
+"npc.Biker_InsideSafeRoom16"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.980000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\InsideSafeRoom16.wav"
+}
+"npc.Biker_InsideSafeRoom17"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.990000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\InsideSafeRoom17.wav"
+}
+"npc.Biker_InsideSafeRoom20"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.610000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\InsideSafeRoom20.wav"
+}
+"npc.Biker_InsideSafeRoom24"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.690000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\InsideSafeRoom24.wav"
+}
+"npc.Biker_InsideSafeRoom25"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.750000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\InsideSafeRoom25.wav"
+}
+"npc.Biker_InsideSafeRoom26"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\InsideSafeRoom26.wav"
+}
+"Player.Biker_LostCall02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.906660"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\LostCall02.wav"
+}
+"Player.Biker_LostCall03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.906660"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\LostCall03.wav"
+}
+"Player.Biker_LostCall06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.850000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\LostCall06.wav"
+}
+"Player.Biker_LostCall07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.850000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\LostCall07.wav"
+}
+"Player.Biker_MoveOn06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.720000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\MoveOn06.wav"
+}
+"npc.Biker_NiceJob20"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\NiceJob20.wav"
+}
+"npc.Biker_NiceOneSarcastic01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\NiceOneSarcastic01.wav"
+}
+"npc.Biker_NiceOneSarcastic02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\NiceOneSarcastic02.wav"
+}
+"npc.Biker_NiceOneSarcastic03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\NiceOneSarcastic03.wav"
+}
+"npc.Biker_NiceOneSarcastic04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\NiceOneSarcastic04.wav"
+}
+"Player.Biker_NiceShooting01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.650000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\NiceShooting01.wav"
+}
+"Player.Biker_NiceShooting02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.650000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\NiceShooting02.wav"
+}
+"Player.Biker_NiceShooting03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.650000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\NiceShooting03.wav"
+}
+"Player.Biker_NiceShooting04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.650000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\NiceShooting04.wav"
+}
+"Player.Biker_NiceShooting05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.620000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\NiceShooting05.wav"
+}
+"Player.Biker_NiceShooting06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.650000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\NiceShooting06.wav"
+}
+"Player.Biker_NiceShooting07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.620000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\NiceShooting07.wav"
+}
+"Player.Biker_NiceShooting08"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\NiceShooting08.wav"
+}
+"Player.Biker_NiceShooting09"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\NiceShooting09.wav"
+}
+"Player.Biker_NiceShooting10"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.720000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\NiceShooting10.wav"
+}
+"Player.Biker_NiceShooting11"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.720000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\NiceShooting11.wav"
+}
+"Player.Biker_NiceShot05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.580000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\NiceShot05.wav"
+}
+"Player.Biker_NiceShot06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.650000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\NiceShot06.wav"
+}
+"npc.Biker_NiceShot11"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\NiceShot11.wav"
+}
+"npc.Biker_NiceShot12"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.560000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\NiceShot12.wav"
+}
+"Player.Biker_No01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.850000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\No01.wav"
+}
+"Player.Biker_No10"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\No10.wav"
+}
+"npc.Biker_PlayerRevive01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.610000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\PlayerRevive01.wav"
+}
+"npc.Biker_PlayerRevive02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\PlayerRevive02.wav"
+}
+"npc.Biker_PlayerRevive04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.660000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\PlayerRevive04.wav"
+}
+"npc.Biker_PlayerRevive05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\PlayerRevive05.wav"
+}
+"npc.Biker_PlayerRevive06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.640000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\PlayerRevive06.wav"
+}
+"npc.Biker_PlayerRevive07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\PlayerRevive07.wav"
+}
+"npc.Biker_PlayerSuggestHealth01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\PlayerSuggestHealth01.wav"
+}
+"npc.Biker_PlayerSuggestHealth02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\PlayerSuggestHealth02.wav"
+}
+"npc.Biker_PlayerSuggestHealth03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.650000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\PlayerSuggestHealth03.wav"
+}
+"Player.Biker_PositiveNoise01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.650000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\PositiveNoise01.wav"
+}
+"Player.Biker_PositiveNoise03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.580000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\PositiveNoise03.wav"
+}
+"Player.Biker_PositiveNoise04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.450000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\PositiveNoise04.wav"
+}
+"Player.Biker_RadioUsedGeneric01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.906660"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\RadioUsedGeneric01.wav"
+}
+"Player.Biker_RadioUsedGeneric04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.906660"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\RadioUsedGeneric04.wav"
+}
+"Player.Biker_RadioUsedGeneric06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.850000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\RadioUsedGeneric06.wav"
+}
+"Player.Biker_RadioUsedGeneric07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.906660"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\RadioUsedGeneric07.wav"
+}
+"Player.Biker_RadioUsedPlane01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.906660"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\RadioUsedPlane01.wav"
+}
+"Player.Biker_ReactionApprehensive01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.460000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ReactionApprehensive01.wav"
+}
+"Player.Biker_ReactionApprehensive02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.440000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ReactionApprehensive02.wav"
+}
+"Player.Biker_ReactionApprehensive04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.430000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ReactionApprehensive04.wav"
+}
+"npc.Biker_ReactionApprehensive05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.440000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\ReactionApprehensive05.wav"
+}
+"npc.Biker_ReactionApprehensive06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.330000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\ReactionApprehensive06.wav"
+}
+"Player.Biker_ReactionNegative01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.250000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ReactionNegative01.wav"
+}
+"Player.Biker_ReactionPositive02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.850000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ReactionPositive02.wav"
+}
+"Player.Biker_ReactionPositive05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.790000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ReactionPositive05.wav"
+}
+"Player.Biker_ReactionPositive07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.906660"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ReactionPositive07.wav"
+}
+"npc.Biker_ReloadingQuiet01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.350000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\ReloadingQuiet01.wav"
+}
+"npc.Biker_ReloadingQuiet02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.350000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\ReloadingQuiet02.wav"
+}
+"Player.Biker_ReviveCriticalFriend01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.570000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\ReviveCriticalFriend01.wav"
+}
+"npc.Biker_ReviveFriend08"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.580000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\ReviveFriend08.wav"
+}
+"npc.Biker_ReviveFriend09"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\ReviveFriend09.wav"
+}
+"npc.Biker_ReviveFriend10"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\ReviveFriend10.wav"
+}
+"npc.Biker_ReviveFriend11"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.570000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\ReviveFriend11.wav"
+}
+"npc.Biker_ReviveFriendA06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.540000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\ReviveFriendA06.wav"
+}
+"Player.Biker_SafeSpotAhead01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.906660"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\SafeSpotAhead01.wav"
+}
+"Player.Biker_SafeSpotAhead02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.906660"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\SafeSpotAhead02.wav"
+}
+"Player.Biker_SafeSpotAhead04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.906660"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\SafeSpotAhead04.wav"
+}
+"Player.Biker_SafeSpotAhead05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.906660"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\SafeSpotAhead05.wav"
+}
+"npc.Biker_SafeSpotAheadReaction06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.660000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\SafeSpotAheadReaction06.wav"
+}
+"npc.Biker_SafeSpotAheadReaction08"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.650000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\SafeSpotAheadReaction08.wav"
+}
+"Player.Biker_SawSomething01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.640000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\SawSomething01.wav"
+}
+"Player.Biker_SawSomething02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.510000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\SawSomething02.wav"
+}
+"Player.Biker_SawSomething03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.560000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\SawSomething03.wav"
+}
+"Player.Biker_SawSomething04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.530000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\SawSomething04.wav"
+}
+"Player.Biker_SawSomething05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.520000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\SawSomething05.wav"
+}
+"Player.Biker_Sorry11"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.450000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\Sorry11.wav"
+}
+"npc.Biker_SPOT01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\SPOT01.WAV"
+}
+"npc.Biker_SPOT02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\SPOT02.WAV"
+}
+"npc.Biker_SPOT03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\SPOT03.WAV"
+}
+"npc.Biker_SPOT04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\SPOT04.WAV"
+}
+"npc.Biker_SPOT05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\SPOT05.WAV"
+}
+"npc.Biker_SPOT06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\SPOT06.WAV"
+}
+"npc.Biker_SPOT07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\SPOT07.WAV"
+}
+"npc.Biker_SPOTWEAPON01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\SPOTWEAPON01.WAV"
+}
+"Player.Biker_StayTogether10"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.740000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\StayTogether10.wav"
+}
+"npc.Biker_Swear05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\Swear05.wav"
+}
+"npc.Biker_Swear07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.830000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Swear07.wav"
+}
+"npc.Biker_Swear11"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.820000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Swear11.wav"
+}
+"npc.Biker_Swear13"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.820000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\Swear13.wav"
+}
+"npc.Biker_SwearCoupDeGrace02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.990000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\SwearCoupDeGrace02.wav"
+}
+"npc.Biker_SwearCoupDeGrace03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.770000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\SwearCoupDeGrace03.wav"
+}
+"npc.Biker_SwearCoupDeGrace04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.820000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\SwearCoupDeGrace04.wav"
+}
+"npc.Biker_SwearCoupDeGrace05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.850000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\SwearCoupDeGrace05.wav"
+}
+"npc.Biker_SwearCoupDeGrace06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\SwearCoupDeGrace06.wav"
+}
+"npc.Biker_SwearCoupDeGrace07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.930000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\SwearCoupDeGrace07.wav"
+}
+"npc.Biker_SwearCoupDeGrace08"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.840000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\SwearCoupDeGrace08.wav"
+}
+"npc.Biker_SwearCoupDeGrace09"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.890000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\SwearCoupDeGrace09.wav"
+}
+"npc.Biker_SwearCoupDeGrace10"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.990000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\SwearCoupDeGrace10.wav"
+}
+"npc.Biker_SwearCoupDeGrace11"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\SwearCoupDeGrace11.wav"
+}
+"npc.Biker_SwearCoupDeGrace12"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\SwearCoupDeGrace12.wav"
+}
+"npc.Biker_SwearCoupDeGrace13"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\SwearCoupDeGrace13.wav"
+}
+"npc.Biker_SwearCoupDeGrace14"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\SwearCoupDeGrace14.wav"
+}
+"npc.Biker_SwearCoupDeGrace15"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\SwearCoupDeGrace15.wav"
+}
+"Player.Biker_TeamKillOnPurpose01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.580000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\TeamKillOnPurpose01.wav"
+}
+"Player.Biker_TeamKillOnPurpose02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\TeamKillOnPurpose02.wav"
+}
+"Player.Biker_TeamKillOnPurpose03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.520000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\TeamKillOnPurpose03.wav"
+}
+"Player.Biker_TeamKillOnPurpose04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.530000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\TeamKillOnPurpose04.wav"
+}
+"Player.Biker_TeamKillOnPurpose05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.810000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\TeamKillOnPurpose05.wav"
+}
+"Player.Biker_TeamKillOnPurpose06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.810000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\TeamKillOnPurpose06.wav"
+}
+"Player.Biker_TeamKillOnPurpose07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.850000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\TeamKillOnPurpose07.wav"
+}
+"Player.Biker_TeamKillOnPurpose08"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.770000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\TeamKillOnPurpose08.wav"
+}
+"Player.Biker_TeamKillOnPurpose10"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.830000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\TeamKillOnPurpose10.wav"
+}
+"npc.Biker_Uncertain01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.580000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Uncertain01.wav"
+}
+"npc.Biker_Uncertain02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Uncertain02.wav"
+}
+"npc.Biker_Uncertain03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.480000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Uncertain03.wav"
+}
+"npc.Biker_Uncertain04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.640000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Uncertain04.wav"
+}
+"npc.Biker_Uncertain05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.650000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Uncertain05.wav"
+}
+"npc.Biker_Uncertain06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.650000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Uncertain06.wav"
+}
+"npc.Biker_Uncertain07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Uncertain07.wav"
+}
+"npc.Biker_Uncertain08"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Uncertain08.wav"
+}
+"npc.Biker_Vampires02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Vampires02.wav"
+}
+"npc.Biker_Vampires03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Vampires03.wav"
+}
+"npc.Biker_Vampires04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Vampires04.wav"
+}
+"npc.Biker_Vampires05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Vampires05.wav"
+}
+"npc.Biker_Vampires07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Vampires07.wav"
+}
+"npc.Biker_Vampires08"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Vampires08.wav"
+}
+"npc.Biker_Vampires09"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Vampires09.wav"
+}
+"npc.Biker_Vampires11"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Vampires11.wav"
+}
+"npc.Biker_Vampires12"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Vampires12.wav"
+}
+"npc.Biker_Vampires13"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\Vampires13.wav"
+}
+"npc.Biker_ViolenceAwe01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.540000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\ViolenceAwe01.wav"
+}
+"npc.Biker_VocalFidgets01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\VocalFidgets01.wav"
+}
+"npc.Biker_VocalFidgets02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\VocalFidgets02.wav"
+}
+"npc.Biker_VocalFidgets03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\VocalFidgets03.wav"
+}
+"npc.Biker_VocalFidgets04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\VocalFidgets04.wav"
+}
+"npc.Biker_VocalFidgets05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\VocalFidgets05.wav"
+}
+"npc.Biker_VocalFidgets06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\VocalFidgets06.wav"
+}
+"npc.Biker_VocalFidgets07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\VocalFidgets07.wav"
+}
+"npc.Biker_VocalFidgets08"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\VocalFidgets08.wav"
+}
+"Player.Biker_WaitHere03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.906660"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\WaitHere03.wav"
+}
+"npc.Biker_WARN01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WARN01.WAV"
+}
+"npc.Biker_WARN02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WARN02.WAV"
+}
+"npc.Biker_WARN03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WARN03.WAV"
+}
+"npc.Biker_WARN04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WARN04.WAV"
+}
+"npc.Biker_WARN05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WARN05.WAV"
+}
+"npc.Biker_WARN06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WARN06.WAV"
+}
+"npc.Biker_WARN07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WARN07.WAV"
+}
+"npc.Biker_WARN08"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WARN08.WAV"
+}
+"npc.Biker_WARN09"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WARN09.WAV"
+}
+"npc.Biker_WARN10"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WARN10.WAV"
+}
+"npc.Biker_WARN11"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WARN11.WAV"
+}
+"npc.Biker_WARN12"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WARN12.WAV"
+}
+"npc.Biker_WARN13"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WARN13.WAV"
+}
+"npc.Biker_WARN14"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WARN14.WAV"
+}
+"npc.Biker_WARN15"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WARN15.WAV"
+}
+"Player.Biker_WarnCharger01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\warncharger01.wav"
+}
+"Player.Biker_WitchChasing01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.906660"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\WitchChasing01.wav"
+}
+"Player.Biker_WitchChasing02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.906660"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\WitchChasing02.wav"
+}
+"Player.Biker_WitchChasing03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.906660"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\WitchChasing03.wav"
+}
+"Player.Biker_WitchChasing04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.860000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\WitchChasing04.wav"
+}
+"npc.Biker_WorldAirport0103"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.590000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldAirport0103.wav"
+}
+"npc.Biker_WorldAirport0108"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldAirport0108.wav"
+}
+"npc.Biker_WorldAirport0109"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.710000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldAirport0109.wav"
+}
+"npc.Biker_WorldAirport0110"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.810000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldAirport0110.wav"
+}
+"npc.Biker_WorldAirport0111"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldAirport0111.wav"
+}
+"npc.Biker_WorldAirport0204"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldAirport0204.wav"
+}
+"npc.Biker_WorldAirport0211"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.750000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldAirport0211.wav"
+}
+"npc.Biker_WorldAirport0212"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.800000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldAirport0212.wav"
+}
+"npc.Biker_WorldAirport0213"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.720000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldAirport0213.wav"
+}
+"npc.Biker_WorldAirport0214"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.900000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldAirport0214.wav"
+}
+"npc.Biker_WorldAirport0218"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldAirport0218.wav"
+}
+"npc.Biker_WorldAirport0219"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldAirport0219.wav"
+}
+"npc.Biker_WorldAirport0220"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldAirport0220.wav"
+}
+"npc.Biker_WorldAirport0225"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.700000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldAirport0225.wav"
+}
+"npc.Biker_WorldAirport0226"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.700000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldAirport0226.wav"
+}
+"npc.Biker_WorldAirport0228"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldAirport0228.wav"
+}
+"npc.Biker_WorldAirport0230"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldAirport0230.wav"
+}
+"npc.Biker_WorldAirport0232"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.570000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldAirport0232.wav"
+}
+"npc.Biker_WorldAirport0307"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldAirport0307.wav"
+}
+"npc.Biker_WorldAirport0401"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldAirport0401.wav"
+}
+"npc.Biker_WorldAirport0405"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldAirport0405.wav"
+}
+"npc.Biker_WorldAirport0406"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldAirport0406.wav"
+}
+"npc.Biker_WorldAirport0407"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.800000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldAirport0407.wav"
+}
+"npc.Biker_WorldAirport0408"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldAirport0408.wav"
+}
+"npc.Biker_WorldAirport0409"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.800000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldAirport0409.wav"
+}
+"npc.Biker_WorldAirport0411"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldAirport0411.wav"
+}
+"npc.Biker_WorldAirport0417"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldAirport0417.wav"
+}
+"npc.Biker_WorldAirport0418"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.650000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldAirport0418.wav"
+}
+"npc.Biker_WorldAirport0422"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldAirport0422.wav"
+}
+"npc.Biker_WorldAirport0427"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.520000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldAirport0427.wav"
+}
+"npc.Biker_WorldAirport0428"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.420000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldAirport0428.wav"
+}
+"npc.Biker_WorldAirport0429"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.450000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldAirport0429.wav"
+}
+"npc.Biker_WorldAirport0501"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldAirport0501.wav"
+}
+"npc.Biker_WorldAirport0502"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldAirport0502.wav"
+}
+"npc.Biker_WorldAirport0503"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldAirport0503.wav"
+}
+"npc.Biker_WorldAirport0504"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.720000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldAirport0504.wav"
+}
+"npc.Biker_WorldAirport0505"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.850000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldAirport0505.wav"
+}
+"npc.Biker_WorldAirport0506"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.850000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldAirport0506.wav"
+}
+"npc.Biker_WorldAirport0507"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.850000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldAirport0507.wav"
+}
+"npc.Biker_WorldAirport0509"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldAirport0509.wav"
+}
+"npc.Biker_WorldAirport0510"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldAirport0510.wav"
+}
+"npc.Biker_WorldAirport0511"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldAirport0511.wav"
+}
+"npc.Biker_WorldAirport0512"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldAirport0512.wav"
+}
+"npc.Biker_WorldAirport05NPC03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldAirport05NPC03.wav"
+}
+"npc.Biker_WorldAirport05NPC05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.350000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldAirport05NPC05.wav"
+}
+"npc.Biker_WorldAirport05NPC06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.910000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldAirport05NPC06.wav"
+}
+"npc.Biker_WorldAirport05NPC07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldAirport05NPC07.wav"
+}
+"npc.Biker_WorldAirport05NPC08"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.900000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldAirport05NPC08.wav"
+}
+"npc.Biker_WorldAirport05NPC09"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.710000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldAirport05NPC09.wav"
+}
+"npc.Biker_WorldAirport05NPC11"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.930000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldAirport05NPC11.wav"
+}
+"npc.Biker_WorldAirport05NPC12"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.900000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldAirport05NPC12.wav"
+}
+"npc.Biker_WorldAirport05NPC13"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.480000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldAirport05NPC13.wav"
+}
+"npc.Biker_WorldAirport05NPC14"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.590000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldAirport05NPC14.wav"
+}
+"npc.Biker_WorldAirport05NPC15"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldAirport05NPC15.wav"
+}
+"npc.Biker_WorldAirport05NPC16"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldAirport05NPC16.wav"
+}
+"npc.Biker_WorldAirport05NPC17"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.700000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldAirport05NPC17.wav"
+}
+"npc.Biker_WorldAirport05NPC18"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.520000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldAirport05NPC18.wav"
+}
+"npc.Biker_WorldAirport05NPC19"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.590000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldAirport05NPC19.wav"
+}
+"npc.Biker_WorldAirport05NPC20"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldAirport05NPC20.wav"
+}
+"npc.Biker_WorldAirport05NPC21"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.750000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldAirport05NPC21.wav"
+}
+"npc.Biker_WorldFarmHouse0102"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.570000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0102.wav"
+}
+"npc.Biker_WorldFarmHouse0103"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.580000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0103.wav"
+}
+"npc.Biker_WorldFarmHouse0104"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0104.wav"
+}
+"npc.Biker_WorldFarmHouse0106"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.640000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0106.wav"
+}
+"npc.Biker_WorldFarmHouse0110"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.840000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0110.wav"
+}
+"npc.Biker_WorldFarmHouse0111"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.640000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0111.wav"
+}
+"npc.Biker_WorldFarmHouse0113"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.650000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0113.wav"
+}
+"npc.Biker_WorldFarmHouse0114"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0114.wav"
+}
+"npc.Biker_WorldFarmHouse0115"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.590000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0115.wav"
+}
+"npc.Biker_WorldFarmHouse0116"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.650000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0116.wav"
+}
+"npc.Biker_WorldFarmHouse0201"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.640000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0201.wav"
+}
+"npc.Biker_WorldFarmHouse0202"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0202.wav"
+}
+"npc.Biker_WorldFarmHouse0205"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.670000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0205.wav"
+}
+"npc.Biker_WorldFarmHouse0209"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.780000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0209.wav"
+}
+"npc.Biker_WorldFarmHouse0210"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.620000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0210.wav"
+}
+"npc.Biker_WorldFarmHouse0211"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.640000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0211.wav"
+}
+"npc.Biker_WorldFarmHouse0213"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0213.wav"
+}
+"npc.Biker_WorldFarmHouse0301"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0301.wav"
+}
+"npc.Biker_WorldFarmHouse0303"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0303.wav"
+}
+"npc.Biker_WorldFarmHouse0304"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0304.wav"
+}
+"npc.Biker_WorldFarmHouse0305"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0305.wav"
+}
+"npc.Biker_WorldFarmHouse0306"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0306.wav"
+}
+"npc.Biker_WorldFarmHouse0307"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.560000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0307.wav"
+}
+"npc.Biker_WorldFarmHouse0308"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.660000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0308.wav"
+}
+"npc.Biker_WorldFarmHouse0309"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.660000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0309.wav"
+}
+"npc.Biker_WorldFarmHouse0310"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.720000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0310.wav"
+}
+"npc.Biker_WorldFarmHouse0311"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.990000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0311.wav"
+}
+"npc.Biker_WorldFarmHouse0319"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.700000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0319.wav"
+}
+"npc.Biker_WorldFarmHouse0320"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.660000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0320.wav"
+}
+"npc.Biker_WorldFarmHouse0321"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.760000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0321.wav"
+}
+"npc.Biker_WorldFarmHouse0322"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.630000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0322.wav"
+}
+"npc.Biker_WorldFarmHouse0323"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0323.wav"
+}
+"npc.Biker_WorldFarmHouse0324"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.850000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0324.wav"
+}
+"npc.Biker_WorldFarmHouse0325"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.850000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0325.wav"
+}
+"npc.Biker_WorldFarmHouse0401"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.780000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0401.wav"
+}
+"npc.Biker_WorldFarmHouse0402"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.770000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0402.wav"
+}
+"npc.Biker_WorldFarmHouse0404"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0404.wav"
+}
+"npc.Biker_WorldFarmHouse0405"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0405.wav"
+}
+"npc.Biker_WorldFarmHouse0407"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.860000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0407.wav"
+}
+"npc.Biker_WorldFarmHouse0408"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.770000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0408.wav"
+}
+"npc.Biker_WorldFarmHouse0409"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.590000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0409.wav"
+}
+"npc.Biker_WorldFarmHouse0410"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.580000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0410.wav"
+}
+"npc.Biker_WorldFarmHouse0411"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.570000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0411.wav"
+}
+"npc.Biker_WorldFarmHouse0413"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0413.wav"
+}
+"npc.Biker_WorldFarmHouse0414"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.820000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0414.wav"
+}
+"npc.Biker_WorldFarmHouse0415"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.880000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0415.wav"
+}
+"npc.Biker_WorldFarmHouse0417"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.910000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0417.wav"
+}
+"npc.Biker_WorldFarmHouse0418"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.900000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0418.wav"
+}
+"npc.Biker_WorldFarmHouse0419"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0419.wav"
+}
+"npc.Biker_WorldFarmHouse0420"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.570000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0420.wav"
+}
+"npc.Biker_WorldFarmHouse0504"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.890000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0504.wav"
+}
+"npc.Biker_WorldFarmHouse0505"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.850000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0505.wav"
+}
+"npc.Biker_WorldFarmHouse0506"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.800000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0506.wav"
+}
+"npc.Biker_WorldFarmHouse0507"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.560000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0507.wav"
+}
+"npc.Biker_WorldFarmHouse0508"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.780000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0508.wav"
+}
+"npc.Biker_WorldFarmHouse0509"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.850000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0509.wav"
+}
+"npc.Biker_WorldFarmHouse0510"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.840000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0510.wav"
+}
+"npc.Biker_WorldFarmHouse0511"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0511.wav"
+}
+"npc.Biker_WorldFarmHouse0512"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.940000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0512.wav"
+}
+"npc.Biker_WorldFarmHouse0513"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.900000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0513.wav"
+}
+"npc.Biker_WorldFarmHouse0515"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.900000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0515.wav"
+}
+"npc.Biker_WorldFarmHouse0517"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.700000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0517.wav"
+}
+"npc.Biker_WorldFarmHouse0518"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.900000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0518.wav"
+}
+"npc.Biker_WorldFarmHouse0519"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.900000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0519.wav"
+}
+"npc.Biker_WorldFarmHouse0521"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.860000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0521.wav"
+}
+"npc.Biker_WorldFarmHouse0522"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.700000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0522.wav"
+}
+"npc.Biker_WorldFarmHouse0529"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.730000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouse0529.wav"
+}
+"npc.Biker_WorldFarmHouseGeneric01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouseGeneric01.wav"
+}
+"npc.Biker_WorldFarmHouseGeneric02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouseGeneric02.wav"
+}
+"npc.Biker_WorldFarmHouseIntro02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouseIntro02.wav"
+}
+"npc.Biker_WorldFarmHouseIntro04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouseIntro04.wav"
+}
+"npc.Biker_WorldFarmHouseIntro06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.580000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldFarmHouseIntro06.wav"
+}
+"npc.Biker_WorldFarmhouseNPC07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.580000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldFarmhouseNPC07.wav"
+}
+"npc.Biker_WorldFarmhouseNPC08"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldFarmhouseNPC08.wav"
+}
+"npc.Biker_WorldHospital0304"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldHospital0304.wav"
+}
+"npc.Biker_WorldHospital0402"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.660000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldHospital0402.wav"
+}
+"npc.Biker_WorldHospital0405"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldHospital0405.wav"
+}
+"npc.Biker_WorldHospital0411"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldHospital0411.wav"
+}
+"npc.Biker_WorldHospital0502"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldHospital0502.wav"
+}
+"npc.Biker_WorldHospitalGeneric01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.630000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldHospitalGeneric01.wav"
+}
+"npc.Biker_WorldHospitalGeneric02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.570000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldHospitalGeneric02.wav"
+}
+"npc.Biker_WorldHospitalGeneric03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldHospitalGeneric03.wav"
+}
+"npc.Biker_WorldHospitalGeneric04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.610000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldHospitalGeneric04.wav"
+}
+"npc.Biker_WorldSmallTown0103"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldSmallTown0103.wav"
+}
+"npc.Biker_WorldSmallTown0104"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.720000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldSmallTown0104.wav"
+}
+"npc.Biker_WorldSmallTown0106"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldSmallTown0106.wav"
+}
+"npc.Biker_WorldSmallTown0107"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.660000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldSmallTown0107.wav"
+}
+"npc.Biker_WorldSmallTown0108"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.740000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldSmallTown0108.wav"
+}
+"npc.Biker_WorldSmallTown0109"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.630000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldSmallTown0109.wav"
+}
+"npc.Biker_WorldSmallTown0110"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.880000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldSmallTown0110.wav"
+}
+"npc.Biker_WorldSmallTown0111"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.750000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldSmallTown0111.wav"
+}
+"npc.Biker_WorldSmallTown0112"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldSmallTown0112.wav"
+}
+"npc.Biker_WorldSmallTown0113"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.720000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldSmallTown0113.wav"
+}
+"npc.Biker_WorldSmallTown0115"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.800000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldSmallTown0115.wav"
+}
+"npc.Biker_WorldSmallTown0118"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.580000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldSmallTown0118.wav"
+}
+"npc.Biker_WorldSmallTown0202"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.640000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldSmallTown0202.wav"
+}
+"npc.Biker_WorldSmallTown0205"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.580000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldSmallTown0205.wav"
+}
+"npc.Biker_WorldSmallTown0206"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.590000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldSmallTown0206.wav"
+}
+"npc.Biker_WorldSmallTown0207"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.540000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldSmallTown0207.wav"
+}
+"npc.Biker_WorldSmallTown0301"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldSmallTown0301.wav"
+}
+"npc.Biker_WorldSmallTown0304"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.800000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldSmallTown0304.wav"
+}
+"npc.Biker_WorldSmallTown0305"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.430000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldSmallTown0305.wav"
+}
+"npc.Biker_WorldSmallTown0307"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldSmallTown0307.wav"
+}
+"npc.Biker_WorldSmallTown0310"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.550000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldSmallTown0310.wav"
+}
+"npc.Biker_WorldSmallTown03NPC01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.630000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldSmallTown03NPC01.wav"
+}
+"npc.Biker_WorldSmallTown03NPC02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.800000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldSmallTown03NPC02.wav"
+}
+"npc.Biker_WorldSmallTown0501"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.850000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldSmallTown0501.wav"
+}
+"npc.Biker_WorldSmallTown0502"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.900000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldSmallTown0502.wav"
+}
+"npc.Biker_WorldSmallTown0503"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.900000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldSmallTown0503.wav"
+}
+"npc.Biker_WorldSmallTown0504"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.850000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldSmallTown0504.wav"
+}
+"npc.Biker_WorldSmallTown0505"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldSmallTown0505.wav"
+}
+"npc.Biker_WorldSmallTown0506"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldSmallTown0506.wav"
+}
+"npc.Biker_WorldSmallTown0507"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.990000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldSmallTown0507.wav"
+}
+"npc.Biker_WorldSmallTown0508"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldSmallTown0508.wav"
+}
+"npc.Biker_WorldSmallTown0510"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldSmallTown0510.wav"
+}
+"npc.Biker_WorldSmallTown0514"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.530000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldSmallTown0514.wav"
+}
+"npc.Biker_WorldSmallTown0515"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.470000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldSmallTown0515.wav"
+}
+"npc.Biker_WorldSmallTown0516"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.730000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldSmallTown0516.wav"
+}
+"npc.Biker_WorldSmallTown0517"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.860000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldSmallTown0517.wav"
+}
+"npc.Biker_WorldSmallTownNPCBellman01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldSmallTownNPCBellman01.wav"
+}
+"npc.Biker_WorldSmallTownNPCBellman06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.770000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldSmallTownNPCBellman06.wav"
+}
+"npc.Biker_WorldSmallTownNPCBellman07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.910000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldSmallTownNPCBellman07.wav"
+}
+"npc.Biker_WorldSmallTownNPCBellman08"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldSmallTownNPCBellman08.wav"
+}
+"npc.Biker_WorldSmallTownNPCBellman09"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.860000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldSmallTownNPCBellman09.wav"
+}
+"npc.Biker_WorldSmallTownNPCBellman10"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.710000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldSmallTownNPCBellman10.wav"
+}
+"npc.Biker_WorldSmallTownNPCBellman11"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"1"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_90dB"
+	"wave"		"player\survivor\voice\Biker\WorldSmallTownNPCBellman11.wav"
+}
+"npc.Biker_WorldSmallTownNPCBellman12"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldSmallTownNPCBellman12.wav"
+}
+"npc.Biker_WorldSmallTownNPCBoatman01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.540000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldSmallTownNPCBoatman01.wav"
+}
+"npc.Biker_WorldSmallTownNPCBoatman02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldSmallTownNPCBoatman02.wav"
+}
+"npc.Biker_WorldSmallTownNPCBoatman04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.660000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldSmallTownNPCBoatman04.wav"
+}
+"npc.Biker_WorldSmallTownNPCBoatman05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldSmallTownNPCBoatman05.wav"
+}
+"npc.Biker_WorldSmallTownNPCBoatman06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.620000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldSmallTownNPCBoatman06.wav"
+}
+"npc.Biker_WorldSmallTownNPCBoatman07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldSmallTownNPCBoatman07.wav"
+}
+"npc.Biker_WorldSmallTownNPCBoatman08"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.640000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldSmallTownNPCBoatman08.wav"
+}
+"npc.Biker_WorldSmallTownNPCBoatman09"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldSmallTownNPCBoatman09.wav"
+}
+"npc.Biker_WorldSmallTownNPCBoatman10"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldSmallTownNPCBoatman10.wav"
+}
+"npc.Biker_WorldSmallTownNPCBoatman11"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldSmallTownNPCBoatman11.wav"
+}
+"npc.Biker_WorldSmallTownNPCBoatman12"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.680000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldSmallTownNPCBoatman12.wav"
+}
+"npc.Biker_WorldSmallTownNPCBoatman13"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.700000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"sndlvl_talking"
+	"wave"		"player\survivor\voice\Biker\WorldSmallTownNPCBoatman13.wav"
+}
+"Player.Biker_YouAreWelcome01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\YouAreWelcome01.wav"
+}
+"Player.Biker_YouAreWelcome03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.600000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_85dB"
+	"wave"		"player\survivor\voice\Biker\YouAreWelcome03.wav"
+}

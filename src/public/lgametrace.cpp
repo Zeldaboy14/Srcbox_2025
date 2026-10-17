@@ -548,28 +548,32 @@ LUA_API void lua_checktracestruct( lua_State *L, int argIndex, Vector &start, Ve
 
     GET_FIELD_WITH_COMPATIBILITY( L, argIndex, "StartPosition", "start" );
     start = Vector( 0, 0, 0 );
-    start = luaL_optvector( L, -1, &start );
+    if ( lua_isvector( L, -1 ) )
+        start = lua_tovector( L, -1 );
     lua_pop( L, 1 );  // pop the StartPosition value
 
     GET_FIELD_WITH_COMPATIBILITY( L, argIndex, "EndPosition", "endpos" );
     end = Vector( 0, 0, 0 );
-    end = luaL_optvector( L, -1, &end );
+    if ( lua_isvector( L, -1 ) )
+        end = lua_tovector( L, -1 );
     lua_pop( L, 1 );  // pop the EndPosition value
 
+    // GMod ignores trace fields of the wrong type and uses the default instead of
+    // erroring (StormFox passes mask = LocalPlayer() by mistake, for one), so be as lenient.
     GET_FIELD_WITH_COMPATIBILITY( L, argIndex, "Mask", "mask" );
-    mask = luaL_optnumber( L, -1, MASK_SOLID );
+    mask = lua_isnumber( L, -1 ) ? ( int )lua_tointeger( L, -1 ) : MASK_SOLID;
     lua_pop( L, 1 );  // pop the Mask value
 
     GET_FIELD_WITH_COMPATIBILITY( L, argIndex, "CollisionGroup", "collisiongroup" );
-    collisionGroup = luaL_optnumber( L, -1, COLLISION_GROUP_NONE );
+    collisionGroup = lua_isnumber( L, -1 ) ? ( int )lua_tointeger( L, -1 ) : COLLISION_GROUP_NONE;
     lua_pop( L, 1 );  // pop the CollisionGroup value
 
     GET_FIELD_WITH_COMPATIBILITY( L, argIndex, "ShouldIgnoreWorld", "ignoreworld" );
-    bIgnoreWorld = luaL_optboolean( L, -1, false );
+    bIgnoreWorld = lua_isnil( L, -1 ) ? false : ( lua_toboolean( L, -1 ) != 0 );
     lua_pop( L, 1 );  // pop the ShouldIgnoreWorld value
 
     GET_FIELD_WITH_COMPATIBILITY( L, argIndex, "IsFilterAllowList", "whitelist" );
-    bFilterTableInverted = luaL_optboolean( L, -1, false );
+    bFilterTableInverted = lua_isnil( L, -1 ) ? false : ( lua_toboolean( L, -1 ) != 0 );
     lua_pop( L, 1 );  // pop the IsFilterAllowList value
 
     GET_FIELD_WITH_COMPATIBILITY( L, argIndex, "Output", "output" );

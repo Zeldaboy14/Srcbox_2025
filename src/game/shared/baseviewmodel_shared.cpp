@@ -28,6 +28,12 @@ extern ConVar in_forceuser;
 #include "iclientmode.h"
 #endif
 
+#ifdef LUA_SDK
+#include "luamanager.h"
+#include "mathlib/lvector.h"
+#include "mathlib/langle.h"
+#endif
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 

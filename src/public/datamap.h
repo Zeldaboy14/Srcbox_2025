@@ -105,7 +105,7 @@ DECLARE_FIELD_SIZE( FIELD_CHARACTER,	sizeof(char))
 DECLARE_FIELD_SIZE( FIELD_COLOR32,		sizeof(int))
 DECLARE_FIELD_SIZE( FIELD_CLASSPTR,		sizeof(intp))
 DECLARE_FIELD_SIZE( FIELD_EHANDLE,		sizeof(int))
-DECLARE_FIELD_SIZE( FIELD_EDICT,		sizeof(int))
+DECLARE_FIELD_SIZE( FIELD_EDICT,		sizeof(void *))	// an edict_t *; was sizeof(int), wrong on 64-bit
 DECLARE_FIELD_SIZE( FIELD_POSITION_VECTOR, 	3 * sizeof(float))
 DECLARE_FIELD_SIZE( FIELD_TIME,			sizeof(float))
 DECLARE_FIELD_SIZE( FIELD_TICK,			sizeof(int))

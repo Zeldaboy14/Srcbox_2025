@@ -105,10 +105,21 @@ void ClientPutInServer( edict_t *pEdict, const char *playername )
 // Note that this is also called for bots
 void ClientActive( edict_t *pEdict, bool bLoadGame )
 {
-    // Can't load games in CS!
-    Assert( !bLoadGame );
-
     CHL2MP_Player*pPlayer = ToHL2MPPlayer( CBaseEntity::Instance( pEdict ) );
+    if ( !pPlayer )
+        return;
+
+    if ( bLoadGame )
+    {
+        // Single-player style level transition (changelevel2) or a loaded save:
+        // the engine restored this player from the save, with its position,
+        // health and weapons. Spawning it again would put it at a spawn point
+        // with the default weapons, so do what single-player's ClientActive
+        // does (InitialSpawn only) and redo the HL2MP setup that isn't saved.
+        pPlayer->InitialSpawn();
+        pPlayer->FinishRestoredSpawn();
+        return;
+    }
 
     FinishClientPutInServer( pPlayer );
 }

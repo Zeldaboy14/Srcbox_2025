@@ -110,6 +110,8 @@ static void RecvProxy_TimerPaused( const CRecvProxyData *pData, void *pStruct, v
 
 #endif
 
+// Srcbox: TeamplayRoundBasedRules() is NULL under HL2MP rules (they aren't round
+// based), but TF maps still place timers there, so every use below checks it.
 LINK_ENTITY_TO_CLASS( team_round_timer, CTeamRoundTimer );
 PRECACHE_REGISTER( team_round_timer );
 
@@ -705,7 +707,7 @@ void CTeamRoundTimer::SendTimeWarning( int nWarning )
 #endif
 
 	// don't play sounds if the level designer has turned them off or if it's during the WaitingForPlayers time
-	if ( !m_bTimerPaused && m_bAutoCountdown && !TeamplayRoundBasedRules()->IsInWaitingForPlayers() )
+	if ( !m_bTimerPaused && m_bAutoCountdown && !( TeamplayRoundBasedRules() && TeamplayRoundBasedRules()->IsInWaitingForPlayers() ) )
 	{
 		C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
 		if ( pPlayer )
@@ -714,7 +716,7 @@ void CTeamRoundTimer::SendTimeWarning( int nWarning )
 			{
 				bool bShouldPlaySound = false;
 
-				if ( TeamplayRoundBasedRules()->IsInTournamentMode() == true && TeamplayRoundBasedRules()->IsInStopWatch() == true )
+				if ( TeamplayRoundBasedRules() && TeamplayRoundBasedRules()->IsInTournamentMode() == true && TeamplayRoundBasedRules()->IsInStopWatch() == true )
 				{
 					int iActiveTimer = ObjectiveResource()->GetTimerToShowInHUD();
 					int iStopWatchTimer = ObjectiveResource()->GetStopWatchTimer();
@@ -795,7 +797,7 @@ void CTeamRoundTimer::SetState( int nState, bool bFireOutput )
 	{
 		if ( IsStopWatchTimer() == false )
 		{
-			TeamplayRoundBasedRules()->SetSetup( true );
+			if ( TeamplayRoundBasedRules() ) TeamplayRoundBasedRules()->SetSetup( true );
 		}
 
 		SetTimerThink( RT_THINK_SETUP );
@@ -809,7 +811,7 @@ void CTeamRoundTimer::SetState( int nState, bool bFireOutput )
 	{
 		if ( IsStopWatchTimer() == false )
 		{
-			TeamplayRoundBasedRules()->SetSetup( false );
+			if ( TeamplayRoundBasedRules() ) TeamplayRoundBasedRules()->SetSetup( false );
 		}
 
 		SetTimerThink( RT_THINK_NORMAL );
@@ -846,7 +848,7 @@ void CTeamRoundTimer::RoundTimerSetupThink( void )
 	float flLastTime = m_flLastTime;
 	m_flLastTime = GetTimeRemaining();
 
-	if ( TeamplayRoundBasedRules()->IsInPreMatch() == true && IsDisabled() == false )
+	if ( TeamplayRoundBasedRules() && TeamplayRoundBasedRules()->IsInPreMatch() == true && IsDisabled() == false )
 	{
 		inputdata_t data;
 		InputDisable( data );
@@ -860,7 +862,7 @@ void CTeamRoundTimer::RoundTimerSetupThink( void )
 	}
 
 	float flTime = GetTimeRemaining();
-	TeamplayRoundBasedRules()->SetOvertime( false );
+	if ( TeamplayRoundBasedRules() ) TeamplayRoundBasedRules()->SetOvertime( false );
 
 	if ( m_flLastTime > 0.f )
 	{
@@ -892,7 +894,7 @@ void CTeamRoundTimer::RoundTimerSetupThink( void )
 		SetState( RT_STATE_NORMAL );
 		SetTimeRemaining( m_nTimeToUseAfterSetupFinished );
 
-		if ( ShowInHud() && !TeamplayRoundBasedRules()->IsInWaitingForPlayers() )
+		if ( ShowInHud() && !( TeamplayRoundBasedRules() && TeamplayRoundBasedRules()->IsInWaitingForPlayers() ) )
 		{
 			UTIL_LogPrintf( "World triggered \"Round_Setup_End\"\n" );
 		}
@@ -947,7 +949,7 @@ void CTeamRoundTimer::RoundTimerSetupThink( void )
 //-----------------------------------------------------------------------------
 void CTeamRoundTimer::RoundTimerThink( void )
 {
-	if ( TeamplayRoundBasedRules()->IsInPreMatch() == true && IsDisabled() == false )
+	if ( TeamplayRoundBasedRules() && TeamplayRoundBasedRules()->IsInPreMatch() == true && IsDisabled() == false )
 	{
 		inputdata_t data;
 		InputDisable( data );
@@ -960,8 +962,8 @@ void CTeamRoundTimer::RoundTimerThink( void )
 	}
 
 	// Don't do anything when the game has been won or if we're loading a bugbait report
-	if ( TeamplayRoundBasedRules()->RoundHasBeenWon() ||
-		 TeamplayRoundBasedRules()->IsLoadingBugBaitReport() )
+	if ( TeamplayRoundBasedRules() && ( TeamplayRoundBasedRules()->RoundHasBeenWon() ||
+		 TeamplayRoundBasedRules()->IsLoadingBugBaitReport() ) )
 	{
 		// We want to stop timers when the round has been won, but we don't want to 
 		// force mapmakers to deal with having to unpause it. This little hack works around that.
@@ -984,7 +986,7 @@ void CTeamRoundTimer::RoundTimerThink( void )
 
 	if ( flTime > 0 && ShowInHud() ) // is this the timer we're showing in the HUD?
 	{
-		TeamplayRoundBasedRules()->SetOvertime( false );
+		if ( TeamplayRoundBasedRules() ) TeamplayRoundBasedRules()->SetOvertime( false );
 	}
 
 	if ( flTime <= 0.0f && m_bFireFinished )
@@ -998,9 +1000,9 @@ void CTeamRoundTimer::RoundTimerThink( void )
 			// is this the timer we're showing in the HUD?
 			if ( ShowInHud() )
 			{
-				if ( !TeamplayRoundBasedRules()->InOvertime() )
+				if ( TeamplayRoundBasedRules() && !TeamplayRoundBasedRules()->InOvertime() )
 				{
-					TeamplayRoundBasedRules()->SetOvertime( true );
+					if ( TeamplayRoundBasedRules() ) TeamplayRoundBasedRules()->SetOvertime( true );
 				}
 #if defined( TF_DLL )
 				else
@@ -1112,7 +1114,7 @@ void CTeamRoundTimer::InputRoundSpawn( inputdata_t &input )
 		SetState( RT_STATE_SETUP );
 		SetTimeRemaining( m_nSetupTimeLength );
 
-		if ( ShowInHud() && !TeamplayRoundBasedRules()->IsInWaitingForPlayers() )
+		if ( ShowInHud() && !( TeamplayRoundBasedRules() && TeamplayRoundBasedRules()->IsInWaitingForPlayers() ) )
 		{
 			UTIL_LogPrintf( "World triggered \"Round_Setup_Begin\"\n" );
 		}
@@ -1123,7 +1125,7 @@ void CTeamRoundTimer::InputRoundSpawn( inputdata_t &input )
 		SetTimeRemaining( m_nTimeToUseAfterSetupFinished );
 	}
 
-	if ( !m_bStartPaused && !TeamplayRoundBasedRules()->IsInWaitingForPlayers() )
+	if ( !m_bStartPaused && !( TeamplayRoundBasedRules() && TeamplayRoundBasedRules()->IsInWaitingForPlayers() ) )
 	{
 		ResumeTimer();
 	}
@@ -1141,7 +1143,7 @@ void CTeamRoundTimer::SetTimeRemaining( int iTimerSeconds )
 	iTimerSeconds = m_nTimerMaxLength > 0 ? MIN( iTimerSeconds, m_nTimerMaxLength ) : iTimerSeconds;
 
 	float flTimerSeconds = (float)iTimerSeconds;
-	if ( TeamplayRoundBasedRules()->IsInTournamentMode() && TeamplayRoundBasedRules()->IsInStopWatch() && ObjectiveResource() && !IsStopWatchTimer() && !TeamplayRoundBasedRules()->InSetup() )
+	if ( TeamplayRoundBasedRules() && TeamplayRoundBasedRules()->IsInTournamentMode() && TeamplayRoundBasedRules()->IsInStopWatch() && ObjectiveResource() && !IsStopWatchTimer() && !TeamplayRoundBasedRules()->InSetup() )
 	{
 		// make sure we don't go over our stop watch timer
 		int iStopWatchTimer = ObjectiveResource()->GetStopWatchTimer();
@@ -1228,12 +1230,12 @@ void CTeamRoundTimer::AddTimerSeconds( int iSecondsToAdd, int iTeamResponsible /
 	if ( IsDisabled() )
 		return;
 
-	if ( TeamplayRoundBasedRules()->InStalemate() )
+	if ( TeamplayRoundBasedRules() && TeamplayRoundBasedRules()->InStalemate() )
 		return;
 
 	// we only want to add time if we're round_running or team_win so the control points 
 	// don't add time when they try to set their default owner when the map is first loading
-	if ( TeamplayRoundBasedRules()->State_Get() != GR_STATE_RND_RUNNING && TeamplayRoundBasedRules()->State_Get() != GR_STATE_TEAM_WIN )
+	if ( TeamplayRoundBasedRules() && TeamplayRoundBasedRules()->State_Get() != GR_STATE_RND_RUNNING && TeamplayRoundBasedRules()->State_Get() != GR_STATE_TEAM_WIN )
 		return;
 
 	if ( m_nTimerMaxLength > 0 )
@@ -1247,7 +1249,7 @@ void CTeamRoundTimer::AddTimerSeconds( int iSecondsToAdd, int iTeamResponsible /
 	}
 
 	float flSecondsToAdd = (float)iSecondsToAdd;
-	if ( TeamplayRoundBasedRules()->IsInTournamentMode() && TeamplayRoundBasedRules()->IsInStopWatch() && ObjectiveResource() && !IsStopWatchTimer() && !TeamplayRoundBasedRules()->InSetup() )
+	if ( TeamplayRoundBasedRules() && TeamplayRoundBasedRules()->IsInTournamentMode() && TeamplayRoundBasedRules()->IsInStopWatch() && ObjectiveResource() && !IsStopWatchTimer() && !TeamplayRoundBasedRules()->InSetup() )
 	{
 		int iStopWatchTimer = ObjectiveResource()->GetStopWatchTimer();
 		CTeamRoundTimer *pStopWatch = dynamic_cast< CTeamRoundTimer* >( UTIL_EntityByIndex( iStopWatchTimer ) );
@@ -1277,9 +1279,9 @@ void CTeamRoundTimer::AddTimerSeconds( int iSecondsToAdd, int iTeamResponsible /
 	m_nTimerLength += iSecondsToAdd;
 	CalculateOutputMessages();
 
-	if ( ( ObjectiveResource() && ObjectiveResource()->GetTimerToShowInHUD() == entindex() ) || ( TeamplayRoundBasedRules()->IsInKothMode() ) )
+	if ( ( ObjectiveResource() && ObjectiveResource()->GetTimerToShowInHUD() == entindex() ) || ( TeamplayRoundBasedRules() && TeamplayRoundBasedRules()->IsInKothMode() ) )
 	{
-		if ( !TeamplayRoundBasedRules()->InStalemate() && !TeamplayRoundBasedRules()->RoundHasBeenWon() && !TeamplayRoundBasedRules()->IsInKothMode() )
+		if ( TeamplayRoundBasedRules() && !TeamplayRoundBasedRules()->InStalemate() && !TeamplayRoundBasedRules()->RoundHasBeenWon() && !TeamplayRoundBasedRules()->IsInKothMode() )
 		{
 			if ( iTeamResponsible >= LAST_SHARED_TEAM+1 )
 			{

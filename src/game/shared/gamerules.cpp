@@ -191,6 +191,14 @@ CBaseEntity *CGameRules::GetPlayerSpawnSpot( CBasePlayer *pPlayer )
 	CBaseEntity *pSpawnSpot = pPlayer->EntSelectSpawnPoint();
 	Assert( pSpawnSpot );
 
+	// Srcbox: never spawn off a NULL spot (maps without spawn points, Lua hooks
+	// returning nothing usable); fall back to the world
+	if ( !pSpawnSpot )
+		pSpawnSpot = CBaseEntity::Instance( INDEXENT( 0 ) );
+
+	if ( !pSpawnSpot )
+		return NULL;
+
 	pPlayer->SetLocalOrigin( pSpawnSpot->GetAbsOrigin() + Vector(0,0,1) );
 	pPlayer->SetAbsVelocity( vec3_origin );
 	pPlayer->SetLocalAngles( pSpawnSpot->GetLocalAngles() );

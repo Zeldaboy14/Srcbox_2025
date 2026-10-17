@@ -382,7 +382,7 @@ LUA_BINDING_BEGIN( EditablePanel, __index, "class", "Metamethod that is called w
 {
     EditablePanel *pEditablePanel = LUA_BINDING_ARGUMENT( lua_toeditablepanel, 1, "editablePanel" );
     LUA_METATABLE_INDEX_CHECK_VALID( L, PanelIsValid );
-    LUA_METATABLE_INDEX_CHECK( L, pEditablePanel );
+    LUA_METATABLE_INDEX_CHECK_PANEL( L, pEditablePanel );
 
     // const char *field = LUA_BINDING_ARGUMENT( luaL_checkstring, 2, "field" );
 

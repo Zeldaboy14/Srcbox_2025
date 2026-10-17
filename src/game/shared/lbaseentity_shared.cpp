@@ -7,6 +7,7 @@
 #endif
 #include "takedamageinfo.h"
 #include "luamanager.h"
+#include "vphysics_interface.h"
 #include "luasrclib.h"
 #include "lbaseentity_shared.h"
 #include "lrecipientfilter.h"
@@ -20,8 +21,10 @@
 #include "iservervehicle.h"
 #endif
 #include "lbaseplayer_shared.h"
+#include "basescripted.h"
 #include "lgametrace.h"
 #include "SoundEmitterSystem/lisoundemittersystembase.h"
+#include "SoundEmitterSystem/isoundemittersystembase.h"
 #include "lshareddefs.h"
 #include "ltakedamageinfo.h"
 #include "mathlib/lvector.h"
@@ -29,13 +32,12 @@
 #include "engine/IEngineSound.h"
 #include <lbasecombatweapon_shared.h>
 #include "vcollide_parse.h"
-#include <gamestringpool.h>
-#include <basescripted.h>
 #include <lColor.h>
 #include <datacache/imdlcache.h>
 #include <filesystem.h>
 #include <utlbuffer.h>
 #include <saverestore.h>
+#include "gamestringpool.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -409,6 +411,13 @@ LUA_BINDING_BEGIN( Entity, EmitSound, "class", "Emit sound." )
     lua_CBaseEntity *pEntity = LUA_BINDING_ARGUMENT( luaL_checkentity, 1, "entity" );
 
     const char *pszSoundName = LUA_BINDING_ARGUMENT( luaL_checkstring, 2, "soundName" );
+
+    // Srcbox: an empty name ends in an engine Host_Error; GMod just plays nothing
+    if ( !pszSoundName[0] )
+    {
+        lua_pushnumber( L, 0 );
+        return 1;
+    }
     soundlevel_t soundLevel = LUA_BINDING_ARGUMENT_ENUM_WITH_DEFAULT( soundlevel_t, 3, SNDLVL_NORM, "soundLevel" );
     float flPitchPercent = LUA_BINDING_ARGUMENT_WITH_DEFAULT( luaL_optnumber, 4, 100, "pitchPercent" );
     float flVolume = LUA_BINDING_ARGUMENT_WITH_DEFAULT( luaL_optnumber, 5, 1, "volume" );
@@ -957,6 +966,31 @@ LUA_BINDING_BEGIN( Entity, GetModelBounds, "class", "Get model bounds." )
 }
 LUA_BINDING_END( "Vector", "The minimum bounds.", "Vector", "The maximum bounds." )
 
+// Srcbox: GMod's Entity:GetModel works on every entity (brush models give "*N"),
+// not only animating ones like CBaseAnimating:GetModelName
+LUA_BINDING_BEGIN( Entity, GetModel, "class", "Get the model path of the entity (any entity type)." )
+{
+    lua_CBaseEntity *pEntity = LUA_BINDING_ARGUMENT( luaL_checkentity, 1, "entity" );
+
+    const model_t *pModel = pEntity->GetModel();
+    const char *pszModelPath = pModel ? modelinfo->GetModelName( pModel ) : NULL;
+
+    if ( pszModelPath && pszModelPath[0] )
+    {
+        lua_pushstring( L, pszModelPath );
+        return 1;
+    }
+
+    const char *pszModelName = STRING( pEntity->GetModelName() );
+    if ( pszModelName && pszModelName[0] )
+        lua_pushstring( L, pszModelName );
+    else
+        lua_pushnil( L );
+
+    return 1;
+}
+LUA_BINDING_END( "string", "The model path, or nil if the entity has no model." )
+
 LUA_BINDING_BEGIN( Entity, GetModelIndex, "class", "Get model index." )
 {
     lua_CBaseEntity *pEntity = LUA_BINDING_ARGUMENT( luaL_checkentity, 1, "entity" );
@@ -1386,6 +1420,24 @@ LUA_BINDING_BEGIN( Entity, IsCurrentlyTouching, "class", "Is currently touching.
     return 1;
 }
 LUA_BINDING_END( "boolean", "True if currently touching, false otherwise." )
+
+#ifdef CLIENT_DLL
+// Srcbox: GMod's Entity:MarkShadowAsDirty (client). Queues a redraw of the
+// entity's render-to-texture shadow, e.g. after the shadow direction changed.
+LUA_BINDING_BEGIN( Entity, MarkShadowAsDirty, "class", "Mark the entity's render-to-texture shadow as needing an update.", "client" )
+{
+    lua_CBaseEntity *pEntity = LUA_BINDING_ARGUMENT( luaL_checkentity, 1, "entity" );
+
+    pEntity->MarkShadowDirty( true );
+
+    ClientShadowHandle_t hShadow = pEntity->GetShadowHandle();
+    if ( g_pClientShadowMgr && hShadow != CLIENTSHADOW_INVALID_HANDLE )
+        g_pClientShadowMgr->MarkRenderToTextureShadowDirty( hShadow );
+
+    return 0;
+}
+LUA_BINDING_END()
+#endif
 
 LUA_BINDING_BEGIN( Entity, IsDormant, "class", "Is dormant." )
 {
@@ -1824,14 +1876,53 @@ LUA_BINDING_BEGIN( Entity, PrecacheScriptSound, "class|static", "Precache script
 {
     const char *pszSound = LUA_BINDING_ARGUMENT( luaL_checkstring, 1, "sound" );
 
+    // Srcbox: an empty name makes the engine Host_Error ("PrecacheSound: Bad string")
+    // and drops the game; GMod ignores it, so do the same
+    if ( !pszSound[0] )
+    {
+        lua_pushinteger( L, -1 );
+        return 1;
+    }
+
     lua_pushinteger( L, CBaseEntity::PrecacheScriptSound( pszSound ) );
     return 1;
 }
 LUA_BINDING_END( "integer", "The precached script sound." )
 
+extern ISoundEmitterSystemBase *soundemitterbase;
+
 LUA_BINDING_BEGIN( Entity, PrecacheSound, "class|static", "Precache sound." )
 {
     const char *pszSound = LUA_BINDING_ARGUMENT( luaL_checkstring, 1, "sound" );
+
+    // Srcbox: an empty name makes the engine Host_Error ("PrecacheSound: Bad string")
+    // and drops the game; GMod ignores it, so do the same
+    if ( !pszSound[0] )
+    {
+        lua_pushboolean( L, false );
+        return 1;
+    }
+
+    // Srcbox: GMod's util.PrecacheSound also takes soundscript names ("Weapon_SMG1.Single").
+    // Handing those to the engine as a wave file fails ("Cannot figure out which search
+    // path sound\\x came from"), so precache the script entry instead.
+    if ( soundemitterbase && soundemitterbase->GetSoundIndex( pszSound ) != soundemitterbase->InvalidIndex() )
+    {
+        lua_pushboolean( L, CBaseEntity::PrecacheScriptSound( pszSound ) != -1 );
+        return 1;
+    }
+
+    // Not a known soundscript and not a sound file either (e.g. a script that gets added
+    // later by sound.Add): the engine can't load it as a wave, so don't try.
+    {
+        const char *pszExt = V_GetFileExtension( pszSound );
+
+        if ( !pszExt || ( V_stricmp( pszExt, "wav" ) && V_stricmp( pszExt, "mp3" ) && V_stricmp( pszExt, "ogg" ) ) )
+        {
+            lua_pushboolean( L, false );
+            return 1;
+        }
+    }
 
     // Copied from PrecacheSound so the "Direct precache of %s" warnings arent shown
     if ( !CBaseEntity::IsPrecacheAllowed() )
@@ -1966,12 +2057,35 @@ LUA_BINDING_BEGIN( Entity, RemoveSolidFlags, "class", "Remove solid flags." )
 }
 LUA_BINDING_END()
 
+#ifdef LUA_SDK
+// Teleports the entity's physics object to its current absolute origin/angles (like GMod's SetPos/SetAngles).
+// Players are skipped (their physics object is a movement shadow), as are parented entities.
+static void LuaSyncPhysicsToEntity( CBaseEntity *pEntity )
+{
+    if ( !pEntity || pEntity->IsPlayer() || pEntity->GetMoveParent() )
+        return;
+
+    IPhysicsObject *pPhysicsObject = pEntity->VPhysicsGetObject();
+
+    if ( pPhysicsObject )
+    {
+        pPhysicsObject->SetPosition( pEntity->GetAbsOrigin(), pEntity->GetAbsAngles(), true );
+    }
+}
+#endif
+
 LUA_BINDING_BEGIN( Entity, SetAngles, "class", "Set absolute angles." )
 {
     lua_CBaseEntity *pEntity = LUA_BINDING_ARGUMENT( luaL_checkentity, 1, "entity" );
     QAngle v = LUA_BINDING_ARGUMENT( luaL_checkangle, 2, "angles" );
 
     pEntity->SetAbsAngles( v );
+#ifdef LUA_SDK
+    // GMod's SetPos/SetAngles move the physics object too. Without this, a prop moved right after
+    // Spawn() (sandbox's "sit flush" step in gm_spawn) kept its physics object half inside the floor
+    // and slowly got pushed up through it.
+    LuaSyncPhysicsToEntity( pEntity );
+#endif
     return 0;
 }
 LUA_BINDING_END()
@@ -1982,6 +2096,12 @@ LUA_BINDING_BEGIN( Entity, SetPosition, "class", "Set absolute origin." )
     Vector v = LUA_BINDING_ARGUMENT( luaL_checkvector, 2, "origin" );
 
     pEntity->SetAbsOrigin( v );
+#ifdef LUA_SDK
+    // GMod's SetPos/SetAngles move the physics object too. Without this, a prop moved right after
+    // Spawn() (sandbox's "sit flush" step in gm_spawn) kept its physics object half inside the floor
+    // and slowly got pushed up through it.
+    LuaSyncPhysicsToEntity( pEntity );
+#endif
     return 0;
 }
 LUA_BINDING_END()
@@ -2091,6 +2211,31 @@ LUA_BINDING_BEGIN( Entity, SetCollisionBounds, "class", "Set collision bounds." 
     Vector vMaxs = LUA_BINDING_ARGUMENT( luaL_checkvector, 3, "maxs" );
 
     pEntity->SetCollisionBounds( vMins, vMaxs );
+    return 0;
+}
+LUA_BINDING_END()
+
+LUA_BINDING_BEGIN( Entity, SetSurroundingBoundsType, "class", "Sets how the surrounding bounds (used for hit tests and culling) are computed (BOUNDS_COLLISION, BOUNDS_HITBOXES, ...)." )
+{
+    lua_CBaseEntity *pEntity = LUA_BINDING_ARGUMENT( luaL_checkentity, 1, "entity" );
+    int nType = clamp( ( int )LUA_BINDING_ARGUMENT( luaL_checknumber, 2, "boundsType" ), ( int )USE_OBB_COLLISION_BOUNDS, ( int )USE_COLLISION_BOUNDS_NEVER_VPHYSICS );
+
+    // Specified bounds need actual bounds; use SetSurroundingBounds for those
+    if ( nType == USE_SPECIFIED_BOUNDS )
+        nType = USE_OBB_COLLISION_BOUNDS;
+
+    pEntity->CollisionProp()->SetSurroundingBoundsType( ( SurroundingBoundsType_t )nType );
+    return 0;
+}
+LUA_BINDING_END()
+
+LUA_BINDING_BEGIN( Entity, SetSurroundingBounds, "class", "Sets fixed surrounding bounds (local mins, maxs)." )
+{
+    lua_CBaseEntity *pEntity = LUA_BINDING_ARGUMENT( luaL_checkentity, 1, "entity" );
+    Vector vMins = LUA_BINDING_ARGUMENT( luaL_checkvector, 2, "mins" );
+    Vector vMaxs = LUA_BINDING_ARGUMENT( luaL_checkvector, 3, "maxs" );
+
+    pEntity->CollisionProp()->SetSurroundingBoundsType( USE_SPECIFIED_BOUNDS, &vMins, &vMaxs );
     return 0;
 }
 LUA_BINDING_END()
@@ -3137,6 +3282,23 @@ LUA_BINDING_BEGIN( Entity, __index, "class", "Metamethod that is called when a n
         {
             LUA_METATABLE_INDEX_CHECK_TABLE( L );
         }
+
+#ifdef LUA_SDK
+        // As in GMod: NPCs also get the methods addons put on FindMetaTable( "NPC" )
+        // (a plain table the compatibility layer creates on first use)
+        if ( pEntity->IsNPC() )
+        {
+            luaL_getmetatable( L, "NPC" );
+            if ( lua_istable( L, -1 ) )
+            {
+                LUA_METATABLE_INDEX_CHECK_TABLE( L );
+            }
+            else
+            {
+                lua_pop( L, 1 );
+            }
+        }
+#endif
 
         luaL_getmetatable( L, LUA_BASEENTITYMETANAME );
         LUA_METATABLE_INDEX_CHECK_TABLE( L );

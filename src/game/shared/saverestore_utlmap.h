@@ -40,7 +40,7 @@ public:
 				NULL, 
 				NULL,
 				pKeyDatamap,
-				sizeof(KEY_TYPE),
+				sizeof( typename UTLMAP::KeyType_t ),	// was sizeof(KEY_TYPE): the FIELD_ number, 4 bytes, not the key
 			},
 			
 			{
@@ -53,7 +53,7 @@ public:
 				NULL, 
 				NULL,
 				pFieldDatamap,
-				sizeof(FIELD_TYPE),
+				sizeof( typename UTLMAP::ElemType_t ),
 			}
 		};
 		
@@ -106,7 +106,7 @@ public:
 				NULL, 
 				NULL,
 				pKeyDatamap,
-				sizeof(KEY_TYPE),
+				sizeof( typename UTLMAP::KeyType_t ),	// was sizeof(KEY_TYPE): the FIELD_ number, 4 bytes, not the key
 			},
 			
 			{
@@ -119,7 +119,7 @@ public:
 				NULL, 
 				NULL,
 				pFieldDatamap,
-				sizeof(FIELD_TYPE),
+				sizeof( typename UTLMAP::ElemType_t ),
 			}
 		};
 		

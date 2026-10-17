@@ -1919,7 +1919,7 @@ LUA_BINDING_BEGIN( Panel, __index, "class", "Metamethod called when a non-existe
     Panel *plPanel = LUA_BINDING_ARGUMENT( lua_topanel, 1, "panel" );
 
     LUA_METATABLE_INDEX_CHECK_VALID( L, PanelIsValid );
-    LUA_METATABLE_INDEX_CHECK( L, plPanel );
+    LUA_METATABLE_INDEX_CHECK_PANEL( L, plPanel );
 
     const char *field = LUA_BINDING_ARGUMENT( luaL_checkstring, 2, "field" );
 

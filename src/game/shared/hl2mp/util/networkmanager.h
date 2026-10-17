@@ -43,6 +43,13 @@ class CNetworkManager
     virtual void SendServerToClientMessage( INetMessage *pMessage, int userId );
 
    private:
+#ifdef LUA_SDK
+    // Drops entries whose net channel the engine no longer has (the player left,
+    // the client reconnected, the map was reloaded). Their channel is freed memory.
+    void PruneDeadChannels();
+    void RemoveBinding( int userId, INetChannel *netChannel );
+#endif
+
     CUtlVector< ConnectedPlayer_t > m_ConnectedPlayers;
 };
 

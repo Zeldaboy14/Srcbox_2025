@@ -880,6 +880,14 @@ void BuildGroup::LoadControlSettings( const char *controlResourceName, const cha
     bool bShouldCacheKeys = true;
     bool bDeleteKeys = false;
 
+    // Keys passed in by the caller belong to the caller (it deletes them), so they must never go into
+    // the res file cache. Caching them left a dangling pointer that ClearResFileCache() freed again on
+    // shutdown (read access violation in KeyValues::RemoveEverything).
+    if ( pPreloadedKeyValues )
+    {
+        bShouldCacheKeys = false;
+    }
+
     while ( !rDat )
     {
         if ( bUsePrecaching )

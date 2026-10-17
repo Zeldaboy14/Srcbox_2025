@@ -1,0 +1,277 @@
+"NPC_Alyx.vehicle_impact_hard"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.850000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"rndwave"
+	{
+		"wave"		"*vo/npc/alyx/gasp02.wav"
+		"wave"		"*vo/npc/alyx/gasp03.wav"
+		"wave"		"*vo/npc/alyx/hurt04.wav"
+		"wave"		"*vo/npc/alyx/hurt05.wav"
+		"wave"		"*vo/npc/alyx/hurt06.wav"
+		"wave"		"*vo/npc/alyx/hurt08.wav"
+		"wave"		"*vo/npc/alyx/uggh01.wav"
+		"wave"		"*vo/npc/alyx/uggh02.wav"
+	}
+}
+"NPC_Alyx.vehicle_obstacle_warning"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.850000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"rndwave"
+	{
+		"wave"		"*vo/npc/alyx/al_car_lookout01.wav"
+		"wave"		"*vo/npc/alyx/al_car_lookout02.wav"
+		"wave"		"*vo/npc/alyx/al_car_lookout03.wav"
+	}
+}
+"NPC_Alyx.vehicle_overturned"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"0.850000"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"wave"		"*vo/npc/alyx/al_car14.wav"
+}
+"NPC_Alyx.vehicle_request_entrance"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"rndwave"
+	{
+		"wave"		"*vo/npc/alyx/al_car11.wav"
+		"wave"		"*vo/npc/alyx/al_car12.wav"
+	}
+}
+"NPC_Alyx.vehicle_jostle"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"rndwave"
+	{
+		"wave"		"*vo/npc/alyx/al_car_bump01.wav"
+		"wave"		"*vo/npc/alyx/al_car_bump03.wav"
+	}
+}
+"NPC_Alyx.vehicle_enter_driverside"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"rndwave"
+	{
+		"wave"		"*vehicles/junker/alyx_enter_driver.wav"
+	}
+}
+"NPC_Alyx.vehicle_exit_driverside"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_NORM"
+	"rndwave"
+	{
+		"wave"		"*vehicles/junker/alyx_exit_driver.wav"
+	}
+}
+"ep_02.al_ambush_getouthere"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_TALKING"
+	"wave"		"*vo/outland_10/olde-inne/al_ambush_getouthere.wav"
+}
+"ep_02.al_ambush_suitcharge"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_TALKING"
+	"wave"		"*vo/outland_10/olde-inne/al_ambush_suitcharge.wav"
+}
+"ep_02.al_car_crazy08"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_TALKING"
+	"wave"		"*vo/npc/alyx/al_car_crazy08.wav"
+}
+"ep_02.al_car_laughing01"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_TALKING"
+	"wave"		"*vo/npc/alyx/al_car_laughing01.wav"
+}
+"ep_02.al_car_laughing02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_TALKING"
+	"wave"		"*vo/npc/alyx/al_car_laughing02.wav"
+}
+"ep_02.al_car_laughing03"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_TALKING"
+	"wave"		"*vo/npc/alyx/al_car_laughing03.wav"
+}
+"ep_02.al_car_laughing04"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_TALKING"
+	"wave"		"*vo/npc/alyx/al_car_laughing04.wav"
+}
+"ep_02.al_car_laughing05"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_TALKING"
+	"wave"		"*vo/npc/alyx/al_car_laughing05.wav"
+}
+"ep_02.al_car_laughing06"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_TALKING"
+	"wave"		"*vo/npc/alyx/al_car_laughing06.wav"
+}
+"ep_02.al_car_laughing07"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_TALKING"
+	"wave"		"*vo/npc/alyx/al_car_laughing07.wav"
+}
+"ep_02.al_car_laughing08"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_TALKING"
+	"wave"		"*vo/npc/alyx/al_car_laughing08.wav"
+}
+"ep_02.al_car_laughing09"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_TALKING"
+	"wave"		"*vo/npc/alyx/al_car_laughing09.wav"
+}
+"ep_02.al_car_laughing10"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_TALKING"
+	"wave"		"*vo/npc/alyx/al_car_laughing10.wav"
+}
+"ep_02.al_car_laughing11"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_TALKING"
+	"wave"		"*vo/npc/alyx/al_car_laughing11.wav"
+}
+"ep_02.al_car_laughing12"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_TALKING"
+	"wave"		"*vo/npc/alyx/al_car_laughing12.wav"
+}
+"ep_02.al_car_laughing13"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_TALKING"
+	"wave"		"*vo/npc/alyx/al_car_laughing13.wav"
+}
+"ep_02.al_car_laughing14"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_TALKING"
+	"wave"		"*vo/npc/alyx/al_car_laughing14.wav"
+}
+"ep_02.al_car_rolled01a"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_TALKING"
+	"wave"		"*vo/npc/alyx/al_car_rolled01a.wav"
+}
+"ep_02.al_car_rolled01b"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_TALKING"
+	"wave"		"*vo/npc/alyx/al_car_rolled01b.wav"
+}
+"ep_02.al_chop_itsback02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_TALKING"
+	"wave"		"*vo/outland_08/chopper/al_chop_itsback02.wav"
+}
+"ep_02.al_rad_carefulok"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_TALKING"
+	"wave"		"*vo/outland_06a/radio/al_rad_carefulok.wav"
+}
+"ep_02.al_silo_cantcome02"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_TALKING"
+	"wave"		"*vo/outland_11a/silo/al_silo_cantcome02.wav"
+}
+"ep_02.al_silo_gotthru"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_TALKING"
+	"wave"		"*vo/outland_11a/silo/al_silo_gotthru.wav"
+}
+"ep_02.al_silo_sameold"
+{
+	"channel"		"CHAN_VOICE"
+	"volume"		"VOL_NORM"
+	"pitch"		"PITCH_NORM"
+	"soundlevel"		"SNDLVL_TALKING"
+	"wave"		"*vo/outland_11a/silo/al_silo_sameold.wav"
+}

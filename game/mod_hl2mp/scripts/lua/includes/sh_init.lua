@@ -3,6 +3,10 @@
 	to bootstrap extensions and modules.
 --]]
 
+-- Keep the real type() here: the GMod compatibility layer reports Colors as
+-- "table" globally, but these helpers need to tell them apart.
+local type = type
+
 function IsValid(target)
 	if (not target) then
 		return false
@@ -14,7 +18,7 @@ function IsValid(target)
 		return false
 	end
 
-	return isValidChecker(object)
+	return isValidChecker(target)
 end
 
 function isangle(variable)

@@ -341,7 +341,7 @@ LUA_BINDING_BEGIN( Button, __index, "class", "Metamethod that is called when a n
 {
     lua_Button *pButton = LUA_BINDING_ARGUMENT( lua_tobutton, 1, "button" );
     LUA_METATABLE_INDEX_CHECK_VALID( L, PanelIsValid );
-    LUA_METATABLE_INDEX_CHECK( L, pButton );
+    LUA_METATABLE_INDEX_CHECK_PANEL( L, pButton );
 
     // const char *field = LUA_BINDING_ARGUMENT( luaL_checkstring, 2, "field" );
 

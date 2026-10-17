@@ -4,7 +4,6 @@
 #include <lsounds.h>
 #include <engine/IEngineSound.h>
 #include <lrecipientfilter.h>
-#include "zip/XUnzip.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -541,8 +540,23 @@ LUA_BINDING_BEGIN( Sounds, Add, "library", "Creates a sound script." )
     }
     lua_pop( L, 1 );  // pop the sound value
 
-    // TODO: Check if the file needs to exist, or if we can just create a sound script without a file
-    soundemitterbase->AddSound( name, "scripts/sounds/lua_procedural.txt", parameters );
+    // Srcbox: GMod's sound.Add replaces an existing entry of the same name
+    if ( soundemitterbase->GetSoundIndex( name ) != soundemitterbase->InvalidIndex() )
+    {
+        soundemitterbase->UpdateSoundParameters( name, parameters );
+        return 0;
+    }
+
+    // The sound emitter warns ("script file not list in manifest") for every sound
+    // added to a script it doesn't know, which floods the console when addons
+    // register hundreds of sounds. File them under a script the manifest lists;
+    // nothing is ever written back to it.
+    const char *pszScript = "scripts/sounds/lua_procedural.txt";
+
+    if ( soundemitterbase->FindSoundScript( pszScript ) < 0 && soundemitterbase->GetNumSoundScripts() > 0 )
+        pszScript = soundemitterbase->GetSoundScriptName( 0 );
+
+    soundemitterbase->AddSound( name, pszScript, parameters );
 
     return 0;
 }
@@ -552,6 +566,10 @@ LUA_BINDING_END()
 LUA_BINDING_BEGIN( Sounds, Play, "library", "Plays a sound emitting from a place in the world. Not properly tested for sound script names (didn't work when I tried it)" )
 {
     const char *pszSoundName = LUA_BINDING_ARGUMENT( luaL_checkstring, 1, "soundName" );  // doc: sound script name or sound file name relative to sound/ folder
+
+    // Srcbox: an empty name ends in an engine Host_Error; GMod just plays nothing
+    if ( !pszSoundName[0] )
+        return 0;
     const Vector vecOrigin = LUA_BINDING_ARGUMENT( luaL_checkvector, 2, "origin" );       // doc: position of the sound
     int entityIndex = ( int )LUA_BINDING_ARGUMENT_WITH_DEFAULT( luaL_optnumber, 3, SOUND_FROM_WORLD, "entity" );
     SOUND_CHANNEL channel = ( SOUND_CHANNEL )LUA_BINDING_ARGUMENT_WITH_DEFAULT( luaL_optnumber, 4, SOUND_CHANNEL::CHAN_AUTO, "channel" );

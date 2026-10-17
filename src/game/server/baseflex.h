@@ -41,6 +41,11 @@ public:
 //-----------------------------------------------------------------------------
 class CBaseFlex : public CBaseAnimatingOverlay
 {
+#ifdef LUA_SDK
+	// From Experiment: push instances to Lua with the LUA_CBASEFLEXLIBNAME metatable, so its methods are available
+	LUA_OVERRIDE_SINGLE_LUA_INSTANCE_METATABLE( CBaseFlex, LUA_CBASEFLEXLIBNAME )
+#endif
+
 	DECLARE_CLASS( CBaseFlex, CBaseAnimatingOverlay );
 public:
 	DECLARE_SERVERCLASS();

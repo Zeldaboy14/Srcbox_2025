@@ -125,7 +125,7 @@ void CTeamControlPoint::Spawn( void )
 	Precache();
 
 	InternalSetOwner( m_iDefaultOwner, false );	//init the owner of this point
-	TeamplayRoundBasedRules()->RecalculateControlPointState();
+	if ( TeamplayRoundBasedRules() ) TeamplayRoundBasedRules()->RecalculateControlPointState();
 
 	SetActive( !m_bStartDisabled );
 
@@ -296,7 +296,7 @@ void CTeamControlPoint::InputReset( inputdata_t &input )
 	m_flLastContestedAt = -1;
 	InternalSetOwner( m_iDefaultOwner, false );
 	ObjectiveResource()->SetOwningTeam( GetPointIndex(), m_iTeam );
-	TeamplayRoundBasedRules()->RecalculateControlPointState();
+	if ( TeamplayRoundBasedRules() ) TeamplayRoundBasedRules()->RecalculateControlPointState();
 }
 
 //-----------------------------------------------------------------------------
@@ -307,13 +307,13 @@ void CTeamControlPoint::HandleScoring( int iTeam )
 	if ( TeamplayRoundBasedRules() && !TeamplayRoundBasedRules()->ShouldScorePerRound() )
 	{
 		GetGlobalTeam( iTeam )->AddScore( 1 );
-		TeamplayRoundBasedRules()->HandleTeamScoreModify( iTeam, 1 );
+		if ( TeamplayRoundBasedRules() ) TeamplayRoundBasedRules()->HandleTeamScoreModify( iTeam, 1 );
 
 		CTeamControlPointMaster *pMaster = g_hControlPointMasters.Count() ? g_hControlPointMasters[0] : NULL;
 		if ( pMaster && !pMaster->WouldNewCPOwnerWinGame( this, iTeam ) )
 		{
 #ifdef TF_DLL
-			if ( TeamplayRoundBasedRules()->GetGameType() == TF_GAMETYPE_ESCORT )
+			if ( TeamplayRoundBasedRules() && TeamplayRoundBasedRules()->GetGameType() == TF_GAMETYPE_ESCORT )
 			{
 				CBroadcastRecipientFilter filter;
 				EmitSound( filter, entindex(), "Hud.EndRoundScored" );
@@ -361,7 +361,7 @@ void CTeamControlPoint::InputSetOwner( inputdata_t &input )
 		}
 
 		ObjectiveResource()->SetOwningTeam( GetPointIndex(), m_iTeam );
-		TeamplayRoundBasedRules()->RecalculateControlPointState();
+		if ( TeamplayRoundBasedRules() ) TeamplayRoundBasedRules()->RecalculateControlPointState();
 	}
 }
 
@@ -435,7 +435,7 @@ void CTeamControlPoint::ForceOwner( int iTeam )
 {
 	InternalSetOwner( iTeam, false, 0, 0 );
 	ObjectiveResource()->SetOwningTeam( GetPointIndex(), m_iTeam );
-	TeamplayRoundBasedRules()->RecalculateControlPointState();
+	if ( TeamplayRoundBasedRules() ) TeamplayRoundBasedRules()->RecalculateControlPointState();
 }
 
 //-----------------------------------------------------------------------------
@@ -450,7 +450,7 @@ void CTeamControlPoint::SetOwner( int iCapTeam, bool bMakeSound, int iNumCappers
 
 		InternalSetOwner( iCapTeam, bMakeSound, iNumCappers, pCappingPlayers );
 		ObjectiveResource()->SetOwningTeam( GetPointIndex(), m_iTeam );
-		TeamplayRoundBasedRules()->RecalculateControlPointState();
+		if ( TeamplayRoundBasedRules() ) TeamplayRoundBasedRules()->RecalculateControlPointState();
 	}
 }
 

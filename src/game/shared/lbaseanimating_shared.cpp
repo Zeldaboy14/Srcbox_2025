@@ -794,6 +794,28 @@ LUA_BINDING_BEGIN( CBaseAnimating, SetBoneController, "class", "Set the value fo
 }
 LUA_BINDING_END( "number", "The bone controller value, clamped between acceptable values" )
 
+LUA_BINDING_BEGIN( CBaseAnimating, SetModelScale, "class", "Set the model scale, optionally over a duration." )
+{
+    lua_CBaseAnimating *pAnimating = LUA_BINDING_ARGUMENT( luaL_checkanimating, 1, "entity" );
+    float flScale = LUA_BINDING_ARGUMENT( luaL_checknumber, 2, "scale" );
+    float flDuration = LUA_BINDING_ARGUMENT_WITH_DEFAULT( luaL_optnumber, 3, 0.0f, "changeDuration" );
+
+    pAnimating->SetModelScale( flScale, flDuration );
+
+    return 0;
+}
+LUA_BINDING_END()
+
+LUA_BINDING_BEGIN( CBaseAnimating, GetModelScale, "class", "Get the model scale." )
+{
+    lua_CBaseAnimating *pAnimating = LUA_BINDING_ARGUMENT( luaL_checkanimating, 1, "entity" );
+
+    lua_pushnumber( L, pAnimating->GetModelScale() );
+
+    return 1;
+}
+LUA_BINDING_END( "number", "The model scale." )
+
 LUA_BINDING_BEGIN( CBaseAnimating, SetCycle, "class", "Set the cycle." )
 {
     lua_CBaseAnimating *pAnimating = LUA_BINDING_ARGUMENT( luaL_checkanimating, 1, "entity" );

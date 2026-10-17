@@ -64,7 +64,7 @@ LUA_BINDING_BEGIN( AvatarImage, __index, "class", "Metamethod that is called whe
 {
     lua_AvatarImage *pAvatarImage = LUA_BINDING_ARGUMENT( lua_toavatarImage, 1, "avatarImage" );
     LUA_METATABLE_INDEX_CHECK_VALID( L, PanelIsValid );
-    LUA_METATABLE_INDEX_CHECK( L, pAvatarImage );
+    LUA_METATABLE_INDEX_CHECK_PANEL( L, pAvatarImage );
 
     // const char *field = LUA_BINDING_ARGUMENT( luaL_checkstring, 2, "field" );
 

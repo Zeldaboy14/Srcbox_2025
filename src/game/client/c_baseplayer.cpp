@@ -50,9 +50,6 @@
 #include "steam/steam_api.h"
 #include "sourcevr/isourcevirtualreality.h"
 #include "client_virtualreality.h"
-#ifdef LUA_SDK
-#include "luamanager.h"
-#endif
 
 #ifdef TF_CLIENT_DLL
 #include "tf_gamerules.h"
@@ -66,6 +63,10 @@
 #include "haptics/ihaptics.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
+#ifdef LUA_SDK
+#include "luamanager.h"
+#endif
+
 #include "tier0/memdbgon.h"
 
 // Don't alias here
@@ -323,6 +324,15 @@ END_RECV_TABLE()
 
 #ifdef LUA_SDK
 		RecvPropEHandle( RECVINFO( m_hHandsEntity ) ),
+
+		// Srcbox: Lua hull / view offset overrides
+		RecvPropInt( RECVINFO( m_nLuaOverrides ) ),
+		RecvPropVector( RECVINFO( m_vecLuaHullMin ) ),
+		RecvPropVector( RECVINFO( m_vecLuaHullMax ) ),
+		RecvPropVector( RECVINFO( m_vecLuaDuckHullMin ) ),
+		RecvPropVector( RECVINFO( m_vecLuaDuckHullMax ) ),
+		RecvPropVector( RECVINFO( m_vecLuaViewOffset ) ),
+		RecvPropVector( RECVINFO( m_vecLuaViewOffsetDucked ) ),
 #endif
 
 	END_RECV_TABLE()
@@ -442,6 +452,16 @@ C_BasePlayer::C_BasePlayer() : m_iv_vecViewOffset( "C_BasePlayer::m_iv_vecViewOf
 #endif
 
 	m_pFlashlight = NULL;
+
+#ifdef LUA_SDK
+	m_nLuaOverrides = 0;
+	m_vecLuaHullMin.Init();
+	m_vecLuaHullMax.Init();
+	m_vecLuaDuckHullMin.Init();
+	m_vecLuaDuckHullMax.Init();
+	m_vecLuaViewOffset.Init();
+	m_vecLuaViewOffsetDucked.Init();
+#endif
 
 	m_pCurrentVguiScreen = NULL;
 	m_pCurrentCommand = NULL;
@@ -1994,6 +2014,26 @@ C_BaseAnimating* C_BasePlayer::GetRenderedWeaponModel()
 	}
 }
 
+#ifdef SRCBOX
+C_BasePlayer* C_BasePlayer::GetLocalOrSpectatedPlayer()
+{
+	//ASSERT_LOCAL_PLAYER_RESOLVABLE();
+	C_BasePlayer* pLocalPlayer = s_pLocalPlayer;
+	if (!pLocalPlayer)
+		return NULL;
+
+	if (pLocalPlayer->GetObserverMode() == OBS_MODE_IN_EYE || pLocalPlayer->GetObserverMode() == OBS_MODE_CHASE)
+	{
+		if (ToBasePlayer(pLocalPlayer->GetObserverTarget()))
+		{
+			return ToBasePlayer(pLocalPlayer->GetObserverTarget());
+		}
+	}
+
+	return pLocalPlayer;
+}
+#endif
+
 //-----------------------------------------------------------------------------
 // Purpose: Gets a pointer to the local player, if it exists yet.
 // Output : C_BasePlayer
@@ -2324,10 +2364,12 @@ void C_BasePlayer::Simulate()
 		UpdateFogController();
 
 #ifdef LUA_SDK
-		if (L)
+		// Client-side Lua "Think" hook (from Experiment). Without it client timers never
+		// advance, so everything using timer.Simple/timer.Create on the client never ran.
+		if ( L )
 		{
-			LUA_CALL_HOOK_BEGIN("Think");
-			LUA_CALL_HOOK_END(0, 0);
+			LUA_CALL_HOOK_BEGIN( "Think" );
+			LUA_CALL_HOOK_END( 0, 0 );
 		}
 #endif
 	}

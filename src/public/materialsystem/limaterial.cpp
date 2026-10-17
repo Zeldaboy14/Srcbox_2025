@@ -5,11 +5,13 @@
 #include "luasrclib.h"
 #include "limaterial.h"
 #include "mathlib/lvector.h"
+#include "mathlib/lvmatrix.h"
 #include "lColor.h"
 #include "materialsystem/itexture.h"
 #include <litexture.h>
 #include <cpng.h>
 #include <filesystem.h>
+#include "tier1/fmtstr.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -604,6 +606,45 @@ LUA_BINDING_BEGIN( Material, SetVector4D, "class", "Set vector 4D." )
 }
 LUA_BINDING_END()
 
+LUA_BINDING_BEGIN( Material, SetMatrix, "class", "Set matrix (e.g. $basetexturetransform)." )
+{
+    bool foundVar;
+    IMaterial *material = LUA_BINDING_ARGUMENT( luaL_checkmaterial, 1, "material" );
+    const char *varName = LUA_BINDING_ARGUMENT( luaL_checkstring, 2, "varName" );
+    lua_VMatrix &matrix = LUA_BINDING_ARGUMENT( luaL_checkvmatrix, 3, "matrix" );
+    IMaterialVar *materialVar = material->FindVar( varName, &foundVar, false );
+
+    if ( !foundVar || !materialVar )
+    {
+        return 0;
+    }
+
+    materialVar->SetMatrixValue( matrix );
+
+    return 0;
+}
+LUA_BINDING_END()
+
+LUA_BINDING_BEGIN( Material, GetMatrix, "class", "Get matrix." )
+{
+    bool foundVar;
+    IMaterial *material = LUA_BINDING_ARGUMENT( luaL_checkmaterial, 1, "material" );
+    const char *varName = LUA_BINDING_ARGUMENT( luaL_checkstring, 2, "varName" );
+    IMaterialVar *materialVar = material->FindVar( varName, &foundVar, false );
+
+    if ( !foundVar || !materialVar )
+    {
+        lua_pushnil( L );
+        return 1;
+    }
+
+    VMatrix matrix = materialVar->GetMatrixValue();
+    lua_pushvmatrix( L, matrix );
+
+    return 1;
+}
+LUA_BINDING_END( "Matrix", "The matrix, or nil." )
+
 LUA_BINDING_BEGIN( Material, SetUseFixedFunctionBakedLighting, "class", "Set use fixed function baked lighting." )
 {
     bool useFixedFunctionBakedLighting = LUA_BINDING_ARGUMENT( luaL_checkboolean, 1, "useFixedFunctionBakedLighting" );
@@ -816,6 +857,56 @@ LUA_BINDING_BEGIN( Materials, Exists, "library", "Checks if a material exists. T
 LUA_BINDING_END( "boolean", "True if the material exists, false otherwise." )
 
 #ifdef CLIENT_DLL
+//-----------------------------------------------------------------------------
+// Srcbox: Lua table -> material KeyValues, as lenient as GMod's CreateMaterial.
+// Values may be strings, numbers, booleans, Vectors ("[x y z]"), ITextures
+// (their name) or nested tables ("Proxies" blocks). The key is converted from a
+// copy, because lua_tostring on the real key would break lua_next.
+//-----------------------------------------------------------------------------
+static void LuaTableToMaterialKeyValues( lua_State *L, int tableIndex, KeyValues *pKeys )
+{
+    tableIndex = lua_absindex( L, tableIndex );
+
+    lua_pushnil( L );
+    while ( lua_next( L, tableIndex ) != 0 )
+    {
+        // stack: key, value
+        lua_pushvalue( L, -2 );
+        const char *key = lua_tostring( L, -1 );  // stack: key, value, keycopy
+
+        if ( key )
+        {
+            if ( lua_istable( L, -2 ) )
+            {
+                LuaTableToMaterialKeyValues( L, -2, pKeys->FindKey( key, true ) );
+            }
+            else if ( lua_isboolean( L, -2 ) )
+            {
+                pKeys->SetInt( key, lua_toboolean( L, -2 ) ? 1 : 0 );
+            }
+            else if ( lua_isvector( L, -2 ) )
+            {
+                const Vector &v = lua_tovector( L, -2 );
+                pKeys->SetString( key, CFmtStr( "[%f %f %f]", v.x, v.y, v.z ) );
+            }
+            else if ( void *pTextureData = luaL_testudata( L, -2, LUA_ITEXTUREMETANAME ) )
+            {
+                ITexture *pTexture = *( ITexture ** )pTextureData;
+                if ( pTexture )
+                    pKeys->SetString( key, pTexture->GetName() );
+            }
+            else if ( lua_type( L, -2 ) == LUA_TNUMBER || lua_type( L, -2 ) == LUA_TSTRING )
+            {
+                lua_pushvalue( L, -2 );
+                pKeys->SetString( key, lua_tostring( L, -1 ) );
+                lua_pop( L, 1 );
+            }
+        }
+
+        lua_pop( L, 2 );  // keycopy, value; leave the key for lua_next
+    }
+}
+
 LUA_BINDING_BEGIN( Materials, Create, "library", "Creates a material", "client" )
 {
     const char *name = LUA_BINDING_ARGUMENT( luaL_checkstring, 1, "name" );
@@ -825,21 +916,7 @@ LUA_BINDING_BEGIN( Materials, Create, "library", "Creates a material", "client" 
 
     if ( LUA_BINDING_ARGUMENT_NILLABLE( lua_istable, 3, "materialData" ) )
     {
-        // Get the table to fill in the key values
-        lua_pushvalue( L, 3 );  // Push the table to the top of the stack
-
-        lua_pushnil( L );  // Push the first key
-        while ( lua_next( L, -2 ) != 0 )
-        {
-            const char *key = luaL_checkstring( L, -2 );
-            const char *value = luaL_checkstring( L, -1 );
-
-            keys->SetString( key, value );
-
-            lua_pop( L, 1 );  // Pop the value, but leave the key
-        }
-
-        lua_pop( L, 1 );  // Pop the table
+        LuaTableToMaterialKeyValues( L, 3, keys );
     }
 
     IMaterial *pMaterial = g_pMaterialSystem->CreateMaterial( name, keys );
