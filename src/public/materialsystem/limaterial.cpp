@@ -1,6 +1,7 @@
 #include "cbase.h"
 #include "imaterial.h"
 #include "materialsystem/imaterialvar.h"
+#include "texture_group_names.h"
 #include "luamanager.h"
 #include "luasrclib.h"
 #include "limaterial.h"
@@ -919,7 +920,34 @@ LUA_BINDING_BEGIN( Materials, Create, "library", "Creates a material", "client" 
         LuaTableToMaterialKeyValues( L, 3, keys );
     }
 
-    IMaterial *pMaterial = g_pMaterialSystem->CreateMaterial( name, keys );
+    // Srcbox: Lua is restarted every map, so addons call CreateMaterial with the same
+    // names again on each map. Creating a second material under a name that already
+    // exists leaves two dictionary entries for one name; the old one gets freed while
+    // still listed, and the material system later walks that freed memory (crash in
+    // the world list on the second map). Reuse the existing material instead and give
+    // it the new parameters, which is also what GMod does.
+    IMaterial *pMaterial = NULL;
+
+    if ( g_pMaterialSystem->IsMaterialLoaded( name ) )
+    {
+        IMaterial *pExisting = g_pMaterialSystem->FindMaterial( name, TEXTURE_GROUP_OTHER, false );
+
+        if ( pExisting && !pExisting->IsErrorMaterial() )
+        {
+            pExisting->SetShaderAndParams( keys );  // copies the key values
+            keys->deleteThis();
+            pMaterial = pExisting;
+        }
+    }
+
+    if ( !pMaterial )
+    {
+        pMaterial = g_pMaterialSystem->CreateMaterial( name, keys );
+
+        // Keep it alive for as long as the name can be looked up again
+        if ( pMaterial )
+            pMaterial->IncrementReferenceCount();
+    }
 
     if ( pMaterial )
     {

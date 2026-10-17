@@ -1743,7 +1743,7 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 	vgui::VGui_InitMatSysInterfacesList( "ClientDLL", &appSystemFactory, 1 );
 
 #ifdef LUA_SDK
-	SetDefLessFunc(CPngTextureRegen::m_mapProceduralMaterials);
+	// m_mapProceduralMaterials is a CUtlDict now (no less func needed)
 
 	// Initialize the GameUI state
 	luasrc_init_gameui();

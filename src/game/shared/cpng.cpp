@@ -19,7 +19,7 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-CUtlMap< const char *, CPngMaterialProxy * > CPngTextureRegen::m_mapProceduralMaterials;
+CUtlDict< CPngMaterialProxy *, int > CPngTextureRegen::m_mapProceduralMaterials;
 
 void CPngTextureRegen::RegenerateTextureBits( ITexture *pTexture, IVTFTexture *pVTFTexture, Rect_t *pSubRect )
 {
@@ -361,7 +361,7 @@ lua_Color CPngTextureRegen::GetProceduralMaterialProxyColorAtPosition( const cha
     char cleanMaterialName[MAX_PATH];
     CleanMaterialName( pMaterialName, cleanMaterialName, sizeof( cleanMaterialName ) );
 
-    unsigned short index = m_mapProceduralMaterials.Find( cleanMaterialName );
+    int index = m_mapProceduralMaterials.Find( cleanMaterialName );
 
     if ( index == m_mapProceduralMaterials.InvalidIndex() )
     {
@@ -371,7 +371,7 @@ lua_Color CPngTextureRegen::GetProceduralMaterialProxyColorAtPosition( const cha
 
     CPngMaterialProxy *pMaterialProxy = m_mapProceduralMaterials.Element( index );
 
-    if ( !pMaterialProxy )
+    if ( !pMaterialProxy || !pMaterialProxy->IsTextureValid() )
     {
         DevWarning( "Failed getting PNG as Material! Material \"%s\" no longer valid!\n", cleanMaterialName );
         return lua_Color();
@@ -415,6 +415,18 @@ CPngMaterialProxy::~CPngMaterialProxy()
 
     free( m_pTexturePointer );  // We don't need this anymore
     m_pTexturePointer = NULL;
+
+    // Remove every lookup entry still pointing at this proxy, otherwise the static
+    // map keeps a dangling pointer across map changes (UncacheAllMaterials frees proxies)
+    for ( int i = CPngTextureRegen::m_mapProceduralMaterials.First(); i != CPngTextureRegen::m_mapProceduralMaterials.InvalidIndex(); )
+    {
+        int next = CPngTextureRegen::m_mapProceduralMaterials.Next( i );
+        if ( CPngTextureRegen::m_mapProceduralMaterials.Element( i ) == this )
+            CPngTextureRegen::m_mapProceduralMaterials.RemoveAt( i );
+        i = next;
+    }
+
+    m_pTexture = NULL;
 }
 
 bool CPngMaterialProxy::Init( IMaterial *pMaterial, KeyValues *pKeyValues )
@@ -444,7 +456,14 @@ bool CPngMaterialProxy::Init( IMaterial *pMaterial, KeyValues *pKeyValues )
     m_pTexture->SetTextureRegenerator( &m_TextureRegen );
     // m_pTexture->Download(); // This will load it into memory, which will have us run out of memory quickly
 
-    CPngTextureRegen::m_mapProceduralMaterials.Insert( m_pTexture->GetName(), this );
+    {
+        // Replace an existing entry rather than adding a duplicate key
+        int idx = CPngTextureRegen::m_mapProceduralMaterials.Find( m_pTexture->GetName() );
+        if ( idx != CPngTextureRegen::m_mapProceduralMaterials.InvalidIndex() )
+            CPngTextureRegen::m_mapProceduralMaterials.Element( idx ) = this;
+        else
+            CPngTextureRegen::m_mapProceduralMaterials.Insert( m_pTexture->GetName(), this );
+    }
 
     LoadTextureFromDisk();
 
@@ -571,7 +590,8 @@ lua_Color CPngMaterialProxy::GetColorAtPosition( int x, int y )
         return lua_Color();
     }
 
-    Assert( m_pTexture );
+    if ( !IsTextureValid() )
+        return lua_Color();
 
     int width = m_pTexture->GetActualWidth();
     int height = m_pTexture->GetActualHeight();
