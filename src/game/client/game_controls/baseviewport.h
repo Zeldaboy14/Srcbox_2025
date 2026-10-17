@@ -76,8 +76,7 @@ class CBaseViewport : public vgui::EditablePanel, public IViewPort, public IGame
     }
 
     virtual int GetDeathMessageStartHeight( void );
-    void StartMainMenuVideo();
-    void StopMainMenuVideo();
+
     // virtual void ChatInputPosition( int *x, int *y );
 
     // Check if any panel other than the scoreboard is visible
@@ -166,8 +165,6 @@ class CBaseViewport : public vgui::EditablePanel, public IViewPort, public IGame
     vgui::HCursor m_hCursorNone;
     vgui::AnimationController *m_pAnimController;
     int m_OldSize[2];
-private:
-    class CMainMenu* m_pMainMenuPanel;
 };
 
 #endif

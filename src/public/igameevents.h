@@ -112,8 +112,8 @@ public:
 	virtual bool ForEventData( IGameEventVisitor2* event ) const = 0;
 
 	// Experiment: TODO: Find a less hacky way to get the keyvalues (which we want to push to lua as a table)
-	void* m_pDescriptor;  // Unknown
-	KeyValues* m_pDataKeys;
+    void *m_pDescriptor;  // Unknown
+    KeyValues *m_pDataKeys;
 };
 
 

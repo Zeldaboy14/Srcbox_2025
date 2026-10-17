@@ -11,10 +11,6 @@
 #pragma once
 #endif
 
-#ifdef LUA_SDK
-#undef MAX_SIZE
-#endif
-
 //-----------------------------------------------------------------------------
 
 typedef unsigned MemoryStackMark_t;
@@ -138,6 +134,7 @@ inline MemoryStackMark_t CMemoryStack::GetCurrentAllocPoint()
 // The CUtlMemoryStack class:
 // A fixed memory class
 //-----------------------------------------------------------------------------
+#undef MAX_SIZE
 template< typename T, typename I, size_t MAX_SIZE, size_t COMMIT_SIZE = 0, size_t INITIAL_COMMIT = 0 >
 class CUtlMemoryStack
 {

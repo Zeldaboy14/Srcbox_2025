@@ -188,8 +188,12 @@ static void CreateFleckParticles( const Vector& origin, const Vector &color, tra
 
 	float	colorRamp;
 
+#ifdef USE_NEW_PARTICLE_SYSTEM
+	int	numFlecks = random->RandomInt( 4, 16 ) * iScale;
+#else
 	float fScale = g_pParticleSystemMgr->ParticleThrottleScaling() * (float)iScale;
 	int	numFlecks = (int)( 0.5f + fScale * (float)( random->RandomInt( 4, 16 ) ) );
+#endif
 
 	FleckParticle	*pFleckParticle;
 
@@ -1086,10 +1090,12 @@ void FX_DustImpact( const Vector &origin, trace_t *tr, float flScale )
 	pSimple->SetSortOrigin( origin );
 
 	// Three types of particle, ideally we want 4 of each.
+#ifndef USE_NEW_PARTICLE_SYSTEM
 	float fNumParticles = 4.0f * g_pParticleSystemMgr->ParticleThrottleScaling();
 	int nParticles1 = (int)( 0.50f + fNumParticles );
 	int nParticles2 = (int)( 0.83f + fNumParticles );		// <-- most visible particle type.
 	int nParticles3 = (int)( 0.17f + fNumParticles );
+#endif
 
 	SimpleParticle	*pParticle;
 
@@ -1102,7 +1108,11 @@ void FX_DustImpact( const Vector &origin, trace_t *tr, float flScale )
 	const static int nParticleIdArray[4] = {3,1,2,0};
 
 	int i;
+#ifdef USE_NEW_PARTICLE_SYSTEM
+	for ( i = 0; i < 4; i++ )
+#else
 	for ( i = 0; i < nParticles1; i++ )
+#endif
 	{
 		int nId = nParticleIdArray[i];
 
@@ -1144,7 +1154,11 @@ void FX_DustImpact( const Vector &origin, trace_t *tr, float flScale )
 	}			
 
 	//Dust specs
-	for ( i = 0; i < nParticles2; i++ )
+#ifdef USE_NEW_PARTICLE_SYSTEM
+	for ( i = 0; i < 4; i++ )
+#else
+	for ( i = 0; i < nParticles1; i++ )
+#endif
 	{
 		int nId = nParticleIdArray[i];
 
@@ -1182,7 +1196,11 @@ void FX_DustImpact( const Vector &origin, trace_t *tr, float flScale )
 	}
 
 	//Impact hit
-	for ( i = 0; i < nParticles3; i++ )
+#ifdef USE_NEW_PARTICLE_SYSTEM
+	for ( i = 0; i < 4; i++ )
+#else
+	for ( i = 0; i < nParticles1; i++ )
+#endif
 	{
 		//int nId = nParticleIdArray[i];
 

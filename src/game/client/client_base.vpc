@@ -22,8 +22,8 @@ $Configuration	"Debug"
 {
 	$General
 	{
-		$OutputDirectory			".\Debug_$GAMENAME" [$WINDOWS]
-		$IntermediateDirectory		".\Debug_$GAMENAME" [$WINDOWS]
+		$OutputDirectory			".\Debug_$GAMENAME$PLATSUBDIR" [$WINDOWS]
+		$IntermediateDirectory		".\Debug_$GAMENAME$PLATSUBDIR" [$WINDOWS]
 
 		$OutputDirectory			".\Debug_$GAMENAME_360"		[$X360]
 		$IntermediateDirectory		".\Debug_$GAMENAME_360"		[$X360]
@@ -35,8 +35,8 @@ $Configuration	"Release"
 	$General
 	{
 		// Windows generator doesn't sandbox these directories per configuration but others do :-/
-		$OutputDirectory			".\Release_$GAMENAME" [$WINDOWS]
-		$IntermediateDirectory		".\Release_$GAMENAME" [$WINDOWS]
+		$OutputDirectory			".\Release_$GAMENAME$PLATSUBDIR" [$WINDOWS]
+		$IntermediateDirectory		".\Release_$GAMENAME$PLATSUBDIR" [$WINDOWS]
 
 		$OutputDirectory			".\Release_$GAMENAME_360"	[$X360]
 		$IntermediateDirectory		".\Release_$GAMENAME_360"	[$X360]
@@ -76,6 +76,7 @@ $Configuration
 		$IgnoreImportLibrary			"TRUE"
 		$AdditionalDependencies			"$BASE winmm.lib"	[$WINDOWS]
 		$AdditionalDependencies			"$BASE wsock32.lib Ws2_32.lib" [$BUILD_REPLAY&&$WINDOWS]
+		$AdditionalDependencies			"$BASE legacy_stdio_definitions.lib" [$WIN32]
 	}
 }
 
@@ -234,8 +235,8 @@ $Project
 		$File	"c_baseflex.cpp"
 		$File	"c_baseplayer.cpp"
 		$File	"c_baseviewmodel.cpp"
-		$File	"c_breakableprop.cpp"
 		$File	"c_beamspotlight.cpp"
+		$File	"c_breakableprop.cpp"
 		$File	"c_colorcorrection.cpp"
 		$File	"c_colorcorrectionvolume.cpp"
 		$File	"c_dynamiclight.cpp"
@@ -257,6 +258,7 @@ $Project
 		$File	"c_func_reflective_glass.cpp"
 		$File	"c_func_rotating.cpp"
 		$File	"c_func_smokevolume.cpp"
+		$File	"c_func_simpleladder.cpp"
 		$File	"c_func_tracktrain.cpp"
 		$File	"c_gib.cpp"
 		$File	"c_hairball.cpp"
@@ -312,6 +314,7 @@ $Project
 		$File	"cdll_util.cpp"
 		$File	"cl_mat_stub.cpp"
 		$File	"classmap.cpp"
+		//$File	"clientalphaproperty.cpp"
 		$File	"client_factorylist.cpp"
 		$File	"client_thinklist.cpp"
 		$File	"client_virtualreality.cpp"
@@ -345,7 +348,6 @@ $Project
 		$File	"$SRCDIR\game\shared\eventlist.cpp"
 		$File	"flashlighteffect.cpp"
 		$File	"$SRCDIR\game\shared\func_ladder.cpp"
-		$File	"$SRCDIR\game\shared\func_simpleladder.cpp"
 		$File	"functionproxy.cpp"
 		$File	"fx_blood.cpp"
 		$File	"fx_cube.cpp"
@@ -400,6 +402,7 @@ $Project
 		$File	"$SRCDIR\game\shared\mapentities_shared.cpp"
 		$File	"mathproxy.cpp"
 		$File	"matrixproxy.cpp"
+		$File	"materialproxydict.cpp" //l4d
 		$File	"menu.cpp"
 		$File	"message.cpp"
 		$File	"movehelper_client.cpp"
@@ -536,15 +539,6 @@ $Project
 			$File	"$SRCDIR\game\shared\sixense\sixense_convars.cpp"
 			$File	"$SRCDIR\game\shared\sixense\sixense_convars_extern.h"
 		}
-		
-		$Folder	"VGUI2 Panels"
-		{
-            $File "$SRCDIR\game\client\vgui2_panels\vgui_singeplayer.cpp"
-            $File "$SRCDIR\game\client\vgui2_panels\vgui_newgame.cpp"
-            $File "$SRCDIR\game\client\vgui2_panels\vgui_savenquit.cpp"
-            $File "$SRCDIR\game\client\vgui2_panels\overrides\OverrideInterface.cpp"
-            $File "$SRCDIR\game\client\vgui2_panels\overrides\OverrideUI_RootPanel.cpp"
-        }
 		
 		// Files not using precompiled header cbase.h
 
@@ -828,6 +822,7 @@ $Project
 		$File	"ipresence.h"
 		$File	"iinput.h"
 		$File	"iloadingdisc.h"
+		$File	"imaterialproxydict.h" // l4d
 		$File	"imessagechars.h"
 		$File	"in_main.h"
 		$File	"inetgraphpanel.h"

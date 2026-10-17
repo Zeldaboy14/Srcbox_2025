@@ -338,19 +338,21 @@ int C_BaseViewModel::DrawModel( int flags )
 #endif
 
 #ifdef LUA_SDK
-	if (!m_bIsPreDrawHookCalling)
+	// From Experiment: GMod's PreDrawViewModel (return true to skip drawing) / PostDrawViewModel.
+	// The base gamemode draws the player's hands (gmod_hands, ply:GetHands()) in PostDrawViewModel.
+	if ( !m_bIsPreDrawHookCalling )
 	{
 		m_bIsPreDrawHookCalling = true;
 
-		LUA_CALL_HOOK_BEGIN("PreDrawViewModel");
-		CBaseViewModel::PushLuaInstanceSafe(L, this);
-		CBasePlayer::PushLuaInstanceSafe(L, pPlayer);
-		CBaseCombatWeapon::PushLuaInstanceSafe(L, pWeapon);
-		LUA_CALL_HOOK_END(3, 1);
+		LUA_CALL_HOOK_BEGIN( "PreDrawViewModel" );
+		CBaseViewModel::PushLuaInstanceSafe( L, this );
+		CBasePlayer::PushLuaInstanceSafe( L, pPlayer );
+		CBaseCombatWeapon::PushLuaInstanceSafe( L, pWeapon );
+		LUA_CALL_HOOK_END( 3, 1 );
 
 		m_bIsPreDrawHookCalling = false;
 
-		LUA_RETURN_VALUE_IF_TRUE(0);
+		LUA_RETURN_VALUE_IF_TRUE( 0 );
 	}
 #endif
 

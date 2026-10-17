@@ -1563,6 +1563,48 @@ bool variant_t::Convert( fieldtype_t newType )
 }
 
 
+#ifdef MAPBASE
+//-----------------------------------------------------------------------------
+// Only for when something like !activator needs to become a FIELD_EHANDLE, or when that's a possibility.
+//-----------------------------------------------------------------------------
+bool variant_t::Convert( fieldtype_t newType, CBaseEntity *pSelf, CBaseEntity *pActivator, CBaseEntity *pCaller )
+{
+	// Support for turning !activator, !caller, and !self into a FIELD_EHANDLE.
+	// Extremely necessary.
+	if (newType == FIELD_EHANDLE)
+	{
+		if (newType == fieldType)
+			return true;
+
+		CBaseEntity *ent = NULL;
+		if (iszVal != NULL_STRING)
+		{
+			ent = gEntList.FindEntityGeneric(NULL, STRING(iszVal), pSelf, pActivator, pCaller);
+		}
+		SetEntity(ent);
+		return true;
+	}
+
+#if 0 // This was scrapped almost immediately. See the Trello card for details.
+	// Serves as a way of converting the name of the !activator, !caller, or !self into a string
+	// without passing the text "!activator" and stuff.
+	else if (fieldType == FIELD_STRING && STRING(iszVal)[0] == '&')
+	{
+		const char *val = STRING(iszVal) + 1;
+
+		#define GetRealName(string, ent) if (FStrEq(val, string)) { if (ent) {SetString(ent->GetEntityName());} return true; }
+
+		GetRealName("!activator", pActivator)
+		else GetRealName("!caller", pCaller)
+		else GetRealName("!self", pSelf)
+	}
+#endif
+
+	return Convert(newType);
+}
+#endif
+
+
 //-----------------------------------------------------------------------------
 // Purpose: All types must be able to display as strings for debugging purposes.
 // Output : Returns a pointer to the string that represents this value.

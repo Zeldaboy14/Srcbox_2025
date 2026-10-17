@@ -96,6 +96,7 @@ inline void *MemAlloc_InlineCallocMemset( void *pMem, size_t nCount, size_t nEle
 
 // --------------------------------------------------------
 // Debug path
+#define USE_MEM_DEBUG 1
 #if defined(USE_MEM_DEBUG)
 
 #define malloc(s)				g_pMemAlloc->Alloc( s, __FILE__, __LINE__)

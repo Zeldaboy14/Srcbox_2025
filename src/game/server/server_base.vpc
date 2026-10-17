@@ -22,8 +22,8 @@ $Configuration	"Debug"
 {
 	$General
 	{
-		$OutputDirectory		".\Debug_$GAMENAME" [$WINDOWS]
-		$IntermediateDirectory	".\Debug_$GAMENAME" [$WINDOWS]
+		$OutputDirectory		".\Debug_$GAMENAME$PLATSUBDIR" [$WINDOWS]
+		$IntermediateDirectory	".\Debug_$GAMENAME$PLATSUBDIR" [$WINDOWS]
 
 		$OutputDirectory		".\Debug_$GAMENAME_360"		[$X360]
 		$IntermediateDirectory	".\Debug_$GAMENAME_360"		[$X360]
@@ -35,8 +35,8 @@ $Configuration	"Release"
 	$General
 	{
 		// Windows generator doesn't sandbox these directories per configuration but others do :-/
-		$OutputDirectory		".\Release_$GAMENAME" [$WINDOWS]
-		$IntermediateDirectory	".\Release_$GAMENAME" [$WINDOWS]
+		$OutputDirectory		".\Release_$GAMENAME$PLATSUBDIR" [$WINDOWS]
+		$IntermediateDirectory	".\Release_$GAMENAME$PLATSUBDIR" [$WINDOWS]
 
 		$OutputDirectory		".\Release_$GAMENAME_360"	[$X360]
 		$IntermediateDirectory	".\Release_$GAMENAME_360"	[$X360]
@@ -78,6 +78,7 @@ $Configuration
 	$Linker
 	{
 		$AdditionalDependencies			"$BASE winmm.lib" [$WINDOWS]
+		$AdditionalDependencies			"$BASE legacy_stdio_definitions.lib" [$WIN32]
 		$SystemLibraries                                                        "iconv" [$OSXALL]
 	}
 }
@@ -395,7 +396,6 @@ $Project
 		$File	"func_dust.cpp"
 		$File	"$SRCDIR\game\shared\func_dust_shared.h"
 		$File	"$SRCDIR\game\shared\func_ladder.cpp"
-		$File	"$SRCDIR\game\shared\func_simpleladder.cpp"
 		$File	"func_ladder_endpoint.cpp"
 		$File	"func_lod.cpp"
 		$File	"func_movelinear.cpp"
@@ -403,6 +403,7 @@ $Project
 		$File	"func_occluder.cpp"
 		$File	"func_reflective_glass.cpp"
 		$File	"func_smokevolume.cpp"
+		$File	"func_simpleladder.cpp"
 		$File	"game.cpp"
 		$File	"game.h"
 		$File	"game_ui.cpp"
@@ -1063,6 +1064,7 @@ $Project
         $Lib	"lua54"
         $Lib	"luasocket"
         $Lib    "libpng"
+        $Lib    "bass"
 
 		$ImpLibexternal steam_api	[!$WIN64]
 		$ImpLibexternal steam_api64	[$WIN64]

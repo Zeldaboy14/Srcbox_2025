@@ -4494,5 +4494,4 @@ bool SafeUnzipMemory( const void *pvZipped, int cubZipped, void *pvDest, int cub
 	return true;
 }
 
-//#include "cbase.h" No newline at end of file
-//this was also causing a million errors... wtf - saint 
+//#include "cbase.h"

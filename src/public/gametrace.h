@@ -77,23 +77,27 @@ public:
 #if !defined ( LUA_SDK )
 private:
 	// No copy constructors allowed
-	CGameTrace(const CGameTrace& vOther);
+	CGameTrace( const CGameTrace& vOther );
 #else
 public:
 	// HACKHACK: We only do this for Lua, but Lua classes which use traces will
 	// throw errors when we compile, so define this outside of the Lua SDK.
 	// No copy constructors allowed
-	// CGameTrace(const CGameTrace& vOther);
-	//
+	//CGameTrace( const CGameTrace &vOther );
+
 	// this shit causes compile issues so I changed it.
 	// the better question is, why was it here twice 
 	// to begin with? - saint
+	// this was here because it's attempting to find a deleted function
+	// not sure how experiment got away with this
+	// better to find the proper change - zb14
 	inline CGameTrace(const CGameTrace& vOther)
 	{
 	}
 #endif
 };
 
+extern CGameTrace;
 
 //-----------------------------------------------------------------------------
 // Returns true if there was any kind of impact at all
@@ -191,4 +195,7 @@ public:
 	CUtlVector<IHandleEntity*>	m_aEntityList;
 };
 
+extern CGameTrace;
+
 #endif // GAMETRACE_H
+

@@ -103,16 +103,15 @@ public:
 	char					szAmmo1[MAX_WEAPON_AMMO_NAME];			// "primary" ammo type
 	char					szAmmo2[MAX_WEAPON_AMMO_NAME];			// "secondary" ammo type
 
+// L4D specific
 
-	// Terror specific
-		// Viewmodel info
-/*	CUtlMap<const char*, const char*> m_viewmodels;
-	CUtlMap<const char*, const char*> m_dualViewmodels;
-	CUtlMap<const char*, const char*> m_viewmodelAddons;
+	// Viewmodel info
+	//CUtlMap<const char*, const char*> m_viewmodels;
+	//CUtlMap<const char*, const char*> m_dualViewmodels;
+	//CUtlMap<const char*, const char*> m_viewmodelAddons;
 	char m_dualPlayerModel[64];
 	char m_dualWorldModel[64];
-	char m_addonAttachmentName[64];*/
-
+	char m_addonAttachmentName[64];
 
 	// Sound blocks
 	char					aShootSounds[NUM_SHOOT_SOUND_TYPES][MAX_WEAPON_STRING];	
@@ -142,6 +141,13 @@ public:
 
 // TF2 specific
 	bool					bShowUsageHint;							// if true, then when you receive the weapon, show a hint about it
+
+#ifdef GAME_DLL
+	void PrecacheViewmodels();
+#endif
+	void Reload(void);
+	const char* GetViewModelAddonName(const char* character, bool dualWielding);
+	const char* GetViewModelName(const char* character, bool dualWielding);
 
 // SERVER DLL
 

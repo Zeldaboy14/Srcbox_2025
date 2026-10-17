@@ -29,7 +29,7 @@ CCvarSlider::CCvarSlider( Panel *parent, const char *name ) : Slider( parent, na
 {
 	SetupSlider( 0, 1, "", false );
 	m_bCreatedInCode = false;
-
+	SetScheme(vgui::scheme()->LoadSchemeFromFile("resource/SourceSchemeLegacy.res", "SourceSchemeLegacy"));
 	AddActionSignalTarget( this );
 }
 

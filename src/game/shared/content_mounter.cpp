@@ -1,4 +1,4 @@
-#include "cbase.h"
+﻿#include "cbase.h"
 #include "SteamCommon.h"
 #ifdef CLIENT_DLL
 #include "clientsteamcontext.h"
@@ -304,4 +304,86 @@ void MountExtraContent()
 	filesystem->AddSearchPath(CFmtStr("%s", CommandLine()->ParmValue("-game")), "MOD_WRITE", PATH_ADD_TO_HEAD);
 	filesystem->AddSearchPath(CFmtStr("%s", CommandLine()->ParmValue("-game")), "DEFAULT_WRITE_PATH", PATH_ADD_TO_HEAD);
 	filesystem->AddSearchPath(CFmtStr("%s/bin", CommandLine()->ParmValue("-game")), "GAMEBIN", PATH_ADD_TO_HEAD);
+}
+
+void MountGamepacks()
+{
+	if (!filesystem)
+	{
+		Warning("[Mount System] Failed to access filesystem interface!\n");
+		return;
+	}
+
+	// Get the full absolute path to the directory containing gameinfo.txt
+	char szGameDir[MAX_PATH];
+	if (!filesystem->RelativePathToFullPath(".", "GAME", szGameDir, sizeof(szGameDir)))
+	{
+		Warning("[Mount System] Failed to resolve base game directory!\n");
+		return;
+	}
+
+	// Strip trailing slashes/backslashes
+	V_StripTrailingSlash(szGameDir);
+
+	// Go one level up from the mod folder to reach the root/parent directory
+	V_StripLastDir(szGameDir, sizeof(szGameDir));
+
+	// Append /gamepacks to form the full path
+	char szGamepacksDir[MAX_PATH];
+	V_snprintf(szGamepacksDir, sizeof(szGamepacksDir), "%s/gamepacks", szGameDir);
+	V_FixSlashes(szGamepacksDir);
+
+	Msg("[Mount System] Scanning directory: %s\n", szGamepacksDir);
+
+	// Search wildcard for folders inside gamepacks
+	char szSearchPath[MAX_PATH];
+	V_snprintf(szSearchPath, sizeof(szSearchPath), "%s/*", szGamepacksDir);
+
+	int nMountedFolders = 0;
+	int nMountedVPKs = 0;
+
+	FileFindHandle_t findHandle;
+	const char* pFileName = filesystem->FindFirstEx(szSearchPath, NULL, &findHandle);
+
+	while (pFileName)
+	{
+		// Skip current directory '.', parent '..', and non-directory files
+		if (pFileName[0] != '.' && filesystem->FindIsDirectory(findHandle))
+		{
+			char szPackPath[MAX_PATH];
+			V_snprintf(szPackPath, sizeof(szPackPath), "%s/%s", szGamepacksDir, pFileName);
+
+			// Mount loose files in the folder directly using absolute path
+			filesystem->AddSearchPath(szPackPath, "GAME", PATH_ADD_TO_TAIL);
+
+			Msg("[Mount System] Mounted Folder: gamepacks/%s\n", pFileName);
+			nMountedFolders++;
+
+			// Scan and mount any VPKs inside this gamepack folder
+			char szVpkSearch[MAX_PATH];
+			V_snprintf(szVpkSearch, sizeof(szVpkSearch), "%s/*.vpk", szPackPath);
+
+			FileFindHandle_t vpkHandle;
+			const char* pVpkName = filesystem->FindFirstEx(szVpkSearch, NULL, &vpkHandle);
+			while (pVpkName)
+			{
+				// Skip VPK chunk files (e.g. pak01_001.vpk); only mount dir or standalone VPKs
+				if (!V_stristr(pVpkName, "_0") && !V_stristr(pVpkName, "_1"))
+				{
+					char szFullVpkPath[MAX_PATH];
+					V_snprintf(szFullVpkPath, sizeof(szFullVpkPath), "%s/%s", szPackPath, pVpkName);
+					filesystem->AddSearchPath(szFullVpkPath, "GAME", PATH_ADD_TO_TAIL);
+
+					Msg("[Mount System] Mounted VPK: %s\n", pVpkName);
+					nMountedVPKs++;
+				}
+				pVpkName = filesystem->FindNext(vpkHandle);
+			}
+			filesystem->FindClose(vpkHandle);
+		}
+		pFileName = filesystem->FindNext(findHandle);
+	}
+	filesystem->FindClose(findHandle);
+
+	Msg("[Mount System] Auto-mounting complete (%d folders, %d VPKs mounted).\n", nMountedFolders, nMountedVPKs);
 }

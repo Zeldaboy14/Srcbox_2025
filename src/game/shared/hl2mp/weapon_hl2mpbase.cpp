@@ -201,7 +201,8 @@ void CWeaponHL2MPBase::Materialize( void )
 
 int CWeaponHL2MPBase::ObjectCaps()
 {
-	return BaseClass::ObjectCaps() & ~FCAP_IMPULSE_USE;
+	//return BaseClass::ObjectCaps() & ~FCAP_IMPULSE_USE;
+	return BaseClass::ObjectCaps() & ~FCAP_ACROSS_TRANSITION;
 }
 
 #endif
@@ -283,6 +284,13 @@ const CHL2MPSWeaponInfo &CWeaponHL2MPBase::GetHL2MPWpnData() const
 
 	return *pHL2MPInfo;
 }
+
+// added to just return the proper info like in l4D
+CHL2MPSWeaponInfo* CWeaponHL2MPBase::GetHL2MPWeaponData(void) const
+{
+	return (CHL2MPSWeaponInfo*)&GetWpnData();
+}
+
 void CWeaponHL2MPBase::FireBullets( const FireBulletsInfo_t &info )
 {
 	FireBulletsInfo_t modinfo = info;

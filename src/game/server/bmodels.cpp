@@ -1469,3 +1469,257 @@ void CFuncVPhysicsClip::InputDisable( inputdata_t &inputdata )
 	VPhysicsGetObject()->EnableCollisions(false);
 	m_bDisabled = true;
 }
+
+// hl goldsrc
+
+#include "hl2mp_player.h"
+
+#ifdef SRCBOX
+#if 0
+class CPendulum : public CBaseEntity
+{
+	DECLARE_CLASS(CPendulum, CBaseEntity);
+public:
+	void	Spawn(void);
+	void	KeyValue(const char* szKeyName, const char* szValue);
+	void	EXPORT Swing(void);
+	void	EXPORT PendulumUse(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value);
+	void	EXPORT Stop(void);
+	void	Touch(CBaseEntity* pOther);
+	void	EXPORT RopeTouch(CBaseEntity* pOther);// this touch func makes the pendulum a rope
+	virtual int	ObjectCaps(void) { return CBaseEntity::ObjectCaps() & ~FCAP_ACROSS_TRANSITION; }
+	virtual int		Save(CSave& save);
+	virtual int		Restore(CRestore& restore);
+	void	Blocked(CBaseEntity* pOther);
+
+	//static	TYPEDESCRIPTION m_SaveData[];
+
+	float	m_accel;			// Acceleration
+	float	m_distance;			// 
+	float	m_time;
+	float	m_damp;
+	float	m_maxSpeed;
+	float	m_dampSpeed;
+	QAngle	m_center;
+	QAngle	m_start;
+	QAngle	angles;
+	QAngle	movedir;
+	float	speed;
+};
+
+LINK_ENTITY_TO_CLASS(func_pendulum, CPendulum);
+
+/*TYPEDESCRIPTION	CPendulum::m_SaveData[] =
+{
+	DEFINE_FIELD(CPendulum, m_accel, FIELD_FLOAT),
+	DEFINE_FIELD(CPendulum, m_distance, FIELD_FLOAT),
+	DEFINE_FIELD(CPendulum, m_time, FIELD_TIME),
+	DEFINE_FIELD(CPendulum, m_damp, FIELD_FLOAT),
+	DEFINE_FIELD(CPendulum, m_maxSpeed, FIELD_FLOAT),
+	DEFINE_FIELD(CPendulum, m_dampSpeed, FIELD_FLOAT),
+	DEFINE_FIELD(CPendulum, m_center, FIELD_VECTOR),
+	DEFINE_FIELD(CPendulum, m_start, FIELD_VECTOR),
+};
+
+IMPLEMENT_SAVERESTORE(CPendulum, CBaseEntity);*/
+
+// func_rotating
+#define SF_BRUSH_ROTATE_Y_AXIS		0
+#define SF_BRUSH_ROTATE_INSTANT		1
+#define	SF_PENDULUM_SWING			2	// spawnflag that makes a pendulum a rope swing.
+#define SF_BRUSH_ROTATE_BACKWARDS	2
+#define SF_BRUSH_ROTATE_Z_AXIS		4
+#define SF_BRUSH_ROTATE_X_AXIS		8
+#define SF_PENDULUM_AUTO_RETURN		16
+#define	SF_PENDULUM_PASSABLE		32
+
+void CPendulum::KeyValue(const char* szKeyName, const char* szValue)
+{
+	if (FStrEq(szKeyName, "distance"))
+	{
+		m_distance = atof(szKeyName);
+		//szKeyName->fHandled = TRUE;
+	}
+	else if (FStrEq(szKeyName, "damp"))
+	{
+		m_damp = atof(szKeyName) * 0.001;
+		//szKeyName->fHandled = TRUE;
+	}
+	else
+		BaseClass::KeyValue(szKeyName, szValue);
+}
+
+
+void CPendulum::Spawn(void)
+{
+	// set the axis of rotation
+	//CBaseToggle::AxisDir();
+
+	if (FBitSet(this->m_spawnflags, SF_DOOR_PASSABLE))
+		this->SetSolid(SOLID_NONE);
+	else
+		this->SetSolid(SOLID_BSP);
+	this->SetMoveType(MOVETYPE_PUSH);
+	UTIL_SetOrigin(this, GetLocalOrigin());
+	//SET_MODEL(ENT(this), STRING(this->model));
+	SetModel(STRING(GetModelName()));
+
+	if (m_distance == 0)
+		return;
+
+	if (this->speed == 0)
+		this->speed = 100;
+
+	m_accel = (this->speed * this->speed) / (2 * fabs(m_distance));	// Calculate constant acceleration from speed and distance
+	m_maxSpeed = this->speed;
+	m_start = this->angles;
+	m_center = this->angles + (m_distance * 0.5) * this->movedir;
+
+	if (FBitSet(this->m_spawnflags, SF_BRUSH_ROTATE_INSTANT))
+	{
+		SetThink(&CPendulum::SUB_CallUseToggle);
+		//this->nextthink = gpGlobals->time + 0.1;
+		this->SetNextThink(gpGlobals->curtime + 0.1f);
+	}
+	this->speed = 0;
+	SetUse(&CPendulum::PendulumUse);
+
+	if (FBitSet(this->m_spawnflags, SF_PENDULUM_SWING))
+	{
+		SetTouch(&CPendulum::RopeTouch);
+	}
+}
+
+void CPendulum::PendulumUse(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value)
+{
+	if (this->speed)		// Pendulum is moving, stop it and auto-return if necessary
+	{
+		if (FBitSet(this->m_spawnflags, SF_PENDULUM_AUTO_RETURN))
+		{
+			float	delta;
+
+			delta = CBaseToggle::AxisDelta(this->m_spawnflags, this->angles, m_start);
+
+			this->avelocity = m_maxSpeed * this->movedir;
+			this->nextthink = this->ltime + (delta / m_maxSpeed);
+			SetThink(&CPendulum::Stop);
+		}
+		else
+		{
+			this->speed = 0;		// Dead stop
+			SetThink(NULL);
+			this->avelocity = NULL;
+		}
+	}
+	else
+	{
+		this->nextthink = this->ltime + 0.1;		// Start the pendulum moving
+		m_time = gpGlobals->time;		// Save time to calculate dt
+		SetThink(&CPendulum::Swing);
+		m_dampSpeed = m_maxSpeed;
+	}
+}
+
+
+void CPendulum::Stop(void)
+{
+	this->angles = m_start;
+	this->speed = 0;
+	SetThink(NULL);
+	this->avelocity = NULL;
+}
+
+
+void CPendulum::Blocked(CBaseEntity* pOther)
+{
+	m_time = gpGlobals->curtime;
+}
+
+
+void CPendulum::Swing(void)
+{
+	float delta, dt;
+
+	delta = CBaseToggle::AxisDelta(this->m_spawnflags, this->angles, m_center);
+	dt = gpGlobals->time - m_time;	// How much time has passed?
+	m_time = gpGlobals->time;		// Remember the last time called
+
+	if (delta > 0 && m_accel > 0)
+		this->speed -= m_accel * dt;	// Integrate velocity
+	else
+		this->speed += m_accel * dt;
+
+	if (this->speed > m_maxSpeed)
+		this->speed = m_maxSpeed;
+	else if (this->speed < -m_maxSpeed)
+		this->speed = -m_maxSpeed;
+	// scale the destdelta vector by the time spent traveling to get velocity
+	this->avelocity = this->speed * this->movedir;
+
+	// Call this again
+	this->nextthink = this->ltime + 0.1;
+
+	if (m_damp)
+	{
+		m_dampSpeed -= m_damp * m_dampSpeed * dt;
+		if (m_dampSpeed < 30.0)
+		{
+			this->angles = m_center;
+			this->speed = 0;
+			SetThink(NULL);
+			this->avelocity = NULL;
+		}
+		else if (this->speed > m_dampSpeed)
+			this->speed = m_dampSpeed;
+		else if (this->speed < -m_dampSpeed)
+			this->speed = -m_dampSpeed;
+
+	}
+}
+
+
+void CPendulum::Touch(CBaseEntity* pOther)
+{
+	entvars_t* pevOther = pOther->this;
+
+	if (this->dmg <= 0)
+		return;
+
+	// we can't hurt this thing, so we're not concerned with it
+	if (!pevOther->takedamage)
+		return;
+
+	// calculate damage based on rotation speed
+	float damage = pev->dmg * pev->speed * 0.01;
+
+	if (damage < 0)
+		damage = -damage;
+
+	pOther->TakeDamage(this, this, damage, DMG_CRUSH);
+
+	pevOther->velocity = (pevOther->origin - VecBModelOrigin(this)).Normalize() * damage;
+}
+
+void CPendulum::RopeTouch(CBaseEntity* pOther)
+{
+	CBaseEdict* pevOther = pOther;
+	edict_t* enemy;
+
+	if (!pOther->IsPlayer())
+	{// not a player!
+		Warning("Not a client\n");
+		return;
+	}
+
+	if (ENT(pevOther) == this->enemy)
+	{// this player already on the rope.
+		return;
+	}
+
+	this->enemy = pOther->edict();
+	//pevOther->velocity = g_vecZero;
+	this->SetVelocity(MOVETYPE_NONE);
+	this->SetMoveType(MOVETYPE_NONE);
+}
+#endif
+#endif

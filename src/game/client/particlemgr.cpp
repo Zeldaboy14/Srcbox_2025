@@ -1078,7 +1078,12 @@ bool CParticleMgr::Init(unsigned long count, IMaterialSystem *pMaterials)
 	m_pMaterialSystem = pMaterials;
 
 	// Initialize the particle system
+#ifdef USE_NEW_PARTICLE_SYSTEM
+	bool bPrecacheParticles = IsPC();
+	g_pParticleSystemMgr->Init(g_pParticleSystemQuery, bPrecacheParticles);
+#else
 	g_pParticleSystemMgr->Init( g_pParticleSystemQuery );
+#endif
 	// tell particle mgr to add the default simulation + rendering ops
 	g_pParticleSystemMgr->AddBuiltinSimulationOperators();
 	g_pParticleSystemMgr->AddBuiltinRenderingOperators();
@@ -1570,12 +1575,20 @@ static void ProcessPSystem( ParticleSimListEntry_t& pSimListEntry )
 
 	if ( pNewEffect->GetFirstFrameFlag() )
 	{
+#ifdef USE_NEW_PARTICLE_SYSTEM
+		pNewEffect->Simulate( 0.0f );
+#else
 		pNewEffect->Simulate( 0.0f, updateBboxOnly );
+#endif
 		pNewEffect->SetFirstFrameFlag( false );
 	}
 	else if ( pNewEffect->ShouldSimulate() )
 	{
+#ifdef USE_NEW_PARTICLE_SYSTEM
+		pNewEffect->Simulate( s_flThreadedPSystemTimeStep );
+#else
 		pNewEffect->Simulate( s_flThreadedPSystemTimeStep, updateBboxOnly );
+#endif
 	}
 
 	if ( pNewEffect->IsFinished() )
@@ -1783,11 +1796,13 @@ void CParticleMgr::BuildParticleSimList( CUtlVector< ParticleSimListEntry_t > &l
 		
 		// Particles that are attached to moving things will need to update their bboxes even if they
 		// otherwise would like to skip the updates. Check that here.
+#ifndef USE_NEW_PARTICLE_SYSTEM
 		if (bSkip)
 		{
 			bNeedsBboxUpdate = pNewEffect->HasMoved();
 			bSkip = !bNeedsBboxUpdate;
 		}
+#endif
 
 		if (!bSkip)
 		{
@@ -1909,6 +1924,7 @@ void CParticleMgr::UpdateNewEffects( float flTimeDelta )
 		StatsAccumulateActiveParticleSystems();
 	}
 
+#ifndef USE_NEW_PARTICLE_SYSTEM
 	bool bFrameWarningNeeded = g_pParticleSystemMgr->Debug_FrameWarningNeededTestAndReset();
 
 	m_nStatsFramesSinceLastAlert++;
@@ -1932,6 +1948,7 @@ void CParticleMgr::UpdateNewEffects( float flTimeDelta )
 			StatsReset();
 		}
 	}
+#endif
 }
 
 void CParticleMgr::UpdateAllEffects( float flTimeDelta )

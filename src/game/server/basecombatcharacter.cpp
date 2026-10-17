@@ -5,6 +5,9 @@
 //=============================================================================//
 
 #include "cbase.h"
+#ifdef LUA_SDK
+#include "luasrclib.h"
+#endif
 #include "basecombatcharacter.h"
 #include "basecombatweapon.h"
 #include "animation.h"

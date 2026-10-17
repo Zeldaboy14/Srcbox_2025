@@ -139,31 +139,14 @@ $Project
             $File "$SRCDIR\public\lColor.h"
             $File "$SRCDIR\game\shared\cpng.cpp"
             $File "$SRCDIR\game\shared\cpng.h"
-            $File "$SRCDIR\public\XUnzip.cpp"
-			{
-				$Configuration
-				{
-					$Compiler
-					{
-						$Create/UsePrecompiledHeader	"Not Using Precompiled Headers"
-					}
-				}
-			}
             $File "$SRCDIR\public\zip_utils.cpp"
-			{
-				$Configuration
-				{
-					$Compiler
-					{
-						$Create/UsePrecompiledHeader	"Not Using Precompiled Headers"
-					}
-				}
-			}
             $File "$SRCDIR\public\zip_utils.h"
             $File "$SRCDIR\game\shared\hl2mp\weapon_hl2mpbase_scriptedweapon.cpp"
             $File "$SRCDIR\game\shared\hl2mp\weapon_hl2mpbase_scriptedweapon.h"
             $File "$SRCDIR\public\base64.cpp"
             $File "$SRCDIR\public\base64.h"
+            $File "$SRCDIR\lua\lua.h"
+            $File "$SRCDIR\lua\lauxlib.h"
 			// for some reason, we need this???
 			
             //$File "$SRCDIR\game\server\hl2mp\lua\lbaselib.c"
@@ -192,18 +175,18 @@ $Project
 		}
         $Folder "Util"
         {
-            $File "$SRCDIR\game\shared\hl2mp\util\jsontokv.h"
-            $File "$SRCDIR\game\shared\hl2mp\util\jsontokv.cpp"
+            $File "$SRCDIR\game\shared\experiment\util\jsontokv.h"
+            $File "$SRCDIR\game\shared\experiment\util\jsontokv.cpp"
 
-            $File "$SRCDIR\game\shared\hl2mp\util\lnetworks.h"
-            $File "$SRCDIR\game\shared\hl2mp\util\lnetworks.cpp"
-            $File "$SRCDIR\game\shared\hl2mp\util\networkmessage.h"
-            $File "$SRCDIR\game\shared\hl2mp\util\networkmessage.cpp"
-            $File "$SRCDIR\game\shared\hl2mp\util\networkmanager.h"
-            $File "$SRCDIR\game\shared\hl2mp\util\networkmanager.cpp"
+            $File "$SRCDIR\game\shared\experiment\util\lnetworks.h"
+            $File "$SRCDIR\game\shared\experiment\util\lnetworks.cpp"
+            $File "$SRCDIR\game\shared\experiment\util\networkmessage.h"
+            $File "$SRCDIR\game\shared\experiment\util\networkmessage.cpp"
+            $File "$SRCDIR\game\shared\experiment\util\networkmanager.h"
+            $File "$SRCDIR\game\shared\experiment\util\networkmanager.cpp"
 
-            $File "$SRCDIR\game\shared\hl2mp\util\lwebconnections.h"
-            $File "$SRCDIR\game\shared\hl2mp\util\lwebconnections.cpp"
+            $File "$SRCDIR\game\shared\experiment\util\lwebconnections.h"
+            $File "$SRCDIR\game\shared\experiment\util\lwebconnections.cpp"
         }
 	}
 }

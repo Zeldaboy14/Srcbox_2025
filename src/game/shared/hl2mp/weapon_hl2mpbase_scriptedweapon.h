@@ -29,6 +29,10 @@ public:
 	CHL2MPScriptedWeapon();
 	~CHL2MPScriptedWeapon();
 
+#ifndef CLIENT_DLL
+	virtual	int	ObjectCaps(void);
+#endif 
+
 #ifdef LUA_SDK
 	virtual void SetupRefTable(lua_State* L);
 	bool m_bInitialized;

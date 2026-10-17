@@ -111,36 +111,3 @@ void CBaseClientRenderTargets::ShutdownClientRenderTargets()
 	// Monitors
 	m_CameraTexture.Shutdown();
 }
-
-//#include "../../dx9sdk/include/d3d9.h"
-
-// ...
-/*void ExampleToFetchSwapChain()
-{
-	IDirect3DSwapChain9* pSwapChain = NULL;
-	g_pDirect3DDevice9->GetSwapChain(0, &pSwapChain);
-
-	//SSAO//(c) Michael Auerbach 2008
-	float pos = sqrt(tex2D(depth, tex).r);
-	half occlusion = 0;
-	float sample;
-	float pPos;
-	half dist = (tex.x * 1440) % 8;
-	dist += (tex.y * 900) % 8;
-	dist += 1;
-	half3 pNorm;
-	float SSnorm;
-	float3 vec;
-	for (int j = 1;j < 3;j++)
-	{
-		for (int i = 0;i < 180;i += 45)
-		{
-			pPos = sqrt(tex2D(depth, tex + float2(cos(i), sin(i)) * j * dist * vecViewPort.zw).r);
-			SSnorm = sqrt(tex2D(depth, tex - float2(cos(i), sin(i)) * j * dist * vecViewPort.zw).r);
-			//SSnorm -= pos;
-			sample = (pos / pPos) - (SSnorm / pos);
-			if ((sample > 0.001) && (sample < 0.05))
-				occlusion += (sample * 30);
-		}
-	}
-}*/

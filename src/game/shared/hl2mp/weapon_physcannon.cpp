@@ -564,7 +564,14 @@ void CGrabController::DetachEntity( bool bClearVelocity )
 			else
 			{
 #ifndef CLIENT_DLL
-				ClampPhysicsVelocity( pPhys, hl2_normspeed.GetFloat() * 1.5f, 2.0f * 360.0f );
+				//ClampPhysicsVelocity( pPhys, hl2_normspeed.GetFloat() * 1.5f, 2.0f * 360.0f );
+#if defined( SRCBOX )
+				ClampPhysicsVelocity(pPhys, HL2_NORM_SPEED * 1.5f, 2.0f * 360.0f);
+#elif defined( HL2MP )
+				ClampPhysicsVelocity(pPhys, HL2_NORM_SPEED * 1.5f, 2.0f * 360.0f);
+#else
+				ClampPhysicsVelocity(pPhys, hl2_normspeed.GetFloat() * 1.5f, 2.0f * 360.0f);
+#endif
 #endif
 			}
 
@@ -2010,7 +2017,15 @@ void CWeaponPhysCannon::DetachObject( bool playSound, bool wasLaunched )
 	if( pOwner != NULL )
 	{
 		pOwner->EnableSprint( true );
-		pOwner->SetMaxSpeed( hl2_normspeed.GetFloat() );
+		//pOwner->SetMaxSpeed( hl2_normspeed.GetFloat() );
+
+#if defined( SRCBOX ) && defined( LUA_SDK )
+		pOwner->SetMaxSpeed(pOwner->GetNormalSpeed());
+#elif defined( HL2MP )
+		pOwner->SetMaxSpeed(HL2_NORM_SPEED);
+#else
+		pOwner->SetMaxSpeed(hl2_normspeed.GetFloat());
+#endif
 	}
 
 	CBaseEntity *pObject = m_grabController.GetAttached();

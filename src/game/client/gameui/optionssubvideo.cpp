@@ -1142,6 +1142,7 @@ void COptionsSubVideo::SetCurrentResolutionComboItem()
 //-----------------------------------------------------------------------------
 void COptionsSubVideo::OnApplyChanges()
 {
+	CGlobalVarsBase* gpGlobals = 0;
 	if ( RequiresRestart() )
 	{
 		INetChannelInfo *nci = engine->GetNetChannelInfo();
@@ -1157,7 +1158,12 @@ void COptionsSubVideo::OnApplyChanges()
 				}
 				else
 				{
-					engine->ClientCmd_Unrestricted( "disconnect\n" );
+					if (gpGlobals->maxClients == 2) // HL2MP always forces 2 maxclients, even when your alone. server first, then player.
+					{
+						engine->ClientCmd_Unrestricted( "retry\n" );
+					} else {
+						engine->ClientCmd_Unrestricted( "disconnect\n" );
+					}
 				}
 			}
 		}

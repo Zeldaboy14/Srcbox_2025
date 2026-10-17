@@ -16,13 +16,17 @@
 #include "model_types.h"
 #include "vprof.h"
 #include "input.h"
+#include "tier2/tier2.h"
 
 extern ConVar cl_particleeffect_aabb_buffer;
 
-//extern ConVar cl_particle_show_bbox;
-//extern ConVar cl_particle_show_bbox_cost;
 extern bool g_cl_particle_show_bbox;
 extern int g_cl_particle_show_bbox_cost;
+
+#ifdef USE_NEW_PARTICLE_SYSTEM
+extern ConVar cl_particleeffect_aabb_buffer;
+extern ConVar cl_particle_show_bbox;
+#endif
 
 
 //-----------------------------------------------------------------------------
@@ -81,6 +85,12 @@ void CNewParticleEffect::Construct()
 		msg->SetPtr( "state", &state );
 		ToolFramework_PostToolMessage( HTOOLHANDLE_INVALID, msg );
 	}
+
+#ifdef USE_NEW_PARTICLE_SYSTEM
+	SetRenderable(this);
+
+	RecordCreation();
+#endif
 }
 
 CNewParticleEffect::~CNewParticleEffect(void)
@@ -242,6 +252,41 @@ void CNewParticleEffect::SetControlPoint( int nWhichPoint, const Vector &v )
 	CParticleCollection::SetControlPoint( nWhichPoint, v );
 }
 
+#ifdef USE_NEW_PARTICLE_SYSTEM
+
+void CNewParticleEffect::SetToolRecording(bool bRecord)
+{
+	if (bRecord == m_bRecord)
+		return;
+
+	m_bRecord = bRecord;
+
+	if (m_bRecord)
+	{
+		RecordCreation();
+	}
+}
+
+void CNewParticleEffect::RecordCreation()
+{
+	if ( IsValid() && clienttools->IsInRecordingMode() )
+	{
+		m_bRecord = true;
+
+		int nId = AllocateToolParticleEffectId();	
+
+		static ParticleSystemCreatedState_t state;
+		state.m_nParticleSystemId = nId;
+		state.m_flTime = gpGlobals->curtime;
+		state.m_pName = m_pDef->GetName();
+		state.m_nOwner = m_hOwner ? m_hOwner->entindex() : -1;
+
+		KeyValues *msg = new KeyValues( "ParticleSystem_Create" );
+		msg->SetPtr( "state", &state );
+		ToolFramework_PostToolMessage( HTOOLHANDLE_INVALID, msg );
+	}
+}
+#endif
 
 void CNewParticleEffect::RecordControlPointOrientation( int nWhichPoint )
 {
@@ -249,7 +294,11 @@ void CNewParticleEffect::RecordControlPointOrientation( int nWhichPoint )
 	{
 		// FIXME: Make a more direct way of getting 
 		QAngle angles;
+#ifdef USE_NEW_PARTICLE_SYSTEM
+		VectorAngles( ControlPoint(nWhichPoint).m_ForwardVector, ControlPoint(nWhichPoint).m_UpVector, angles );
+#else
 		VectorAngles( m_ControlPoints[nWhichPoint].m_ForwardVector, m_ControlPoints[nWhichPoint].m_UpVector, angles );
+#endif
 
 		static ParticleSystemSetControlPointOrientationState_t state;
 		state.m_nParticleSystemId = GetToolParticleEffectId();
@@ -519,10 +568,27 @@ int CNewParticleEffect::DrawModel( int flags )
 	{
 		return 0;
 	}
+
+#ifdef USE_NEW_PARTICLE_SYSTEM
+	if( flags & STUDIO_SHADOWDEPTHTEXTURE )
+		return 0;
+
+	if ( m_hOwner && m_hOwner->IsDormant() )
+		return 0;
+#endif
 	
 	// do distance cull check here. We do it here instead of in particles so we can easily only do
 	// it for root objects, not bothering to cull children individually
 	CMatRenderContextPtr pRenderContext( materials );
+#ifdef USE_NEW_PARTICLE_SYSTEM
+	if ( !m_pDef->IsScreenSpaceEffect() && !m_pDef->IsViewModelEffect() )
+	{
+		Vector vecCamera;
+		pRenderContext->GetWorldSpaceCameraPosition( &vecCamera );
+		if ( ( CalcSqrDistanceToAABB( m_MinBounds, m_MaxBounds, vecCamera ) > ( m_pDef->m_flMaxDrawDistance * m_pDef->m_flMaxDrawDistance ) ) )
+			return 0;
+	}
+#else
 	Vector vecCamera;
 	pRenderContext->GetWorldSpaceCameraPosition( &vecCamera );
 	if ( CalcSqrDistanceToAABB( m_MinBounds, m_MaxBounds, vecCamera ) > ( m_pDef->m_flMaxDrawDistance * m_pDef->m_flMaxDrawDistance ) )
@@ -537,6 +603,7 @@ int CNewParticleEffect::DrawModel( int flags )
 
 		return 0;
 	}
+#endif
 
 	if ( flags & STUDIO_TRANSPARENCY )
 	{
@@ -571,10 +638,27 @@ int CNewParticleEffect::DrawModel( int flags )
 			}
 		}
 
+#ifdef USE_NEW_PARTICLE_SYSTEM
+		// and the reverse: only render the system when the camera IS the entity attached to this control point
+		// (used by the precipitation effects, which put the local player on control point 2)
+		if ( pCameraObject &&
+			 ( m_pDef->m_nAllowRenderControlPoint != -1 ) &&
+			 ( m_pDef->m_nAllowRenderControlPoint <= m_nHighestCP ) &&
+			 ( (C_BaseEntity *)GetControlPointEntity( m_pDef->m_nAllowRenderControlPoint ) != pCameraObject ) )
+			return 0;
+#endif
+
+#ifdef USE_NEW_PARTICLE_SYSTEM
+		Vector4D vecDiffuseModulation( 1.0f, 1.0f, 1.0f, 1.0f ); //instance.m_nAlpha / 255.0f );
+#endif
 		pRenderContext->MatrixMode( MATERIAL_MODEL );
 		pRenderContext->PushMatrix();
 		pRenderContext->LoadIdentity();
+#ifdef USE_NEW_PARTICLE_SYSTEM
+		Render( pRenderContext, vecDiffuseModulation, ( flags & STUDIO_TRANSPARENCY ) ? IsTwoPass() : false, pCameraObject );
+#else
 		Render( pRenderContext, IsTwoPass(), pCameraObject );
+#endif
 		pRenderContext->MatrixMode( MATERIAL_MODEL );
 		pRenderContext->PopMatrix();
 	}
@@ -583,6 +667,7 @@ int CNewParticleEffect::DrawModel( int flags )
 		g_pParticleSystemMgr->AddToRenderCache( this );
 	}
 
+#ifndef USE_NEW_PARTICLE_SYSTEM
 	if ( !IsRetail() )
 	{
 		CParticleMgr *pMgr = ParticleMgr();
@@ -596,6 +681,34 @@ int CNewParticleEffect::DrawModel( int flags )
 			DebugDrawBbox ( false );
 		}
 	}
+#endif
+
+#ifdef USE_NEW_PARTICLE_SYSTEM
+	if ( cl_particle_show_bbox.GetBool() )
+	{
+		Vector center = GetRenderOrigin();
+		Vector mins   = m_MinBounds - center;
+		Vector maxs   = m_MaxBounds - center;
+	
+		int r, g;
+		if ( GetAutoUpdateBBox() )
+		{
+			// red is bad, the bbox update is costly
+			r = 255;
+			g = 0;
+		}
+		else
+		{
+			// green, this effect presents less cpu load 
+			r = 0;
+			g = 255;
+		}
+		Vector vecCurCPPos = GetControlPointAtCurrentTime( 0 );
+		debugoverlay->AddBoxOverlay( center, mins, maxs, QAngle( 0, 0, 0 ), r, g, 0, 16, 0 );
+		debugoverlay->AddTextOverlayRGB( center, 0, 0, r, g, 0, 64, "%s:(%d)", GetEffectName(),
+										 m_nActiveParticles );
+	}
+#endif
 
 	return 1;
 }

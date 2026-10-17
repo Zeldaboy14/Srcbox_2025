@@ -16,7 +16,8 @@
 
 #include "weapon_hl2mpbasebasebludgeon.h"
 
-#define	PISTOL_FASTEST_REFIRE_TIME		0.1f
+//#define	PISTOL_FASTEST_REFIRE_TIME		0.1f
+#define	PISTOL_FASTEST_REFIRE_TIME		0.075;
 #define	PISTOL_FASTEST_DRY_REFIRE_TIME	0.2f
 
 #define	PISTOL_ACCURACY_SHOT_PENALTY_TIME		0.2f	// Applied amount of time each shot adds to the time we must recover from
@@ -179,6 +180,15 @@ CWeaponPistol_Terror::CWeaponPistol_Terror( void )
 void CWeaponPistol_Terror::Precache( void )
 {
 	BaseClass::Precache();
+#ifdef GAME_DLL
+	bool oldLock = engine->LockNetworkStringTables(false);
+#endif
+	//m_dualPlayerModelIndex = PrecacheModel(GetHL2MPWeaponData()->m_dualPlayerModel);
+	//m_dualWorldModelIndex = PrecacheModel(GetHL2MPWeaponData()->m_dualWorldModel);
+	//m_singleModelIndex = PrecacheModel(GetHL2MPWeaponData()->szWorldModel);
+#ifdef GAME_DLL
+	engine->LockNetworkStringTables(oldLock);
+#endif
 }
 
 
@@ -243,7 +253,10 @@ void CWeaponPistol_Terror::SecondaryAttack( void )
 {
 	Swing(true);
 
-	m_flNextSecondaryAttack = gpGlobals->curtime + GetViewModelSequenceDuration();
+	if (!ACT_VM_DRAW)
+	{ 
+		m_flNextSecondaryAttack = gpGlobals->curtime + GetViewModelSequenceDuration();
+	}
 
 	SendWeaponAnim(ACT_VM_HITCENTER);
 

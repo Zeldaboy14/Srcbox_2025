@@ -262,7 +262,7 @@ void C_BeamSpotLight::SpotlightDestroy(void)
 {
 	if ( m_hSpotlight )
 	{
-		UTIL_Remove( m_hSpotlight );
+		m_hSpotlight->Release();
 		m_hSpotlight.Term();
 	}
 }

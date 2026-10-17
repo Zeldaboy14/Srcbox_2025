@@ -37,7 +37,7 @@
 		"ControlName"			"BaseModHybridButton"
 		"fieldName"				"BtnReturnToGame"
 		"xpos"					"100"
-		"ypos"					"148"
+		"ypos"					"135"
 		"wide"					"220"	[$WIN32]
 		"wide"					"180"	[$X360]
 		"tall"					"20"
@@ -66,16 +66,18 @@
 		"tall"					"20"
 		"autoResize"			"1"
 		"pinCorner"				"0"
-		"visible"				"0"
+		"visible"				"1"
 		"enabled"				"1"
 		"tabPosition"			"1"
 		"navUp"					"BtnReturnToGame"
 		"navDown"				"BtnCallAVote"
-		"labelText"				"#L4D360UI_InGameMainMenu_GoIdle"
-		"tooltiptext"			"#L4D360UI_InGameMainMenu_GoIdle_Tip"
+		//"labelText"			"#L4D360UI_InGameMainMenu_GoIdle"
+		"labelText"				"#srcbox_singleplayer_menu_gmm"
+		//"tooltiptext"			"#L4D360UI_InGameMainMenu_GoIdle_Tip"
+		"tooltiptext"			"#srcbox_singleplayer_menu_gmm_Tip"
 		"disabled_tooltiptext"	"#L4D360UI_InGameMainMenu_GoIdle_Disabled"
 		"style"					"MainMenuButton"
-		"command"				"GoIdle"
+		"command"				"Srcbox_Singleplayer_Menu"
 		"ActivationType"		"1"
 	}
 
@@ -99,7 +101,7 @@
 		"tooltiptext"			"#L4D360UI_InGameMainMenu_CallAVote_Tip"
 		"disabled_tooltiptext" "#L4D360UI_InGameMainMenu_CallAVote_Tip"
 		"style"					"MainMenuButton"
-		"command" 				"Srcbox_Singleplayer_Menu"
+		"command" 				"FlmVoteFlyout"
 		"ActivationType"		"1"
 	}
 
@@ -137,7 +139,7 @@
 		"tall"					"0"
 		"zpos"					"3"
 		"InitialFocus"			"BtnPlayers"
-		"ResourceFile"			"resource/UI/basemodui/DropDownInviteLive.res"
+		"ResourceFile"			"resource/UI/L4D360UI/DropDownInviteLive.res"
 	}
 	
 	"BtnLeaderboard"
@@ -151,7 +153,7 @@
 		"tall"					"20"	
 		"autoResize"			"1"		
 		"pinCorner"				"0"
-		"visible"				"0"
+		"visible"				"1"
 		"enabled"				"1"
 		"tabPosition"			"0"
 		"navUp"					"BtnInviteFriends"
@@ -168,7 +170,7 @@
 		"ControlName"			"BaseModHybridButton"
 		"fieldName"				"BtnStatsAndAchievements"
 		"xpos"					"100"
-		"ypos"					"235"
+		"ypos"					"260"
 		"wide"					"220"	[$WIN32]
 		"wide"					"180"	[$X360]
 		"tall"					"20"
@@ -194,7 +196,7 @@
 		"ControlName"			"BaseModHybridButton"
 		"fieldName"				"BtnOptions"
 		"xpos"					"100"
-		"ypos"					"260"
+		"ypos"					"285"
 		"wide"					"220"	[$WIN32]
 		"wide"					"180"	[$X360]
 		"tall"					"20"
@@ -208,7 +210,7 @@
 		"labelText"				"#L4D360UI_MainMenu_Options"
 		"tooltiptext"			"#L4D360UI_MainMenu_Options_Tip"
 		"style"					"MainMenuButton"
-		"command"				"OpenLegacyOptions"
+		"command"				"FlmOptionsFlyout"
 		"ActivationType"		"1"
 	}
 
@@ -217,7 +219,7 @@
 		"ControlName"			"BaseModHybridButton"
 		"fieldName"				"BtnExitToMainMenu"
 		"xpos"					"100"
-		"ypos"					"297"
+		"ypos"					"322"
 		"wide"					"220"	[$WIN32]
 		"wide"					"180"	[$X360]
 		"tall"					"20"

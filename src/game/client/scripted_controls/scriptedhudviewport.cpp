@@ -1,4 +1,4 @@
-//========= Copyright © 1996-2005, Valve Corporation, All rights reserved. ============//
+//========= Copyright Â© 1996-2005, Valve Corporation, All rights reserved. ============//
 //
 // Purpose: Client DLL VGUI2 Viewport
 //
@@ -27,26 +27,27 @@
 using namespace vgui;
 
 //================================================================
-CScriptedHudViewport::CScriptedHudViewport(lua_State* L) : vgui::EditablePanel(NULL, "CScriptedHudViewport")
+CScriptedHudViewport::CScriptedHudViewport( lua_State* L )
+    : vgui::EditablePanel( NULL, "CScriptedHudViewport" )
 {
-	m_lua_State = L;
+    m_lua_State = L;
 
-	SetKeyBoardInputEnabled( false );
-	SetMouseInputEnabled( false );
+    SetKeyBoardInputEnabled( false );
+    SetMouseInputEnabled( false );
 
-	SetProportional( true );
+    SetProportional( true );
 }
 
 //-----------------------------------------------------------------------------
 // Purpose: Sets the parent for each panel to use
 //-----------------------------------------------------------------------------
-void CScriptedHudViewport::SetParent(vgui::VPANEL parent)
+void CScriptedHudViewport::SetParent( vgui::VPANEL parent )
 {
-	EditablePanel::SetParent( parent );
-	// force ourselves to be proportional - when we set our parent above, if our new
-	// parent happened to be non-proportional (such as the vgui root panel), we got
-	// slammed to be nonproportional
-	EditablePanel::SetProportional( true );
+    EditablePanel::SetParent( parent );
+    // force ourselves to be proportional - when we set our parent above, if our new
+    // parent happened to be non-proportional (such as the vgui root panel), we got
+    // slammed to be nonproportional
+    EditablePanel::SetProportional( true );
 }
 
 void CScriptedHudViewport::Paint()

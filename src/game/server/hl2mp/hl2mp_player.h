@@ -162,6 +162,8 @@ public:
 
 	virtual bool	CanHearAndReadChatFrom( CBasePlayer *pPlayer );
 
+	CNetworkVar(int, m_PlayerColor);
+
 #ifdef LUA_SDK
 	
     bool IsAirborne() const

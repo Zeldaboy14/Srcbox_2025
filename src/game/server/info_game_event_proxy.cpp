@@ -656,7 +656,9 @@ void CWorld::DecalTrace( trace_t *pTrace, char const *decalName)
 
 void CWorld::RegisterSharedActivities( void )
 {
+#ifndef LUA_SDK
 	ActivityList_RegisterSharedActivities();
+#endif
 }
 
 void CWorld::RegisterSharedEvents( void )

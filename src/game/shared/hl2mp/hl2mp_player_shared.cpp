@@ -15,6 +15,12 @@
 #include "hl2mp_player.h"
 #endif
 
+#ifdef SRCBOX
+//#include "srcbox/tf/tf_shareddefs.h"
+//#include "srcbox/tf/entity_capture_flag.h"
+//#include "econ/attribute_manager.h"
+#endif
+
 #ifdef LUA_SDK
 #include "luamanager.h"
 //#include "lhl2mp_player_shared.h"
@@ -34,6 +40,81 @@ const char *g_ppszPlayerSoundPrefixNames[PLAYER_SOUNDS_MAX] =
 	"NPC_CombineS",
 	"NPC_MetroPolice",
 };
+
+#ifdef SRCBOX_EXPERIMENT
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+bool C_HL2MP_Player::HasItem(void) const
+{
+	return (m_hItem != NULL);
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+void C_HL2MP_Player::SetItem(CTFItem* pItem)
+{
+	m_hItem = pItem;
+
+#ifndef CLIENT_DLL
+	if (pItem)
+	{
+		AddGlowEffect();
+	}
+	else
+	{
+		RemoveGlowEffect();
+	}
+
+	if (pItem && pItem->GetItemID() == TF_ITEM_CAPTURE_FLAG)
+	{
+		RemoveInvisibility();
+	}
+#endif
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+CTFItem* C_HL2MP_Player::GetItem(void) const
+{
+	return m_hItem;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Is the player carrying the flag?
+//-----------------------------------------------------------------------------
+bool C_HL2MP_Player::HasTheFlag(ETFFlagType exceptionTypes[], int nNumExceptions) const
+{
+	if (HasItem() && GetItem()->GetItemID() == TF_ITEM_CAPTURE_FLAG)
+	{
+		CCaptureFlag* pFlag = static_cast<CCaptureFlag*>(GetItem());
+
+		for (int i = 0; i < nNumExceptions; ++i)
+		{
+			if (exceptionTypes[i] == pFlag->GetType())
+				return false;
+		}
+
+		return true;
+	}
+
+	return false;
+}
+
+bool C_HL2MP_Player::IsAllowedToPickUpFlag(void) const
+{
+	/*int iCannotPickUpIntelligence = 0;
+	CALL_ATTRIB_HOOK_INT(iCannotPickUpIntelligence, cannot_pick_up_intelligence);
+	if (iCannotPickUpIntelligence)
+	{
+		return false;
+	}*/
+
+	return true;
+}
+#endif
 
 const char *CHL2MP_Player::GetPlayerModelSoundPrefix( void )
 {

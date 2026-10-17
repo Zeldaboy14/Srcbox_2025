@@ -57,6 +57,7 @@ private:
 };
 
 CBackgroundMovie* BackgroundMovie();
+extern CBackgroundMovie *g_pBackgroundMovie;
 #endif
 
 class CNB_Header_Footer : public vgui::EditablePanel

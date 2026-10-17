@@ -46,7 +46,8 @@ using namespace vgui;
 //-----------------------------------------------------------------------------
 COptionsSubKeyboard::COptionsSubKeyboard(vgui::Panel *parent) : PropertyPage(parent, NULL)
 {
-	vgui::HScheme scheme = vgui::scheme()->LoadSchemeFromFile("resource/SourceScheme.res", "SwarmFrameScheme");
+	//vgui::HScheme scheme = vgui::scheme()->LoadSchemeFromFile("resource/SourceScheme.res", "SwarmFrameScheme");
+	vgui::HScheme scheme = vgui::scheme()->LoadSchemeFromFile("resource/SourceSchemeLegacy.res", "SwarmFrameScheme");
 	SetScheme(scheme);
 
 	Q_memset( m_Bindings, 0, sizeof( m_Bindings ));
@@ -107,6 +108,7 @@ void COptionsSubKeyboard::CreateKeyBindingList()
 {
 	// Create the control
 	m_pKeyBindList = new VControlsListPanel(this, "listpanel_keybindlist");
+	m_pKeyBindList->GetScrollBar()->UseImages( "scroll_up", "scroll_down", "scroll_line", "scroll_box" );
 	m_pKeyBindList->GetScrollBar()->UseImages( "scroll_up", "scroll_down", "scroll_line", "scroll_box" );
 }
 

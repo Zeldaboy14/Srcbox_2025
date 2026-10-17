@@ -437,11 +437,17 @@ void CGameUI::Shutdown()
 	}
 
 	steamapicontext->Clear();
-	
+
+#ifndef CLIENT_DLL
+	// Only when GameUI is its own DLL (as in Alien Swarm). Built into client.dll these are the client's
+	// own convars and interface pointers (g_pCVar, g_pFullFileSystem, ...); tearing them down here left
+	// the rest of the client shutdown (e.g. ~CConsolePanel) running on NULL interfaces. The client
+	// handles its own unregister/disconnect.
 	ConVar_Unregister();
 	DisconnectTier3Libraries();
 	DisconnectTier2Libraries();
 	DisconnectTier1Libraries();
+#endif
 }
 
 //-----------------------------------------------------------------------------

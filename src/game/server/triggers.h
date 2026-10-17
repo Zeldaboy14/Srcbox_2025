@@ -320,4 +320,54 @@ private:
 
 bool IsTakingTriggerHurtDamageAtPoint( const Vector &vecPoint );
 
+//#ifdef TERROR
+#ifdef SRCBOX
+#define SF_SC_DISABLE_WHEN_MOVE_FINISHED	(1 << 0)
+#define SF_SC_PLAYER_SETFOV					(1 << 1)
+
+class CSurvivorCamera : public CBaseEntity
+{
+public:
+	DECLARE_CLASS(CSurvivorCamera, CBaseEntity);
+	DECLARE_DATADESC();
+
+	CSurvivorCamera();
+
+	void Spawn(void);
+
+	void Enable(void);
+	void Disable(void);
+
+	void FollowTarget(void);
+
+	void StartMovement(void);
+
+	// Input handlers
+	void InputEnable(inputdata_t& inputdata);
+	void InputDisable(inputdata_t& inputdata);
+	void InputStartMovement(inputdata_t& inputdata);
+
+	void Move(void);
+
+	// Always transmit to clients so they know where to move the view to
+	virtual int UpdateTransmitState();
+
+private:
+
+	EHANDLE m_hPlayer;
+
+	float m_fov;
+	float m_fovSpeed;
+
+	bool m_bEnabled;
+
+	bool m_bDisableOnMoveEnd;
+	bool m_bMovementStarted;
+
+	Vector m_vStartPos;
+	float m_flInterpStartTime;
+
+};
+#endif
+
 #endif // TRIGGERS_H

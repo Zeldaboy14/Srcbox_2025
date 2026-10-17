@@ -35,7 +35,7 @@ static int g_physgunBeam;
 
 #define MAX_PELLETS	16
 
-class CWeaponGravityGun;
+class CWeaponGravityGun_E3;
 
 class CGravityPellet : public CBaseAnimating
 {
@@ -126,13 +126,13 @@ CGravityPellet::~CGravityPellet()
 	}
 }
 
-class CGravControllerPoint : public IMotionEvent
+class CGravControllerPointE3 : public IMotionEvent
 {
 	DECLARE_SIMPLE_DATADESC();
 
 public:
-	CGravControllerPoint( void );
-	~CGravControllerPoint( void );
+	CGravControllerPointE3( void );
+	~CGravControllerPointE3( void );
 	void AttachEntity( CBaseEntity *pEntity, IPhysicsObject *pPhys, const Vector &position );
 	void DetachEntity( void );
 	void SetMaxVelocity( float maxVel )
@@ -184,7 +184,7 @@ public:
 };
 
 
-BEGIN_SIMPLE_DATADESC( CGravControllerPoint )
+BEGIN_SIMPLE_DATADESC( CGravControllerPointE3)
 
 	DEFINE_FIELD( m_localPosition,		FIELD_VECTOR ),
 	DEFINE_FIELD( m_targetPosition,		FIELD_POSITION_VECTOR ),
@@ -208,18 +208,18 @@ BEGIN_SIMPLE_DATADESC( CGravControllerPoint )
 END_DATADESC()
 
 
-CGravControllerPoint::CGravControllerPoint( void )
+CGravControllerPointE3::CGravControllerPointE3( void )
 {
 	m_attachedEntity = NULL;
 }
 
-CGravControllerPoint::~CGravControllerPoint( void )
+CGravControllerPointE3::~CGravControllerPointE3( void )
 {
 	DetachEntity();
 }
 
 
-void CGravControllerPoint::AttachEntity( CBaseEntity *pEntity, IPhysicsObject *pPhys, const Vector &position )
+void CGravControllerPointE3::AttachEntity( CBaseEntity *pEntity, IPhysicsObject *pPhys, const Vector &position )
 {
 	m_attachedEntity = pEntity;
 	pPhys->WorldToLocal( &m_localPosition, position );
@@ -237,7 +237,7 @@ void CGravControllerPoint::AttachEntity( CBaseEntity *pEntity, IPhysicsObject *p
 	m_maxAngularAcceleration = torque * pPhys->GetInvInertia();
 }
 
-void CGravControllerPoint::DetachEntity( void )
+void CGravControllerPointE3::DetachEntity( void )
 {
 	CBaseEntity *pEntity = m_attachedEntity;
 	if ( pEntity )
@@ -259,7 +259,7 @@ void CGravControllerPoint::DetachEntity( void )
 	m_worldPosition = vec3_origin;
 }
 
-void AxisAngleQAngle( const Vector &axis, float angle, QAngle &outAngles )
+void AxisAngleQAngleE3( const Vector &axis, float angle, QAngle &outAngles )
 {
 	// map back to HL rotation axes
 	outAngles.z = axis.x * angle;
@@ -267,7 +267,7 @@ void AxisAngleQAngle( const Vector &axis, float angle, QAngle &outAngles )
 	outAngles.y = axis.z * angle;
 }
 
-IMotionEvent::simresult_e CGravControllerPoint::Simulate( IPhysicsMotionController *pController, IPhysicsObject *pObject, float deltaTime, Vector &linear, AngularImpulse &angular )
+IMotionEvent::simresult_e CGravControllerPointE3::Simulate( IPhysicsMotionController *pController, IPhysicsObject *pObject, float deltaTime, Vector &linear, AngularImpulse &angular )
 {
 	Vector vel;
 	AngularImpulse angVel;
@@ -369,7 +369,7 @@ IMotionEvent::simresult_e CGravControllerPoint::Simulate( IPhysicsMotionControll
 				float angleDiff = angleDest - angleSrc;
 				angleDiff = RAD2DEG(angleDiff);
 				axis += m_targetAlignNormal * angleDiff;
-				//world = m_targetPosition;// + rotDest * (1-ratio);
+				world = m_targetPosition;// + rotDest * (1-ratio);
 //				NDebugOverlay::Line( worldRotCenter, worldRotCenter-m_targetAlignNormal*50, 255, 0, 0, false, 0.1 );
 //				NDebugOverlay::Line( worldRotCenter, worldRotCenter+tangent*50, 0, 255, 0, false, 0.1 );
 //				NDebugOverlay::Line( worldRotCenter, worldRotCenter+binormal*50, 0, 0, 255, false, 0.1 );
@@ -459,14 +459,14 @@ struct pelletlist_t
 	EHANDLE						parent;
 };
 
-class CWeaponGravityGun : public CBaseCombatWeapon
+class CWeaponGravityGun_E3 : public CBaseCombatWeapon
 {
 	DECLARE_DATADESC();
 
 public:
-	DECLARE_CLASS( CWeaponGravityGun, CBaseCombatWeapon );
+	DECLARE_CLASS( CWeaponGravityGun_E3, CBaseCombatWeapon );
 
-	CWeaponGravityGun();
+	CWeaponGravityGun_E3();
 	void Spawn( void );
 	void OnRestore( void );
 	void Precache( void );
@@ -562,7 +562,7 @@ private:
 	CNetworkVar( int, m_viewModelIndex );
 	Vector		m_originalObjectPosition;
 
-	CGravControllerPoint		m_gravCallback;
+	CGravControllerPointE3		m_gravCallback;
 	pelletlist_t m_activePellets[MAX_PELLETS];
 	int			m_pelletCount;
 	int			m_objectPelletCount;
@@ -573,7 +573,7 @@ private:
 	CNetworkVar( bool, m_glueTouching );
 };
 
-IMPLEMENT_SERVERCLASS_ST( CWeaponGravityGun, DT_WeaponGravityGun )
+IMPLEMENT_SERVERCLASS_ST( CWeaponGravityGun_E3, DT_WeaponGravityGun_E3 )
 	SendPropVector( SENDINFO_NAME(m_gravCallback.m_targetPosition, m_targetPosition), -1, SPROP_COORD ),
 	SendPropVector( SENDINFO_NAME(m_gravCallback.m_worldPosition, m_worldPosition), -1, SPROP_COORD ),
 	SendPropInt( SENDINFO(m_active), 1, SPROP_UNSIGNED ),
@@ -581,8 +581,8 @@ IMPLEMENT_SERVERCLASS_ST( CWeaponGravityGun, DT_WeaponGravityGun )
 	SendPropModelIndex( SENDINFO(m_viewModelIndex) ),
 END_SEND_TABLE()
 
-LINK_ENTITY_TO_CLASS( weapon_physgun, CWeaponGravityGun );
-PRECACHE_WEAPON_REGISTER(weapon_physgun);
+LINK_ENTITY_TO_CLASS( weapon_physgun_e3, CWeaponGravityGun_E3 );
+PRECACHE_WEAPON_REGISTER(weapon_physgun_e3);
 
 //---------------------------------------------------------
 // Save/Restore
@@ -595,7 +595,7 @@ BEGIN_SIMPLE_DATADESC( pelletlist_t )
 
 END_DATADESC()
 
-BEGIN_DATADESC( CWeaponGravityGun )
+BEGIN_DATADESC( CWeaponGravityGun_E3 )
 
 	DEFINE_FIELD( m_active,				FIELD_INTEGER ),
 	DEFINE_FIELD( m_useDown,				FIELD_BOOLEAN ),
@@ -627,7 +627,7 @@ enum physgun_soundIndex { SI_LOCKEDON = 0, SI_SCANNING = 1, SI_LIGHTOBJECT = 2, 
 //=========================================================
 //=========================================================
 
-CWeaponGravityGun::CWeaponGravityGun()
+CWeaponGravityGun_E3::CWeaponGravityGun_E3()
 {
 	m_active = false;
 	m_bFiresUnderwater = true;
@@ -637,7 +637,7 @@ CWeaponGravityGun::CWeaponGravityGun()
 
 //=========================================================
 //=========================================================
-void CWeaponGravityGun::Spawn( )
+void CWeaponGravityGun_E3::Spawn( )
 {
 	BaseClass::Spawn();
 //	SetModel( GetWorldModel() );
@@ -645,7 +645,7 @@ void CWeaponGravityGun::Spawn( )
 	FallInit();
 }
 
-void CWeaponGravityGun::OnRestore( void )
+void CWeaponGravityGun_E3::OnRestore( void )
 {
 	BaseClass::OnRestore();
 
@@ -658,7 +658,7 @@ void CWeaponGravityGun::OnRestore( void )
 
 //=========================================================
 //=========================================================
-void CWeaponGravityGun::Precache( void )
+void CWeaponGravityGun_E3::Precache( void )
 {
 	BaseClass::Precache();
 
@@ -671,14 +671,14 @@ void CWeaponGravityGun::Precache( void )
 	PrecacheScriptSound( "Weapon_Physgun.HeavyObject" );
 }
 
-void CWeaponGravityGun::EffectCreate( void )
+void CWeaponGravityGun_E3::EffectCreate( void )
 {
 	EffectUpdate();
 	m_active = true;
 }
 
 
-void CWeaponGravityGun::EffectUpdate( void )
+void CWeaponGravityGun_E3::EffectUpdate( void )
 {
 	Vector start, angles, forward, right;
 	trace_t tr;
@@ -841,22 +841,24 @@ void CWeaponGravityGun::EffectUpdate( void )
 	{
 		m_gravCallback.ClearAutoAlign();
 	}
+
+	NetworkStateChanged();
 }
 
-void CWeaponGravityGun::SoundCreate( void )
+void CWeaponGravityGun_E3::SoundCreate( void )
 {
 	m_soundState = SS_SCANNING;
 	SoundStart();
 }
 
 
-void CWeaponGravityGun::SoundDestroy( void )
+void CWeaponGravityGun_E3::SoundDestroy( void )
 {
 	SoundStop();
 }
 
 
-void CWeaponGravityGun::SoundStop( void )
+void CWeaponGravityGun_E3::SoundStop( void )
 {
 	switch( m_soundState )
 	{
@@ -898,7 +900,7 @@ static float UTIL_LineFraction( float value, float low, float high, float scale 
 	return scale * (value-low) / delta;
 }
 
-void CWeaponGravityGun::SoundStart( void )
+void CWeaponGravityGun_E3::SoundStart( void )
 {
 	CPASAttenuationFilter filter( GetOwner() );
 	filter.MakeReliable();
@@ -924,7 +926,7 @@ void CWeaponGravityGun::SoundStart( void )
 													//   volume, att, flags, pitch
 }
 
-void CWeaponGravityGun::SoundUpdate( void )
+void CWeaponGravityGun_E3::SoundUpdate( void )
 {
 	int newState;
 	
@@ -970,7 +972,9 @@ void CWeaponGravityGun::SoundUpdate( void )
 			// blend the "mass" sounds between 50 and 500 kg
 			IPhysicsObject *pPhys = m_hObject->VPhysicsGetObject();
 			
-			float fade = UTIL_LineFraction( pPhys->GetMass(), 50, 500, 1.0 );
+			float fade = 100;
+			if (pPhys)
+				fade = UTIL_LineFraction( pPhys->GetMass(), 50, 500, 1.0 );
 
 			if ( GetParametersForSound( "Weapon_Physgun.LightObject", params, NULL ) )
 			{
@@ -995,7 +999,7 @@ void CWeaponGravityGun::SoundUpdate( void )
 }
 
 
-void CWeaponGravityGun::AddPellet( CGravityPellet *pPellet, CBaseEntity *pAttach, const Vector &surfaceNormal )
+void CWeaponGravityGun_E3::AddPellet( CGravityPellet *pPellet, CBaseEntity *pAttach, const Vector &surfaceNormal )
 {
 	Assert(m_pelletCount<MAX_PELLETS);
 
@@ -1011,7 +1015,7 @@ void CWeaponGravityGun::AddPellet( CGravityPellet *pPellet, CBaseEntity *pAttach
 	m_pelletCount++;
 }
 
-void CWeaponGravityGun::SortPelletsForObject( CBaseEntity *pObject )
+void CWeaponGravityGun_E3::SortPelletsForObject( CBaseEntity *pObject )
 {
 	m_objectPelletCount = 0;
 	for ( int i = 0; i < m_pelletCount; i++ )
@@ -1032,7 +1036,7 @@ void CWeaponGravityGun::SortPelletsForObject( CBaseEntity *pObject )
 	SetObjectPelletsColor( 192, 255, 192 );
 }
 
-void CWeaponGravityGun::SetObjectPelletsColor( int r, int g, int b )
+void CWeaponGravityGun_E3::SetObjectPelletsColor( int r, int g, int b )
 {
 	color32 color;
 	color.r = r;
@@ -1050,7 +1054,7 @@ void CWeaponGravityGun::SetObjectPelletsColor( int r, int g, int b )
 	}
 }
 
-CBaseEntity *CWeaponGravityGun::GetBeamEntity()
+CBaseEntity *CWeaponGravityGun_E3::GetBeamEntity()
 {
 	CBasePlayer *pOwner = ToBasePlayer( GetOwner() );
 	if ( !pOwner )
@@ -1064,7 +1068,7 @@ CBaseEntity *CWeaponGravityGun::GetBeamEntity()
 	return pOwner;
 }
 
-void CWeaponGravityGun::DeleteActivePellets()
+void CWeaponGravityGun_E3::DeleteActivePellets()
 {
 	CBaseEntity *pEnt = GetBeamEntity();
 
@@ -1092,7 +1096,7 @@ void CWeaponGravityGun::DeleteActivePellets()
 	m_pelletCount = 0;
 }
 
-void CWeaponGravityGun::CreatePelletAttraction( float radius, CBaseEntity *pObject )
+void CWeaponGravityGun_E3::CreatePelletAttraction( float radius, CBaseEntity *pObject )
 {
 	int nearPellet = -1;
 	int objectPellet = -1;
@@ -1172,7 +1176,7 @@ void CWeaponGravityGun::CreatePelletAttraction( float radius, CBaseEntity *pObje
 	}
 
 
-IPhysicsObject *CWeaponGravityGun::GetPelletPhysObject( int pelletIndex )
+IPhysicsObject *CWeaponGravityGun_E3::GetPelletPhysObject( int pelletIndex )
 {
 	if ( pelletIndex < 0 )
 		return NULL;
@@ -1184,7 +1188,7 @@ IPhysicsObject *CWeaponGravityGun::GetPelletPhysObject( int pelletIndex )
 	return g_PhysWorldObject;
 }
 
-void CWeaponGravityGun::EffectDestroy( void )
+void CWeaponGravityGun_E3::EffectDestroy( void )
 {
 	m_active = false;
 	SoundStop();
@@ -1192,7 +1196,7 @@ void CWeaponGravityGun::EffectDestroy( void )
 	DetachObject();
 }
 
-void CWeaponGravityGun::DetachObject( void )
+void CWeaponGravityGun_E3::DetachObject( void )
 {
 	m_pelletHeld = -1;
 	m_pelletAttract = -1;
@@ -1210,7 +1214,7 @@ void CWeaponGravityGun::DetachObject( void )
 	}
 }
 
-void CWeaponGravityGun::AttachObject( CBaseEntity *pObject, const Vector& start, const Vector &end, float distance )
+void CWeaponGravityGun_E3::AttachObject( CBaseEntity *pObject, const Vector& start, const Vector &end, float distance )
 {
 	m_hObject = pObject;
 	m_useDown = false;
@@ -1253,7 +1257,7 @@ void CWeaponGravityGun::AttachObject( CBaseEntity *pObject, const Vector& start,
 
 //=========================================================
 //=========================================================
-void CWeaponGravityGun::PrimaryAttack( void )
+void CWeaponGravityGun_E3::PrimaryAttack( void )
 {
 	if ( !m_active )
 	{
@@ -1268,7 +1272,7 @@ void CWeaponGravityGun::PrimaryAttack( void )
 	}
 }
 
-void CWeaponGravityGun::SecondaryAttack( void )
+void CWeaponGravityGun_E3::SecondaryAttack( void )
 {
 	m_flNextSecondaryAttack = gpGlobals->curtime + 0.1;
 	if ( m_active )
@@ -1341,7 +1345,7 @@ void CWeaponGravityGun::SecondaryAttack( void )
 
 }
 
-void CWeaponGravityGun::WeaponIdle( void )
+void CWeaponGravityGun_E3::WeaponIdle( void )
 {
 	if ( HasWeaponIdleTimeElapsed() )
 	{
@@ -1367,7 +1371,7 @@ void CWeaponGravityGun::WeaponIdle( void )
 	}
 }
 
-void CWeaponGravityGun::ItemPostFrame( void )
+void CWeaponGravityGun_E3::ItemPostFrame( void )
 {
 	CBasePlayer *pOwner = ToBasePlayer( GetOwner() );
 	if (!pOwner)
@@ -1399,7 +1403,7 @@ void CWeaponGravityGun::ItemPostFrame( void )
 // Purpose: 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-bool CWeaponGravityGun::HasAnyAmmo( void )
+bool CWeaponGravityGun_E3::HasAnyAmmo( void )
 {
 	//Always report that we have ammo
 	return true;
@@ -1407,7 +1411,7 @@ bool CWeaponGravityGun::HasAnyAmmo( void )
 
 //=========================================================
 //=========================================================
-bool CWeaponGravityGun::Reload( void )
+bool CWeaponGravityGun_E3::Reload( void )
 {
 	CBasePlayer *pOwner = ToBasePlayer( GetOwner() );
 
@@ -1422,6 +1426,7 @@ bool CWeaponGravityGun::Reload( void )
 	return false;
 }
 
+/*
 #define NUM_COLLISION_TESTS 2500
 void CC_CollisionTest( const CCommand &args )
 {
@@ -1521,3 +1526,4 @@ void CC_CollisionTest( const CCommand &args )
 #endif
 }
 static ConCommand collision_test("collision_test", CC_CollisionTest, "Tests collision system", FCVAR_CHEAT );
+*/

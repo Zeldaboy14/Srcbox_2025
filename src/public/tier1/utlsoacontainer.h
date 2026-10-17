@@ -107,6 +107,11 @@ public:
 	{
 		m_pData += nNumElements*m_nStride;
 	}
+	FORCEINLINE size_t Stride( void ) const
+	{
+		return m_nStride;
+
+	}
 };
 
 // allowed field data types. if you change these values, you need to change the tables in the .cpp file
@@ -124,6 +129,7 @@ enum EAttributeDataType
 
 class CSOAContainer
 {
+	friend class CSOAAttributeReference;
 
 protected:
 	int m_nColumns;											// # of rows and columns created with
@@ -176,6 +182,9 @@ public:
 
 	size_t ElementSize( void ) const;					// total bytes per element. not super fast.
 
+	// Did the container allocate memory for this attribute?
+	bool HasAllocatedMemory( int nAttrIdx ) const;
+
 	// set the data type for an attribute. If you set the data type, but tell it not to allocate,
 	// the data type will be set but writes will assert, and reads will give you back zeros.
 	FORCEINLINE void SetAttributeType( int nAttrIdx, EAttributeDataType nDataType, bool bAllocateMemory = true )
@@ -188,6 +197,7 @@ public:
 		else
 			m_nFieldPresentMask &= ~( 1 << nAttrIdx );
 	}
+	EAttributeDataType GetAttributeType(int nAttrIdx) const;
 
 	FORCEINLINE int NumRows( void ) const
 	{
@@ -231,10 +241,12 @@ public:
 
 	// how much to step to go from the end of one row to the start of the next one. Basically, how
 	// many bytes to add at the end of a row when iterating over the whole 2d array with ++
-	FORCEINLINE size_t RowToRowStep( int nAttrIdx ) const
-	{
-		return 0;
-	}
+	size_t RowToRowStep( int nAttrIdx ) const;
+	template<class T> T *RowPtr( int nAttributeIdx, int nRowNumber, int nSliceNumber = 0 ) const;
+	void const *ConstRowPtr( int nAttributeIdx, int nRowNumber, int nSliceNumber = 0 ) const;
+	template<class T> T *ElementPointer( int nAttributeIdx, int nX = 0, int nY = 0, int nZ = 0 ) const;
+	FourVectors *ElementPointer4V( int nAttributeIdx, int nX = 0, int nY = 0, int nZ = 0 ) const;
+	size_t ItemByteStride( int nAttributeIdx ) const;
 	
 	FORCEINLINE void *RowPtr( int nAttributeIdx, int nRowNumber, int nSliceNumber = 0 ) const
 	{
@@ -247,45 +259,12 @@ public:
 			+ nSliceNumber * m_nSliceStrideInBytes[nAttributeIdx];
 	}
 
-	FORCEINLINE void const *ConstRowPtr( int nAttributeIdx, int nRowNumber, int nSliceNumber = 0 ) const
-	{
-		Assert( nRowNumber < m_nRows );
-		Assert( nAttributeIdx < MAX_SOA_FIELDS );
-		Assert( m_nDataType[nAttributeIdx] != ATTRDATATYPE_NONE );
-		return m_pAttributePtrs[nAttributeIdx] 
-			+ nRowNumber * m_nRowStrideInBytes[nAttributeIdx]
-			+ nSliceNumber * m_nSliceStrideInBytes[nAttributeIdx];
-	}
-
-
-	template<class T> FORCEINLINE T *ElementPointer( int nAttributeIdx, 
-													   int nX = 0, int nY = 0, int nZ = 0 ) const
-	{
-		Assert( nAttributeIdx < MAX_SOA_FIELDS );
-		Assert( nX < m_nColumns );
-		Assert( nY < m_nRows );
-		Assert( nZ < m_nSlices );
-		Assert( m_nDataType[nAttributeIdx] != ATTRDATATYPE_NONE );
-		Assert( m_nDataType[nAttributeIdx] != ATTRDATATYPE_4V );
-		return reinterpret_cast<T *>( m_pAttributePtrs[nAttributeIdx] 
-									  + nX * sizeof( float )
-									  + nY * m_nRowStrideInBytes[nAttributeIdx]
-									  + nZ * m_nSliceStrideInBytes[nAttributeIdx]
-			);
-	}
-		
-	FORCEINLINE size_t ItemByteStride( int nAttributeIdx ) const
-	{
-		Assert( nAttributeIdx < MAX_SOA_FIELDS );
-		Assert( m_nDataType[nAttributeIdx] != ATTRDATATYPE_NONE );
-		return m_nStrideInBytes[ nAttributeIdx ];
-	}
-
 	// copy the attribute data from another soacontainer. must be compatible geometry
 	void CopyAttrFrom( CSOAContainer const &other, int nAttributeIdx );
 
 	// copy the attribute data from another attribute. must be compatible data format
 	void CopyAttrToAttr( int nSrcAttributeIndex, int nDestAttributeIndex);
+
 
 	// move all the data from one csoacontainer to another, leaving the source empty.
 	// this is just a pointer copy.
@@ -310,6 +289,51 @@ public:
 										 Vector const &flValue01, Vector const &flValue11 ) const;
 
 };
+
+template<class T> FORCEINLINE T* CSOAContainer::ElementPointer(int nAttributeIdx, int nX, int nY, int nZ) const
+{
+	Assert(nAttributeIdx < MAX_SOA_FIELDS);
+	Assert(nX < m_nColumns);
+	Assert(nY < m_nRows);
+	Assert(nZ < m_nSlices);
+	Assert(m_nDataType[nAttributeIdx] != ATTRDATATYPE_NONE);
+	Assert(m_nDataType[nAttributeIdx] != ATTRDATATYPE_4V);
+	return reinterpret_cast<T*>(m_pAttributePtrs[nAttributeIdx]
+		+ nX * m_nStrideInBytes[nAttributeIdx]
+		+ nY * m_nRowStrideInBytes[nAttributeIdx]
+		+ nZ * m_nSliceStrideInBytes[nAttributeIdx]
+		);
+}
+
+FORCEINLINE FourVectors* CSOAContainer::ElementPointer4V(int nAttributeIdx, int nX, int nY, int nZ) const
+{
+	Assert(nAttributeIdx < MAX_SOA_FIELDS);
+	Assert(nX < m_nColumns);
+	Assert(nY < m_nRows);
+	Assert(nZ < m_nSlices);
+	Assert(m_nDataType[nAttributeIdx] == ATTRDATATYPE_4V);
+	int nXIdx = nX / 4;
+	uint8* pRet = m_pAttributePtrs[nAttributeIdx]
+		+ nXIdx * 4 * m_nStrideInBytes[nAttributeIdx]
+		+ nY * m_nRowStrideInBytes[nAttributeIdx]
+		+ nZ * m_nSliceStrideInBytes[nAttributeIdx];
+	pRet += 4 * (nX & 3);
+	return reinterpret_cast<FourVectors*>(pRet);
+}
+
+//-----------------------------------------------------------------------------
+// Did the container allocate memory for this attribute?
+//-----------------------------------------------------------------------------
+FORCEINLINE bool CSOAContainer::HasAllocatedMemory( int nAttrIdx ) const
+{
+	return ( m_nFieldPresentMask & ( 1 << nAttrIdx ) ) != 0;
+}
+
+FORCEINLINE EAttributeDataType CSOAContainer::GetAttributeType( int nAttrIdx ) const
+{
+	Assert( ( nAttrIdx >= 0 ) && ( nAttrIdx < MAX_SOA_FIELDS ) );
+	return m_nDataType[nAttrIdx];
+}
 
 class CFltX4AttributeIterator : public CStridedConstPtr<fltx4>
 {

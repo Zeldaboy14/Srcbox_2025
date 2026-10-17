@@ -39,8 +39,21 @@ static float flVolume = NULL;
 //-----------------------------------------------------------------------------
 // Purpose: Constructor
 //-----------------------------------------------------------------------------
+// Every live background movie panel, so their videos can be released before the video services shut down
+static CUtlVector< CAnimatedBackgroundMovie * > s_BackgroundMovies;
+
+void CAnimatedBackgroundMovie::ReleaseAllVideos()
+{
+	for ( int i = 0; i < s_BackgroundMovies.Count(); i++ )
+	{
+		s_BackgroundMovies[i]->ReleaseVideo();
+	}
+}
+
 CAnimatedBackgroundMovie::CAnimatedBackgroundMovie(vgui::Panel* parent, const char* pElementName) : vgui::Panel(NULL, "MainMenu")
 {
+	s_BackgroundMovies.AddToTail( this );
+
 	vgui::VPANEL pParent = enginevgui->GetPanel(PANEL_GAMEUIDLL);
 	SetParent(pParent);
 	SetBuildModeEditable(false);
@@ -59,6 +72,7 @@ CAnimatedBackgroundMovie::CAnimatedBackgroundMovie(vgui::Panel* parent, const ch
 	m_bGamepadUIMode = false;
 	m_bLoaded = false;
 	bInit = false;
+	m_szVideoFile[0] = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -66,6 +80,7 @@ CAnimatedBackgroundMovie::CAnimatedBackgroundMovie(vgui::Panel* parent, const ch
 //-----------------------------------------------------------------------------
 CAnimatedBackgroundMovie::~CAnimatedBackgroundMovie()
 {
+	s_BackgroundMovies.FindAndRemove( this );
 	ReleaseVideo();
 	MarkForDeletion();
 
@@ -224,14 +239,26 @@ void CAnimatedBackgroundMovie::Paint(void)
 		if (m_VideoMaterial == NULL)
 			return;
 
+		// Loop. This has to happen before the Update() check below: Update() returns false whenever there
+		// is no new frame, and near the end of the clip that early return skipped the loop check, so the
+		// video reached the end and stopped. These video materials ignore SetLooping, and once finished
+		// they reset and can't be restarted, so jump back just before the end, or reload it if it did end.
+		float cur_vidtime = m_VideoMaterial->GetCurrentVideoTime();
+		float dur_vidtime = m_VideoMaterial->GetVideoDuration();
+
+		if ( m_VideoMaterial->IsFinishedPlaying() )
+		{
+			if ( !m_szVideoFile[0] || !BeginPlayback( m_szVideoFile ) )
+				return;
+		}
+		else if ( dur_vidtime > 0.0f && ( cur_vidtime + 0.1f ) >= dur_vidtime )
+		{
+			m_VideoMaterial->SetTime( 0 );
+		}
+
 		// Update our frame
 		if (m_VideoMaterial->Update() == false)
 			return;
-
-		float cur_vidtime = m_VideoMaterial->GetCurrentVideoTime();
-		float dur_vidtime = m_VideoMaterial->GetVideoDuration();
-		if ((cur_vidtime + 0.1) >= dur_vidtime)
-			m_VideoMaterial->SetTime(0);
 
 		// Sit in the "center"
 		int xpos, ypos;
@@ -582,6 +609,10 @@ bool CAnimatedBackgroundMovie::BeginPlayback(const char* pFilename)
 		return false;
 
 	m_bPaintVideo = true;
+
+	// Remember it so Paint() can restart it if it ever reaches the end
+	if ( pFilename != m_szVideoFile )
+		Q_strncpy( m_szVideoFile, pFilename, sizeof( m_szVideoFile ) );
 
 	m_VideoMaterial->SetLooping(true);
 

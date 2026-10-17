@@ -10,6 +10,11 @@
 #include "mountsteamcontent.h"
 #include "steam/steam_api.h"
 #include "luamanager.h"
+#include "fmtstr.h"
+#include "tier3/tier3.h"
+
+#undef SRCBOX
+#define EXPERIMENT 1
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -295,23 +300,33 @@ void InitializeGameContentMounting()
         return;
     }
 
-    REGISTER_GAME( pSteamApps, "Half-Life 2", "hl2", 220 );
-    REGISTER_GAME( pSteamApps, "Half-Life", "hl1", 280 );
+    //REGISTER_GAME( pSteamApps, "Half-Life 2", "hl2", 220 );
+    REGISTER_GAME_WITH_VPK( pSteamApps, "Half-Life 2", "hl2", 220, "hl2/hl2_misc_dir.vpk", "hl2/hl2_misc_dir.vpk", "hl2/hl2_sound_misc_dir.vpk", "hl2/hl2_sound_vo_english_dir.vpk", "episodic/ep1_pak_dir.vpk", "ep2/ep2_pak_dir.vpk");
+    //REGISTER_GAME( pSteamApps, "Half-Life", "hl1", 280 );
+    REGISTER_GAME_WITH_VPK( pSteamApps, "Half-Life", "hl1", 280, "hl1/hl1_pak_dir.vpk", "hl1_hd/hl1_hd_pak_dir.vpk");
 
     REGISTER_GAME( pSteamApps, "Day of Defeat: Source", "dod", 300 );
     REGISTER_GAME( pSteamApps, "Half-Life 2: Lost Coast", "lostcoast", 340 );
     REGISTER_GAME( pSteamApps, "Half-Life Deathmatch: Source", "hl1mp", HL1MP_APPID );
-    REGISTER_GAME( pSteamApps, "Half-Life 2: Episode One", "episodic", 380 );
+    //REGISTER_GAME( pSteamApps, "Half-Life 2: Episode One", "episodic", 380 );
     REGISTER_GAME( pSteamApps, "Portal", "portal", 400 );
-    REGISTER_GAME( pSteamApps, "Half-Life 2: Episode Two", "ep2", 420 );
-    REGISTER_GAME( pSteamApps, "Team Fortress 2", "tf", 440 );
+    //REGISTER_GAME( pSteamApps, "Half-Life 2: Episode Two", "ep2", 420 );
+    REGISTER_GAME_WITH_VPK( pSteamApps, "Team Fortress 2", "tf", 440, "tf/tf2_misc_dir.vpk", "tf/tf2_sound_misc_dir.vpk", "tf/tf2_sound_vo_english_dir.vpk", "tf/tf2_textures_dir.vpk");
 
     REGISTER_GAME_WITH_VPK( pSteamApps, "Counter-Strike: Source", "cstrike", 240, "cstrike/cstrike_pak_dir.vpk" );
     REGISTER_GAME_WITH_VPK( pSteamApps, "Garry's Mod", "garrysmod", 4000, "garrysmod/fallback_dir.vpk", "garrysmod/garrysmod_dir.vpk" );
+    REGISTER_GAME_WITH_VPK( pSteamApps, "Left 4 Dead", "l4d", 500, "left4dead/pak01_dir.vpk", "left4dead_dlc3/pak01_dir.vpk", "left4dead",  "left4dead2_dlc3");
+    REGISTER_GAME_WITH_VPK( pSteamApps, "Left 4 Dead 2", "l4d2", 550, "left4dead2/pak01_dir.vpk", "left4dead2_dlc1/pak01_dir.vpk", "left4dead2_dlc2/pak01_dir.vpk", "left4dead2_dlc3/pak01_dir.vpk", "update/pak01_dir.vpk", "left4dead2",  "left4dead2_dlc1", "left4dead2_dlc2", "left4dead2_dlc3", "update");
+    REGISTER_GAME(pSteamApps, "The Stanley Parable", "thestanleyparable", 221910);
+    REGISTER_GAME_WITH_VPK(pSteamApps, "Black Mesa", "bms", 362890, "bms/bms_models_dir.vpk", "bms/bms_materials_dir.vpk", "bms/bms_maps_dir.vpk", "bms/bms_sound_vo_english_dir.vpk", "bms/bms_sounds_misc_dir.vpk", "bms/bms_textures_dir.vpk", "bms");
 
     KeyValues *pMainFile, *pFileSystemInfo;
 
+#ifdef SRCBOX
+    pMainFile = new KeyValues( "cfg/mountdepots.txt" );
+#elif defined EXPERIMENT
     pMainFile = new KeyValues( "gamecontent.txt" );
+#endif
 
 #ifdef CLIENT_DLL
 #define UTIL_VarArgs VarArgs
@@ -319,16 +334,57 @@ void InitializeGameContentMounting()
 
     // On linux because of case sensitiviy we need to check for both.
     const char *paths[] = {
-#ifdef _LINUX
-        "%s/GameContent.txt",
+#ifdef SRCBOX
+    #ifdef _LINUX
+            "%s/Cfg/MountDepots.txt",
+    #endif
+            "%s/cfg/mountdepots.txt" };
+    #elif defined EXPERIMENT
+    #ifdef _LINUX
+            "%s/GameContent.txt",
+    #endif
+            "%s/gamecontent.txt"
+    };
 #endif
-        "%s/gamecontent.txt" };
+
+#ifdef SRCBOX
+    //KeyValuesAD mountdepots("MountDepots");
+    //mountdepots->LoadFromFile(filesystem, "cfg/mountdepots.txt");
+#endif
 
     for ( int i = 0; i < ARRAYSIZE( paths ); i++ )
     {
         if ( !pMainFile->LoadFromFile( filesystem, UTIL_VarArgs( paths[i], gamePath ), CONTENT_SEARCH_PATH ) )
             continue;
 
+#ifdef SRCBOX
+        // pKey->GetName() is garrysmod/cstrike/etc
+ /*       for (KeyValues* pKey = pFileSystemInfo->GetFirstSubKey(); pKey; pKey = pKey->GetNextKey())
+        {
+            int nAppId = pKey->GetInt();
+
+            if (pKey->GetNextKey() && pMainFile->GetBool(""))
+            {
+                AddSearchPathByAppId(nAppId);
+            }
+        }*/
+
+        pFileSystemInfo = pMainFile->FindKey("gamedepotsystem");
+
+        if (!pFileSystemInfo)
+            continue;
+
+        /*for (KeyValues* pKey = pFileSystemInfo->GetFirstSubKey(); pKey; pKey = pKey->GetNextKey())
+        {
+            // pKey->GetName() is garrysmod/cstrike/etc
+            int nAppId = pKey->GetInt();
+
+            if (pMainFile->GetBool(""))
+            {
+                AddSearchPathByAppId(nAppId);
+            }
+        }*/
+#elif defined EXPERIMENT
         pFileSystemInfo = pMainFile->FindKey( "FileSystem" );
 
         if ( !pFileSystemInfo )
@@ -344,6 +400,7 @@ void InitializeGameContentMounting()
                 AddSearchPathByAppId( nAppId );
             }
         }
+#endif
     }
 
     pMainFile->deleteThis();
@@ -374,7 +431,11 @@ bool MountGameContentByAppId( int nAppId )
     }
 
     KeyValues *pMainFile, *pFileSystemInfo;
-    pMainFile = new KeyValues( "gamecontent.txt" );
+#ifdef SRCBOX
+    pMainFile = new KeyValues( "mountdepots.txt" );
+#elif defined EXPERIMENT
+    pMainFile = new KeyValues("gamecontent.txt");
+#endif
 
 #ifdef CLIENT_DLL
     const char *gamePath = engine->GetGameDirectory();
@@ -386,10 +447,18 @@ bool MountGameContentByAppId( int nAppId )
 
     // On linux because of case sensitiviy we need to check for both.
     const char *paths[] = {
+#ifdef SRCBOX
+    #ifdef _LINUX
+            "%s/Cfg/MountDepots.txt",
+    #endif
+            "%s/cfg/mountdepots.txt" };
+#elif defined EXPERIMENT
 #ifdef _LINUX
         "%s/GameContent.txt",
 #endif
-        "%s/gamecontent.txt" };
+        "%s/gamecontent.txt"
+};
+#endif
 
     bool bFound = false;
 
@@ -456,10 +525,18 @@ bool UnmountGameContentByAppId( int nAppId )
 
     // On linux because of case sensitiviy we need to check for both.
     const char *paths[] = {
+#ifdef SRCBOX
+    #ifdef _LINUX
+            "%s/Cfg/MountDepots.txt",
+    #endif
+            "%s/cfg/mountdepots.txt" };
+#elif defined EXPERIMENT
 #ifdef _LINUX
         "%s/GameContent.txt",
 #endif
-        "%s/gamecontent.txt" };
+        "%s/gamecontent.txt"
+};
+#endif
 
     bool bFound = false;
 

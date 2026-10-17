@@ -242,6 +242,7 @@ BEGIN_DATADESC(CNPC_CombineCamera)
 END_DATADESC()
 
 LINK_ENTITY_TO_CLASS(npc_combine_camera, CNPC_CombineCamera);
+LINK_ENTITY_TO_CLASS(npc_security_camera, CNPC_CombineCamera); // TEMP
 
 
 //-----------------------------------------------------------------------------

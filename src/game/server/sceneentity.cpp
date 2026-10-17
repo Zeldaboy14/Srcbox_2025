@@ -1770,6 +1770,7 @@ void CSceneEntity::DispatchStartSpeak( CChoreoScene *scene, CBaseFlex *actor, CC
 	// Emit sound
 	if ( actor )
 	{
+
 #ifdef SRCBOX
 		CBroadcastRecipientFilter filter; // repairs breencast, and other sceneentites from distance checks
 #else
@@ -4568,6 +4569,8 @@ int CSceneEntity::UpdateTransmitState()
 	if ( !ShouldNetwork() )
 	{
 		return SetTransmitState( FL_EDICT_DONTSEND );
+	} else {
+		return SetTransmitState( FL_EDICT_ALWAYS );
 	}
 
 	if ( m_pRecipientFilter )

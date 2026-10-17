@@ -2,5 +2,6 @@
 #define CONTENT_MOUNTER_H
 
 void MountExtraContent();
+void MountGamepacks();
 
 #endif

@@ -60,12 +60,6 @@
 #include "luamanager.h"
 #endif
 
-//#define USE_CUSTOM_ANIMATED_BACKGROUND 1
-
-#ifdef USE_CUSTOM_ANIMATED_BACKGROUND
-#include "../menu_background.h"
-#endif
-
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -242,20 +236,6 @@ void CBaseViewport::OnScreenSizeChanged( int iOldWide, int iOldTall )
     {
         ShowPanel( PANEL_SPECGUI, true );
     }
-
-#ifdef USE_CUSTOM_ANIMATED_BACKGROUND
-    bool bRestartMainMenuVideo = false;
-
-    if (m_pMainMenuPanel)
-        bRestartMainMenuVideo = m_pMainMenuPanel->IsVideoPlaying();
-
-    m_pMainMenuPanel = new CMainMenu(NULL, NULL);
-    m_pMainMenuPanel->SetZPos(500);
-    m_pMainMenuPanel->SetVisible(false);
-
-    if (bRestartMainMenuVideo)
-        m_pMainMenuPanel->StartVideo();
-#endif
 
 #ifdef LUA_SDK
     if ( g_bLuaInitialized )
@@ -533,13 +513,6 @@ IViewPortPanel *CBaseViewport::GetActivePanel( void )
 
 void CBaseViewport::RemoveAllPanels( void )
 {
-#ifdef USE_CUSTOM_ANIMATED_BACKGROUND
-    if (m_pMainMenuPanel)
-    {
-        m_pMainMenuPanel->MarkForDeletion();
-        m_pMainMenuPanel = NULL;
-    }
-#endif
     g_lastPanel = NULL;
     for ( int i = 0; i < m_Panels.Count(); i++ )
     {
@@ -562,11 +535,6 @@ CBaseViewport::~CBaseViewport()
 {
     m_bInitialized = false;
 
-
-#ifdef USE_CUSTOM_ANIMATED_BACKGROUND
-    m_pMainMenuPanel = NULL;
-#endif
-
     if ( gViewPortInterface == this )
         gViewPortInterface = NULL;
 
@@ -588,12 +556,6 @@ CBaseViewport::~CBaseViewport()
 //-----------------------------------------------------------------------------
 void CBaseViewport::Start( IGameUIFuncs *pGameUIFuncs, IGameEventManager2 *pGameEventManager )
 {
-#ifdef USE_CUSTOM_ANIMATED_BACKGROUND
-    m_pMainMenuPanel = new CMainMenu(NULL, NULL);
-    m_pMainMenuPanel->SetZPos(500);
-    m_pMainMenuPanel->SetVisible(false);
-    m_pMainMenuPanel->StartVideo();
-#endif
     m_GameuiFuncs = pGameUIFuncs;
     m_GameEventManager = pGameEventManager;
 #ifndef _XBOX
@@ -814,26 +776,6 @@ int CBaseViewport::GetDeathMessageStartHeight( void )
 {
     return YRES( 16 );
 }
-
-#ifdef USE_CUSTOM_ANIMATED_BACKGROUND
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-void CBaseViewport::StartMainMenuVideo()
-{
-    if (m_pMainMenuPanel)
-        m_pMainMenuPanel->StartVideo();
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-void CBaseViewport::StopMainMenuVideo()
-{
-    if (m_pMainMenuPanel)
-        m_pMainMenuPanel->StopVideo();
-}
-#endif
 
 void CBaseViewport::Paint()
 {

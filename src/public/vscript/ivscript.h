@@ -182,6 +182,10 @@ inline const char * ScriptFieldTypeName( int16 eType )
 	return VariantFieldTypeName( eType );
 }
 
+#ifdef MAPBASE_VSCRIPT
+struct ScriptHook_t;
+#endif
+
 //---------------------------------------------------------
 
 struct ScriptFuncDescriptor_t

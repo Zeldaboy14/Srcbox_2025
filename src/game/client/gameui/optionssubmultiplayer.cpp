@@ -632,8 +632,8 @@ void COptionsSubMultiplayer::OnFileSelected(const char *fullpath)
 		char origpath[MAX_PATH*2];
 		Q_strncpy(origpath, tgaPath, sizeof(origpath));
 
-		int index = 0;
-	/*	do {
+		/*int index = 0;
+		do {
 			Q_snprintf(tgaPath, sizeof(tgaPath), "%stemp%d.tga", origpath, index);
 			++index;
 		} while (_access(tgaPath, 0) != -1);*/

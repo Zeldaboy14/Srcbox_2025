@@ -24,7 +24,7 @@
 #include "filesystem.h"
 #include "matsys_controls/matsyscontrols.h"
 //#include "MyPanel.h"
-#include "vgui2_panels/vgui_singeplayer.h"
+#include "vgui2_panels/vgui_singleplayer.h"
 #include "vgui2_panels/vgui_friends.h"
 #include "vgui2_panels/vgui_newgame.h"
 #include "vgui2_panels/vgui_savenquit.h"

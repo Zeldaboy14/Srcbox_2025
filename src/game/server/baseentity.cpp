@@ -2610,7 +2610,7 @@ int CBaseEntity::ObjectCaps( void )
 #ifdef LUA_SDK
 	model_t* pModel = GetModel();
 	bool bIsBrush = (pModel && modelinfo->GetModelType(pModel) == mod_brush);
-	int caps;
+	int caps = 0;
 
 	// We inherit our parent's use capabilities so that we can forward use commands
 	// to our parent.
@@ -2649,9 +2649,12 @@ int CBaseEntity::ObjectCaps( void )
 	{
 		caps |= FCAP_IMPULSE_USE;
 	}
+
+	return caps;
 #else 
 	model_t* pModel = GetModel();
 	bool bIsBrush = (pModel && modelinfo->GetModelType(pModel) == mod_brush);
+	int caps = 0;
 
 	// We inherit our parent's use capabilities so that we can forward use commands
 	// to our parent.
@@ -2674,9 +2677,10 @@ int CBaseEntity::ObjectCaps( void )
 	{
 		return FCAP_ACROSS_TRANSITION;
 	}
+
+	return caps;
 #endif
 
-	return 0;
 #else
 	// We inherit our parent's use capabilities so that we can forward use commands
 	// to our parent.

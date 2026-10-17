@@ -60,7 +60,7 @@ public:
 	void WeaponSound( WeaponSound_t sound_type, float soundtime = 0.0f );
 	
 	CHL2MPSWeaponInfo const	&GetHL2MPWpnData() const;
-
+	CHL2MPSWeaponInfo* GetHL2MPWeaponData(void) const;
 
 	virtual void FireBullets( const FireBulletsInfo_t &info );
 	virtual void FallInit( void );

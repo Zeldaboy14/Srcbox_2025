@@ -26,14 +26,14 @@ $Configuration
 	$Compiler
 	{
 		$AdditionalIncludeDirectories	"$BASE;$SRCDIR\game\shared\hl2,.\hl2,.\hl2mp,.\episodic,$SRCDIR\game\shared\hl2mp,$SRCDIR\game\shared\srcbox;"
-		$PreprocessorDefinitions		"$BASE;HL2MP;HL2_DLL;HL2_EPISODIC;NEXT_BOT;ASW_PROJECTED_TEXTURES;USES_SAVERESTORE"
+		$PreprocessorDefinitions		"$BASE;HL2MP;HL2_DLL;HL2_EPISODIC;NEXT_BOT;ASW_PROJECTED_TEXTURES;USES_SAVERESTORE;FAKE_CSM;EXPERIMENT;LUA_SDK"
 	}
 }
 
 $Project "Server (HL2MP)"
 {
 	$Folder	"Source Files"
-	{
+	{	
 		$Folder	"HL2 DLL"
 		{
 			$File	"hl2\weapon_citizenpackage.cpp"
@@ -45,27 +45,37 @@ $Project "Server (HL2MP)"
 		}
 		$Folder "Srcbox"
 		{
+			$File	"$SRCDIR\game\shared\srcbox\srcbox_gamerules.cpp"
 			$File	"$SRCDIR\game\shared\srcbox\hooks\bsp_compat.cpp"
 			$File	"$SRCDIR\game\shared\srcbox\hooks\bsp_compat.h"
-			$File	"$SRCDIR\game\shared\srcbox\srcbox_gamerules.cpp"
+			$File	"$SRCDIR\game\shared\srcbox\hooks\gma_mount.cpp"
+			$File	"$SRCDIR\game\shared\srcbox\hooks\gma_mount.h"
 			$File	"$SRCDIR\game\server\srcbox\tf\entity_ammopack.cpp"
 			$File	"$SRCDIR\game\server\srcbox\tf\entity_healthkit.cpp"
 			$File	"$SRCDIR\game\server\srcbox\tf\tf_powerup.cpp"
-			$File	"$SRCDIR\game\shared\srcbox\hooks\gma_mount.cpp"
-			$File	"$SRCDIR\game\shared\srcbox\hooks\gma_mount.h"
 		}
-		$Folder "terror"
+		$Folder "Terror"
 		{
 			$Folder "Weapons"
 			{
 				$File	"$SRCDIR\game\shared\terror\weapon_pistol_terror.cpp"
+				$File	"$SRCDIR\game\shared\terror\crowbar.cpp"
+				$File	"$SRCDIR\game\shared\terror\weapon_smg_silenced.cpp"
 			}
 			$File	"terror\prop_car_alarm.cpp"
 		}
 		$Folder "Portal"
 		{
 			$File	"$SRCDIR\game\shared\portal\weapon_portalgun.cpp"
+			$File	"$SRCDIR\game\shared\hl2mp\hl2mp_portal_shared.cpp"
+			$File	"$SRCDIR\game\shared\hl2mp\hl2mp_portal_shared.h"
 			$File	"$SRCDIR\game\server\portal\prop_portal.cpp"
+			$File	"$SRCDIR\game\server\portal\prop_portal.h"
+		}
+		$Folder "NH2"
+		{
+			$File	"nh2\nh2_guard.cpp"
+			$File	"nh2\nh2_zombie.cpp"
 		}
 		
 		$File	"ai_relationship.cpp"
@@ -80,6 +90,7 @@ $Project "Server (HL2MP)"
 		$File	"basegrenade_timed.cpp"
 		$File	"beamspotlight.cpp"
 		$File	"EntityFlame.h"
+		$File	"env_cascade_light.cpp"
 		$File	"hl2\Func_Monitor.cpp"
 		$File	"grenadethrown.cpp"
 		$File	"grenadethrown.h"
@@ -87,6 +98,7 @@ $Project "Server (HL2MP)"
 		$File	"h_cycler.h"
 		$File	"monstermaker.cpp"
 		$File	"monstermaker.h"
+		$File	"physgun.cpp"
 		$File	"physics_bone_follower.h"
 		$File	"$SRCDIR\game\shared\predicted_viewmodel.cpp"
 		$File	"$SRCDIR\game\shared\predicted_viewmodel.h"
@@ -115,8 +127,7 @@ $Project "Server (HL2MP)"
 		$File	"env_instructor_hint.cpp"
 		$File   "$SRCDIR\game\shared\teamplay_round_timer.cpp"
 		$File   "$SRCDIR\game\shared\teamplay_round_timer.h"
-		$File	"$SRCDIR\game\shared\hl2mp\hl2mp_portal_shared.cpp"
-		$File	"$SRCDIR\game\shared\hl2mp\hl2mp_portal_shared.h"
+		$File	"$SRCDIR\game\shared\handviewmodel_shared.cpp"
 
 		$Folder "NextBot"
 		{

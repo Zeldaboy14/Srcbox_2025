@@ -57,8 +57,10 @@ struct te_tf_particle_effects_control_point_t
 void ParseParticleEffects( bool bLoadSheets, bool bPrecache );
 void ParseParticleEffectsMap( const char *pMapName, bool bLoadSheets ); 
 
+#ifndef USE_NEW_PARTICLE_SYSTEM
 // Get a list of the files inside the particle manifest file
 void GetParticleManifest( CUtlVector<CUtlString>& list );
+#endif
 
 // Precaches standard particle systems (only necessary on server)
 // Should be called once per level

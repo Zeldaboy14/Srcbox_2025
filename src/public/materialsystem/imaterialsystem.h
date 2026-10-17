@@ -439,9 +439,9 @@ struct FlashlightState_t
 		m_bEnableShadows = false;						// Provide reasonable defaults for shadow depth mapping parameters
 		m_bDrawShadowFrustum = false;
 #ifdef ASW_PROJECTED_TEXTURES
-		m_flShadowMapResolution = 2048.0f;
-		m_flShadowFilterSize = 0.5f;
-		m_flShadowSlopeScaleDepthBias = 16.0f;
+		m_flShadowMapResolution = 4096.0f;
+		m_flShadowFilterSize = 0.2f;
+		m_flShadowSlopeScaleDepthBias = 4.0f;
 		m_flShadowDepthBias = 0.0005f;
 #else
 		m_flShadowMapResolution = 1024.0f;
@@ -451,12 +451,18 @@ struct FlashlightState_t
 #endif
 		m_flShadowJitterSeed = 0.0f;
 		m_flShadowAtten = 0.0f;
+		m_nShadowQuality = 0;
+		m_bShadowHighRes = false;
+
 		m_bScissor = false; 
 		m_nLeft = -1;
 		m_nTop = -1;
 		m_nRight = -1;
 		m_nBottom = -1;
-		m_nShadowQuality = 0;
+
+#ifdef UBERLIGHTS
+		m_bUberlight = false;
+#endif
 
 #ifdef ASW_PROJECTED_TEXTURES
 		m_bOrtho = false;
@@ -467,6 +473,10 @@ struct FlashlightState_t
 
 		m_fBrightnessScale = 1.0f;
 		m_pSpotlightTexture = NULL;
+
+		m_bSimpleProjection = false;
+		m_flProjectionSize = 500.0f;
+		m_flProjectionRotation = 0.0f;
 #endif
 	}
 
@@ -494,16 +504,6 @@ struct FlashlightState_t
 	float m_flShadowAtten;
 	int   m_nShadowQuality;
 
-#ifdef ASW_PROJECTED_TEXTURES
-	bool m_bOrtho;
-	float m_fOrthoLeft;
-	float m_fOrthoRight;
-	float m_fOrthoTop;
-	float m_fOrthoBottom;
-
-	float m_fBrightnessScale;
-#endif
-
 	// Getters for scissor members
 	bool DoScissor() { return m_bScissor; }
 	int GetLeft()	 { return m_nLeft; }
@@ -524,6 +524,38 @@ private:
 	int m_nTop;
 	int m_nRight;
 	int m_nBottom;
+
+public:
+	// Fields added on top of the engine's FlashlightState_t. They MUST stay after all of the
+	// engine's own fields: the engine binaries read this struct with their original layout.
+	bool  m_bShadowHighRes;
+
+	// simple projection
+	bool	m_bSimpleProjection;
+	float	m_flProjectionSize;
+	float	m_flProjectionRotation;
+
+#ifdef UBERLIGHTS
+	// Uberlight parameters
+	bool m_bUberlight;
+	UberlightState_t m_uberlightState;
+#endif
+
+#ifdef ASW_PROJECTED_TEXTURES
+	bool m_bOrtho;
+	float m_fOrthoLeft;
+	float m_fOrthoRight;
+	float m_fOrthoTop;
+	float m_fOrthoBottom;
+
+	float m_FarZAtten;
+	float m_fBrightnessScale;
+	bool m_bGlobalLight;
+#endif
+
+#ifdef MAPBASE
+	bool m_bAlwaysDraw;
+#endif
 };
 
 // Passed as the callback object to Async functions in the material system

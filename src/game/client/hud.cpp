@@ -410,6 +410,9 @@ CHud::CHud()
 void CHud::Init( void )
 {
 	HOOK_HUD_MESSAGE( gHUD, ResetHUD );
+#ifdef SRCBOX
+	HudIcons().Init();
+#endif
 	
 #ifdef CSTRIKE_DLL
 	HOOK_HUD_MESSAGE( gHUD, SendAudio );
@@ -452,7 +455,7 @@ void CHud::Init( void )
 				KeyValues *key = kv->FindKey( pPanel->GetName(), false );
 				if ( !key )
 				{
-					Assert( false );
+					//Assert( false );
 					Msg( "Hud element '%s' doesn't have an entry '%s' in scripts/HudLayout.res\n", m_HudList[i]->GetName(), pPanel->GetName() );
 				}
 
@@ -1215,7 +1218,6 @@ CON_COMMAND_F( testhudanim, "Test a hud element animation.\n\tArguments: <anim n
 	g_pClientMode->GetViewportAnimationController()->StartAnimationSequence( args[1] );
 }
 
-
 #ifdef SRCBOX
 CHudIcons::CHudIcons() :
 	m_bHudTexturesLoaded(false)
@@ -1443,3 +1445,4 @@ CHudIcons& HudIcons()
 	return g_HudIcons;
 }
 #endif
+

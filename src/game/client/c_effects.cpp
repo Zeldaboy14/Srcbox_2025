@@ -352,7 +352,16 @@ void CClient_Precipitation::OnDataChanged( DataUpdateType_t updateType )
 		}
 	}
 
-	m_flDensity = RemapVal( m_clrRender->a, 0, 255, 0, 0.001 );
+	if ( IsParticleRainType( m_nPrecipType ) )
+	{
+		// particle precipitation (Swarm/L4D2): renderamt is a 0-100 density percentage that
+		// scales the effects' emission rate through control point 3
+		m_flDensity = RemapVal( m_clrRender->a, 0, 100, 0, 1 );
+	}
+	else
+	{
+		m_flDensity = RemapVal( m_clrRender->a, 0, 255, 0, 0.001 );
+	}
 
 	BaseClass::OnDataChanged( updateType );
 }
@@ -1393,6 +1402,8 @@ void CClient_Precipitation::DispatchOuterParticlePrecip(C_BasePlayer* pPlayer, V
 	Vector vPlayerPos = pPlayer->EyePosition();
 
 	m_pParticlePrecipOuter = ParticleProp()->Create(m_pParticleOuterDef, PATTACH_ABSORIGIN_FOLLOW);
+	if ( !m_pParticlePrecipOuter )
+		return;	// the effect isn't loaded (missing/unreadable .pcf)
 	m_pParticlePrecipOuter->SetControlPointEntity(2, pPlayer);
 	m_pParticlePrecipOuter->SetControlPoint(1, vPlayerPos + Vector(0, 0, 180));
 	m_pParticlePrecipOuter->SetControlPoint(3, vDensity);
@@ -1411,15 +1422,25 @@ void CClient_Precipitation::DispatchInnerParticlePrecip(C_BasePlayer* pPlayer, V
 	m_pParticlePrecipOuter = ParticleProp()->Create(m_pParticleOuterDef, PATTACH_ABSORIGIN_FOLLOW);
 	m_pParticlePrecipInnerNear = ParticleProp()->Create(m_pParticleInnerNearDef, PATTACH_ABSORIGIN_FOLLOW);
 	m_pParticlePrecipInnerFar = ParticleProp()->Create(m_pParticleInnerFarDef, PATTACH_ABSORIGIN_FOLLOW);
-	m_pParticlePrecipOuter->SetControlPointEntity(2, pPlayer);
-	m_pParticlePrecipInnerNear->SetControlPointEntity(2, pPlayer);
-	m_pParticlePrecipInnerFar->SetControlPointEntity(2, pPlayer);
-	m_pParticlePrecipOuter->SetControlPoint(1, vOffsetPos);
-	m_pParticlePrecipInnerNear->SetControlPoint(1, vOffsetPosNear);
-	m_pParticlePrecipInnerFar->SetControlPoint(1, vOffsetPosFar);
-	m_pParticlePrecipInnerNear->SetControlPoint(3, vDensity);
-	m_pParticlePrecipInnerFar->SetControlPoint(3, vDensity);
-	m_pParticlePrecipOuter->SetControlPoint(3, vDensity);
+	// any of these can be NULL when the effect isn't loaded (missing/unreadable .pcf)
+	if ( m_pParticlePrecipOuter )
+	{
+		m_pParticlePrecipOuter->SetControlPointEntity(2, pPlayer);
+		m_pParticlePrecipOuter->SetControlPoint(1, vOffsetPos);
+		m_pParticlePrecipOuter->SetControlPoint(3, vDensity);
+	}
+	if ( m_pParticlePrecipInnerNear )
+	{
+		m_pParticlePrecipInnerNear->SetControlPointEntity(2, pPlayer);
+		m_pParticlePrecipInnerNear->SetControlPoint(1, vOffsetPosNear);
+		m_pParticlePrecipInnerNear->SetControlPoint(3, vDensity);
+	}
+	if ( m_pParticlePrecipInnerFar )
+	{
+		m_pParticlePrecipInnerFar->SetControlPointEntity(2, pPlayer);
+		m_pParticlePrecipInnerFar->SetControlPoint(1, vOffsetPosFar);
+		m_pParticlePrecipInnerFar->SetControlPoint(3, vDensity);
+	}
 }
 
 

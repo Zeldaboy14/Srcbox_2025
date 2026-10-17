@@ -33,11 +33,18 @@
 #include "ltakedamageinfo.h"
 #endif
 
+#ifdef SRCBOX
+#include "script_intro.h"
+#include "point_camera.h"
+#endif
+
 #include "engine/IEngineSound.h"
 #include "SoundEmitterSystem/isoundemittersystembase.h"
 
 #include "ilagcompensationmanager.h"
 #include "triggers.h"
+
+#define HANDVIEWMODEL "models/weapons/arms/v_arms_coach_new.mdl"
 
 extern ConVar srcbox_gamemode_sandbox;
 extern ConVar srcbox_gamemode_hl2;
@@ -226,6 +233,9 @@ void CHL2MP_Player::Precache( void )
 	PrecacheScriptSound("Player.FlashlightOff");
 
 	PrecacheModel ( "sprites/glow01.vmt" );
+#if 0
+	PrecacheModel(HANDVIEWMODEL);
+#endif
 
 	//Precache Citizen models
 	int nHeads = ARRAYSIZE( g_ppszRandomCitizenModels );
@@ -239,6 +249,7 @@ void CHL2MP_Player::Precache( void )
 
 	for ( i = 0; i < nHeads; ++i )
 	   	 PrecacheModel( g_ppszRandomCombineModels[i] );
+
 
 	PrecacheFootStepSounds();
 
@@ -428,6 +439,8 @@ void CHL2MP_Player::Spawn(void)
 
 	PickDefaultSpawnTeam();
 
+	SetViewEntity(NULL);
+
 	BaseClass::Spawn();
 
 	if (!IsObserver())
@@ -442,6 +455,9 @@ void CHL2MP_Player::Spawn(void)
 
 	SetNumAnimOverlays( 3 );
 	ResetAnimation();
+#if 0
+	GetViewModel(1)->SetModel(HANDVIEWMODEL); // set the viewmodels for the hands
+#endif
 
 	m_nRenderFX = kRenderNormal;
 
@@ -1617,7 +1633,7 @@ CBaseEntity* CHL2MP_Player::EntSelectSpawnPoint( void )
 	CBaseEntity *pSpot4 = NULL;
 	CBaseEntity *pSpot5 = NULL;
 	CBaseEntity *pSpot6 = NULL;
-	CBaseEntity* pSpot7 = NULL;
+	CBaseEntity *pSpot7 = NULL;
 	CBaseEntity *pLastSpawnPoint = g_pLastSpawn;
 	edict_t		*player = edict();
 	const char *pSpawnpointName = "info_player_deathmatch";
@@ -1699,16 +1715,17 @@ CBaseEntity* CHL2MP_Player::EntSelectSpawnPoint( void )
 		if (pSpot)
 			goto ReturnSpot;
 
-		// interate
-		CBaseEntity* pFallbacks[] = { pSpot2, pSpot3, pSpot4, pSpot5, pSpot6, pSpot7 };
-		for (int i = 0; i < ARRAYSIZE(pFallbacks); i++)
+		// Srcbox: the first spawn type the map has (the old chain returned pSpot2
+		// even when it was NULL, and NULL when the map had none of these)
+		CBaseEntity *pFallbacks[] = { pSpot2, pSpot3, pSpot4, pSpot5, pSpot6, pSpot7 };
+		for ( int i = 0; i < ARRAYSIZE( pFallbacks ); i++ )
 		{
-			if (pFallbacks[i])
+			if ( pFallbacks[i] )
 				return pFallbacks[i];
 		}
 
-		// No spawn points at all: spawn at the world origin
-		return CBaseEntity::Instance(INDEXENT(0));
+		// No spawn points at all: spawn at the world origin like HL2DM does
+		return CBaseEntity::Instance( INDEXENT( 0 ) );
 	}
 
 ReturnSpot:
@@ -2056,7 +2073,6 @@ bool CHL2MP_Player::KeyDown(int buttonCode)
 //-----------------------------------------------------------------------------
 void CHL2MP_Player::SetupBones(matrix3x4_t* pBoneToWorld, int boneMask)
 {
-	/*
 	VPROF_BUDGET("CHL2MP_Player::SetupBones", VPROF_BUDGETGROUP_SERVER_ANIM);
 
 	// Get the studio header.
@@ -2109,7 +2125,7 @@ void CHL2MP_Player::SetupBones(matrix3x4_t* pBoneToWorld, int boneMask)
 		}
 	}
 
-	Studio_BuildMatrices(
+	/*Studio_BuildMatrices(
 		pStudioHdr,
 		m_PlayerAnimState->GetRenderAngles(),
 		adjOrigin,

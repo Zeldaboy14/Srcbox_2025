@@ -40,6 +40,7 @@
 #include "../gameconsole.h"
 #include "vgui/ISystem.h"
 #include "vgui/ISurface.h"
+#include "vgui/IPanel.h"
 #include "vgui/ILocalize.h"
 #include "vgui_controls/AnimationController.h"
 #include "../gameui_util.h"
@@ -111,6 +112,7 @@ CBaseModPanel::CBaseModPanel(): BaseClass(0, "CBaseModPanel"),
 	m_DelayActivation = 3;
 
 	m_UIScheme = vgui::scheme()->LoadSchemeFromFileEx( 0, "resource/SwarmSchemeNew.res", "SwarmScheme" );
+	//m_UIScheme = vgui::scheme()->LoadSchemeFromFileEx( 0, "resource/SourceSchemeLegacy.res", "SwarmScheme" );
 	// Below is a different testing scheme that uses the old BaseModUI scheme file
 	//m_UIScheme = vgui::scheme()->LoadSchemeFromFileEx(0, " resource/SourceScheme.res", "SwarmScheme");
 	SetScheme( m_UIScheme );
@@ -782,6 +784,110 @@ void CBaseModPanel::RunFrame()
 			}
 			OnGameUIActivated();
 		}
+	}
+
+	KeepLegacyDialogsOnTop();
+}
+
+//=============================================================================
+// The Swarm menu frames (and this panel) are VGUI popups, so clicking on them moves them in front of
+// any classic VGUI2 dialog (options dialog, server browser, mod panels built on vgui::Frame) that is
+// open. HL2's GameUI menu never competed with its dialogs like that. When that happens, put the classic
+// dialogs back on top, in the order they were in.
+// While a confirmation popup (quit, disconnect, ...) is up, the classic dialogs are hidden instead, and
+// shown again (in front of the menu) once it is gone.
+//=============================================================================
+static ConVar ui_legacy_dialogs_on_top( "ui_legacy_dialogs_on_top", "1", FCVAR_NONE, "Keep classic VGUI2 dialogs above the main/pause menu frames, and hide them while a confirmation is shown." );
+
+void CBaseModPanel::KeepLegacyDialogsOnTop()
+{
+	if ( !ui_legacy_dialogs_on_top.GetBool() )
+		return;
+
+	int popupCount = vgui::surface()->GetPopupCount();
+	int frontmostMenu = -1;
+	int backmostLegacy = -1;
+	// The Swarm frames are not popups (CBaseModFrame passes bPopup = false); they are children of this
+	// panel, so the confirmation has to be looked up as one of our windows rather than in the popup list
+	CBaseModFrame *pConfirmation = GetWindow( WT_GENERICCONFIRMATION );
+	bool bConfirmationVisible = ( pConfirmation && pConfirmation->IsVisible() );
+	CUtlVector< vgui::VPANEL > legacyDialogs;
+
+	// Popups are drawn in list order, so a higher index is further in front
+	for ( int i = 0; i < popupCount; i++ )
+	{
+		vgui::VPANEL vPopup = vgui::surface()->GetPopup( i );
+
+		if ( !vPopup || !vgui::ipanel()->IsVisible( vPopup ) )
+			continue;
+
+		// Only panels from this module (the engine console etc. are left alone)
+		vgui::Panel *pPopup = vgui::ipanel()->GetPanel( vPopup, vgui::GetControlsModuleName() );
+
+		if ( !pPopup )
+			continue;
+
+		if ( dynamic_cast< GenericConfirmation * >( pPopup ) )
+		{
+			bConfirmationVisible = true;
+		}
+		else if ( pPopup == this || dynamic_cast< CBaseModFrame * >( pPopup ) )
+		{
+			frontmostMenu = i;
+		}
+		else if ( dynamic_cast< vgui::Frame * >( pPopup ) )
+		{
+			if ( backmostLegacy < 0 )
+				backmostLegacy = i;
+
+			legacyDialogs.AddToTail( vPopup );
+		}
+	}
+
+	if ( bConfirmationVisible )
+	{
+		// Hide the classic dialogs (back to front, so they can be restored in the same order)
+		for ( int i = 0; i < legacyDialogs.Count(); i++ )
+		{
+			vgui::Panel *pDialog = vgui::ipanel()->GetPanel( legacyDialogs[i], vgui::GetControlsModuleName() );
+
+			if ( pDialog )
+			{
+				pDialog->SetVisible( false );
+
+				vgui::PHandle hDialog;
+				hDialog = pDialog;
+				m_HiddenLegacyDialogs.AddToTail( hDialog );
+			}
+		}
+
+		return;
+	}
+
+	if ( m_HiddenLegacyDialogs.Count() > 0 )
+	{
+		// The confirmation is gone: bring back what we hid, in front of the menu
+		for ( int i = 0; i < m_HiddenLegacyDialogs.Count(); i++ )
+		{
+			vgui::Panel *pDialog = m_HiddenLegacyDialogs[i].Get();
+
+			if ( pDialog )
+			{
+				pDialog->SetVisible( true );
+				pDialog->MoveToFront();
+			}
+		}
+
+		m_HiddenLegacyDialogs.RemoveAll();
+		return;
+	}
+
+	if ( backmostLegacy < 0 || frontmostMenu < backmostLegacy )
+		return;	// no classic dialog open, or they are all already in front of the menu
+
+	for ( int i = 0; i < legacyDialogs.Count(); i++ )
+	{
+		vgui::ipanel()->MoveToFront( legacyDialogs[i] );
 	}
 }
 
@@ -1506,19 +1612,25 @@ const char *CBaseModPanel::GetUISoundName(  UISound_t UISound )
 	switch ( UISound )
 	{
 	case UISOUND_BACK:
-		return "UI/menu_back.wav";
+		//return "UI/menu_back.wav";
+		return "menu/button_7.wav";
 	case UISOUND_ACCEPT:
-		return "UI/menu_accept.wav";
+		//return "UI/menu_accept.wav";
+		return "menu/button_7.wav";
 	case UISOUND_INVALID:
-		return "UI/menu_invalid.wav";
+		//return "UI/menu_invalid.wav";
+		return "menu/horn.wav";
 	case UISOUND_COUNTDOWN:
 		return "UI/menu_countdown.wav";
 	case UISOUND_FOCUS:
-		return "UI/menu_focus.wav";
+		//return "UI/menu_focus.wav";
+		return "menu/morph.wav";
 	case UISOUND_CLICK:
-		return "UI/buttonclick.wav";
+		//return "UI/buttonclick.wav";
+		return "menu/morph.wav";
 	case UISOUND_DENY:
-		return "UI/menu_invalid.wav";
+		//return "UI/menu_invalid.wav";
+		return "menu/horn.wav";
 	}
 	return NULL;
 }

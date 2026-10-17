@@ -79,6 +79,7 @@ private:
 	int m_iRenderGroupOverride = -1;
 #endif
 };
+
 //void RegisterScriptedEntity( const char *szClassname );
 void ResetEntityFactoryDatabase( void );
 

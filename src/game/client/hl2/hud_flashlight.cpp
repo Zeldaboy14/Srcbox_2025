@@ -19,6 +19,8 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+static ConVar srcbox_flashlight_version("srcbox_flashlight_version", "0", FCVAR_REPLICATED | FCVAR_ARCHIVE, "Select which flashlight from a version of Source (or Goldsource) to use. 1 is Half-Life's (Goldsource), 2 is Half-Life 2: Episode 2, and 3 is Left 4 Dead (2). Default is 0");
+
 //-----------------------------------------------------------------------------
 // Purpose: Shows the flashlight icon
 //-----------------------------------------------------------------------------
@@ -104,6 +106,7 @@ void CHudFlashlight::SetFlashlightState( bool flashlightOn )
 //-----------------------------------------------------------------------------
 void CHudFlashlight::Paint()
 {
+	int flashlight_version = srcbox_flashlight_version.GetInt();
 #ifdef HL2_EPISODIC
 	C_BaseHLPlayer *pPlayer = (C_BaseHLPlayer *)C_BasePlayer::GetLocalPlayer();
 	if ( !pPlayer )
@@ -112,7 +115,7 @@ void CHudFlashlight::Paint()
 	// Only paint if we're using the new flashlight code
 	if ( pPlayer->m_HL2Local.m_flFlashBattery < 0.0f )
 	{
-		SetPaintBackgroundEnabled( false );
+		SetPaintBackgroundEnabled(false);
 		return;
 	}
 

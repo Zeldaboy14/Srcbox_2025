@@ -16,7 +16,7 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-CLIENTEFFECT_REGISTER_BEGIN( PrecacheEffectGravityGun )
+CLIENTEFFECT_REGISTER_BEGIN( PrecacheEffectGravityGun_E3 )
 CLIENTEFFECT_MATERIAL( "sprites/physbeam" )
 CLIENTEFFECT_REGISTER_END()
 
@@ -26,18 +26,23 @@ public:
 	C_BeamQuadratic();
 	void			Update( C_BaseEntity *pOwner );
 
-	const matrix3x4_t &C_BeamQuadratic::RenderableToWorldTransform( void )
-	{
-		return RenderableToWorldTransform();
-	}
-
 	// IClientRenderable
-	virtual const Vector&			GetRenderOrigin( void ) { return m_worldPosition; }
+	virtual const Vector&			GetRenderOrigin( void ) { return m_targetPosition; }
 	virtual const QAngle&			GetRenderAngles( void ) { return vec3_angle; }
 	virtual bool					ShouldDraw( void ) { return true; }
 	virtual bool					IsTransparent( void ) { return true; }
 	virtual bool					ShouldReceiveProjectedTextures( int flags ) { return false; }
 	virtual int						DrawModel( int flags );
+
+	matrix3x4_t z;
+	const matrix3x4_t& RenderableToWorldTransform() 
+	{ 
+		//return z; 
+		static matrix3x4_t mat;
+		SetIdentityMatrix(mat);
+		PositionMatrix(GetRenderOrigin(), mat);
+		return mat;
+	}
 
 	// Returns the bounds relative to the origin (render bounds)
 	virtual void	GetRenderBounds( Vector& mins, Vector& maxs )
@@ -59,11 +64,11 @@ public:
 };
 
 
-class C_WeaponGravityGun : public C_BaseHL2MPCombatWeapon
+class C_WeaponGravityGun_E3 : public C_BaseHL2MPCombatWeapon
 {
-	DECLARE_CLASS( C_WeaponGravityGun, C_BaseHL2MPCombatWeapon );
+	DECLARE_CLASS( C_WeaponGravityGun_E3, C_BaseHL2MPCombatWeapon );
 public:
-	C_WeaponGravityGun() {}
+	C_WeaponGravityGun_E3() {}
 
 	DECLARE_CLIENTCLASS();
 	DECLARE_PREDICTABLE();
@@ -95,16 +100,16 @@ public:
 	}
 
 private:
-	C_WeaponGravityGun( const C_WeaponGravityGun & );
+	C_WeaponGravityGun_E3( const C_WeaponGravityGun_E3 & );
 
 	C_BeamQuadratic	m_beam;
 
 	DECLARE_ACTTABLE();
 };
 
-STUB_WEAPON_CLASS_IMPLEMENT( weapon_physgun, C_WeaponGravityGun );
+STUB_WEAPON_CLASS_IMPLEMENT( weapon_physgun_e3, C_WeaponGravityGun_E3 );
 
-IMPLEMENT_CLIENTCLASS_DT( C_WeaponGravityGun, DT_WeaponGravityGun, CWeaponGravityGun )
+IMPLEMENT_CLIENTCLASS_DT( C_WeaponGravityGun_E3, DT_WeaponGravityGun_E3, CWeaponGravityGun_E3 )
 	RecvPropVector( RECVINFO_NAME(m_beam.m_targetPosition,m_targetPosition) ),
 	RecvPropVector( RECVINFO_NAME(m_beam.m_worldPosition, m_worldPosition) ),
 	RecvPropInt( RECVINFO_NAME(m_beam.m_active, m_active) ),
@@ -112,7 +117,7 @@ IMPLEMENT_CLIENTCLASS_DT( C_WeaponGravityGun, DT_WeaponGravityGun, CWeaponGravit
 	RecvPropInt( RECVINFO_NAME(m_beam.m_viewModelIndex, m_viewModelIndex) ),
 END_RECV_TABLE()
 
-acttable_t	C_WeaponGravityGun::m_acttable[] = 
+acttable_t	C_WeaponGravityGun_E3::m_acttable[] = 
 {
 	{ ACT_MP_STAND_IDLE,				ACT_HL2MP_IDLE_PHYSGUN,					false },
 	{ ACT_MP_CROUCH_IDLE,				ACT_HL2MP_IDLE_CROUCH_PHYSGUN,			false },
@@ -129,12 +134,13 @@ acttable_t	C_WeaponGravityGun::m_acttable[] =
 	{ ACT_MP_JUMP,						ACT_HL2MP_JUMP_PHYSGUN,					false },
 };
 
-IMPLEMENT_ACTTABLE(C_WeaponGravityGun);
+IMPLEMENT_ACTTABLE(C_WeaponGravityGun_E3);
 
 
 C_BeamQuadratic::C_BeamQuadratic()
 {
 	m_pOwner = NULL;
+	m_hRenderHandle = INVALID_CLIENT_RENDER_HANDLE;
 }
 
 void C_BeamQuadratic::Update( C_BaseEntity *pOwner )
@@ -154,6 +160,7 @@ void C_BeamQuadratic::Update( C_BaseEntity *pOwner )
 	else if ( !m_active && m_hRenderHandle != INVALID_CLIENT_RENDER_HANDLE )
 	{
 		ClientLeafSystem()->RemoveRenderable( m_hRenderHandle );
+		m_hRenderHandle = INVALID_CLIENT_RENDER_HANDLE;
 	}
 }
 

@@ -42,14 +42,17 @@ extern bool g_fGameOver;
 
 void FinishClientPutInServer( CHL2MP_Player *pPlayer )
 {
-#ifdef EXPERIMENT_SOURCE
+#if defined SRCBOX && LUA_SDK
     // We don't call this until BotPutInServer has set the flag that it's a fake client
     if ( !IsPuttingBotInServer() )
     {
 #endif
-        pPlayer->InitialSpawn();
-        pPlayer->Spawn();
-#ifdef EXPERIMENT_SOURCE
+        //if (pPlayer)
+        //{
+            pPlayer->InitialSpawn();
+            pPlayer->Spawn();
+        //}
+#if defined SRCBOX && LUA_SDK
     }
 #endif
 
@@ -215,8 +218,8 @@ void GameStartFrame( void )
     gpGlobals->teamplay = ( teamplay.GetInt() != 0 );
 
 #if defined( DEBUG ) || defined( LUA_SDK )
-    extern void Bot_RunAll();
-    Bot_RunAll();
+    //extern void Bot_RunAll();
+    //Bot_RunAll();
 #endif
 }
 

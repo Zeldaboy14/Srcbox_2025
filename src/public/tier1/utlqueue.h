@@ -13,10 +13,6 @@
 
 #include "utlmemory.h"
 
-#ifdef LUA_SDK
-#undef MAX_SIZE
-#endif
-
 // #define TEST_UTLQUEUE
 
 enum QueueIter_t
@@ -90,6 +86,7 @@ class CUtlQueue
 // The CUtlQueueFixed class:
 // A queue class with a fixed allocation scheme
 //-----------------------------------------------------------------------------
+#undef MAX_SIZE
 template < class T, size_t MAX_SIZE >
 class CUtlQueueFixed : public CUtlQueue< T, CUtlMemoryFixed< T, MAX_SIZE > >
 {

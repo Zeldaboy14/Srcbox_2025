@@ -106,6 +106,15 @@ void ResetWeaponFactoryDatabase( void )
 #endif
 }
 
+#ifndef CLIENT_DLL
+int CHL2MPScriptedWeapon::ObjectCaps()
+{
+	//return BaseClass::ObjectCaps() & ~FCAP_IMPULSE_USE;
+	return BaseClass::ObjectCaps() & ~FCAP_ACROSS_TRANSITION;
+}
+
+#endif
+
 
 // acttable_t CHL2MPScriptedWeapon::m_acttable[] = 
 // {
@@ -630,8 +639,8 @@ void CHL2MPScriptedWeapon::OnDataChanged( DataUpdateType_t updateType )
 			InitScriptedWeapon();
 
 #ifdef LUA_SDK
-			//BEGIN_LUA_CALL_WEAPON_METHOD( "Precache" );
-			//END_LUA_CALL_WEAPON_METHOD( 0, 0 );
+			LUA_CALL_WEAPON_METHOD_BEGIN("Precache");
+			LUA_CALL_WEAPON_METHOD_END(0, 0);
 #endif
 		}
 	}

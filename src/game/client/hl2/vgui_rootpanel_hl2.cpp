@@ -16,7 +16,7 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-#ifdef LUA_SDK
+#ifndef LUA_SDK
 C_ScriptedBaseGameUIPanel* g_pScriptedBaseGameUIPanel = NULL;
 
 

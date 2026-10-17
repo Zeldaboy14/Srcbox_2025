@@ -3922,6 +3922,10 @@ void CBasePropDoor::OnUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TY
 			int nSequence = SelectWeightedSequence((Activity)ACT_DOOR_OPEN);
 			PropSetSequence(nSequence);
 
+			//if (!IsCheckpointDoor() && nSequence >= 0)
+			if (nSequence >= 0)
+				PropSetSequence(nSequence);
+
 			if ((nSequence == -1) || !HasAnimEvent(nSequence, AE_DOOR_OPEN))
 			{
 				// No open anim event, we need to open the door here.

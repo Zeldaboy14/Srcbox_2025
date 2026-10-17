@@ -18,7 +18,9 @@
 #include "baseviewmodel_shared.h"
 #include "weapon_proficiency.h"
 #include "utlmap.h"
+#ifdef HL2MP
 #include "hl2mp_weapon_parse.h"
+#endif
 
 #if defined( CLIENT_DLL )
 #define CBaseCombatWeapon C_BaseCombatWeapon
@@ -264,7 +266,9 @@ public:
 
 	virtual bool			ShouldBlockPrimaryFire() { return false; }
 	// terror
-	CHL2MPSWeaponInfo* GetTerrorWeaponData(void) const;
+#ifdef HL2MP
+	//CHL2MPSWeaponInfo* GetTerrorWeaponData(void) const;
+#endif
 
 #ifdef CLIENT_DLL
 	virtual void			CreateMove( float flInputSampleTime, CUserCmd *pCmd, const QAngle &vecOldViewAngles ) {}

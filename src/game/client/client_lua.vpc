@@ -173,8 +173,8 @@ $Project
 	
 		$Folder	"UI"
 		{
-			//$File	"hl2mp\ui\mainmenu.cpp"
-			//$File	"hl2mp\ui\mainmenu.h"
+			$File	"hl2mp\ui\mainmenu.cpp"
+			$File	"hl2mp\ui\mainmenu.h"
 			$File	"hl2mp\ui\backgroundpanel.cpp"
 			$File	"hl2mp\ui\backgroundpanel.h"
 			//$File	"hl2mp\experiment_hud_chat.cpp"

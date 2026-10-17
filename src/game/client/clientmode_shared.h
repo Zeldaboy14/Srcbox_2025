@@ -16,6 +16,7 @@
 #include "GameEventListener.h"
 #include "GameUI/IGameUI.h"
 #include <baseviewport.h>
+
 #ifdef LUA_SDK
 #include <scripted_controls/scriptedhudviewport.h>
 #include <scripted_controls/scriptedclientluapanel.h>

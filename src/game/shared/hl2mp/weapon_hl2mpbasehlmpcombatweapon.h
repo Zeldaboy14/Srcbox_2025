@@ -30,6 +30,10 @@ public:
 
 	CBaseHL2MPCombatWeapon();
 
+#ifndef CLIENT_DLL
+	virtual	int	ObjectCaps(void);
+#endif
+
 	virtual bool	WeaponShouldBeLowered( void );
 
 	virtual bool	Ready( void );

@@ -1419,7 +1419,8 @@ private:
 	static int AddDependentEntities( int nCount, CBaseEntity **ppEntList, int *pEntityFlags, int nMaxList );
 
 	// Figures out save flags for the entity
-	static int ComputeEntitySaveFlags( CBaseEntity *pEntity );
+	//static int ComputeEntitySaveFlags( CBaseEntity *pEntity );
+	static int ComputeEntitySaveFlags( CBaseEntity *pEntity, const char* pVolumeName);
 
 private:
 	char m_szMapName[cchMapNameMost];		// trigger_changelevel only:  next map
@@ -1983,7 +1984,8 @@ int CChangeLevel::BuildChangeLevelList( levellist_t *pLevelList, int maxList )
 //------------------------------------------------------------------------------
 // Adds a single entity to the transition list, if appropriate. Returns the new count
 //------------------------------------------------------------------------------
-int CChangeLevel::ComputeEntitySaveFlags( CBaseEntity *pEntity )
+//int CChangeLevel::ComputeEntitySaveFlags( CBaseEntity *pEntity )
+int CChangeLevel::ComputeEntitySaveFlags( CBaseEntity *pEntity, const char* pVolumeName )
 {
 	if ( g_iDebuggingTransition == DEBUG_TRANSITIONS_VERBOSE )
 	{
@@ -2075,7 +2077,8 @@ int CChangeLevel::BuildEntityTransitionList( CBaseEntity *pLandmarkEntity, const
 	CBaseEntity *pEntity = NULL; 
 	while ( (pEntity = UTIL_EntitiesInPVS( pLandmarkEntity, pEntity)) != NULL )
 	{
-		int flags = ComputeEntitySaveFlags( pEntity );
+		//int flags = ComputeEntitySaveFlags( pEntity );
+		int flags = ComputeEntitySaveFlags( pEntity, pLandmarkName );
 		if ( !flags )
 			continue;
 
@@ -2171,7 +2174,7 @@ int CChangeLevel::AddDependentEntities( int nCount, CBaseEntity **ppEntList, int
 			// Mark the entity as being in the list
 			Set( pEntitiesSaved, nEntIndex );
 
-			int flags = ComputeEntitySaveFlags( pEntity );
+			int flags = ComputeEntitySaveFlags( pEntity, NULL );
 			if ( flags )
 			{
 				if ( nCount >= nMaxList )
@@ -3729,6 +3732,233 @@ void CTriggerCamera::Move()
 #endif
 }
 
+//#ifdef TERROR
+#ifdef SRCBOX
+BEGIN_DATADESC(CSurvivorCamera)
+
+// Inputs
+DEFINE_INPUTFUNC(FIELD_VOID, "Enable", InputEnable),
+DEFINE_INPUTFUNC(FIELD_VOID, "Disable", InputDisable),
+DEFINE_INPUTFUNC(FIELD_VOID, "StartMovement", InputStartMovement),
+
+// Function Pointers
+DEFINE_FUNCTION(FollowTarget),
+END_DATADESC()
+
+LINK_ENTITY_TO_CLASS(point_viewcontrol_survivor, CSurvivorCamera);
+
+CSurvivorCamera::CSurvivorCamera()
+{
+	m_hPlayer = NULL;
+	m_fov = 90;
+	m_fovSpeed = 1;
+}
+
+void CSurvivorCamera::Spawn(void)
+{
+	BaseClass::Spawn();
+
+	SetMoveType(MOVETYPE_NOCLIP);
+	SetSolid(SOLID_NONE);								// Remove model & collisions
+	SetRenderAlpha(0);								// The engine won't draw this model if this is set to 0 and blending is on
+	m_nRenderMode = kRenderTransTexture;
+
+	m_bEnabled = false;
+	m_bMovementStarted = false;
+
+	m_bDisableOnMoveEnd = (m_spawnflags & SF_SC_DISABLE_WHEN_MOVE_FINISHED) != 0;
+
+	DispatchUpdateTransmitState();
+}
+
+void CSurvivorCamera::Enable(void)
+{
+	m_bEnabled = true;
+
+	if (!m_hPlayer)
+	{
+		DispatchUpdateTransmitState();
+		return;
+	}
+
+	Assert(m_hPlayer->IsPlayer());
+	CBasePlayer* pPlayer = NULL;
+
+	if (m_hPlayer->IsPlayer())
+	{
+		pPlayer = ((CBasePlayer*)m_hPlayer.Get());
+	}
+
+	if (HasSpawnFlags(SF_SC_PLAYER_SETFOV))
+	{
+		if (pPlayer)
+		{
+			if (pPlayer->GetFOVOwner() && (FClassnameIs(pPlayer->GetFOVOwner(), "point_viewcontrol_multiplayer") || FClassnameIs(pPlayer->GetFOVOwner(), "point_viewcontrol_survivor")))
+			{
+				pPlayer->ClearZoomOwner();
+			}
+			pPlayer->SetFOV(this, m_fov, m_fovSpeed);
+		}
+	}
+
+	SetAbsVelocity(vec3_origin);
+
+	if (pPlayer)
+	{
+		pPlayer->SetViewEntity(this);
+
+		// Hide the player's viewmodel
+		pPlayer->m_Local.m_bDrawViewmodel = false;
+	}
+
+	DispatchUpdateTransmitState();
+
+	if (m_bMovementStarted)
+	{
+		// follow the player down
+		SetThink(&CTriggerCamera::FollowTarget);
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CSurvivorCamera::Disable(void)
+{
+	if (m_hPlayer)
+	{
+		CBasePlayer* pBasePlayer = (CBasePlayer*)m_hPlayer.Get();
+
+		if (pBasePlayer->IsAlive())
+		{
+			pBasePlayer->SetViewEntity(NULL);
+			pBasePlayer->EnableControl(TRUE);
+			pBasePlayer->m_Local.m_bDrawViewmodel = true;
+		}
+
+		if (HasSpawnFlags(SF_SC_PLAYER_SETFOV))
+		{
+			pBasePlayer->SetFOV(this, 0, m_fovSpeed);
+		}
+	}
+
+	m_bEnabled = false;
+	SetThink(NULL);
+
+	SetLocalAngularVelocity(vec3_angle);
+
+	DispatchUpdateTransmitState();
+}
+
+void CSurvivorCamera::FollowTarget(void)
+{
+	if (m_hPlayer == NULL)
+	{
+		Disable();
+		return;
+	}
+
+	QAngle ang = m_hPlayer->GetLocalAngles() - GetLocalAngles();
+
+	// We could use AngleNormalize() for these, but fmodf isn't called
+	if (ang.x < -180)
+		ang.x += 360;
+	if (ang.x > 180)
+		ang.x -= 360;
+
+	if (ang.y < -180)
+		ang.y += 360;
+	if (ang.y > 180)
+		ang.y -= 360;
+
+	if (ang.z < -180)
+		ang.z += 360;
+	if (ang.z > 180)
+		ang.z -= 360;
+
+	float speed = 40.0 * gpGlobals->frametime;
+	ang *= speed;
+
+	SetLocalAngularVelocity(ang);
+	SetNextThink(gpGlobals->curtime);
+	Move();
+}
+
+void CSurvivorCamera::StartMovement(void)
+{
+	if (m_hPlayer == NULL)
+	{
+		Disable();
+		return;
+	}
+
+	SetParent(NULL);
+	SetMoveType(MOVETYPE_NOCLIP);
+	m_vStartPos = GetAbsOrigin();
+	m_bMovementStarted = true;
+	SetThink(&CSurvivorCamera::FollowTarget);
+	m_flInterpStartTime = gpGlobals->curtime;
+	FollowTarget();
+}
+
+int CSurvivorCamera::UpdateTransmitState()
+{
+	// always tranmit if currently used by a monitor
+	if (m_bEnabled)
+	{
+		return SetTransmitState(FL_EDICT_ALWAYS);
+	}
+	else
+	{
+		return SetTransmitState(FL_EDICT_DONTSEND);
+	}
+}
+
+void CSurvivorCamera::InputEnable(inputdata_t& inputdata)
+{
+	m_hPlayer = inputdata.pActivator;
+	Enable();
+}
+
+void CSurvivorCamera::InputDisable(inputdata_t& inputdata)
+{
+	Disable();
+}
+
+void CSurvivorCamera::InputStartMovement(inputdata_t& inputdata)
+{
+	StartMovement();
+}
+
+void CSurvivorCamera::Move()
+{
+	Vector vEndPos = m_hPlayer->EyePosition();
+
+	float interp = gpGlobals->curtime - m_flInterpStartTime;
+	if (interp < 1.0)
+	{
+		float interpResult = Bias(interp, 0.15);
+		float distance = (float)1.0 / gpGlobals->frametime;
+
+		Vector desiredVel = (interpResult * (vEndPos - m_vStartPos) + m_vStartPos - GetAbsOrigin()) * distance;
+
+		SetAbsVelocity(desiredVel);
+	}
+	else
+	{
+		UTIL_SetOrigin(this, vEndPos);
+		SetAbsAngles(m_hPlayer->GetLocalAngles());
+		SetAbsVelocity(vec3_origin);
+
+		if (m_bDisableOnMoveEnd)
+		{
+			Disable();
+		}
+
+		m_bMovementStarted = false;
+	}
+}
+#endif // TERROR
 
 //-----------------------------------------------------------------------------
 // Purpose: Starts/stops cd audio tracks

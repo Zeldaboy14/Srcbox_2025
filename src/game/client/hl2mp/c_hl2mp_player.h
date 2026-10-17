@@ -117,6 +117,10 @@ class C_HL2MP_Player : public C_BaseHLPlayer
     virtual int DrawModel( int flags );
     virtual void AddEntity( void );
 
+    SurvivorCharacterType m_survivorCharacter;	// 6468
+
+    SurvivorCharacterType GetCharacter() const { return m_survivorCharacter; }
+
     QAngle GetAnimEyeAngles( void )
     {
         return m_angEyeAngles;
@@ -200,6 +204,8 @@ class C_HL2MP_Player : public C_BaseHLPlayer
 	CNetworkHandle( C_TFItem, m_hItem );
 #endif
 
+    CNetworkVar(int, m_PlayerColor);
+
 #ifdef LUA_SDK
     // Avoiding players
     void SetAvoidPlayers(bool shouldAvoid);
@@ -253,7 +259,7 @@ class C_HL2MP_Player : public C_BaseHLPlayer
 #ifdef LUA_SDK
     CHL2MPPlayerAnimState* m_PlayerAnimState;
 #else
-    CHL2MPPlayerAnimState m_PlayerAnimState;
+    CPlayerAnimState m_PlayerAnimState;
 #endif
 
     QAngle m_angEyeAngles;

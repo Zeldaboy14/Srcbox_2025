@@ -16,9 +16,9 @@
 #include "fmtstr.h"
 #include "utlbuffer.h"
 #include "tier0/vprof.h"
-#ifdef TERROR
+//#ifdef TERROR
 #include "func_simpleladder.h"
-#endif
+//#endif
 #include "functorutils.h"
 #include "nav_pathfind.h"
 
@@ -2742,7 +2742,7 @@ static ConCommand nav_compress_id( "nav_compress_id", CommandNavCompressID, "Re-
 
 
 //--------------------------------------------------------------------------------------------------------------
-#ifdef TERROR
+//#ifdef TERROR
 void CommandNavShowLadderBounds( void )
 {
 	if ( !UTIL_IsCommandIssuedByServerAdmin() )
@@ -2758,7 +2758,7 @@ void CommandNavShowLadderBounds( void )
 	}
 }
 static ConCommand nav_show_ladder_bounds( "nav_show_ladder_bounds", CommandNavShowLadderBounds, "Draws the bounding boxes of all func_ladders in the map.", FCVAR_GAMEDLL | FCVAR_CHEAT );
-#endif
+//#endif
 
 //--------------------------------------------------------------------------------------------------------------
 void CommandNavBuildLadder( void )

@@ -492,7 +492,99 @@ private:
 	unsigned int m_flags;
 };
 
+#include "hl2mp_player.h"
 
 extern bool IsWalkableTraceLineClear( const Vector &from, const Vector &to, unsigned int flags = 0 );
+
+#ifdef SRCBOX2
+typedef CUtlVector< CNavArea* > CNavAreaVector;
+
+class CNavMesh : public CNavMesh
+{
+	typedef CNavMesh BaseClass;
+public:
+
+	CNavMesh();
+	~CNavMesh();
+
+	virtual CNavArea* CreateArea(void) const;							// CNavArea factory
+	virtual unsigned int GetSubVersionNumber(void) const;
+
+	virtual void Update();
+	virtual void OnServerActivate(void);	// (EXTEND) invoked when server loads a new map
+	virtual void OnRoundRestart(void);
+	void CheckpointRoundRestart();
+	void CollectBoundaryAreas();
+
+	bool ComputeDirectedFlowDistances(CNavArea::FlowType type, CNavArea* startArea, CNavArea* endArea);
+	CNavArea* ComputeFlowDistances();
+	bool InitializeFlowDistances();
+	void InitializeCheckpoints();
+	void UpdateCheckpoints();
+	void UpdateBoundarySpread();
+	void ProcessBreakables();
+
+	virtual void PreLoadAreas(int nAreas);
+	virtual NavErrorType Load(void);									// load navigation data from a file
+	virtual void LoadCustomData(CUtlBuffer& fileBuffer, unsigned int subVersion);			// load custom mesh data for derived classes
+	virtual void LoadCustomDataPreArea(CUtlBuffer& fileBuffer, unsigned int subVersion);	// load custom mesh data for derived classes that needs to be loaded before areas are read in
+	void LoadFogPlaceDataBase(void);
+
+	void	OnPlayerSpawned(C_HL2MP_Player* player);
+	void	OnAreaCleared(CNavArea* area);
+
+	void MaintainWanderingPopulation();
+	void RemoveWanderersInActiveAreaSet();
+	void RecomputeFlowDistances();
+
+	Place NameToFogPlace(const char* name);
+
+	CNavArea* FindGoalArea();
+	int GetCheckpointCount();
+	Checkpoint* GetCheckpoint(int index);
+	Checkpoint* GetCheckpoint(const Vector& pos);
+
+	Checkpoint* GetInitialCheckpoint();
+	Checkpoint* GetLastCheckpoint();
+
+	CNavArea* GetGoalArea() const;
+
+	void	OnCheckpointLeft();
+	virtual void OnDoorCreated(CBaseEntity* door);
+
+public:
+
+	float m_maxFlowDistance;
+	float m_maxNonCheckpointFlowDistance;
+	float m_battlefieldFlowThreshold;
+
+	CNavArea* m_zeroFlowArea;
+	CNavArea* m_rescueVehicleArea;
+	CNavArea* m_goalArea;
+
+	bool m_isFlowValid;
+
+	CountdownTimer m_boundarySpreadTimer;
+
+	CNavAreaVector m_boundaryAreas;
+	int m_boundaryAreaUpdateIndex;
+
+	CNavAreaVector m_boundaryNotClearedAreas;
+
+	CNavArea* m_editArea;
+
+	CUtlVector<char*> m_fogPlaceNames;
+	int m_editFogPlace;
+
+	CUtlVector<Checkpoint*> m_checkpoints;
+
+	CUtlVector<EHANDLE> m_newBreakables;
+	CUtlVector<Extent> m_oldBreakables;
+
+	CountdownTimer m_debugTimer;
+	CountdownTimer m_populationTimer;
+	CountdownTimer m_flowRecomputeTimer;
+};
+#endif
 
 #endif // _NAV_H_

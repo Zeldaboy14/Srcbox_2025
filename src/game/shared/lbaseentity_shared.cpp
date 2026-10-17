@@ -1,6 +1,7 @@
 #include "cbase.h"
 #ifdef CLIENT_DLL
 #include "c_recipientfilter.h"
+#include "c_baseanimating.h"
 #define CRecipientFilter C_RecipientFilter
 #else
 #include "recipientfilter.h"
@@ -707,6 +708,47 @@ LUA_BINDING_BEGIN( Entity, GetCheckUntouch, "class", "Get check untouch." )
 }
 LUA_BINDING_END( "boolean", "True if check untouch, false otherwise." )
 
+#ifdef CLIENT_DLL
+// Srcbox: the client has no map classname for most networked entities, so C_BaseEntity::GetClassname
+// falls back to the class map name of the nearest prediction datamap (a server ragdoll reported
+// itself as a dynamic prop). Map the common server classes to their real entity names, like GMod does.
+static const char *LuaClientEntityNameFromNetworkClass( C_BaseEntity *pEntity )
+{
+    ClientClass *pClientClass = pEntity->GetClientClass();
+
+    if ( !pClientClass || !pClientClass->m_pNetworkName )
+        return NULL;
+
+    static const struct
+    {
+        const char *pszNetworkName;
+        const char *pszEntityName;
+    } s_NetworkClassNames[] = {
+        { "CRagdollProp", "prop_ragdoll" },
+        { "CRagdollPropAttached", "prop_ragdoll_attached" },
+        { "CPhysicsProp", "prop_physics" },
+        { "CDynamicProp", "prop_dynamic" },
+        { "CPhysBox", "func_physbox" },
+        { "CPropJeep", "prop_vehicle_jeep" },
+        { "CPropJeepEpisodic", "prop_vehicle_jeep" },
+        { "CPropAirboat", "prop_vehicle_airboat" },
+        { "CPropVehiclePrisonerPod", "prop_vehicle_prisoner_pod" },
+        { "CPropVehicleChoreoGeneric", "prop_vehicle_choreo_generic" },
+        { "CPropVehicleDriveable", "prop_vehicle_driveable" },
+        { "CPropCrane", "prop_vehicle_crane" },
+        { "CPropCannon", "prop_vehicle_cannon" },
+    };
+
+    for ( int i = 0; i < ARRAYSIZE( s_NetworkClassNames ); i++ )
+    {
+        if ( Q_strcmp( pClientClass->m_pNetworkName, s_NetworkClassNames[i].pszNetworkName ) == 0 )
+            return s_NetworkClassNames[i].pszEntityName;
+    }
+
+    return NULL;
+}
+#endif
+
 LUA_BINDING_BEGIN( Entity, GetClass, "class", "Get class name." )
 {
     lua_CBaseEntity *pEntity = LUA_BINDING_ARGUMENT( luaL_checkentity, 1, "entity" );
@@ -727,6 +769,8 @@ LUA_BINDING_BEGIN( Entity, GetClass, "class", "Get class name." )
             lua_pushstring( L, pWeapon->GetScriptedClassname() );
         }
     }
+    else if ( const char *pszNetworkEntityName = LuaClientEntityNameFromNetworkClass( pEntity ) )
+        lua_pushstring( L, pszNetworkEntityName );
     else
 #endif
         lua_pushstring( L, pEntity->GetClassname() );
@@ -1653,6 +1697,40 @@ LUA_BINDING_BEGIN( Entity, IsWorld, "class", "Whether entity is world." )
     return 1;
 }
 LUA_BINDING_END( "boolean", "true if world, false otherwise." )
+
+LUA_BINDING_BEGIN( Entity, IsVehicle, "class", "Whether the entity is a vehicle." )
+{
+    lua_CBaseEntity *pEntity = LUA_BINDING_ARGUMENT( luaL_checkentity, 1, "entity" );
+#ifdef CLIENT_DLL
+    lua_pushboolean( L, pEntity->GetClientVehicle() != NULL );
+#else
+    lua_pushboolean( L, pEntity->GetServerVehicle() != NULL );
+#endif
+    return 1;
+}
+LUA_BINDING_END( "boolean", "true if the entity is a vehicle, false otherwise." )
+
+LUA_BINDING_BEGIN( Entity, IsRagdoll, "class", "Whether the entity is a ragdoll." )
+{
+    lua_CBaseEntity *pEntity = LUA_BINDING_ARGUMENT( luaL_checkentity, 1, "entity" );
+#ifdef CLIENT_DLL
+    bool bIsRagdoll = dynamic_cast< C_ClientRagdoll * >( pEntity ) != NULL;
+
+    if ( !bIsRagdoll )
+    {
+        ClientClass *pClientClass = pEntity->GetClientClass();
+        bIsRagdoll = pClientClass && pClientClass->m_pNetworkName &&
+                     ( Q_strcmp( pClientClass->m_pNetworkName, "CRagdollProp" ) == 0 ||
+                       Q_strcmp( pClientClass->m_pNetworkName, "CRagdollPropAttached" ) == 0 );
+    }
+
+    lua_pushboolean( L, bIsRagdoll );
+#else
+    lua_pushboolean( L, FClassnameIs( pEntity, "prop_ragdoll" ) || FClassnameIs( pEntity, "prop_ragdoll_attached" ) );
+#endif
+    return 1;
+}
+LUA_BINDING_END( "boolean", "true if the entity is a ragdoll, false otherwise." )
 
 LUA_BINDING_BEGIN( Entity, KeyValue, "class", "Key value." )
 {

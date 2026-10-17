@@ -695,6 +695,7 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 #elif !defined LUA_SDK || !defined TF
 	MountExtraContent();
 #endif
+	MountGamepacks();
 
 	// cache the globals
 	gpGlobals = pGlobals;

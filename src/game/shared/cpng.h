@@ -13,6 +13,7 @@
 
 #include <bitmap/bitmap.h>
 #include "utlmap.h"
+#include "utldict.h"
 #include "utlbuffer.h"
 #include "materialsystem/itexture.h"
 #include <materialsystem/imaterial.h>
@@ -38,7 +39,8 @@ class CPngTextureRegen : public ITextureRegenerator
     CPngMaterialProxy *m_pProxy;
 
     public:
-    static CUtlMap< const char *, CPngMaterialProxy * > m_mapProceduralMaterials;
+    // CUtlDict copies its keys (case-insensitive), so entries never point at a freed texture name
+    static CUtlDict< CPngMaterialProxy *, int > m_mapProceduralMaterials;
 
     static IMaterial *GetOrCreateProceduralMaterial(
         const char *pMaterialName,
@@ -59,6 +61,11 @@ class CPngMaterialProxy : public IMaterialProxy
     virtual void Release( void )
     {
         delete this;
+    }
+
+    bool IsTextureValid() const
+    {
+        return m_pTexture != NULL && !m_pTexture->IsError();
     }
 
     virtual IMaterial *GetMaterial()

@@ -892,6 +892,31 @@ if (GAMEMODE_NAME == nil) then
 	if (gamemodeConVar) then
 		GAMEMODE_NAME = gamemodeConVar:GetString()
 	end
+
+	-- gmod_minimal is Srcbox's thin wrapper around sandbox; addons should see it as sandbox
+	-- (e.g. the playermodel selector only edits the existing sandbox window entry then).
+	if (GAMEMODE_NAME == "gmod_minimal") then
+		GAMEMODE_NAME = "sandbox"
+	end
+end
+
+-- Desktop window entries without a size (addons that replace the entry outside sandbox only set
+-- title/icon/init) made the context menu's DoClick call SetSize(nil). Give them sandbox's default.
+if (CLIENT) then
+	hook.Add("ContextMenuOpen", "GModCompatibility.DesktopWindowDefaults", function()
+		local desktopWindows = list.GetForEdit and list.GetForEdit("DesktopWindows")
+
+		if (not istable(desktopWindows)) then
+			return
+		end
+
+		for _, window in pairs(desktopWindows) do
+			if (istable(window)) then
+				window.width = window.width or 960
+				window.height = window.height or 700
+			end
+		end
+	end)
 end
 
 local registry = debug.getregistry()
@@ -4534,6 +4559,78 @@ for name, default in pairs({
 	end
 end
 
+-- GMod spells the bodygroup functions "Bodygroup"; ours are "BodyGroup".
+do
+	local aliases = {
+		GetBodygroup = "GetBodyGroup",
+		SetBodygroup = "SetBodyGroup",
+		GetBodygroupCount = "GetBodyGroupCount",
+		GetBodygroupName = "GetBodyGroupName",
+		FindBodygroupByName = "FindBodyGroupByName",
+		GetNumBodyGroups = "GetBodyGroupsCount",
+	}
+
+	for _, metaName in ipairs({ "Entity", "CBaseAnimating" }) do
+		local meta = FindMetaTable(metaName)
+
+		if (meta) then
+			for gmodName, ourName in pairs(aliases) do
+				if (rawget(meta, gmodName) == nil and meta[ourName]) then
+					meta[gmodName] = meta[ourName]
+				end
+			end
+		end
+	end
+end
+
+-- GMod's GetSpawnFlags is shared, ours only exists on the server. The client doesn't know
+-- the flags, so report none (property filters call this on the client).
+if (CLIENT and not ENTITY_META.GetSpawnFlags) then
+	function ENTITY_META:GetSpawnFlags()
+		return 0
+	end
+end
+
+-- properties.OpenEntityMenu runs every property's Filter while building the menu, and it only
+-- calls menu:Open() at the end. One Filter erroring (an addon property using a function we
+-- lack) aborted that, leaving the half-built menu in the top-left corner. Treat an erroring
+-- Filter as "not applicable" instead.
+if (properties and properties.Add) then
+	local function guardFilter(name, property)
+		if (not istable(property) or not isfunction(property.Filter) or property._SrcboxFilterGuarded) then
+			return
+		end
+
+		local originalFilter = property.Filter
+		property._SrcboxFilterGuarded = true
+
+		property.Filter = function(...)
+			local success, result = pcall(originalFilter, ...)
+
+			if (not success) then
+				ErrorNoHalt("[GModCompatibility] Property '" .. tostring(name) .. "' Filter failed: " .. tostring(result) .. "\n")
+				return false
+			end
+
+			return result
+		end
+	end
+
+	local originalAdd = properties._SrcboxOriginalAdd or properties.Add
+	properties._SrcboxOriginalAdd = originalAdd
+
+	function properties.Add(name, property)
+		guardFilter(name, property)
+		return originalAdd(name, property)
+	end
+
+	if (istable(properties.List)) then
+		for name, property in pairs(properties.List) do
+			guardFilter(name, property)
+		end
+	end
+end
+
 --[[
 	Load the autorun scripts for Garry's Mod addons/etc.
 --]]
@@ -4632,9 +4729,30 @@ hook.Add(
 		if (differentBase[className]) then
 			scriptedWeapon.Base = differentBase[className]
 		elseif (differentBase[className] == false) then
-			scriptedEntity.Base = nil
+			scriptedWeapon.Base = nil
 		end
 
 		weapons.Register(scriptedWeapon, className)
 	end
 )
+
+-- GMod builds a SWEP instance from weapons.Get(class): a copy of the SWEP with its whole Base chain
+-- inherited (and BaseClass set). Srcbox's InitializeRefTable only merged the SWEP's own table, so
+-- anything from weapon_base (SetWeaponHoldType, ShootEffects, TakePrimaryAmmo, ...) was missing.
+do
+	local originalInitializeRefTable = ScriptedWeapons._SrcboxInitializeRefTable or ScriptedWeapons.InitializeRefTable
+	ScriptedWeapons._SrcboxInitializeRefTable = originalInitializeRefTable
+
+	function ScriptedWeapons.InitializeRefTable(refTable, className)
+		if (weapons and weapons.Get and weapons.GetStored and weapons.GetStored(className)) then
+			local success, weaponTable = pcall(weapons.Get, className)
+
+			if (success and istable(weaponTable)) then
+				table.Merge(refTable, weaponTable)
+				return
+			end
+		end
+
+		return originalInitializeRefTable(refTable, className)
+	end
+end

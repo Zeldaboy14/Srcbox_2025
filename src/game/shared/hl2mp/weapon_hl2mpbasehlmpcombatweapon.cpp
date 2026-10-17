@@ -58,6 +58,14 @@ CBaseHL2MPCombatWeapon::CBaseHL2MPCombatWeapon( void )
 
 }
 
+#ifndef CLIENT_DLL
+int CBaseHL2MPCombatWeapon::ObjectCaps()
+{
+	//return BaseClass::ObjectCaps() & ~FCAP_IMPULSE_USE;
+	return BaseClass::ObjectCaps() & ~FCAP_ACROSS_TRANSITION;
+}
+#endif
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------

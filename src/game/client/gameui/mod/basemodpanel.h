@@ -128,6 +128,7 @@ namespace BaseModUI
 		void OpenFrontScreen();
 		void OpenInGameFrontScreen();
 		void RunFrame();
+		void KeepLegacyDialogsOnTop();
 		void OnLevelLoadingStarted( char const *levelName, bool bShowProgressDialog );
 		void OnLevelLoadingFinished( KeyValues *kvEvent );
 		bool UpdateProgressBar(float progress, const char *statusText);
@@ -182,6 +183,7 @@ namespace BaseModUI
 		vgui::HScheme m_UIScheme;
 		vgui::DHANDLE<COptionsDialog> m_hOptionsDialog;	// standalone options dialog - PC only
 		vgui::DHANDLE<CCreateMultiplayerGameDialog> m_hCreateMultiplayerGameDialog;
+		CUtlVector< vgui::PHandle > m_HiddenLegacyDialogs;	// classic VGUI2 dialogs hidden while a GenericConfirmation is up
 
 		vgui::HFont m_hDefaultFont;
 

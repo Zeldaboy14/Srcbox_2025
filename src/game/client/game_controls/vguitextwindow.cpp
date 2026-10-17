@@ -198,7 +198,6 @@ void CTextWindow::ShowURL( const char *URL, bool bAllowUserToDisable )
 
 void CTextWindow::ShowIndex( const char *entry )
 {
-    return;
     const char *data = NULL;
     int length = 0;
 
@@ -244,7 +243,6 @@ void CTextWindow::ShowIndex( const char *entry )
 
 void CTextWindow::ShowFile( const char *filename )
 {
-    return;
     if ( Q_stristr( filename, ".htm" ) || Q_stristr( filename, ".html" ) )
     {
         // it's a local HTML file
@@ -280,7 +278,6 @@ void CTextWindow::ShowFile( const char *filename )
 
 void CTextWindow::Update( void )
 {
-    return;
     SetTitle( m_szTitle, false );
 
     m_pTitleLabel->SetText( m_szTitle );
@@ -321,7 +318,6 @@ void CTextWindow::Update( void )
 
 void CTextWindow::OnCommand( const char *command )
 {
-    return;
     if ( !Q_strcmp( command, "okay" ) )
     {
         //=============================================================================
@@ -411,7 +407,6 @@ void CTextWindow::SetData( int type, const char *title, const char *message, con
 
 void CTextWindow::ShowPanel( bool bShow )
 {
-    return;
     if ( BaseClass::IsVisible() == bShow )
         return;
 
@@ -437,7 +432,6 @@ void CTextWindow::ShowPanel( bool bShow )
 
 bool CTextWindow::CMOTDHTML::OnStartRequest( const char *url, const char *target, const char *pchPostData, bool bIsRedirect )
 {
-    return false;
     if ( Q_strstr( url, "steam://" ) )
         return false;
 

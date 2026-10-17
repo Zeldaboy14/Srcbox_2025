@@ -380,6 +380,14 @@ public:
 	virtual void MarkAsDrawn() = 0;
 
 	virtual unsigned ComputeMemoryUsed() = 0;
+
+	// Alien Swarm's IMesh had a virtual DrawModulated(); this engine's material system doesn't, so it
+	// must NOT be a virtual here (that would shift the vtable away from the engine's). The particle
+	// client always passes a modulation of (1,1,1,1), so a plain Draw is equivalent.
+	FORCEINLINE void DrawModulated( const Vector4D &diffuseModulation, int nFirstIndex = -1, int nIndexCount = 0 )
+	{
+		Draw( nFirstIndex, nIndexCount );
+	}
 };
 
 

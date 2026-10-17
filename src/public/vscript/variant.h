@@ -206,7 +206,7 @@ private:
 	// This is not implemented. Use AssignTo( char *pDest, uint nBufLen ) instead.
 	// Declaring this private to produce more sensible error messages.
 	bool AssignTo( char **pDest ) const;
-
+public:
 	union
 	{
 		int				m_int;
@@ -224,6 +224,7 @@ private:
 		float64			m_float64;
 //		uint32			m_utlStringToken; // Can't use CUtlStringToken in union because it has a nonempty constructor
 	};
+private:
 
 	int16				m_type;
 	uint16				m_flags;

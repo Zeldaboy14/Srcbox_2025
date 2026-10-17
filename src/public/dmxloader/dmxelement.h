@@ -71,6 +71,7 @@ struct DmxElementUnpackStructure_t
 #define DMXELEMENT_UNPACK_FIELD_STRING( _attributeName, _defaultString, _varName )	\
 	{ _attributeName, _defaultString, AT_STRING, offsetof( DestStructType_t, _varName ), sizeof( ((DestStructType_t *)0)->_varName), NULL },
 
+
 #define DMXELEMENT_UNPACK_FIELD_USERDATA( _attributeName, _defaultString, _type, _varName, _userData )	\
 	{ _attributeName, _defaultString, CDmAttributeInfo<_type>::AttributeType(), (int)offsetof( DestStructType_t, _varName ), sizeof( ((DestStructType_t *)0)->_varName), _userData },
 #define DMXELEMENT_UNPACK_FIELD_STRING_USERDATA( _attributeName, _defaultString, _varName, _userData )	\

@@ -1,0 +1,988 @@
+//========= Srcbox ============================================================//
+//
+// Purpose: Garry's Mod addons (.gma), mounted in place
+//
+// Garry's Mod keeps workshop addons as .gma archives (steamapps/workshop/
+// content/4000/<id>/*.gma; older items as an LZMA-compressed *_legacy.bin)
+// and its own filesystem_stdio reads them directly. The TF2 SDK's file system
+// is closed, so this does the same one level down, through the Windows file
+// API redirect in bsp_compat.cpp:
+//  - every addon's file list is read once at startup into one virtual folder
+//    tree under <mod>/cache/gma_mount (a real, empty folder), merged like GMod
+//    does it (a later addon replaces an earlier one's file)
+//  - that folder is added to the GAME search path, last
+//  - opening a file under it opens the .gma, and reads from that handle are
+//    served from the file's bytes inside it (bsp_compat tracks the handle with
+//    an offset); attributes and folder listings (FindFirstFile...) come from
+//    the tree
+// Nothing is extracted. Legacy .bin items are decompressed once into
+// <mod>/cache/gma_legacy.
+//
+// It runs when Garry's Mod is mounted (a GAME search path ending in
+// "garrysmod"): its addons folder and the workshop folder of the same Steam
+// library are scanned. -gmapath <folder> points at a workshop content/4000
+// folder directly; -nogma turns it off.
+//
+// Not yet: Lua from addons (lua/...), maps or models inside addons that need
+// bsp_compat's conversions, and mounting while the game runs.
+//
+//=============================================================================//
+
+#include "cbase.h"
+#include "filesystem.h"
+#include "tier0/icommandline.h"
+#include "tier1/lzmaDecoder.h"
+#include "KeyValues.h"
+#include "tier1/fmtstr.h"
+#include "gma_mount.h"
+
+#include "tier0/valve_minmax_off.h"
+#include <string>
+#include <vector>
+#include <unordered_map>
+#include <unordered_set>
+#include "tier0/valve_minmax_on.h"
+
+#ifdef _WIN32
+#include "winlite.h"
+#undef CreateEvent
+#endif
+
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
+
+//-----------------------------------------------------------------------------
+// cfg/mount.cfg (any platform: only the stock file system is used)
+//-----------------------------------------------------------------------------
+static bool IsSafeConfigName( const char *pszName )
+{
+	return pszName && pszName[0] && !V_strstr( pszName, ".." ) && !V_strstr( pszName, ":" ) &&
+		   !V_strstr( pszName, "/" ) && !V_strstr( pszName, "\\" );
+}
+
+// A folder whose files are laid out like a game's (materials/, models/, ...)
+static bool IsContentFolder( const char *pszFolder )
+{
+	static const char *s_pszContentDirs[] = { "materials", "models", "sound", "maps", "particles", "scripts", "resource", "lua", "gamemodes" };
+	for ( int i = 0; i < ARRAYSIZE( s_pszContentDirs ); i++ )
+	{
+		char szPath[MAX_PATH];
+		V_snprintf( szPath, sizeof( szPath ), "%s/%s", pszFolder, s_pszContentDirs[i] );
+		if ( filesystem->IsDirectory( szPath ) )
+			return true;
+	}
+	return false;
+}
+
+static bool HasVPKs( const char *pszFolder )
+{
+	char szPattern[MAX_PATH];
+	V_snprintf( szPattern, sizeof( szPattern ), "%s/*_dir.vpk", pszFolder );
+	FileFindHandle_t hFind;
+	const bool bFound = filesystem->FindFirst( szPattern, &hFind ) != NULL;
+	filesystem->FindClose( hFind );
+	return bFound;
+}
+
+static void MountContentFolder( const char *pszName, const char *szFolder );
+
+// A content folder is mounted as it is. Any other folder is a collection, like
+// custom/*: each of its subfolders that holds content (or VPKs) is mounted.
+static int MountFolderAndVPKs( const char *pszName, const char *pszFolder )
+{
+	char szFolder[MAX_PATH];
+	V_strncpy( szFolder, pszFolder, sizeof( szFolder ) );
+	V_FixSlashes( szFolder, '/' );
+	V_StripTrailingSlash( szFolder );
+
+	if ( !V_IsAbsolutePath( szFolder ) || !filesystem->IsDirectory( szFolder ) )
+	{
+		Warning( "mount.cfg: \"%s\": %s isn't a folder\n", pszName, szFolder );
+		return 0;
+	}
+
+	if ( IsContentFolder( szFolder ) || HasVPKs( szFolder ) )
+	{
+		MountContentFolder( pszName, szFolder );
+		return 1;
+	}
+
+	int nMounted = 0;
+	char szPattern[MAX_PATH];
+	V_snprintf( szPattern, sizeof( szPattern ), "%s/*", szFolder );
+	CUtlVector< CUtlString > subFolders;
+	FileFindHandle_t hFind;
+	for ( const char *pszFile = filesystem->FindFirst( szPattern, &hFind ); pszFile; pszFile = filesystem->FindNext( hFind ) )
+	{
+		if ( pszFile[0] == '.' || !filesystem->FindIsDirectory( hFind ) )
+			continue;
+		char szSub[MAX_PATH];
+		V_snprintf( szSub, sizeof( szSub ), "%s/%s", szFolder, pszFile );
+		subFolders.AddToTail( szSub );
+	}
+	filesystem->FindClose( hFind );
+
+	for ( int i = 0; i < subFolders.Count(); i++ )
+	{
+		if ( IsContentFolder( subFolders[i].Get() ) || HasVPKs( subFolders[i].Get() ) )
+		{
+			MountContentFolder( pszName, subFolders[i].Get() );
+			nMounted++;
+		}
+	}
+
+	if ( !nMounted )
+		Warning( "mount.cfg: \"%s\": nothing to mount in %s (no materials/, models/, ... or VPKs in it or its subfolders)\n", pszName, szFolder );
+	return nMounted;
+}
+
+static void MountContentFolder( const char *pszName, const char *szFolder )
+{
+	// its VPKs first (foo_dir.vpk is mounted as foo.vpk), then the loose files
+	int nVPKs = 0;
+	char szPattern[MAX_PATH];
+	V_snprintf( szPattern, sizeof( szPattern ), "%s/*_dir.vpk", szFolder );
+	FileFindHandle_t hFind;
+	for ( const char *pszFile = filesystem->FindFirst( szPattern, &hFind ); pszFile; pszFile = filesystem->FindNext( hFind ) )
+	{
+		char szVPK[MAX_PATH];
+		V_snprintf( szVPK, sizeof( szVPK ), "%s/%s", szFolder, pszFile );
+		const int nLen = V_strlen( szVPK );
+		if ( nLen <= 8 )
+			continue;
+		V_strcpy( szVPK + nLen - 8, ".vpk" );	// "_dir.vpk" -> ".vpk"
+		filesystem->AddSearchPath( szVPK, "GAME", PATH_ADD_TO_TAIL );
+		if ( CommandLine()->FindParm( "-mountcfgmod" ) )
+			filesystem->AddSearchPath( szVPK, "MOD", PATH_ADD_TO_TAIL );
+		nVPKs++;
+	}
+	filesystem->FindClose( hFind );
+
+	// GAME only, as GMod's mount.cfg and a gameinfo.txt "game" line do. (A path ID
+	// per entry was tried and the engine crashed in its main loop with it.)
+	filesystem->AddSearchPath( szFolder, "GAME", PATH_ADD_TO_TAIL );
+	// -mountcfgmod: also MOD, like a gameinfo.txt "game+mod" line
+	if ( CommandLine()->FindParm( "-mountcfgmod" ) )
+		filesystem->AddSearchPath( szFolder, "MOD", PATH_ADD_TO_TAIL );
+	Msg( "mount.cfg: \"%s\": %s%s\n", pszName, szFolder, nVPKs ? CFmtStr( " (+%d VPKs)", nVPKs ).Get() : "" );
+}
+
+void MountCfg_Init()
+{
+	static bool s_bDone = false;
+	if ( s_bDone )
+		return;
+	s_bDone = true;
+
+	char szFile[MAX_PATH] = "cfg/mount.cfg";
+	const char *pszOverride = CommandLine()->ParmValue( "-mountcfgfile", (const char *)NULL );
+	if ( pszOverride )
+	{
+		if ( IsSafeConfigName( pszOverride ) )
+			V_snprintf( szFile, sizeof( szFile ), "cfg/%s", pszOverride );
+		else
+			Warning( "mount.cfg: ignoring -mountcfgfile \"%s\" (a file name in cfg/ only)\n", pszOverride );
+	}
+
+	KeyValues *pConfig = new KeyValues( "mountcfg" );
+	if ( !pConfig->LoadFromFile( filesystem, szFile, "MOD" ) )
+	{
+		pConfig->deleteThis();
+		return;
+	}
+
+	int nMounted = 0;
+	for ( KeyValues *pGame = pConfig->GetFirstValue(); pGame; pGame = pGame->GetNextValue() )
+	{
+		const char *pszFolder = pGame->GetString();
+		if ( pszFolder && pszFolder[0] )
+			nMounted += MountFolderAndVPKs( pGame->GetName(), pszFolder );
+	}
+	pConfig->deleteThis();
+
+	if ( nMounted )
+		Msg( "mount.cfg: mounted %d folder%s from %s\n", nMounted, nMounted == 1 ? "" : "s", szFile );
+}
+
+#ifdef _WIN32
+
+#define GMA_MAX_INDEX_READ		( 64 * 1024 * 1024 )
+#define GMA_MAX_LEGACY_SIZE		( 1024LL * 1024 * 1024 )
+
+struct GMAArchive_t
+{
+	std::wstring		m_strPath;
+	unsigned long long	m_nWriteTime;
+};
+
+struct GMAEntry_t
+{
+	int			m_nArchive;
+	long long	m_nOffset;
+	long long	m_nSize;
+};
+
+struct GMADir_t
+{
+	std::unordered_set< std::wstring >	m_Files;
+	std::unordered_set< std::wstring >	m_Dirs;
+};
+
+struct GMAFind_t
+{
+	std::vector< WIN32_FIND_DATAW >	m_Results;
+	size_t							m_nNext;
+};
+
+// Built at startup, then only read
+static bool												s_bActive = false;
+static wchar_t											s_szRoot[MAX_PATH];	// full, lowercase, no trailing separator
+static int												s_nRootLen = 0;
+static std::vector< GMAArchive_t >						s_Archives;
+static std::unordered_map< std::wstring, GMAEntry_t >	s_Files;	// full path -> where its bytes are
+static std::unordered_map< std::wstring, GMADir_t >		s_Dirs;		// full path -> what's in it (the root too)
+
+static SRWLOCK								s_FindLock = SRWLOCK_INIT;
+static std::unordered_set< void * >			s_Finds;
+
+//-----------------------------------------------------------------------------
+// Paths
+//-----------------------------------------------------------------------------
+static bool IsSep( wchar_t c )
+{
+	return c == L'\\' || c == L'/';
+}
+
+static const wchar_t *SkipLongPrefix( const wchar_t *psz )
+{
+	if ( psz[0] == L'\\' && psz[1] == L'\\' && psz[2] == L'?' && psz[3] == L'\\' )
+		return psz + 4;
+	return psz;
+}
+
+// Cheap test on the path as given, before it's worth normalizing
+static bool StartsWithRoot( const wchar_t *psz )
+{
+	if ( !s_bActive || !psz )
+		return false;
+	psz = SkipLongPrefix( psz );
+	for ( int i = 0; i < s_nRootLen; i++ )
+	{
+		const wchar_t c = psz[i];
+		if ( !c )
+			return false;
+		if ( IsSep( c ) && s_szRoot[i] == L'\\' )
+			continue;
+		if ( towlower( c ) != s_szRoot[i] )
+			return false;
+	}
+	return !psz[s_nRootLen] || IsSep( psz[s_nRootLen] );
+}
+
+// Full path, lowercase, backslashes, no trailing separator
+static bool NormalizePath( const wchar_t *psz, std::wstring &out )
+{
+	wchar_t sz[MAX_PATH * 2];
+	DWORD n = GetFullPathNameW( SkipLongPrefix( psz ), ARRAYSIZE( sz ), sz, NULL );
+	if ( !n || n >= ARRAYSIZE( sz ) )
+		return false;
+	_wcslwr_s( sz, ARRAYSIZE( sz ) );
+	while ( n > 3 && sz[n - 1] == L'\\' )
+		sz[--n] = 0;
+	out.assign( sz, n );
+	return true;
+}
+
+// A normalized path that is the root or inside it
+static bool IsInRoot( const std::wstring &path )
+{
+	if ( path.size() < (size_t)s_nRootLen || path.compare( 0, s_nRootLen, s_szRoot ) != 0 )
+		return false;
+	return path.size() == (size_t)s_nRootLen || path[s_nRootLen] == L'\\';
+}
+
+static std::wstring Widen( const char *psz )
+{
+	wchar_t sz[MAX_PATH * 2];
+	if ( !MultiByteToWideChar( CP_UTF8, 0, psz, -1, sz, ARRAYSIZE( sz ) ) )
+		return std::wstring();
+	return sz;
+}
+
+static std::string Narrow( const std::wstring &str )
+{
+	char sz[MAX_PATH * 4];
+	if ( !WideCharToMultiByte( CP_UTF8, 0, str.c_str(), -1, sz, sizeof( sz ), NULL, NULL ) )
+		return std::string();
+	return sz;
+}
+
+static unsigned long long FileTimeToU64( const FILETIME &ft )
+{
+	return ( (unsigned long long)ft.dwHighDateTime << 32 ) | ft.dwLowDateTime;
+}
+
+static void CreateDirectories( const std::wstring &path )
+{
+	for ( size_t i = 3; i <= path.size(); i++ )
+	{
+		if ( i == path.size() || path[i] == L'\\' )
+			CreateDirectoryW( path.substr( 0, i ).c_str(), NULL );
+	}
+}
+
+template < typename FN >
+static void ForEachInFolder( const std::wstring &dir, const wchar_t *pszSpec, FN fn )
+{
+	WIN32_FIND_DATAW fd;
+	HANDLE hFind = FindFirstFileW( ( dir + L"\\" + pszSpec ).c_str(), &fd );
+	if ( hFind == INVALID_HANDLE_VALUE )
+		return;
+	do
+	{
+		if ( fd.cFileName[0] != L'.' )
+			fn( fd );
+	}
+	while ( FindNextFileW( hFind, &fd ) );
+	FindClose( hFind );
+}
+
+static bool ReadAt( HANDLE hFile, long long nOffset, void *pDest, size_t nSize )
+{
+	unsigned char *pOut = (unsigned char *)pDest;
+	while ( nSize > 0 )
+	{
+		OVERLAPPED ov;
+		memset( &ov, 0, sizeof( ov ) );
+		ov.Offset = (DWORD)( nOffset & 0xFFFFFFFF );
+		ov.OffsetHigh = (DWORD)( nOffset >> 32 );
+		DWORD nChunk = (DWORD)MIN( nSize, (size_t)( 64 * 1024 * 1024 ) );
+		DWORD nRead = 0;
+		if ( !ReadFile( hFile, pOut, nChunk, &nRead, &ov ) || !nRead )
+			return false;
+		pOut += nRead;
+		nOffset += nRead;
+		nSize -= nRead;
+	}
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+// The .gma format (as GMod's gmad writes it):
+//   "GMAD", version (byte), author SteamID (u64), timestamp (u64),
+//   [version > 1] required content: strings, ending with an empty one,
+//   name, description, author (strings), addon version (i32),
+//   files: { number (u32, 0 ends the list), name (string), size (i64), crc (u32) },
+//   then every file's bytes, in that order.
+//-----------------------------------------------------------------------------
+struct GMAParsedFile_t
+{
+	std::string	m_strName;
+	long long	m_nSize;
+};
+
+struct GMAParser_t
+{
+	const unsigned char	*m_p;
+	size_t				m_nLen;
+	size_t				m_nPos;
+	bool				m_bOK;
+
+	template < typename T > T Get()
+	{
+		T value = T();
+		if ( m_nPos + sizeof( T ) > m_nLen )
+			m_bOK = false;
+		else
+		{
+			memcpy( &value, m_p + m_nPos, sizeof( T ) );
+			m_nPos += sizeof( T );
+		}
+		return value;
+	}
+
+	std::string String()
+	{
+		size_t nEnd = m_nPos;
+		while ( nEnd < m_nLen && m_p[nEnd] )
+			nEnd++;
+		if ( nEnd >= m_nLen )
+		{
+			m_bOK = false;
+			return std::string();
+		}
+		std::string str( (const char *)m_p + m_nPos, nEnd - m_nPos );
+		m_nPos = nEnd + 1;
+		return str;
+	}
+};
+
+// 1: read, 0: the index goes past the bytes given, -1: not a .gma
+static int ParseGMA( const unsigned char *p, size_t nLen, std::vector< GMAParsedFile_t > &files, long long &nDataStart, std::string &strTitle )
+{
+	if ( nLen < 5 )
+		return 0;
+	if ( memcmp( p, "GMAD", 4 ) != 0 )
+		return -1;
+
+	GMAParser_t parser = { p, nLen, 4, true };
+	const unsigned char nVersion = parser.Get< unsigned char >();
+	if ( nVersion > 3 )
+		return -1;
+	parser.Get< unsigned long long >();	// author
+	parser.Get< unsigned long long >();	// timestamp
+	if ( nVersion > 1 )
+	{
+		while ( parser.m_bOK && !parser.String().empty() )
+			;
+	}
+	strTitle = parser.String();
+	parser.String();	// description
+	parser.String();	// author
+	parser.Get< int >();
+	if ( !parser.m_bOK )
+		return 0;
+
+	files.clear();
+	for ( ;; )
+	{
+		const unsigned int nNumber = parser.Get< unsigned int >();
+		if ( !parser.m_bOK )
+			return 0;
+		if ( !nNumber )
+			break;
+
+		GMAParsedFile_t file;
+		file.m_strName = parser.String();
+		file.m_nSize = parser.Get< long long >();
+		parser.Get< unsigned int >();	// crc
+		if ( !parser.m_bOK )
+			return 0;
+		if ( file.m_nSize < 0 || files.size() > 500000 )
+			return -1;
+		files.push_back( file );
+	}
+
+	nDataStart = (long long)parser.m_nPos;
+	return 1;
+}
+
+//-----------------------------------------------------------------------------
+// The tree
+//-----------------------------------------------------------------------------
+static void AddEntry( int nArchive, const std::string &strName, long long nOffset, long long nSize )
+{
+	std::wstring rel = Widen( strName.c_str() );
+	if ( rel.empty() )
+		return;
+	for ( size_t i = 0; i < rel.size(); i++ )
+	{
+		rel[i] = (wchar_t)towlower( rel[i] );
+		if ( rel[i] == L'/' )
+			rel[i] = L'\\';
+		if ( rel[i] == L':' )
+			return;
+	}
+	if ( rel.find( L".." ) != std::wstring::npos )
+		return;
+
+	// the folders on the way, then the file
+	std::wstring parent( s_szRoot, s_nRootLen );
+	size_t nStart = 0;
+	for ( ;; )
+	{
+		const size_t nSlash = rel.find( L'\\', nStart );
+		const std::wstring name = rel.substr( nStart, ( nSlash == std::wstring::npos ) ? std::wstring::npos : nSlash - nStart );
+		if ( name.empty() )
+		{
+			if ( nSlash == std::wstring::npos )
+				return;
+			nStart = nSlash + 1;
+			continue;
+		}
+
+		GMADir_t &dir = s_Dirs[parent];
+		if ( nSlash == std::wstring::npos )
+		{
+			dir.m_Files.insert( name );
+			GMAEntry_t entry = { nArchive, nOffset, nSize };
+			s_Files[parent + L"\\" + name] = entry;	// a later addon replaces it, as in GMod
+			return;
+		}
+		dir.m_Dirs.insert( name );
+		parent += L"\\";
+		parent += name;
+		s_Dirs[parent];
+		nStart = nSlash + 1;
+	}
+}
+
+static bool MountArchive( const std::wstring &strPath, int &nFiles )
+{
+	HANDLE hFile = CreateFileW( strPath.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+		NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL );
+	if ( hFile == INVALID_HANDLE_VALUE )
+		return false;
+
+	BY_HANDLE_FILE_INFORMATION info;
+	if ( !GetFileInformationByHandle( hFile, &info ) )
+	{
+		CloseHandle( hFile );
+		return false;
+	}
+	const long long nFileSize = ( (long long)info.nFileSizeHigh << 32 ) | info.nFileSizeLow;
+
+	// read until the whole index is in
+	std::vector< unsigned char > buffer;
+	std::vector< GMAParsedFile_t > files;
+	long long nDataStart = 0;
+	std::string strTitle;
+	int nResult = 0;
+	for ( size_t nWant = 64 * 1024; ; nWant *= 4 )
+	{
+		const size_t nRead = (size_t)MIN( (long long)nWant, nFileSize );
+		buffer.resize( nRead );
+		if ( !ReadAt( hFile, 0, buffer.data(), nRead ) )
+			break;
+		nResult = ParseGMA( buffer.data(), nRead, files, nDataStart, strTitle );
+		if ( nResult != 0 || (long long)nRead >= nFileSize || nWant >= GMA_MAX_INDEX_READ )
+			break;
+	}
+	CloseHandle( hFile );
+
+	const std::string strName = Narrow( strPath );
+	if ( nResult != 1 )
+	{
+		Warning( "GMA: %s isn't a readable addon, skipped\n", strName.c_str() );
+		return false;
+	}
+
+	long long nOffset = nDataStart;
+	for ( size_t i = 0; i < files.size(); i++ )
+		nOffset += files[i].m_nSize;
+	if ( nOffset > nFileSize )
+	{
+		Warning( "GMA: %s is cut short, skipped\n", strName.c_str() );
+		return false;
+	}
+
+	GMAArchive_t archive;
+	archive.m_strPath = strPath;
+	archive.m_nWriteTime = FileTimeToU64( info.ftLastWriteTime );
+	const int nArchive = (int)s_Archives.size();
+	s_Archives.push_back( archive );
+
+	nOffset = nDataStart;
+	for ( size_t i = 0; i < files.size(); i++ )
+	{
+		AddEntry( nArchive, files[i].m_strName, nOffset, files[i].m_nSize );
+		nOffset += files[i].m_nSize;
+	}
+	nFiles += (int)files.size();
+	DevMsg( 2, "GMA: %s (%d files): %s\n", strTitle.c_str(), (int)files.size(), strName.c_str() );
+	return true;
+}
+
+// *_legacy.bin: a .gma in an LZMA "alone" stream (5 property bytes, the
+// uncompressed size as a u64, then the data). Decompressed once, into strOut.
+static bool DecompressLegacy( const std::wstring &strBin, const std::wstring &strOut )
+{
+	WIN32_FILE_ATTRIBUTE_DATA binData, outData;
+	if ( !GetFileAttributesExW( strBin.c_str(), GetFileExInfoStandard, &binData ) )
+		return false;
+	if ( GetFileAttributesExW( strOut.c_str(), GetFileExInfoStandard, &outData ) && ( outData.nFileSizeLow || outData.nFileSizeHigh ) &&
+		 CompareFileTime( &outData.ftLastWriteTime, &binData.ftLastWriteTime ) >= 0 )
+		return true;	// done before
+
+	const long long nSize = ( (long long)binData.nFileSizeHigh << 32 ) | binData.nFileSizeLow;
+	if ( nSize < 13 || nSize > GMA_MAX_LEGACY_SIZE )
+		return false;
+
+	// Read it 4 bytes in, so the 17-byte Valve header CLZMA wants fits over the
+	// 13-byte one: the compressed data starts at 17 either way.
+	std::vector< unsigned char > in( (size_t)nSize + 4 );
+	HANDLE hFile = CreateFileW( strBin.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL );
+	if ( hFile == INVALID_HANDLE_VALUE )
+		return false;
+	const bool bRead = ReadAt( hFile, 0, in.data() + 4, (size_t)nSize );
+	CloseHandle( hFile );
+	if ( !bRead )
+		return false;
+
+	unsigned long long nUnpacked;
+	memcpy( &nUnpacked, in.data() + 4 + 5, sizeof( nUnpacked ) );
+	if ( nUnpacked < 5 || nUnpacked > 0x7FFFFFFF )
+		return false;
+
+	lzma_header_t header;
+	header.id = LZMA_ID;
+	header.actualSize = (unsigned int)nUnpacked;
+	header.lzmaSize = (unsigned int)( nSize - 13 );
+	memcpy( header.properties, in.data() + 4, 5 );
+	memcpy( in.data(), &header, sizeof( header ) );
+
+	std::vector< unsigned char > out( (size_t)nUnpacked );
+	if ( CLZMA::Uncompress( in.data(), out.data() ) != nUnpacked || memcmp( out.data(), "GMAD", 4 ) != 0 )
+		return false;
+
+	const std::wstring strTemp = strOut + L".tmp";
+	hFile = CreateFileW( strTemp.c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL );
+	if ( hFile == INVALID_HANDLE_VALUE )
+		return false;
+	bool bWritten = true;
+	for ( size_t nDone = 0; nDone < out.size() && bWritten; )
+	{
+		DWORD nWrote = 0;
+		const DWORD nChunk = (DWORD)MIN( out.size() - nDone, (size_t)( 64 * 1024 * 1024 ) );
+		bWritten = WriteFile( hFile, out.data() + nDone, nChunk, &nWrote, NULL ) && nWrote == nChunk;
+		nDone += nWrote;
+	}
+	CloseHandle( hFile );
+	if ( !bWritten || !MoveFileExW( strTemp.c_str(), strOut.c_str(), MOVEFILE_REPLACE_EXISTING ) )
+	{
+		DeleteFileW( strTemp.c_str() );
+		return false;
+	}
+	return true;
+}
+
+static void ScanWorkshop( const std::wstring &strContent, const std::wstring &strLegacyCache, int &nAddons, int &nFiles )
+{
+	ForEachInFolder( strContent, L"*", [&]( const WIN32_FIND_DATAW &item )
+	{
+		if ( !( item.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY ) )
+			return;
+		const std::wstring strItem = strContent + L"\\" + item.cFileName;
+
+		std::wstring strGMA;
+		ForEachInFolder( strItem, L"*.gma", [&]( const WIN32_FIND_DATAW &fd )
+		{
+			if ( strGMA.empty() )
+				strGMA = strItem + L"\\" + fd.cFileName;
+		} );
+
+		if ( strGMA.empty() )
+		{
+			std::wstring strBin;
+			ForEachInFolder( strItem, L"*.bin", [&]( const WIN32_FIND_DATAW &fd )
+			{
+				if ( strBin.empty() )
+					strBin = strItem + L"\\" + fd.cFileName;
+			} );
+			if ( strBin.empty() )
+				return;
+
+			const std::wstring strOut = strLegacyCache + L"\\" + item.cFileName + L".gma";
+			if ( !DecompressLegacy( strBin, strOut ) )
+			{
+				Warning( "GMA: couldn't decompress %s, skipped\n", Narrow( strBin ).c_str() );
+				return;
+			}
+			strGMA = strOut;
+		}
+
+		if ( MountArchive( strGMA, nFiles ) )
+			nAddons++;
+	} );
+}
+
+// The entries of a search path list ("a;b;c")
+static std::vector< std::string > SplitSearchPath( const char *pszPathID )
+{
+	std::vector< std::string > paths;
+	char szPaths[16384];
+	if ( !filesystem->GetSearchPath( pszPathID, false, szPaths, sizeof( szPaths ) ) )
+		return paths;
+	for ( char *p = szPaths; *p; )
+	{
+		char *pEnd = strchr( p, ';' );
+		if ( pEnd )
+			*pEnd = 0;
+		std::string str = p;
+		while ( !str.empty() && ( str.back() == '\\' || str.back() == '/' ) )
+			str.pop_back();
+		if ( !str.empty() )
+			paths.push_back( str );
+		if ( !pEnd )
+			break;
+		p = pEnd + 1;
+	}
+	return paths;
+}
+
+//-----------------------------------------------------------------------------
+// Interface
+//-----------------------------------------------------------------------------
+const wchar_t *GMAMount_GetRoot()
+{
+	return s_szRoot;
+}
+
+GMAPathKind_t GMAMount_Lookup( const wchar_t *pszPath, GMAFileInfo_t *pInfo )
+{
+	if ( !StartsWithRoot( pszPath ) )
+		return GMA_PATH_OUTSIDE;
+
+	std::wstring path;
+	if ( !NormalizePath( pszPath, path ) || !IsInRoot( path ) )
+		return GMA_PATH_OUTSIDE;	// e.g. "..\" out of it
+	if ( path.size() == (size_t)s_nRootLen )
+		return GMA_PATH_ROOT;
+
+	auto itFile = s_Files.find( path );
+	if ( itFile != s_Files.end() )
+	{
+		if ( pInfo )
+		{
+			const GMAArchive_t &archive = s_Archives[itFile->second.m_nArchive];
+			pInfo->m_pszArchive = archive.m_strPath.c_str();
+			pInfo->m_nOffset = itFile->second.m_nOffset;
+			pInfo->m_nSize = itFile->second.m_nSize;
+			pInfo->m_nWriteTime = archive.m_nWriteTime;
+		}
+		return GMA_PATH_FILE;
+	}
+	return ( s_Dirs.find( path ) != s_Dirs.end() ) ? GMA_PATH_DIRECTORY : GMA_PATH_MISSING;
+}
+
+// '*' and '?', case-insensitive (names are lowercase already)
+static bool WildcardMatch( const wchar_t *pszPattern, const wchar_t *pszName )
+{
+	const wchar_t *pStar = NULL, *pAfterStar = NULL;
+	while ( *pszName )
+	{
+		if ( *pszPattern == L'*' )
+		{
+			pStar = pszPattern++;
+			pAfterStar = pszName;
+		}
+		else if ( *pszPattern == L'?' || towlower( *pszPattern ) == *pszName )
+		{
+			pszPattern++;
+			pszName++;
+		}
+		else if ( pStar )
+		{
+			pszPattern = pStar + 1;
+			pszName = ++pAfterStar;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	while ( *pszPattern == L'*' )
+		pszPattern++;
+	return !*pszPattern;
+}
+
+static void FillFindData( WIN32_FIND_DATAW &fd, const std::wstring &name, const GMAEntry_t *pEntry )
+{
+	memset( &fd, 0, sizeof( fd ) );
+	fd.dwFileAttributes = pEntry ? FILE_ATTRIBUTE_ARCHIVE : FILE_ATTRIBUTE_DIRECTORY;
+	if ( pEntry )
+	{
+		const unsigned long long nTime = s_Archives[pEntry->m_nArchive].m_nWriteTime;
+		fd.ftLastWriteTime.dwLowDateTime = (DWORD)( nTime & 0xFFFFFFFF );
+		fd.ftLastWriteTime.dwHighDateTime = (DWORD)( nTime >> 32 );
+		fd.ftCreationTime = fd.ftLastAccessTime = fd.ftLastWriteTime;
+		fd.nFileSizeHigh = (DWORD)( (unsigned long long)pEntry->m_nSize >> 32 );
+		fd.nFileSizeLow = (DWORD)( pEntry->m_nSize & 0xFFFFFFFF );
+	}
+	wcsncpy_s( fd.cFileName, name.c_str(), _TRUNCATE );
+}
+
+void *GMAMount_FindFirst( const wchar_t *pszPattern, _WIN32_FIND_DATAW *pData, bool *pbHandled )
+{
+	*pbHandled = false;
+	if ( !pszPattern || !StartsWithRoot( pszPattern ) )
+		return NULL;
+
+	std::wstring full;
+	if ( !NormalizePath( pszPattern, full ) )
+		return NULL;
+	const size_t nSlash = full.rfind( L'\\' );
+	if ( nSlash == std::wstring::npos )
+		return NULL;
+	const std::wstring dir = full.substr( 0, nSlash );
+	std::wstring spec = full.substr( nSlash + 1 );
+	if ( !IsInRoot( dir ) )
+		return NULL;	// the root itself, by name: a real folder
+
+	*pbHandled = true;
+	auto itDir = s_Dirs.find( dir );
+	if ( itDir == s_Dirs.end() )
+	{
+		SetLastError( ERROR_PATH_NOT_FOUND );
+		return NULL;
+	}
+	if ( spec == L"*.*" )
+		spec = L"*";
+
+	GMAFind_t *pFind = new GMAFind_t;
+	pFind->m_nNext = 1;
+	for ( const std::wstring &name : itDir->second.m_Dirs )
+	{
+		if ( WildcardMatch( spec.c_str(), name.c_str() ) )
+		{
+			pFind->m_Results.emplace_back();
+			FillFindData( pFind->m_Results.back(), name, NULL );
+		}
+	}
+	for ( const std::wstring &name : itDir->second.m_Files )
+	{
+		if ( !WildcardMatch( spec.c_str(), name.c_str() ) )
+			continue;
+		auto itFile = s_Files.find( dir + L"\\" + name );
+		if ( itFile == s_Files.end() )
+			continue;
+		pFind->m_Results.emplace_back();
+		FillFindData( pFind->m_Results.back(), name, &itFile->second );
+	}
+
+	if ( pFind->m_Results.empty() )
+	{
+		delete pFind;
+		SetLastError( ERROR_FILE_NOT_FOUND );
+		return NULL;
+	}
+
+	*(WIN32_FIND_DATAW *)pData = pFind->m_Results[0];
+	AcquireSRWLockExclusive( &s_FindLock );
+	s_Finds.insert( pFind );
+	ReleaseSRWLockExclusive( &s_FindLock );
+	SetLastError( NO_ERROR );
+	return pFind;
+}
+
+bool GMAMount_IsFind( void *pFind )
+{
+	if ( !pFind || pFind == INVALID_HANDLE_VALUE )
+		return false;
+	AcquireSRWLockShared( &s_FindLock );
+	const bool bFound = s_Finds.find( pFind ) != s_Finds.end();
+	ReleaseSRWLockShared( &s_FindLock );
+	return bFound;
+}
+
+bool GMAMount_FindNext( void *pHandle, _WIN32_FIND_DATAW *pData )
+{
+	GMAFind_t *pFind = (GMAFind_t *)pHandle;
+	if ( pFind->m_nNext >= pFind->m_Results.size() )
+	{
+		SetLastError( ERROR_NO_MORE_FILES );
+		return false;
+	}
+	*(WIN32_FIND_DATAW *)pData = pFind->m_Results[pFind->m_nNext++];
+	return true;
+}
+
+void GMAMount_FindClose( void *pHandle )
+{
+	AcquireSRWLockExclusive( &s_FindLock );
+	const bool bFound = s_Finds.erase( pHandle ) > 0;
+	ReleaseSRWLockExclusive( &s_FindLock );
+	if ( bFound )
+		delete (GMAFind_t *)pHandle;
+}
+
+void GMAMount_Init()
+{
+	if ( s_bActive || CommandLine()->FindParm( "-nogma" ) )
+		return;
+
+	// Garry's Mod, if it's mounted: the GAME path that is its garrysmod folder
+	std::wstring strGMod;
+	const std::vector< std::string > gamePaths = SplitSearchPath( "GAME" );
+	for ( size_t i = 0; i < gamePaths.size() && strGMod.empty(); i++ )
+	{
+		const std::string &str = gamePaths[i];
+		if ( str.size() >= 10 && !V_stricmp( str.c_str() + str.size() - 9, "garrysmod" ) && IsSep( (wchar_t)str[str.size() - 10] ) )
+			strGMod = Widen( str.c_str() );
+	}
+
+	std::wstring strWorkshop;
+	const char *pszOverride = CommandLine()->ParmValue( "-gmapath", (const char *)NULL );
+	if ( pszOverride && pszOverride[0] )
+	{
+		strWorkshop = Widen( pszOverride );
+	}
+	else if ( !strGMod.empty() )
+	{
+		// <library>\steamapps\common\GarrysMod\garrysmod -> <library>\steamapps\workshop\content\4000
+		std::wstring lower = strGMod;
+		for ( size_t i = 0; i < lower.size(); i++ )
+			lower[i] = IsSep( lower[i] ) ? L'\\' : (wchar_t)towlower( lower[i] );
+		const size_t nSteamApps = lower.rfind( L"\\steamapps\\" );
+		if ( nSteamApps != std::wstring::npos )
+			strWorkshop = strGMod.substr( 0, nSteamApps ) + L"\\steamapps\\workshop\\content\\4000";
+	}
+
+	if ( strGMod.empty() && strWorkshop.empty() )
+		return;	// Garry's Mod isn't mounted
+
+	const std::vector< std::string > modPaths = SplitSearchPath( "MOD" );
+	if ( modPaths.empty() )
+		return;
+
+	std::wstring strRoot;
+	if ( !NormalizePath( ( Widen( modPaths[0].c_str() ) + L"\\cache\\gma_mount" ).c_str(), strRoot ) || strRoot.size() >= MAX_PATH )
+		return;
+	const std::wstring strLegacyCache = strRoot.substr( 0, strRoot.size() - wcslen( L"gma_mount" ) ) + L"gma_legacy";
+	CreateDirectories( strRoot );
+	CreateDirectories( strLegacyCache );
+	wcsncpy_s( s_szRoot, strRoot.c_str(), _TRUNCATE );
+	s_nRootLen = (int)wcslen( s_szRoot );
+
+	int nAddons = 0, nFiles = 0;
+	if ( !strGMod.empty() )
+	{
+		const std::wstring strAddons = strGMod + L"\\addons";
+		ForEachInFolder( strAddons, L"*.gma", [&]( const WIN32_FIND_DATAW &fd )
+		{
+			if ( MountArchive( strAddons + L"\\" + fd.cFileName, nFiles ) )
+				nAddons++;
+		} );
+	}
+	if ( !strWorkshop.empty() )
+		ScanWorkshop( strWorkshop, strLegacyCache, nAddons, nFiles );
+
+	if ( !nAddons )
+	{
+		DevMsg( "GMA: Garry's Mod is mounted, but no addons were found\n" );
+		GMAMount_Shutdown();
+		return;
+	}
+
+	s_Dirs[std::wstring( s_szRoot )];	// the root lists as a folder even if empty
+	s_bActive = true;
+	filesystem->AddSearchPath( Narrow( strRoot ).c_str(), "GAME", PATH_ADD_TO_TAIL );
+	Msg( "GMA: mounted %d Garry's Mod addons (%d files)\n", nAddons, nFiles );
+}
+
+void GMAMount_Shutdown()
+{
+	s_bActive = false;
+	s_Files.clear();
+	s_Dirs.clear();
+	s_Archives.clear();
+
+	AcquireSRWLockExclusive( &s_FindLock );
+	for ( void *pFind : s_Finds )
+		delete (GMAFind_t *)pFind;
+	s_Finds.clear();
+	ReleaseSRWLockExclusive( &s_FindLock );
+}
+
+#else
+
+GMAPathKind_t GMAMount_Lookup( const wchar_t *, GMAFileInfo_t * ) { return GMA_PATH_OUTSIDE; }
+const wchar_t *GMAMount_GetRoot() { return L""; }
+void *GMAMount_FindFirst( const wchar_t *, _WIN32_FIND_DATAW *, bool *pbHandled ) { *pbHandled = false; return NULL; }
+bool GMAMount_IsFind( void * ) { return false; }
+bool GMAMount_FindNext( void *, _WIN32_FIND_DATAW * ) { return false; }
+void GMAMount_FindClose( void * ) {}
+void GMAMount_Init() {}
+void GMAMount_Shutdown() {}
+
+#endif // _WIN32

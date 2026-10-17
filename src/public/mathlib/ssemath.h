@@ -2596,6 +2596,9 @@ public:
 	/// This is an in-place transformation.
 	static void TransformManyBy(FourVectors * RESTRICT pVectors, unsigned int numVectors, const matrix3x4_t& rotationMatrix );
 
+	static void CalcClosestPointOnLineSIMD(const FourVectors& P, const FourVectors& vLineA, const FourVectors& vLineB, FourVectors& vClosest, fltx4* outT = 0);
+	static fltx4 CalcClosestPointToLineTSIMD(const FourVectors& P, const FourVectors& vLineA, const FourVectors& vLineB, FourVectors& vDir);
+
 	// X(),Y(),Z() - get at the desired component of the i'th (0..3) vector.
 	FORCEINLINE const float & X(int idx) const
 	{
@@ -3029,6 +3032,17 @@ FORCEINLINE fltx4 RandSignedSIMD( void )					// -1..1
 	return SubSIMD( MulSIMD( Four_Twos, RandSIMD() ), Four_Ones );
 }
 
+FORCEINLINE fltx4 LerpSIMD(const fltx4& percent, const fltx4& a, const fltx4& b)
+{
+	return AddSIMD(a, MulSIMD(SubSIMD(b, a), percent));
+}
+
+FORCEINLINE fltx4 RemapValClampedSIMD(const fltx4& val, const fltx4& a, const fltx4& b, const fltx4& c, const fltx4& d) // Remap val from clamped range between a and b to new range between c and d
+{
+	fltx4 range = MaskedAssign(CmpEqSIMD(a, b), Four_Ones, SubSIMD(b, a)); //make sure range > 0
+	fltx4 cVal = MaxSIMD(Four_Zeros, MinSIMD(Four_Ones, DivSIMD(SubSIMD(val, a), range))); //saturate
+	return LerpSIMD(cVal, c, d);
+}
 
 // SIMD versions of mathlib simplespline functions
 // hermite basis function for smooth interpolation

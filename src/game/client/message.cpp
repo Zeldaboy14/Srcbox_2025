@@ -632,6 +632,7 @@ void CHudMessage::Paint()
 		}
 		else
 		{
+			/*
 			brightness = FadeBlend( m_pGameTitle->fadein, m_pGameTitle->fadeout, m_pGameTitle->holdtime, localTime );
 
 			int halfWidth = m_iconTitleHalf->Width();
@@ -643,7 +644,7 @@ void CHudMessage::Paint()
 
 			m_iconTitleHalf->DrawSelf( x, y, Color( m_pGameTitle->r1, m_pGameTitle->g1, m_pGameTitle->b1, brightness * 255 ) );
 			m_iconTitleLife->DrawSelf( x + halfWidth, y, Color( m_pGameTitle->r1, m_pGameTitle->g1, m_pGameTitle->b1, brightness * 255 ) );
-			drawn = 1;
+			drawn = 1;*/
 		}
 	}
 

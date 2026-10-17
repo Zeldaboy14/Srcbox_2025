@@ -25,17 +25,12 @@ $Include "$SRCDIR\engine\engine_patches_client.vpc"
 //-----------------------------------------
 $Include "$SRCDIR\game\client\client_lua.vpc"
 
-//-----------------------------------------
-// EXPERIMENT Lua Weapons setups
-//-----------------------------------------
-//$Include "$SRCDIR\game\client\client_experiment.vpc"
-
 $Configuration
 {
 	$Compiler
 	{
 		$AdditionalIncludeDirectories		"$BASE;hl2mp\ui,.\hl2mp,$SRCDIR\game\shared\hl2mp,.\hl2,.\hl2\elements,$SRCDIR\game\shared\hl2;$SRCDIR\game\shared\srcbox;$SRCDIR\thirdparty\mem;$SRCDIR\thirdparty\lighthook"
-		$PreprocessorDefinitions			"$BASE;HL2MP;HL2_CLIENT_DLL;HL2_EPISODIC;NEXT_BOT;ASW_PROJECTED_TEXTURES;GAMEUI_EMBEDDED;GAMEUI_EXPORTS;MAPBASE;LUA_SDK"
+		$PreprocessorDefinitions			"$BASE;HL2MP;HL2_CLIENT_DLL;HL2_EPISODIC;NEXT_BOT;ASW_PROJECTED_TEXTURES;GAMEUI_EMBEDDED;GAMEUI_EXPORTS;MAPBASE;DYNAMIC_RTT_SHADOWS;EXPERIMENT;LUA_SDK"
 	}
 }
 
@@ -49,6 +44,8 @@ $Project "Client (HL2MP)"
 		$File	"c_team_objectiveresource.h"
 		$File	"c_team_train_watcher.cpp"
 		$File	"c_team_train_watcher.h"
+		$File	"estranged_system_caps.cpp"
+		$File	"estrangedclientrendertargets.cpp"
 		$File	"hud_voicestatus.cpp"
 		$File	"c_baselesson.cpp"
 		$File	"c_gameinstructor.cpp"
@@ -57,6 +54,10 @@ $Project "Client (HL2MP)"
 		$File	"$SRCDIR\game\shared\predicted_viewmodel.h"
 		$File	"$SRCDIR\game\shared\teamplay_round_timer.cpp"
 		$File	"$SRCDIR\game\shared\teamplay_round_timer.h"
+		$File	"c_env_cascade_light.cpp"
+		$File	"C_Env_Cascade_Light.h"
+		$File	"worldlight.cpp"
+		$File	"worldlight.h"
 
 		$Folder	"NextBot"
 		{
@@ -69,23 +70,31 @@ $Project "Client (HL2MP)"
 		}
 		$Folder "Srcbox"
 		{
-			$File	"$SRCDIR\game\shared\srcbox\hooks\bsp_compat.cpp"
-			$File	"$SRCDIR\game\shared\srcbox\hooks\bsp_compat.h"
+			$File	"$SRCDIR\game\shared\srcbox\srcbox_gamerules.cpp"
 			$File	"$SRCDIR\game\shared\srcbox\hooks\staticprop_colormod.cpp"
 			$File	"$SRCDIR\game\shared\srcbox\hooks\staticprop_colormod.h"
+			$File	"$SRCDIR\game\shared\srcbox\hooks\bsp_compat.cpp"
+			$File	"$SRCDIR\game\shared\srcbox\hooks\bsp_compat.h"
 			$File	"$SRCDIR\game\shared\srcbox\hooks\gma_mount.cpp"
 			$File	"$SRCDIR\game\shared\srcbox\hooks\gma_mount.h"
 		}
 		$Folder "Portal"
 		{
 			$File	"$SRCDIR\game\shared\portal\weapon_portalgun.cpp"
+			$File	"$SRCDIR\game\shared\hl2mp\hl2mp_portal_shared.cpp"
 			$File	"$SRCDIR\game\client\portal\c_prop_portal.cpp"
 		}
-		$Folder "terror"
+		$Folder "Terror"
 		{
+			$Folder "Effects"
+			{
+				$File "terror/Effects/ProxyPlayerTeam.cpp"
+			}
 			$Folder "Weapons"
 			{
 				$File	"$SRCDIR\game\shared\terror\weapon_pistol_terror.cpp"
+				$File	"$SRCDIR\game\shared\terror\crowbar.cpp"
+				$File	"$SRCDIR\game\shared\terror\weapon_smg_silenced.cpp"
 			}
 		}
 
@@ -176,7 +185,8 @@ $Project "Client (HL2MP)"
 			$File	"hl2\hud_zoom.cpp"
 			$File	"hl2\shieldproxy.cpp"
 			$File	"hl2\vgui_rootpanel_hl2.cpp"
-			//$File	"hl2\c_weapon_gravitygun.cpp"
+			$File	"hl2\c_weapon_gravitygun.cpp"
+			$File	"$SRCDIR\game\shared\handviewmodel_shared.cpp"
 		}
 
 		$Folder	"HL2MP"
@@ -186,16 +196,15 @@ $Project "Client (HL2MP)"
 			$File	"hl2mp\c_te_hl2mp_shotgun_shot.cpp"
 			$File	"hl2mp\clientmode_hl2mpnormal.cpp"
 			$File	"hl2mp\clientmode_hl2mpnormal.h"
-			$File	"hl2mp\hl2mp_rendertargets.cpp"
-			$File	"hl2mp\hl2mp_rendertargets.h"
 			$File	"$SRCDIR\game\shared\hl2mp\hl2mp_gamerules.cpp"
 			$File	"$SRCDIR\game\shared\hl2mp\hl2mp_gamerules.h"
 			$File	"$SRCDIR\game\shared\hl2mp\hl2mp_player_shared.cpp"
 			$File	"$SRCDIR\game\shared\hl2mp\hl2mp_player_shared.h"
-			$File	"$SRCDIR\game\shared\hl2mp\hl2mp_portal_shared.cpp"
-			$File	"$SRCDIR\game\shared\hl2mp\hl2mp_portal_shared.h"
 			$File	"$SRCDIR\game\shared\hl2mp\hl2mp_weapon_parse.cpp"
 			$File	"$SRCDIR\game\shared\hl2mp\hl2mp_weapon_parse.h"
+			
+			$File	"$SRCDIR\game\client\hl2mp\hl2mp_rendertargets.cpp"
+			$File	"$SRCDIR\game\client\hl2mp\hl2mp_rendertargets.h"
 
 			$Folder	"Weapons"
 			{
@@ -241,5 +250,14 @@ $Project "Client (HL2MP)"
 				$File	"hl2mp\hud_deathnotice.cpp"
 			}
 		}
+		
+		$Folder	"VGUI2 Panels"
+		{
+            $File "$SRCDIR\game\client\vgui2_panels\vgui_singleplayer.cpp"
+            $File "$SRCDIR\game\client\vgui2_panels\vgui_newgame.cpp"
+            $File "$SRCDIR\game\client\vgui2_panels\vgui_savenquit.cpp"
+            $File "$SRCDIR\game\client\vgui2_panels\overrides\OverrideInterface.cpp"
+            $File "$SRCDIR\game\client\vgui2_panels\overrides\OverrideUI_RootPanel.cpp"
+        }
 	}
 }

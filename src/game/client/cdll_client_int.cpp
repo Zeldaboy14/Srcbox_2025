@@ -1509,6 +1509,7 @@ CHLClient::CHLClient()
 extern IGameSystem *ViewportClientSystem();
 
 #include "content_mounter.h"
+#include "../shared/srcbox/hooks/hook_bsp_formatting.h"
 
 //-----------------------------------------------------------------------------
 ISourceVirtualReality *g_pSourceVR = NULL;
@@ -1699,6 +1700,7 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 #elif !defined LUA_SDK || !defined TF
 	MountExtraContent();
 #endif
+	MountGamepacks();
 
 	if ( CommandLine()->FindParm( "-textmode" ) )
 		g_bTextMode = true;
@@ -2084,6 +2086,12 @@ void CHLClient::Shutdown( void )
 #endif // GAMEPADUI
 	
 	gHUD.Shutdown();
+	// The menu background movie panels outlive the video services; release their videos while it is still safe
+	CAnimatedBackgroundMovie::ReleaseAllVideos();
+#ifdef PLATFORM_64BITS
+	if ( g_pBackgroundMovie )
+		g_pBackgroundMovie->ClearCurrentMovie();	// the GameUI header/footer background movie
+#endif
 
 	VGui_Shutdown();
 

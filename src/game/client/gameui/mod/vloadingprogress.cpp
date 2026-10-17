@@ -235,6 +235,8 @@ float LoadingProgress::GetProgress()
 	return retVal;
 }
 
+#include "hl2mp_gamerules.h"
+
 void LoadingProgress::PaintBackground()
 {
 	int screenWide, screenTall;
@@ -249,7 +251,27 @@ void LoadingProgress::PaintBackground()
 		surface()->DrawSetColor( Color( 255, 255, 255, 255 ) );
 		s_nBGTextureID = vgui::surface()->CreateNewTextureID(true); // procedural
 		//vgui::surface()->DrawSetTextureFile(s_nBGTextureID, "vgui/loadingscreen_background", true, 0);
-		vgui::surface()->DrawSetTextureFile(s_nBGTextureID, "vgui/appchooser/background_hl2", true, 0);
+		//if (GetGameDescription)
+		//vgui::surface()->DrawSetTextureFile(s_nBGTextureID, "vgui/appchooser/background_hl2", true, 0);
+				//const char* pszGame = HL2MPRules()->GetGameDescription();
+
+		const char* pszGameMode = "";
+
+		CHL2MPRules* pRules = dynamic_cast<CHL2MPRules*>(GameRules());
+		// If gamerules aren't ready (null) or description is empty, choose a safe default background.
+		if (!pRules)
+		{
+			DevMsg("LoadingProgress::PaintBackground: HL2MPRules() not ready, using default background\n");
+			vgui::surface()->DrawSetTextureFile(s_nBGTextureID, "vgui/appchooser/background_hl2", true, 0);
+		} 
+		//else if (!Q_stricmp(pszGameMode, "Terror (L4D)")) {
+		else if (!Q_stricmp(pszGameMode, "Terror (L4D)")) {
+			vgui::surface()->DrawSetTextureFile(s_nBGTextureID, "vgui/loadingscreen_background", true, 0);
+		} else if (!Q_stricmp(pszGameMode, "Half-Life 2")) {
+			vgui::surface()->DrawSetTextureFile(s_nBGTextureID, "vgui/appchooser/background_hl2", true, 0);
+		} else {
+			vgui::surface()->DrawSetTextureFile(s_nBGTextureID, "vgui/appchooser/background_hl2", true, 0);
+		}
 		//surface()->DrawSetTexture( m_pBGImage->GetImage()->GetID() );
 		surface()->DrawTexturedRect( x, y, x+wide, y+tall );
 	}
@@ -293,7 +315,7 @@ void LoadingProgress::PaintBackground()
 	bool bRenderSpinner = ( m_bDrawSpinner && m_pWorkingAnim );
 	Panel *pWaitscreen = CBaseModPanel::GetSingleton().GetWindow( WT_GENERICWAITSCREEN );
 	if ( pWaitscreen && pWaitscreen->IsVisible() && ( m_LoadingWindowType == LWT_BKGNDSCREEN ) )
-		bRenderSpinner = false;	// Don't render spinner if the progress screen is displaying progress
+		bRenderSpinner = true;	// Don't render spinner if the progress screen is displaying progress
 	if ( bRenderSpinner  )
 	{
 		int x, y, wide, tall;

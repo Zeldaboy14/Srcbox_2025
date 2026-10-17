@@ -124,6 +124,10 @@ public:
 	virtual bool				ShouldSimulate() const { return m_bSimulate; }
 	virtual void				SetShouldSimulate( bool bSim ) { m_bSimulate = bSim; }
 
+#ifdef USE_NEW_PARTICLE_SYSTEM
+	void SetToolRecording( bool bRecord );
+#endif
+
 	int AllocateToolParticleEffectId();
 	int GetToolParticleEffectId() const;
 	CNewParticleEffect( CBaseEntity *pOwner, const char *pEffectName );
@@ -145,6 +149,9 @@ protected:
 	bool		m_bAutoUpdateBBox : 1;
 	bool		m_bAllocated : 1;
 	bool		m_bSimulate : 1;
+#ifdef USE_NEW_PARTICLE_SYSTEM
+	bool		m_bRecord : 1;
+#endif
 	bool		m_bShouldPerformCullCheck : 1;
 
 	int			m_nToolParticleEffectId;
@@ -164,9 +171,16 @@ private:
 	void		Release();
 	void		RecordControlPointOrientation( int nWhichPoint );
 	void		Construct();
+#ifdef USE_NEW_PARTICLE_SYSTEM
+	void		RecordCreation();
+#endif
 	
 	int			m_RefCount;		// When this goes to zero and the effect has no more active
 								// particles, (and it's dynamically allocated), it will delete itself.
+
+#ifdef USE_NEW_PARTICLE_SYSTEM
+	matrix3x4a_t m_DrawModelMatrix;
+#endif
 
 	CNewParticleEffect( const CNewParticleEffect & ); // not defined, not accessible
 };

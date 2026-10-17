@@ -158,7 +158,7 @@ IEntityFactory *CEntityFactoryDictionary::FindFactory( const char *pClassName )
 //-----------------------------------------------------------------------------
 void CEntityFactoryDictionary::InstallFactory( IEntityFactory *pFactory, const char *pClassName )
 {
-	Assert( FindFactory( pClassName ) == NULL );
+	//Assert( FindFactory( pClassName ) == NULL );
 	m_Factories.Insert( pClassName, pFactory );
 }
 
@@ -182,39 +182,43 @@ IServerNetworkable *CEntityFactoryDictionary::Create( const char *pClassName )
 	if ( !pFactory )
 	{
 #ifdef LUA_SDK
-		// required
-		if (L && g_szLuaExpectedScriptedLibrary)
+		// Experiment; Lua scripted entities/weapons (SENTs/SWEPs) have no C++ factory: ask Lua whether
+		// the class is registered (ScriptedEntities/ScriptedWeapons.GetStored) and create the scripted
+		// C++ class for it. g_szLuaExpectedScriptedLibrary is set around the Create calls that may want
+		// one (Weapon_Create, map entity parsing, Entities.Create). Without this every Lua SWEP/SENT was
+		// "unknown" (gmod_tool, gmod_hands, ...).
+		if ( L && g_szLuaExpectedScriptedLibrary )
 		{
-			int iTop = lua_gettop(L);
+			int iTop = lua_gettop( L );
 			bool bIsRegistered = false;
 
-			lua_getglobal(L, g_szLuaExpectedScriptedLibrary);
+			lua_getglobal( L, g_szLuaExpectedScriptedLibrary );
 
-			if (lua_istable(L, -1))
+			if ( lua_istable( L, -1 ) )
 			{
-				lua_getfield(L, -1, "GetStored");
+				lua_getfield( L, -1, "GetStored" );
 
-				if (lua_isfunction(L, -1))
+				if ( lua_isfunction( L, -1 ) )
 				{
-					lua_pushstring(L, pClassName);
+					lua_pushstring( L, pClassName );
 
-					if (luasrc_pcall(L, 1, 1) == LUA_OK)
-						bIsRegistered = lua_istable(L, -1);
+					if ( luasrc_pcall( L, 1, 1 ) == LUA_OK )
+						bIsRegistered = lua_istable( L, -1 );
 				}
 			}
 
-			lua_settop(L, iTop);
+			lua_settop( L, iTop );
 
-			if (bIsRegistered)
+			if ( bIsRegistered )
 			{
-				if (Q_strcmp(g_szLuaExpectedScriptedLibrary, LUA_SCRIPTEDENTITIESLIBNAME) == 0)
+				if ( Q_strcmp( g_szLuaExpectedScriptedLibrary, LUA_SCRIPTEDENTITIESLIBNAME ) == 0 )
 				{
-					CBaseScripted* pEnt = _CreateEntityTemplate((CBaseScripted*)NULL, pClassName);
+					CBaseScripted *pEnt = _CreateEntityTemplate( ( CBaseScripted * )NULL, pClassName );
 					return pEnt->NetworkProp();
 				}
-				else if (Q_strcmp(g_szLuaExpectedScriptedLibrary, LUA_SCRIPTEDWEAPONSLIBNAME) == 0)
+				else if ( Q_strcmp( g_szLuaExpectedScriptedLibrary, LUA_SCRIPTEDWEAPONSLIBNAME ) == 0 )
 				{
-					CHL2MPScriptedWeapon* pEnt = _CreateEntityTemplate((CHL2MPScriptedWeapon*)NULL, pClassName);
+					CHL2MPScriptedWeapon *pEnt = _CreateEntityTemplate( ( CHL2MPScriptedWeapon * )NULL, pClassName );
 					return pEnt->NetworkProp();
 				}
 			}
@@ -635,25 +639,28 @@ CBasePlayer	*UTIL_PlayerByIndex( int playerIndex )
 CBasePlayer* UTIL_GetNearestPlayer(const Vector& origin, int iTeam /*= TEAM_ANY*/)
 {
 	float distToNearest = FLT_MAX;
-	CBasePlayer* pNearest = NULL;
+	CBasePlayer *pNearest = NULL;
 
-	for (int i = 1; i <= gpGlobals->maxClients; i++)
+	for (int i = 1; i <= gpGlobals->maxClients; i++ )
 	{
-		CBasePlayer* pPlayer = UTIL_PlayerByIndex(i);
-		if (!pPlayer)
+		CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+		if ( !pPlayer )
 			continue;
 
-		if (pPlayer->GetTeamNumber() <= TEAM_SPECTATOR)
+		// Ignore spectators.
+		if ( pPlayer->GetTeamNumber() == TEAM_SPECTATOR )
 			continue;
 
-		if (pPlayer->IsHLTV() || pPlayer->IsReplay())
+		if ( iTeam != TEAM_ANY && pPlayer->GetTeamNumber() != iTeam )
 			continue;
 
 		float flDist = (pPlayer->GetAbsOrigin() - origin).LengthSqr();
-		if (flDist < distToNearest)
+		if ( flDist < distToNearest )
+
 		{
 			pNearest = pPlayer;
 			distToNearest = flDist;
+
 		}
 	}
 

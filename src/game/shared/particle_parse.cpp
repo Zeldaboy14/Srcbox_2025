@@ -62,7 +62,8 @@ int GetAttachTypeFromString( const char *pszString )
 // Purpose: 
 // Input  : list - 
 //-----------------------------------------------------------------------------
-void GetParticleManifest( CUtlVector<CUtlString>& list )
+#ifndef USE_NEW_PARTICLE_SYSTEM
+void GetParticleManifest(CUtlVector<CUtlString>& list)
 {
 	// Open the manifest file, and read the particles specified inside it
 	KeyValues *manifest = new KeyValues( PARTICLES_MANIFEST_FILE );
@@ -86,6 +87,7 @@ void GetParticleManifest( CUtlVector<CUtlString>& list )
 
 	manifest->deleteThis();
 }
+#endif
 
 
 //-----------------------------------------------------------------------------

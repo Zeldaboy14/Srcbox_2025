@@ -14,7 +14,6 @@
 #include "weapon_parse.h"
 #include "networkvar.h"
 
-
 //--------------------------------------------------------------------------------------------------------
 class CHL2MPSWeaponInfo : public FileWeaponInfo_t
 {
@@ -24,9 +23,7 @@ public:
 	CHL2MPSWeaponInfo();
 	
 	virtual void Parse( ::KeyValues *pKeyValuesData, const char *szWeaponName );
-
-	const char* GetViewModelAddonName(const char* character, bool dualWielding);
-	const char* GetViewModelName(const char* character, bool dualWielding);
+	void Reload(void);
 
 public:
 

@@ -3386,6 +3386,9 @@ private:
 };
 #endif
 
+ConVar classiclighting("cl_hl1_classic_lighting", "1", FCVAR_ARCHIVE);
+Vector white[6];
+
 //-----------------------------------------------------------------------------
 // Purpose: Draws the object
 // Input  : flags - 
@@ -3499,6 +3502,62 @@ int C_BaseAnimating::InternalDrawModel( int flags )
 	DrawModelState_t state;
 	matrix3x4_t *pBoneToWorld = NULL;
 	bool bMarkAsDrawn = modelrender->DrawModelSetup( *pInfo, &state, NULL, &pBoneToWorld );
+
+#ifdef SRCBOX
+	if (classiclighting.GetBool())
+	{
+		modelrender->SuppressEngineLighting(true);
+
+		Vector		diffuseColor, baseColor;
+		diffuseColor = engine->GetLightForPoint(GetRenderOrigin() + Vector(0, 0, 5), false);
+
+		// hack - optimize! - convert from linear to gamma space - this should be hidden
+		diffuseColor[0] = pow(diffuseColor[0], 1.0f / 2.2f);
+		diffuseColor[1] = pow(diffuseColor[1], 1.0f / 2.2f);
+		diffuseColor[2] = pow(diffuseColor[2], 1.0f / 2.2f);
+
+		Vector dist;
+		float add;
+		dlight_t* cl_dlights[MAX_DLIGHTS];
+		int nLights = effects->CL_GetActiveDLights(cl_dlights);
+		for (int lnum = 0; lnum < nLights; lnum++)
+		{
+			if (cl_dlights[lnum]->die >= gpGlobals->curtime)
+			{
+				VectorSubtract(GetAbsOrigin(),
+					cl_dlights[lnum]->origin,
+					dist);
+				add = cl_dlights[lnum]->m_InnerAngle - dist.Length();
+
+				if (add > 0)
+					diffuseColor += add / 128.f;
+			}
+		}
+
+		float lighting[6]
+		{
+			0.5f,
+				0.5f,
+				0.5f,
+				0.5f,
+				1.0f,
+				0.0f,
+		};
+		for (int i = 0; i < 6; i++)
+		{
+			white[i] = diffuseColor * lighting[i];
+		}
+
+		g_pStudioRender->SetAmbientLightColors(white);
+		g_pStudioRender->SetLocalLights(0, NULL);
+	}
+	DoInternalDrawModel(pInfo, (bMarkAsDrawn && (pInfo->flags & STUDIO_RENDER)) ? &state : NULL, pBoneToWorld);
+
+	if (classiclighting.GetBool())
+	{
+		modelrender->SuppressEngineLighting(false);
+	}
+#endif
 	
 	// Scale the base transform if we don't have a bone hierarchy
 	if ( IsModelScaled() )

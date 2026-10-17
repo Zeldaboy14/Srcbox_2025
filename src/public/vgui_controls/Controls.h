@@ -14,7 +14,7 @@
 
 #include <vgui/VGUI.h>
 #include <vgui/IPanel.h>
-#include <VGuiMatSurface/IMatSystemSurface.h> // Legacy framework shit for VGUI2
+#include <VGuiMatSurface/IMatSystemSurface.h>
 #include <vstdlib/IKeyValuesSystem.h>
 
 #include "tier1/interface.h"
@@ -82,12 +82,12 @@ inline vgui::IPanel *ipanel()
     return g_pVGuiPanel;
 }
 
-// Legacy framework shit for VGUI2
-inline bool BSurfaceIsMatSysSurface(void)
+inline bool BSurfaceIsMatSysSurface( void )
 {
-    static IMatSystemSurface* s_pMatSysSurface = dynamic_cast<IMatSystemSurface*>(surface());
-    return !!s_pMatSysSurface;
+	static IMatSystemSurface *s_pMatSysSurface = dynamic_cast< IMatSystemSurface * >( surface() );
+	return !!s_pMatSysSurface;
 }
+
 
 // predeclare all the vgui control class names
 class AnalogBar;

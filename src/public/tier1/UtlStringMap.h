@@ -61,6 +61,17 @@ public:
 		return m_SymbolTable.Find( pString );
 	}
 
+	UtlSymId_t AddString(const char* pString)
+	{
+		CUtlSymbol symbol = m_SymbolTable.AddString(pString);
+		int index = (int)(UtlSymId_t)symbol;
+		if (m_Vector.Count() <= index)
+		{
+			m_Vector.EnsureCount(index + 1);
+		}
+		return symbol;
+	}
+
 	static UtlSymId_t InvalidIndex()
 	{
 		return UTL_INVAL_SYMBOL;

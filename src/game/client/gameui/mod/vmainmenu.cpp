@@ -56,10 +56,13 @@ void OpenGammaDialog( VPANEL parent );
 MainMenu::MainMenu(Panel* parent, const char* panelName) :
 	BaseClass(parent, panelName, true, false, false, false)
 {
+	m_pMainMenuPanel = NULL;	// its creation below is commented out; OnOpen() checks it
+
 	SetProportional( true );
 	SetTitle( "", false );
 	SetMoveable( false );
 	SetSizeable( false );
+	SetZPos( -2 );
 
 	SetLowerGarnishEnabled( false );
 
@@ -67,7 +70,7 @@ MainMenu::MainMenu(Panel* parent, const char* panelName) :
 
 #ifdef PLATFORM_64BITS
 	// Main menu panel, which will handle the video background
-	m_pMainMenuPanel = new CAnimatedBackgroundMovie(this, "BackgroundVideo");
+	//m_pMainMenuPanel = new CAnimatedBackgroundMovie(this, "BackgroundVideo");
 #endif
 }
 
@@ -79,9 +82,9 @@ MainMenu::~MainMenu()
 #ifdef PLATFORM_64BITS
 	if (m_pMainMenuPanel && m_pMainMenuPanel->IsVisible())
 	{
-		m_pMainMenuPanel->StopVideo();
-		m_pMainMenuPanel->SetVisible(false);
-		ConColorMsg(Color(255, 0, 0, 255), "MainMenu: Stopping video\n");
+		//m_pMainMenuPanel->StopVideo();
+		//m_pMainMenuPanel->SetVisible(false);
+		//ConColorMsg(Color(255, 0, 0, 255), "MainMenu: Stopping video\n");
 	}
 #endif
 }
@@ -519,18 +522,18 @@ void MainMenu::ApplySchemeSettings(IScheme* pScheme)
 	GetParent()->GetSize(nParentW, nParentH);
 	SetBounds(0, 0, nParentW, nParentH);
 
-	BaseModHybridButton *button = dynamic_cast< BaseModHybridButton* >( FindChildByName( "BtnPlaySolo" ) );
+	BaseModHybridButton* button = dynamic_cast<BaseModHybridButton*>(FindChildByName("BtnPlaySolo"));
 	if (button)
 	{
 #ifdef _X360
-		button->SetText( ( XBX_GetNumGameUsers() > 1 ) ? ( "#L4D360UI_MainMenu_PlaySplitscreen" ) : ( "#L4D360UI_MainMenu_PlaySolo" ) );
+		button->SetText((XBX_GetNumGameUsers() > 1) ? ("#L4D360UI_MainMenu_PlaySplitscreen") : ("#L4D360UI_MainMenu_PlaySolo"));
 		button->SetHelpText((XBX_GetNumGameUsers() > 1) ? ("#L4D360UI_MainMenu_OfflineCoOp_Tip") : ("#L4D360UI_MainMenu_PlaySolo_Tip"));
 #endif
-}
+	}
 
 	if (IsPC())
 	{
-		FlyoutMenu *pFlyout = dynamic_cast< FlyoutMenu* >(FindChildByName("FlmOptionsFlyout"));
+		FlyoutMenu* pFlyout = dynamic_cast<FlyoutMenu*>(FindChildByName("FlmOptionsFlyout"));
 		if (pFlyout)
 		{
 			bool bUsesCloud = false;
@@ -539,7 +542,7 @@ void MainMenu::ApplySchemeSettings(IScheme* pScheme)
 			//ISteamRemoteStorage *pRemoteStorage = SteamClient()?(ISteamRemoteStorage *)SteamClient()->GetISteamGenericInterface(
 				//SteamAPI_GetHSteamUser(), SteamAPI_GetHSteamPipe(), STEAMREMOTESTORAGE_INTERFACE_VERSION ):NULL;
 #else
-			ISteamRemoteStorage *pRemoteStorage = NULL;
+			ISteamRemoteStorage* pRemoteStorage = NULL;
 			AssertMsg(false, "This branch run on a PC build without IS_WINDOWS_PC defined.");
 #endif
 
@@ -557,6 +560,26 @@ void MainMenu::ApplySchemeSettings(IScheme* pScheme)
 	}
 
 	SetFooterState();
+
+	// srcbox - html baby!!!!
+	/*HTML* m_pGameMenu;
+
+	m_pGameMenu = new HTML(this, "NewsPanel");
+
+	m_pGameMenu->SetBounds(0, 100, nParentW, -150);
+
+	m_pGameMenu->OpenURL("asset://mod_hl2mp/html/menu.html", nullptr);
+
+	m_pGameMenu->MakePopup();
+	/*if (m_pGameMenu->NotVisable)
+	{
+		m_pGameMenu->RequestFocus();
+		m_pGameMenu->MoveToFront();
+	}
+	m_pGameMenu->MoveToFront();
+	m_pGameMenu->SetZPos(-1);
+	m_pGameMenu->SetKeyBoardInputEnabled(true);
+	m_pGameMenu->SetMouseInputEnabled(true);*/
 
 }
 

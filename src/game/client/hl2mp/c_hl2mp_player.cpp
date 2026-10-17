@@ -133,8 +133,11 @@ CSuitPowerDevice SuitDeviceFlashlight( bits_SUIT_DEVICE_FLASHLIGHT, 2.222 );  //
 #endif
 CSuitPowerDevice SuitDeviceBreather( bits_SUIT_DEVICE_BREATHER, 6.7f );  // 100 units in 15 seconds (plus three padded seconds)
 
-C_HL2MP_Player::C_HL2MP_Player()
-    : m_iv_angEyeAngles("C_HL2MP_Player::m_iv_angEyeAngles")
+#ifdef LUA_SDK
+C_HL2MP_Player::C_HL2MP_Player() : m_iv_angEyeAngles("C_HL2MP_Player::m_iv_angEyeAngles")
+#else
+C_HL2MP_Player::C_HL2MP_Player() : m_PlayerAnimState(this), m_iv_angEyeAngles("C_HL2MP_Player::m_iv_angEyeAngles")
+#endif
 {
     m_iIDEntIndex = 0;
     m_iSpawnInterpCounterCache = 0;
@@ -405,6 +408,16 @@ int C_HL2MP_Player::DrawModel( int flags )
     if ( !m_bReadyToDraw )
         return 0;
 
+    //CBasePlayer* pPlayerBase;
+    //C_HL2MP_Player* pPlayer = ToHL2MPPlayer(pPlayerBase);
+
+    /*int nPlayerColor = pPlayer->m_PlayerColor;
+    int r = (nPlayerColor >> 16) & 0xFF;
+    int g = (nPlayerColor >> 8) & 0xFF;
+    int b = nPlayerColor & 0xFF;
+
+    Color(r, g, b, 255);*/
+
     return BaseClass::DrawModel( flags );
 }
 
@@ -659,6 +672,9 @@ void C_HL2MP_Player::AddEntity( void )
 
     //m_PlayerAnimState.Update();
 #endif
+
+    // Fallback to team colors if we're not in COOP or we don't have any
+    // actual color set from the ping colors.
 
     // Zero out model pitch, blending takes care of all of it.
     SetLocalAnglesDim( X_INDEX, 0 );

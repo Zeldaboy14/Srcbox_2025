@@ -225,7 +225,7 @@ void CAI_BaseActor::SetModel( const char *szModelName )
 	Init( m_FlexweightGestureRightLeft, "gesture_rightleft" );
 }
 
-
+#include "hl2mp_player.h"
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------

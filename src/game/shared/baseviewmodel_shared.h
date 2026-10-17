@@ -194,6 +194,9 @@ private:
 private:
 	CNetworkVar( int, m_nViewModelIndex );		// Which viewmodel is it?
 	CNetworkHandle( CBaseEntity, m_hOwner );				// Player or AI carrying this weapon
+	CNetworkVar(int, m_nLayerSequence); // 598
+	CNetworkVar(int, m_nLayer); // 599
+	CNetworkVar(float, m_flLayerStartTime); // 600
 
 	// soonest time Update will call WeaponIdle
 	float					m_flTimeWeaponIdle;							
@@ -209,6 +212,14 @@ private:
 
 #if defined( CLIENT_DLL )
 	int						m_nOldAnimationParity;
+#ifdef Srcbox
+	float					m_flOldElapsedTime;			// 608
+	float					m_flOldCycle;				// 609
+	int						m_var610;
+	int						m_nOldLayerSequence;		// 611
+	int						m_nOldLayer;				// 612
+	float					m_flOldLayerStartTime;		// 613
+#endif
 #endif
 
 

@@ -51,7 +51,9 @@ COptionsDialog::COptionsDialog(vgui::Panel *parent, OptionsDialogTabStyle iTabSt
 		vgui::scheme()->GetProportionalScaledValueEx( GetScheme(), 512 ),
 		vgui::scheme()->GetProportionalScaledValueEx( GetScheme(), 415 ) );*/
 	SetBounds(544, 247, 512, 406); // x, y, width, height
+	//SetBounds(544, 247, 684, 543); // x, y, width, height
 	SetSizeable( false );
+	SetScheme(vgui::scheme()->LoadSchemeFromFile("resource/SourceSchemeLegacy.res", "SourceSchemeLegacy"));
 
 	// debug timing code, this function takes too long
 //	double s4 = system()->GetCurrentTime();

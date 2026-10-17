@@ -74,6 +74,10 @@ extern ConVar replay_rendersetting_renderglow;
 #include "c_tf_team.h"
 #endif
 
+#ifdef LUA_SDK
+#include "mainmenu.h"
+#endif
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -299,9 +303,6 @@ ClientModeShared::ClientModeShared()
 	m_pScriptedViewport = NULL;
 #endif
 	m_pViewport = NULL;
-/*#ifdef LUA_SDK
-	m_pClientLuaPanel = NULL;
-#endif*/
 	m_pChatElement = NULL;
 	m_pWeaponSelection = NULL;
 	m_nRootSize[ 0 ] = m_nRootSize[ 1 ] = -1;
@@ -361,7 +362,10 @@ void	ClientModeShared::ComputeVguiResConditions( KeyValues *pkvConditions )
 	}
 }
 
-
+// Fenix: Needed for the custom background loading screens
+// See interface.h/.cpp for specifics: basically this ensures that we actually Sys_UnloadModule the dll and that we don't call Sys_LoadModule
+// over and over again.
+static CDllDemandLoader g_GameUI("GameUI");
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -417,6 +421,26 @@ void ClientModeShared::Init()
 
 	HOOK_MESSAGE( VGUIMenu );
 	HOOK_MESSAGE( Rumble );
+
+#ifdef LUA_SDK2
+	// Fenix: Custom background loading screens - Injects the custom panel at the loading screen
+	CreateInterfaceFn gameUIFactory = g_GameUI.GetFactory();
+
+	if (gameUIFactory)
+	{
+		m_pGameUI = (IGameUI*)gameUIFactory(GAMEUI_INTERFACE_VERSION, NULL);
+		if (m_pGameUI)
+		{
+			//g_pMapLoadingPanel = new CMapLoadBG("Background");
+			//g_pMapLoadingPanel->InvalidateLayout(false, true);
+			//g_pMapLoadingPanel->SetVisible(false);
+			//g_pMapLoadingPanel->MakePopup(false);
+			//m_pGameUI->SetLoadingBackgroundDialog(g_pMapLoadingPanel->GetVPanel());
+
+			CBaseMenuPanel::Init();
+		}
+	}
+#endif
 }
 
 

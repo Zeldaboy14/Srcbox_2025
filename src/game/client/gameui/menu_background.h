@@ -38,6 +38,9 @@ public:
 	void Paint();
 	bool BeginPlayback(const char* pFilename);
 	void ReleaseVideo();
+	// Releases the videos of every live background movie panel. Called early in client shutdown,
+	// because these panels are only destroyed after the video services have already shut down.
+	static void ReleaseAllVideos();
 	void DoModal();
 
 	MESSAGE_FUNC(OnDisconnectFromGame, "DisconnectedFromGame");
@@ -59,6 +62,7 @@ private:
 	wchar_t* m_DrawLogoText2;
 	vgui::HFont m_DrawLogoFont;
 	char m_szFadeFilename[MAX_PATH];
+	char m_szVideoFile[MAX_PATH];	// file passed to BeginPlayback, to restart it if it finishes
 
 public:
 	bool bInit;

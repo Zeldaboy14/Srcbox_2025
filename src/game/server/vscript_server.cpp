@@ -3534,7 +3534,7 @@ void VScriptServerTerm()
 	{
 		if( g_pScriptVM )
 		{
-			scriptmanager->DestroyVM( g_pScriptVM );
+			//scriptmanager->DestroyVM( g_pScriptVM ); // is this ok to be disabled? think about it again eventually
 			g_pScriptVM = NULL;
 		}
 	}

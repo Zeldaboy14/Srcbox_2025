@@ -64,6 +64,21 @@ public:
 	{
 		return m_pObject;
 	}
+	
+	FORCEINLINE bool IsValid( void) const
+	{
+		return ( m_pObject != NULL );
+	}
+	
+	FORCEINLINE T * GetObject( void )
+	{
+		return m_pObject;
+	}
+
+	FORCEINLINE const T* GetObject( void ) const
+	{
+		return m_pObject;
+	}
 
 	FORCEINLINE operator T*()
 	{

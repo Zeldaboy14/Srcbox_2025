@@ -26,6 +26,11 @@
 #define VEC_CROUCH_TRACE_MIN	HL2MPRules()->GetHL2MPViewVectors()->m_vCrouchTraceMin
 #define VEC_CROUCH_TRACE_MAX	HL2MPRules()->GetHL2MPViewVectors()->m_vCrouchTraceMax
 
+#ifdef SRCBOX
+#define TEAM_SURVIVOR TEAM_REBELS
+#define TEAM_ZOMBIES TEAM_COMBINE
+#endif
+
 enum
 {
 	TEAM_COMBINE = 2,
