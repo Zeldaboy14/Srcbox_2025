@@ -164,8 +164,8 @@ SendPropBool(SENDINFO(m_bCameraSpace)),
 SendPropFloat(SENDINFO(m_flAmbient)),
 SendPropString(SENDINFO(m_SpotlightTextureName)),
 SendPropInt(SENDINFO(m_nSpotlightTextureFrame)),
-SendPropFloat(SENDINFO(m_flNearZ), 16, SPROP_ROUNDDOWN, 0.0f, 500.0f),
-SendPropFloat(SENDINFO(m_flFarZ), 18, SPROP_ROUNDDOWN, 0.0f, 1500.0f),
+SendPropFloat(SENDINFO(m_flNearZ), 0, SPROP_NOSCALE), // Srcbox: was 16, SPROP_ROUNDDOWN, 0.0f, 500.0f, which clamped the CSM range on this engine
+SendPropFloat(SENDINFO(m_flFarZ), 0, SPROP_NOSCALE), // Srcbox: was 18, SPROP_ROUNDDOWN, 0.0f, 1500.0f, which clamped the CSM range on this engine
 SendPropInt(SENDINFO(m_nShadowQuality), 1, SPROP_UNSIGNED)  // Just one bit for now
 END_SEND_TABLE()
 
@@ -306,8 +306,8 @@ SendPropBool(SENDINFO(m_bCameraSpace)),
 SendPropFloat(SENDINFO(m_flAmbient)),
 SendPropString(SENDINFO(m_SpotlightTextureName)),
 SendPropInt(SENDINFO(m_nSpotlightTextureFrame)),
-SendPropFloat(SENDINFO(m_flNearZ), 16, SPROP_ROUNDDOWN, 0.0f, 500.0f),
-SendPropFloat(SENDINFO(m_flFarZ), 18, SPROP_ROUNDDOWN, 0.0f, 1500.0f),
+SendPropFloat(SENDINFO(m_flNearZ), 0, SPROP_NOSCALE), // Srcbox: was 16, SPROP_ROUNDDOWN, 0.0f, 500.0f, which clamped the CSM range on this engine
+SendPropFloat(SENDINFO(m_flFarZ), 0, SPROP_NOSCALE), // Srcbox: was 18, SPROP_ROUNDDOWN, 0.0f, 1500.0f, which clamped the CSM range on this engine
 SendPropInt(SENDINFO(m_nShadowQuality), 1, SPROP_UNSIGNED)  // Just one bit for now
 END_SEND_TABLE()
 
@@ -429,7 +429,13 @@ private:
 	CNetworkVar(int, m_nSpotlightTextureFrame);
 	CNetworkVar(float, m_flNearZ);
 	CNetworkVar(float, m_flFarZ);
+	// Srcbox: the light's height above csm_origin (csm_current_distance). Its networked local origin
+	// can't carry it: 100000 is past the coordinate range, and this engine wraps it (to ~1696).
+	CNetworkVar(float, m_flCSMDistance);
 	CNetworkVar(int, m_nShadowQuality);
+	// Srcbox: where the mapper placed the entity (it is re-parented to csm_origin afterwards);
+	// the client centres the fixed map-wide sun (csm_fixed) on it
+	CNetworkVector(m_vecFixedCenter);
 	float m_flBrightnessScale;
 
 	bool m_bEnableThird;
@@ -482,8 +488,10 @@ IMPLEMENT_SERVERCLASS_ST(CEnvCascadeLight, DT_EnvCascadeLight)
 	SendPropFloat(SENDINFO(m_flAmbient)),
 	SendPropString(SENDINFO(m_SpotlightTextureName)),
 	SendPropInt(SENDINFO(m_nSpotlightTextureFrame)),
-	SendPropFloat(SENDINFO(m_flNearZ), 16, SPROP_ROUNDDOWN, 0.0f, 500.0f),
-	SendPropFloat(SENDINFO(m_flFarZ), 18, SPROP_ROUNDDOWN, 0.0f, 1500.0f),
+	SendPropFloat(SENDINFO(m_flNearZ), 0, SPROP_NOSCALE), // Srcbox: was 16, SPROP_ROUNDDOWN, 0.0f, 500.0f, which clamped the CSM range on this engine
+	SendPropFloat(SENDINFO(m_flFarZ), 0, SPROP_NOSCALE), // Srcbox: was 18, SPROP_ROUNDDOWN, 0.0f, 1500.0f, which clamped the CSM range on this engine
+	SendPropFloat(SENDINFO(m_flCSMDistance), 0, SPROP_NOSCALE),
+	SendPropVector(SENDINFO(m_vecFixedCenter), 0, SPROP_NOSCALE),
 	SendPropInt(SENDINFO(m_nShadowQuality), 1, SPROP_UNSIGNED)  // Just one bit for now
 END_SEND_TABLE()
 
@@ -493,6 +501,7 @@ END_SEND_TABLE()
 CEnvCascadeLight::CEnvCascadeLight(void)
 {
 	m_bState = true;
+	m_flCSMDistance = 0.0f;
 	m_flLightFOV = 45.0f;
 	m_bEnableShadows = true;
 	m_bLightOnlyTarget = false;
@@ -514,6 +523,7 @@ CEnvCascadeLight::CEnvCascadeLight(void)
 
 void CEnvCascadeLight::Preparation()
 {
+	m_vecFixedCenter = GetAbsOrigin();
 	CreateEntityByName("csm_origin");
 	CreateEntityByName("csm_second");
 	defFOV.SetValue(m_flLightFOV);
@@ -564,6 +574,7 @@ void CEnvCascadeLight::Preparation()
 		SetParent(csm_origin, 1);
 
 		SetAbsOrigin(Vector(csm_origin->GetAbsOrigin().x, csm_origin->GetAbsOrigin().y, csm_origin->GetAbsOrigin().z + curdist.GetInt()));
+		m_flCSMDistance = curdist.GetInt();
 
 		if (m_bEnableAngleFromEnv)
 			csm_origin->angFEnv = true;
