@@ -375,6 +375,9 @@ void CBaseEntityModelLoadProxy::Handler::OnModelLoadComplete( const model_t *pMo
 CBaseEntity::CBaseEntity( bool bServerOnly )
 {
 	m_pAttributes = NULL;
+#ifdef LUA_SDK
+	m_UsabilityType = -1;	// not set by Lua: the entity's own use caps apply (see ObjectCaps)
+#endif
 
 	COMPILE_TIME_ASSERT( MOVETYPE_LAST < (1 << MOVETYPE_MAX_BITS) );
 	COMPILE_TIME_ASSERT( MOVECOLLIDE_COUNT < (1 << MOVECOLLIDE_MAX_BITS) );
@@ -2633,19 +2636,28 @@ int CBaseEntity::ObjectCaps( void )
 		caps |= FCAP_ACROSS_TRANSITION;
 	}
 
-	if (m_UsabilityType == USABILITY_TYPE::CONTINUOUS)
+	// Srcbox: only a use type set with Entity:SetUseType applies. It used to be
+	// uninitialized (0 == CONTINUOUS) for every entity, so prop_physics & co. were
+	// "used" every tick while +use was held: each tick picked the prop up again,
+	// leaving the previous pickup controllers holding it in mid air forever.
+	// Lua scripted entities (not weapons) default to continuous use, as in GMod.
+	int nUseType = m_UsabilityType;
+	if ( nUseType < 0 && IsScripted() && !IsBaseCombatWeapon() )
+		nUseType = USABILITY_TYPE::CONTINUOUS;
+
+	if (nUseType == USABILITY_TYPE::CONTINUOUS)
 	{
 		caps |= FCAP_CONTINUOUS_USE;
 	}
-	else if (m_UsabilityType == USABILITY_TYPE::ON_OFF)
+	else if (nUseType == USABILITY_TYPE::ON_OFF)
 	{
 		caps |= FCAP_ONOFF_USE;
 	}
-	else if (m_UsabilityType == USABILITY_TYPE::DIRECTIONAL)
+	else if (nUseType == USABILITY_TYPE::DIRECTIONAL)
 	{
 		caps |= FCAP_DIRECTIONAL_USE;
 	}
-	else if (m_UsabilityType == USABILITY_TYPE::IMPULSE)
+	else if (nUseType == USABILITY_TYPE::IMPULSE)
 	{
 		caps |= FCAP_IMPULSE_USE;
 	}
