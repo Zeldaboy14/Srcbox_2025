@@ -1015,11 +1015,7 @@ void CBaseModPanel::OnLevelLoadingStarted( char const *levelName, bool bShowProg
 	pLoadingProgress->SetLoadingType( type );
 	pLoadingProgress->SetProgress( 0.0f );
 
-	if (Q_stricmp("0", "changelevel2")) {
-		m_LevelLoading = false;
-	} else {
-		m_LevelLoading = true;
-	}
+	m_LevelLoading = true;
 }
 
 
