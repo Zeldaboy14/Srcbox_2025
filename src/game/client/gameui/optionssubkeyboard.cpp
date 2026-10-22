@@ -50,6 +50,18 @@ COptionsSubKeyboard::COptionsSubKeyboard(vgui::Panel *parent) : PropertyPage(par
 	vgui::HScheme scheme = vgui::scheme()->LoadSchemeFromFile("resource/SourceSchemeLegacy.res", "SwarmFrameScheme");
 	SetScheme(scheme);
 
+	// Srcbox: inside the Swarm-style VKeyboard frame this page is proportional and
+	// positions itself from its own res (Alien Swarm's layout). Alien Swarm's vgui
+	// inherited proportional from the parent; this one doesn't, and the stock
+	// Resource/OptionsSubKeyboard.res (the Orange Box one, from hl2) gives the page
+	// no size at all, so the list never showed.
+	const bool bSwarmLayout = ( parent && parent->IsProportional() );
+	if ( bSwarmLayout )
+	{
+		SetProportional( true );
+		SetName( "OptionsSubKeyboard" );
+	}
+
 	Q_memset( m_Bindings, 0, sizeof( m_Bindings ));
 
 	// create the key bindings list
@@ -62,7 +74,7 @@ COptionsSubKeyboard::COptionsSubKeyboard(vgui::Panel *parent) : PropertyPage(par
 	m_pSetBindingButton = new Button(this, "ChangeKeyButton", "");
 	m_pClearBindingButton = new Button(this, "ClearKeyButton", "");
 
-	LoadControlSettings("Resource/OptionsSubKeyboard.res");
+	LoadControlSettings( bSwarmLayout ? "Resource/UI/basemodui/OptionsSubKeyboard.res" : "Resource/OptionsSubKeyboard.res" );
 
 	m_pSetBindingButton->SetEnabled(false);
 	m_pClearBindingButton->SetEnabled(false);

@@ -98,6 +98,7 @@ BaseClass(parent, panelName)
 
 	m_drpModelDetail = NULL;
 	m_drpTextureDetail = NULL;
+	m_bReactivatePending = false;
 	//m_drpPagedPoolMem = NULL;
 	m_drpAntialias = NULL;
 	m_drpFiltering = NULL;
@@ -692,26 +693,30 @@ void Video::OnThink()
 	if( !m_drpAspectRatio )
 	{
 		m_drpAspectRatio = dynamic_cast< DropDownMenu* >( FindChildByName( "DrpAspectRatio" ) );
-		needsActivate = true;
+		if ( m_drpAspectRatio )
+			needsActivate = true;
 	}
 
 	if( !m_drpResolution )
 	{
 		m_drpResolution = dynamic_cast< DropDownMenu* >( FindChildByName( "DrpResolution" ) );
-		needsActivate = true;
+		if ( m_drpResolution )
+			needsActivate = true;
 	}
 
 	if( !m_drpDisplayMode )
 	{
 		m_drpDisplayMode = dynamic_cast< DropDownMenu* >( FindChildByName( "DrpDisplayMode" ) );
-		needsActivate = true;
+		if ( m_drpDisplayMode )
+			needsActivate = true;
 	}
 
 	/*
 	if ( !m_drpLockMouse )
 	{
 		m_drpLockMouse = dynamic_cast< DropDownMenu* >( FindChildByName( "DrpLockMouse" ) );
-		needsActivate = true;
+		if ( m_drpLockMouse )
+			needsActivate = true;
 	}
 	
 	if ( m_drpLockMouse )
@@ -722,62 +727,72 @@ void Video::OnThink()
 	if( !m_drpPagedPoolMem )
 	{
 		m_drpPagedPoolMem = dynamic_cast< DropDownMenu* >( FindChildByName( "DrpPagedPoolMem" ) );
-		needsActivate = true;
+		if ( m_drpPagedPoolMem )
+			needsActivate = true;
 	}
 
 	if( !m_drpCPUDetail )
 	{
 		m_drpCPUDetail = dynamic_cast< DropDownMenu* >( FindChildByName( "DrpCPUDetail" ) );
-		needsActivate = true;
+		if ( m_drpCPUDetail )
+			needsActivate = true;
 	}
 	*/
 
 	if( !m_btnAdvanced )
 	{
 		m_btnAdvanced = dynamic_cast< BaseModHybridButton* >( FindChildByName( "BtnAdvanced" ) );
-		needsActivate = true;
+		if ( m_btnAdvanced )
+			needsActivate = true;
 	}
 
 	if( !m_drpModelDetail )
 	{
 		m_drpModelDetail = dynamic_cast< DropDownMenu* >( FindChildByName( "DrpModelDetail" ) );
-		needsActivate = true;
+		if ( m_drpModelDetail )
+			needsActivate = true;
 	}
 
 	if (!m_drpTextureDetail)
 	{
 		m_drpTextureDetail = dynamic_cast<DropDownMenu*>(FindChildByName("DrpTextureDetail"));
-		needsActivate = true;
+		if ( m_drpTextureDetail )
+			needsActivate = true;
 	}
 
 	if( !m_drpAntialias )
 	{
 		m_drpAntialias = dynamic_cast< DropDownMenu* >( FindChildByName( "DrpAntialias" ) );
-		needsActivate = true;
+		if ( m_drpAntialias )
+			needsActivate = true;
 	}
 
 	if( !m_drpFiltering )
 	{
 		m_drpFiltering = dynamic_cast< DropDownMenu* >( FindChildByName( "DrpFiltering" ) );
-		needsActivate = true;
+		if ( m_drpFiltering )
+			needsActivate = true;
 	}
 
 	if( !m_drpVSync )
 	{
 		m_drpVSync = dynamic_cast< DropDownMenu* >( FindChildByName( "DrpVSync" ) );
-		needsActivate = true;
+		if ( m_drpVSync )
+			needsActivate = true;
 	}
 
 	if( !m_drpQueuedMode )
 	{
 		m_drpQueuedMode = dynamic_cast< DropDownMenu* >( FindChildByName( "DrpQueuedMode" ) );
-		needsActivate = true;
+		if ( m_drpQueuedMode )
+			needsActivate = true;
 	}
 
 	if( !m_drpShaderDetail )
 	{
 		m_drpShaderDetail = dynamic_cast< DropDownMenu* >( FindChildByName( "DrpShaderDetail" ) );
-		needsActivate = true;
+		if ( m_drpShaderDetail )
+			needsActivate = true;
 	}
 
 	
@@ -785,7 +800,8 @@ void Video::OnThink()
 	if( !m_btnUseRecommended )
 	{
 		m_btnUseRecommended = dynamic_cast< BaseModHybridButton* >( FindChildByName( "BtnUseRecommended" ) );
-		needsActivate = true;
+		if ( m_btnUseRecommended )
+			needsActivate = true;
 	}
 // 
 // 	if( !m_btnCancel )
@@ -803,6 +819,15 @@ void Video::OnThink()
 	if( !m_btn3rdPartyCredits )
 	{
 		m_btn3rdPartyCredits = dynamic_cast< BaseModHybridButton* >( FindChildByName( "Btn3rdPartyCredits" ) );
+		if ( m_btn3rdPartyCredits )
+			needsActivate = true;
+	}
+
+	// A resolution / scheme change re-applies video.res to every control, which
+	// resets the dynamic resolution labels ("_res0"...) and visibility. Refill once.
+	if ( m_bReactivatePending )
+	{
+		m_bReactivatePending = false;
 		needsActivate = true;
 	}
 
@@ -947,7 +972,7 @@ void Video::OnCommand(const char *command)
 		m_iModelDetail = 2;
 		m_bDirtyValues = true;
 	}
-	else if ( !Q_strcmp( command, "TextureDetailUltra" ) )
+	else if ( !Q_strcmp( command, "TextureDetailUltra" ) || !Q_strcmp( command, "TextureDetailVeryHigh" ) )
 	{
 		m_iTextureDetail = -1;
 		m_bDirtyValues = true;
@@ -1375,8 +1400,9 @@ void Video::ApplyChanges()
 	ConVarRef mat_picmip("mat_picmip");
 	mat_picmip.SetValue(m_iTextureDetail);
 
-	ConVarRef mem_level( "mem_level" );
-	mem_level.SetValue( m_iPagedPoolMem );
+	// mem_level doesn't exist in this engine
+	//ConVarRef mem_level( "mem_level" );
+	//mem_level.SetValue( m_iPagedPoolMem );
 
 	ConVarRef mat_antialias( "mat_antialias" );
 	ConVarRef mat_aaquality( "mat_aaquality" );
@@ -1389,20 +1415,23 @@ void Video::ApplyChanges()
 	ConVarRef mat_vsync( "mat_vsync" );
 	mat_vsync.SetValue( m_bVSync );
 
-	ConVarRef mat_triplebuffered( "mat_triplebuffered" );
-	mat_triplebuffered.SetValue( m_bTripleBuffered );
+	// mat_triplebuffered doesn't exist in this engine
+	//ConVarRef mat_triplebuffered( "mat_triplebuffered" );
+	//mat_triplebuffered.SetValue( m_bTripleBuffered );
 
 	ConVarRef mat_queue_mode( "mat_queue_mode" );
 	mat_queue_mode.SetValue( m_iQueuedMode );
 
-	ConVarRef cpu_level( "cpu_level" );
-	cpu_level.SetValue( m_iCPUDetail );
+	// cpu_level doesn't exist in this engine
+	//ConVarRef cpu_level( "cpu_level" );
+	//cpu_level.SetValue( m_iCPUDetail );
 
 	ConVarRef mat_reducefillrate( "mat_reducefillrate" );
 	mat_reducefillrate.SetValue( m_iGPUDetail );
 
-	ConVarRef in_lock_mouse_to_window( "in_lock_mouse_to_window" );
-	in_lock_mouse_to_window.SetValue( m_bLockMouse );
+	// in_lock_mouse_to_window doesn't exist in this engine
+	//ConVarRef in_lock_mouse_to_window( "in_lock_mouse_to_window" );
+	//in_lock_mouse_to_window.SetValue( m_bLockMouse );
 
 	// Make sure there is a resolution change
 	const MaterialSystem_Config_t &config = materials->GetCurrentConfigForVideoCard();
@@ -1482,6 +1511,8 @@ void Video::ApplySchemeSettings( vgui::IScheme *pScheme )
 	// required for new style
 	SetPaintBackgroundEnabled( true );
 	SetupAsDialogStyle();
+
+	m_bReactivatePending = true;
 
 	// Collapse the buttons under the advance options button
 	int iAdvancedPos = 0;

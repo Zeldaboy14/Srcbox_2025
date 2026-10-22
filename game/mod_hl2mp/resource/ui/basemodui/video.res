@@ -69,7 +69,7 @@
 			"ypos"						"0"
 			"zpos"						"0"
 			"wide"						"410"
-			"wideatopen"				"260"	[$WIN32 && !$WIN32WIDE]
+			"wideatopen"				"260"	[$X360]
 			"tall"						"15"
 			"autoResize"				"1"
 			"pinCorner"					"0"
@@ -125,7 +125,7 @@
 			"ypos"						"0"
 			"zpos"						"0"
 			"wide"						"410"
-			"wideatopen"				"260"	[$WIN32 && !$WIN32WIDE]
+			"wideatopen"				"260"	[$X360]
 			"tall"						"15"
 			"autoResize"				"1"
 			"pinCorner"					"0"
@@ -170,7 +170,7 @@
 		"usetitlesafe"		"0"
 		"tabPosition"		"0"
 		"navUp"				"DrpResolution"
-		"navDown"			"DrpLockMouse"
+		"navDown"			"BtnAdvanced"
 				
 		//button and label
 		"BtnDropButton"
@@ -181,7 +181,7 @@
 			"ypos"						"0"
 			"zpos"						"0"
 			"wide"						"410"
-			"wideatopen"				"260"	[$WIN32 && !$WIN32WIDE]
+			"wideatopen"				"260"	[$X360]
 			"tall"						"15"
 			"autoResize"				"1"
 			"pinCorner"					"0"
@@ -221,12 +221,12 @@
 		"zpos"				"3"
 		"wide"				"410"
 		"tall"				"15"
-		"visible"			"1"
+		"visible"			"0"
 		"enabled"			"1"
 		"usetitlesafe"		"0"
 		"tabPosition"		"0"
 		"navUp"				"DrpResolution"
-		"navDown"			"SldFilmGrain"
+		"navDown"			"BtnAdvanced"
 				
 		//button and label
 		"BtnDropButton"
@@ -237,7 +237,7 @@
 			"ypos"						"0"
 			"zpos"						"0"
 			"wide"						"410"
-			"wideatopen"				"260"	[$WIN32 && !$WIN32WIDE]
+			"wideatopen"				"260"	[$X360]
 			"tall"						"15"
 			"autoResize"				"1"
 			"pinCorner"					"0"
@@ -268,57 +268,6 @@
 		"OnlyActiveUser"		"1"
 	}
 	
-	"SldFilmGrain"
-	{
-		"ControlName"			"SliderControl"
-		"fieldName"				"SldFilmGrain"
-		"xpos"					"c-205"
-		"ypos"					"170"
-		"zpos"					"3"
-		"wide"					"410"
-		"tall"					"15"
-		"visible"				"0"
-		"enabled"				"1"
-		"usetitlesafe"			"0"
-		"tabPosition"			"0"
-		"minValue"				"0.0"
-		"maxValue"				"3.0"
-		"stepSize"				"0.2"
-		"navUp"					"DrpDisplayMode"
-		"navDown"				"BtnAdvanced"
-		"conCommand"			"mat_grain_scale_override"
-		"usetitlesafe"			"0"
-		"inverseFill"			"0"
-		
-		//button and label
-		"BtnDropButton"
-		{
-			"ControlName"			"BaseModHybridButton"
-			"fieldName"				"BtnDropButton"
-			"xpos"					"0"
-			"ypos"					"0"
-			"zpos"					"0"
-			"wide"					"410"
-			"wideatopen"			"260"	[$WIN32 && !$WIN32WIDE]
-			"tall"					"15"
-			"autoResize"			"1"
-			"pinCorner"				"0"
-			"visible"				"1"
-			"enabled"				"1"
-			"tabPosition"			"0"
-			"AllCaps"					"1"
-			"labelText"				"#L4D360UI_VideoOptions_FilmGrain"
-			"tooltiptext"			"#L4D360UI_VideoOptions_Tooltip_FilmGrain"	[$X360]
-			"tooltiptext"			"#L4D_film_grain_tip"						[$WIN32]
-			"disabled_tooltiptext"	"#L4D360UI_VideoOptions_Tooltip_FilmGrain_Disabled"
-			"style"					"DefaultButton"
-			"command"				""
-			"ActivationType"		"1"	
-			"OnlyActiveUser"		"1"
-			"usablePlayerIndex"		"nobody"
-		}
-	}
-	
 	"BtnAdvanced"
 	{
 		"ControlName"			"BaseModHybridButton"
@@ -334,7 +283,7 @@
 		"enabled"				"1"
 		"tabPosition"			"0"
 		"wrap"					"1"
-		"navUp"					"SldFilmGrain"
+		"navUp"					"DrpDisplayMode"
 		"navDown"				"DrpAntialias"
 		"AllCaps"				"1"
 		"labelText"				"#L4D_advanced_settings"
@@ -372,7 +321,7 @@
 			"ypos"						"0"
 			"zpos"						"0"
 			"wide"						"410"
-			"wideatopen"				"260"	[$WIN32 && !$WIN32WIDE]
+			"wideatopen"				"260"	[$X360]
 			"tall"						"15"
 			"autoResize"				"1"
 			"pinCorner"					"0"
@@ -428,7 +377,7 @@
 			"ypos"						"0"
 			"zpos"						"0"
 			"wide"						"410"
-			"wideatopen"				"260"	[$WIN32 && !$WIN32WIDE]
+			"wideatopen"				"260"	[$X360]
 			"tall"						"15"
 			"autoResize"				"1"
 			"pinCorner"					"0"
@@ -484,7 +433,7 @@
 			"ypos"						"0"
 			"zpos"						"0"
 			"wide"						"410"
-			"wideatopen"				"260"	[$WIN32 && !$WIN32WIDE]
+			"wideatopen"				"260"	[$X360]
 			"tall"						"15"
 			"autoResize"				"1"
 			"pinCorner"					"0"
@@ -540,7 +489,7 @@
 			"ypos"						"0"
 			"zpos"						"0"
 			"wide"						"410"
-			"wideatopen"				"260"	[$WIN32 && !$WIN32WIDE]
+			"wideatopen"				"260"	[$X360]
 			"tall"						"15"
 			"autoResize"				"1"
 			"pinCorner"					"0"
@@ -596,7 +545,7 @@
 			"ypos"						"0"
 			"zpos"						"0"
 			"wide"						"410"
-			"wideatopen"				"260"	[$WIN32 && !$WIN32WIDE]
+			"wideatopen"				"260"	[$X360]
 			"tall"						"15"
 			"autoResize"				"1"
 			"pinCorner"					"0"
@@ -652,7 +601,7 @@
 			"ypos"						"0"
 			"zpos"						"0"
 			"wide"						"410"
-			"wideatopen"				"260"	[$WIN32 && !$WIN32WIDE]
+			"wideatopen"				"260"	[$X360]
 			"tall"						"15"
 			"autoResize"				"1"
 			"pinCorner"					"0"
@@ -697,7 +646,7 @@
 		"usetitlesafe"		"0"
 		"tabPosition"		"0"
 		"navUp"				"DrpCPUDetail"
-		"navDown"			"DrpPagedPoolMem"
+		"navDown"			"DrpTextureDetail"
 				
 		//button and label
 		"BtnDropButton"
@@ -708,7 +657,7 @@
 			"ypos"						"0"
 			"zpos"						"0"
 			"wide"						"410"
-			"wideatopen"				"260"	[$WIN32 && !$WIN32WIDE]
+			"wideatopen"				"260"	[$X360]
 			"tall"						"15"
 			"autoResize"				"1"
 			"pinCorner"					"0"
@@ -716,7 +665,7 @@
 			"enabled"					"1"
 			"tabPosition"				"1"
 			"AllCaps"					"1"
-			"labelText"					"#L4D360UI_VideoOptions_Model_Texture_Detail"
+			"labelText"					"#GameUI_Model_Detail"
 			"tooltiptext"				"#L4D_model_texture_tip"
 			"style"						"DropDownButton"
 			"command"					"FlmModelDetail"
@@ -736,6 +685,62 @@
 		"zpos"					"4"
 		"InitialFocus"			"BtnOff"
 		"ResourceFile"			"resource/UI/basemodui/DropDownModelDetail.res"
+		"OnlyActiveUser"		"1"
+	}
+	
+	"DrpTextureDetail"
+	{
+		"ControlName"		"DropDownMenu"
+		"fieldName"			"DrpTextureDetail"
+		"xpos"				"c-205"
+		"ypos"				"330"
+		"zpos"				"3"
+		"wide"				"410"
+		"tall"				"15"
+		"visible"			"0"
+		"enabled"			"1"
+		"usetitlesafe"		"0"
+		"tabPosition"		"0"
+		"navUp"				"DrpModelDetail"
+		"navDown"			"BtnUseRecommended"
+				
+		//button and label
+		"BtnDropButton"
+		{
+			"ControlName"				"BaseModHybridButton"
+			"fieldName"					"BtnDropButton"
+			"xpos"						"0"
+			"ypos"						"0"
+			"zpos"						"0"
+			"wide"						"410"
+			"wideatopen"				"260"	[$X360]
+			"tall"						"15"
+			"autoResize"				"1"
+			"pinCorner"					"0"
+			"visible"					"1"
+			"enabled"					"1"
+			"tabPosition"				"1"
+			"AllCaps"					"1"
+			"labelText"					"#GameUI_Texture_Detail"
+			"tooltiptext"				"#GameUI_Texture_Detail"
+			"style"						"DropDownButton"
+			"command"					"FlmTextureDetail"
+			"ActivationType"			"1"
+			"OnlyActiveUser"			"1"
+		}
+	}
+	
+		//flyouts		
+	"FlmTextureDetail"
+	{
+		"ControlName"			"FlyoutMenu"
+		"fieldName"				"FlmTextureDetail"
+		"visible"				"0"
+		"wide"					"0"
+		"tall"					"0"
+		"zpos"					"4"
+		"InitialFocus"			"BtnHigh"
+		"ResourceFile"			"resource/UI/basemodui/DropDownTextureDetail.res"
 		"OnlyActiveUser"		"1"
 	}
 	
@@ -764,7 +769,7 @@
 			"ypos"						"0"
 			"zpos"						"0"
 			"wide"						"410"
-			"wideatopen"				"260"	[$WIN32 && !$WIN32WIDE]
+			"wideatopen"				"260"	[$X360]
 			"tall"						"15"
 			"autoResize"				"1"
 			"pinCorner"					"0"
@@ -810,7 +815,7 @@
 		"enabled"				"1"
 		"tabPosition"			"0"
 		"wrap"					"1"
-		"navUp"					"DrpPagedPoolMem"
+		"navUp"					"DrpTextureDetail"
 		"navDown"				"BtnCancel"
 		"AllCaps"				"1"
 		"labelText"				"#L4D360UI_UseRecommended"

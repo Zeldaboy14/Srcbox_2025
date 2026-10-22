@@ -897,6 +897,18 @@ void CBaseModPanel::OnLevelLoadingStarted( char const *levelName, bool bShowProg
 {
 	Assert( !m_LevelLoading );
 
+	// Srcbox: a level transition (changelevel2) from inside a level doesn't ask for
+	// the progress dialog. Half-Life 2 keeps the last frame on screen with the
+	// engine's loading plaque instead of a full loading screen, so don't open one
+	// (it painted the screen black for the whole transition).
+	if ( !bShowProgressDialog && GameUI().IsInLevel() )
+	{
+		if ( UI_IsDebug() )
+			Msg( "[GAMEUI] OnLevelLoadingStarted - level transition to %s, no loading screen\n", levelName ? levelName : "<< no level specified >>" );
+		m_LevelLoading = true;	// OnLevelLoadingFinished still runs
+		return;
+	}
+
 	CloseAllWindows();
 
 	if ( UI_IsDebug() )
@@ -1015,6 +1027,8 @@ void CBaseModPanel::OnLevelLoadingStarted( char const *levelName, bool bShowProg
 	pLoadingProgress->SetLoadingType( type );
 	pLoadingProgress->SetProgress( 0.0f );
 
+	// (this compared two string literals, so it always cleared m_LevelLoading and the
+	// progress bar never moved; transitions are handled at the top now)
 	m_LevelLoading = true;
 }
 

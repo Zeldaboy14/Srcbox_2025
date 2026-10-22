@@ -193,7 +193,8 @@
 		"labelText"				"#L4D360UI_MainMenu_Options"
 		"tooltiptext"			"#L4D360UI_MainMenu_Options_Tip"
 		"style"					"AlienSwarmMenuButtonSmall"
-		"command"				"OpenLegacyOptions"			[!$X360GUEST]	
+		"command"				"FlmOptionsFlyout"			[!$X360GUEST]
+		"command"				"FlmOptionsGuestFlyout"		[$X360GUEST]	
 		"ActivationType"		"1"
 	}
 
@@ -216,5 +217,17 @@
 		"ActivationType"		"1"
 		"labelText"				"#L4D360UI_MainMenu_Quit"			[$WIN32]
 		"command"				"Quit"
+	}
+	"FlmOptionsFlyout"
+	{
+		"ControlName"			"FlyoutMenu"
+		"fieldName"				"FlmOptionsFlyout"
+		"visible"				"0"
+		"wide"					"0"
+		"tall"					"0"
+		"zpos"					"3"
+		"InitialFocus"			"BtnAudioVideo"	[$X360]
+		"InitialFocus"			"BtnVideo"	[$WIN32]
+		"ResourceFile"			"resource/UI/basemodui/OptionsFlyout.res"
 	}
 }

@@ -335,7 +335,6 @@ void CBaseModFrame::OnClose()
 //=============================================================================
 Panel* CBaseModFrame::NavigateBack()
 {
-	return 0;
 	// don't do anything if we have nowhere to navigate back to
 	if ( !CanNavBack() )
 		return NULL;

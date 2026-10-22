@@ -200,6 +200,27 @@ Scheme
 		NewGame.FillColor			"0 0 0 255"
 		NewGame.SelectionColor		"Orange"
 		NewGame.DisabledColor		"128 128 128 196"
+
+		// Srcbox: BaseModHybridButton styles (from the Alien Swarm scheme). Only these: the
+		// other styles name fonts this scheme doesn't have, so they stay the simple style.
+		// The AlienSwarm ones draw the Orange Box menu look (vhybridbutton.cpp).
+		AlienSwarmMenuButton.Style					"11"
+		AlienSwarmMenuButtonSmall.Style				"12"
+		AlienSwarmDefault.Style						"13"
+
+		// Srcbox: the Alien Swarm options screens (Video, Audio, ...): drop downs with a
+		// value on the right, the flyout items, dialog buttons and plain ones
+		DefaultButton.Style							"0"
+		DefaultButton.TextInsetY					"0"
+		FlyoutMenuButton.Style						"2"
+		FlyoutMenuButton.TextInsetX					"8"
+		FlyoutMenuButton.TextInsetY					"2"
+		DropDownButton.Style						"3"
+		DropDownButton.TextInsetY					"0"
+		DialogButton.Style							"4"
+		DialogButton.TextInsetY						"0"
+		HybridButton.BorderColor					"65 74 96 255"
+		HybridButton.BlotchColor					"65 74 96 64"
 	}
 
 	//
@@ -256,9 +277,9 @@ Scheme
 		{
 			"1"
 			{
-				"name"		"Tahoma"
-				"tall"		"16"
-				"weight"	"1000"
+				"name"		"Verdana"
+				"tall"		"14"
+				"weight"	"0"
 			}
 		}
 		"DefaultUnderline"
@@ -516,22 +537,75 @@ Scheme
 			"1"
 			{
 				"name"		"HalfLife2"
-				"tall"		"72"
-				"weight"	"400"
+				"tall"		"41"
+				"weight"	"100"
 				"antialias"	"1"
 				"custom"	"1"
 			}
 		}
 
-		TitleFont2
+		// Srcbox: Alien Swarm options screens (Neo Sans, resource/neosans.ttf)
+		"SwarmOptionBold"
 		{
 			"1"
 			{
-				"name"		"HalfLife2"
-				"tall"		"120"
+				"name"		"Neo Sans Std"
+				"tall"		"16"
+				"weight"	"100"
+				"antialias"	"1"
+			}
+		}
+		"SwarmOptionBoldBlur"
+		{
+			"1"
+			{
+				"name"		"Neo Sans Std"
+				"tall"		"16"
+				"weight"	"100"
+				"antialias"	"1"
+				"blur"		"3"
+			}
+		}
+		"DefaultMedium"
+		{
+			"1"
+			{
+				"name"		"Neo Sans Std"
+				"tall"		"12"
+				"weight"	"100"
+				"antialias"	"1"
+			}
+		}
+		"DefaultMediumBlur"
+		{
+			"1"
+			{
+				"name"		"Neo Sans Std"
+				"tall"		"12"
+				"weight"	"100"
+				"blur"		"1"
+			}
+		}
+		"DefaultExtraLarge"
+		{
+			"1"
+			{
+				"name"		"Neo Sans Std"
+				"tall"		"20"
+				"weight"	"100"
+				"antialias"	"1"
+			}
+		}
+
+		// Srcbox: Orange Box (360) main menu items: caps ~16 px tall at 1080p (letters spaced in code)
+		"MenuButtonOB"
+		{
+			"1"
+			{
+				"name"		"Verdana"
+				"tall"		"11"
 				"weight"	"400"
 				"antialias"	"1"
-				"custom"	"1"
 			}
 		}
 	}
@@ -940,6 +1014,8 @@ Scheme
 	{
 		"1"		"resource/HALFLIFE2.ttf"
 		"2"		"resource/fonts/Raleway-Medium.ttf"
+		"2"		"resource/fonts/verdana.ttf"
+		"3"		"resource/neosans.ttf"
 	
 	}
 	"MyPanel"

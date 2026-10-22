@@ -182,6 +182,25 @@ void ExpandButtonWidthIfNecessary( vgui::Button *pButton )
 }
 
 //=============================================================================
+// Srcbox: L4D2-style layout, all in proportional units (screen height / 480) so it
+// lands in the same place at any resolution. Measured off Left 4 Dead 2 at 1080p:
+//   title band     y 108-144 (244-325 px), title text x 86
+//   message band   y 178-377 (400-848 px), message x 95 (resource file)
+//   CANCEL / OK    rows 20 apart from y 329 (740 px), text x 110, icons x 95
+// The dialog is the full screen width with its top at y 89; everything below is
+// relative to that, and the resource file's positions already match it.
+// (This used to mix pixels and scaled values with magic factors, e.g. the buttons at
+// dialogHeight * 2.25 / 2.445 and the bands at fixed pixel rows, so it only lined
+// up at one resolution.)
+//=============================================================================
+#define GC_DIALOG_Y			89
+#define GC_TITLEBAND_Y		19		// relative to the dialog
+#define GC_TITLEBAND_TALL	36
+#define GC_TITLE_X			86
+#define GC_MSGBAND_Y		89
+#define GC_MSGBAND_TALL		199
+#define GC_MSG_WIDE			545
+
 void GenericConfirmation::LoadLayout()
 {
 	BaseClass::LoadLayout();
@@ -189,131 +208,37 @@ void GenericConfirmation::LoadLayout()
 	int screenWidth, screenHeight;
 	CBaseModPanel::GetSingleton().GetSize( screenWidth, screenHeight );
 
-	int dialogWidth = ScreenWidth(); //vgui::scheme()->GetProportionalScaledValueEx( GetScheme(), 100 );
-	int dialogHeight = vgui::scheme()->GetProportionalScaledValueEx( GetScheme(), 66 );
+	const int nScheme = GetScheme();
+	#define GC_P( v ) vgui::scheme()->GetProportionalScaledValueEx( nScheme, ( v ) )
 
-	// need a border gap to inset all controls
-	int borderGap = vgui::scheme()->GetProportionalScaledValueEx( GetScheme(), 8 );
+	SetPos( 0, GC_P( GC_DIALOG_Y ) );
+	SetSize( screenWidth, MAX( GetTall(), GC_P( GC_MSGBAND_Y + GC_MSGBAND_TALL ) ) );
 
-	int checkBoxGap = 0;
-
-	// first solve the size of the parent window
-	int titleWide = 0;
-	int titleTall = 0;
 	vgui::Label *pLblTitle = dynamic_cast< vgui::Label* >( FindChildByName( "LblTitle" ) );
 	if ( pLblTitle )
 	{
-		// account for size of the title and a gap
+		// left aligned, centred in the title band
+		int titleWide, titleTall;
 		pLblTitle->GetContentSize( titleWide, titleTall );
-		int shim = vgui::scheme()->GetProportionalScaledValueEx( GetScheme(), 90 );
-		if ( dialogWidth < titleWide + shim )
-		{
-			dialogWidth = titleWide + shim;
-		}
+		const int nBandTall = GC_P( GC_TITLEBAND_TALL );
+		pLblTitle->SetContentAlignment( vgui::Label::a_west );
+		pLblTitle->SetBounds( GC_P( GC_TITLE_X ), GC_P( GC_TITLEBAND_Y ) + ( nBandTall - titleTall ) / 2,
+			MAX( titleWide, screenWidth - GC_P( GC_TITLE_X ) * 2 ), titleTall );
 	}
 
 	if ( m_pLblMessage )
 	{
-		// account for the size of the message and a gap
+		// position and font come from the resource file; long text wraps at its width
 		int msgWide, msgTall;
 		m_pLblMessage->GetContentSize( msgWide, msgTall );
-
-		if ( msgWide > screenWidth - 100 )
+		if ( msgWide > GC_P( GC_MSG_WIDE ) )
 		{
 			m_pLblMessage->SetWrap( true );
-			m_pLblMessage->SetWide( screenWidth - 100 );
+			m_pLblMessage->SetWide( GC_P( GC_MSG_WIDE ) );
 			m_pLblMessage->SetTextInset( 0, 0 );
 			m_pLblMessage->GetContentSize( msgWide, msgTall );
 		}
-
-		int shimX = vgui::scheme()->GetProportionalScaledValueEx( GetScheme(), 80 );
-		int shimY = vgui::scheme()->GetProportionalScaledValueEx( GetScheme(), 50 );
-		if ( dialogWidth < msgWide + shimX )
-		{
-			dialogWidth = msgWide + shimX;
-		}
-		if ( dialogHeight < msgTall + shimY )
-		{
-			dialogHeight = msgTall + shimY;
-		}
-
-		if ( m_pCheckBox )
-		{
-			int boxWide, boxTall;
-			//m_pCheckBox->GetContentSize( boxWide, boxTall );
-			checkBoxGap = boxTall * 2;
-			dialogHeight += checkBoxGap;
-		}
-	}
-
-
-	// In the Xbox, OK/Cancel xbox buttons use the same font and are the same size, use the OK button
-	int buttonWide = 0;
-	int buttonTall = 0;
-	
-	// On the PC, the buttons will be the same size, use the OK button
-	vgui::Button *pOkButton = NULL;
-	vgui::Button *pCancelButton = NULL;
-	pOkButton = dynamic_cast< vgui::Button* >( FindChildByName( "BtnOk" ) );
-	pCancelButton = dynamic_cast< vgui::Button* >( FindChildByName( "BtnCancel" ) );
-	pOkButton->GetSize( buttonWide, buttonTall );
-
-	if ( m_data.bOkButtonEnabled || m_data.bCancelButtonEnabled )
-	{
-		// account for the buttons
-		dialogHeight += vgui::scheme()->GetProportionalScaledValueEx( GetScheme(), buttonTall );
-		dialogHeight += borderGap;
-	}
-
-	// don't get smaller than a minimum width
-	int minWidth = vgui::scheme()->GetProportionalScaledValueEx( GetScheme(), 235 );
-	if ( dialogWidth < minWidth )
-		dialogWidth = minWidth;
-
-	// now have final dialog dimensions, center the dialog
-	SetPos( ( screenWidth - dialogWidth ) / 2, ( screenHeight - dialogHeight ) / 4.3 + 7 );
-	//SetSize( dialogWidth, dialogHeight );
-	//SetPos( screenWidth, ( screenHeight - dialogHeight ) / 2 );
-	//SetSize( screenWidth, dialogHeight );
-
-	if ( pLblTitle )
-	{
-		// horizontally center and vertically inset the title
-		pLblTitle->SetPos( ( dialogWidth - titleWide ) / 9.5 - 3, 15 );
-		pLblTitle->SetSize( titleWide * 4, titleTall * 4);
-	}
-
-	if ( m_pLblMessage )
-	{
-		// center the message
-		int msgWide, msgTall;
-		m_pLblMessage->GetContentSize( msgWide, msgTall );
-		m_pLblMessage->SetPos( ( dialogWidth - msgWide ) / 7.4 + 2, ( dialogHeight - checkBoxGap - msgTall ) + 20 );
-		m_pLblMessage->SetSize( msgWide * 2, msgTall );
-
-		if ( m_pCheckBox )
-		{
-			int boxWide, boxTall;
-			//m_pCheckBox->GetContentSize( boxWide, boxTall );
-			//m_pCheckBox->SetVisible( true );
-
-			int boxX = ( dialogWidth - boxWide ) / 2;
-			int boxY = ( dialogHeight - checkBoxGap - msgTall ) / 2 + msgTall + checkBoxGap / 2;
-
-			if ( m_pLblCheckBox )
-			{
-				int lblCheckBoxWide, lblCheckBoxTall;
-				m_pLblCheckBox->GetContentSize( lblCheckBoxWide, lblCheckBoxTall );
-				boxX = ( dialogWidth - ( boxWide + lblCheckBoxWide ) ) / 2;
-
-				//m_pLblCheckBox->SetVisible( true );
-				m_pLblCheckBox->SetPos( boxX + boxWide, boxY );
-				m_pLblCheckBox->SetSize( lblCheckBoxWide, lblCheckBoxTall );
-			}
-			
-			//m_pCheckBox->SetPos( boxX, boxY );
-		}
-
+		m_pLblMessage->SetTall( msgTall );
 	}
 
 	m_pLblCancelButton->SetVisible( false );
@@ -321,63 +246,50 @@ void GenericConfirmation::LoadLayout()
 	m_pLblOkButton->SetVisible( false );
 	m_pLblOkText->SetVisible( false );
 
+	vgui::Button *pOkButton = dynamic_cast< vgui::Button* >( FindChildByName( "BtnOk" ) );
+	vgui::Button *pCancelButton = dynamic_cast< vgui::Button* >( FindChildByName( "BtnCancel" ) );
+	vgui::Panel *pOkIcon = FindChildByName( "IconForwardArrow" );
+	vgui::Panel *pCancelIcon = FindChildByName( "IconBackArrow" );
+
 	if ( pOkButton )
-	{
 		pOkButton->SetVisible( m_data.bOkButtonEnabled );
-		ExpandButtonWidthIfNecessary( pOkButton );
-	}
 	if ( pCancelButton )
-	{
 		pCancelButton->SetVisible( m_data.bCancelButtonEnabled );
-		ExpandButtonWidthIfNecessary( pCancelButton );
-	}
+	if ( pOkIcon )
+		pOkIcon->SetVisible( m_data.bOkButtonEnabled );
+	if ( pCancelIcon )
+		pCancelIcon->SetVisible( m_data.bCancelButtonEnabled );
 
-	if ( m_data.bCancelButtonEnabled || m_data.bOkButtonEnabled )
+	// a lone OK takes the first row (where CANCEL sits), with its icon
+	if ( pOkButton && pCancelButton && m_data.bOkButtonEnabled && !m_data.bCancelButtonEnabled )
 	{
-		// when only one button is enabled, center that button
-		vgui::Button *pButton = NULL;
-		bool bSingleButton = false;
-		if ( ( m_data.bCancelButtonEnabled && !m_data.bOkButtonEnabled ) )
+		int x, y;
+		pCancelButton->GetPos( x, y );
+		int okX, okY;
+		pOkButton->GetPos( okX, okY );
+		pOkButton->SetPos( okX, y );
+		if ( pOkIcon && pCancelIcon )
 		{
-			// cancel is centered
-			bSingleButton = true;
-			pButton = pCancelButton;
-		}
-		else if ( !m_data.bCancelButtonEnabled && m_data.bOkButtonEnabled )
-		{
-			// OK is centered
-			bSingleButton = true;
-			pButton = pOkButton;
-		}
-
-		if ( bSingleButton )
-		{
-			// center the button
-			pButton->SetPos( ( dialogWidth - pButton->GetWide() )/2, dialogHeight - borderGap - buttonTall );
-		}
-		else
-		{
-			//if( dialogWidth <= minWidth )
-			{
-				// center left the OK
-				pOkButton->SetPos( dialogWidth / 8 + 5, dialogHeight * 2.445 );
-				// center right the CANCEL
-				pCancelButton->SetPos( dialogWidth / 8 + 5, dialogHeight * 2.25);
-			}
-// 				else
-// 				{
-// 					// right align both the buttons
-// 					int x = dialogWidth - borderGap - vgui::scheme()->GetProportionalScaledValueEx( GetScheme(), 40 );
-// 
-// 					x -= pCancelButton->GetWide();
-// 					pCancelButton->SetPos( x, dialogHeight - borderGap - buttonTall );
-// 
-// 					x -= borderGap;
-// 					x -= pOkButton->GetWide();
-// 					pOkButton->SetPos(x, dialogHeight - borderGap - buttonTall );
-// 				}
+			int ix, iy, cx, cy;
+			pOkIcon->GetPos( ix, iy );
+			pCancelIcon->GetPos( cx, cy );
+			pOkIcon->SetPos( ix, cy );
 		}
 	}
+
+	// keep each icon centred on its button's row
+	struct { vgui::Panel *pButton; vgui::Panel *pIcon; } rows[] = { { pOkButton, pOkIcon }, { pCancelButton, pCancelIcon } };
+	for ( int i = 0; i < ARRAYSIZE( rows ); i++ )
+	{
+		if ( !rows[i].pButton || !rows[i].pIcon )
+			continue;
+		int bx, by, ix, iy;
+		rows[i].pButton->GetPos( bx, by );
+		rows[i].pIcon->GetPos( ix, iy );
+		rows[i].pIcon->SetPos( ix, by + ( rows[i].pButton->GetTall() - rows[i].pIcon->GetTall() ) / 2 );
+	}
+
+	#undef GC_P
 }
 
 //=============================================================================
@@ -386,18 +298,16 @@ void GenericConfirmation::PaintBackground()
 	// Alien Swarm stuff. Don't use
 	//BaseClass::DrawGenericBackground();
 
-	int wide, tall;
-	GetSize(wide, tall);
-	int iHalfWide = wide * 0.5f;
-	float flAlpha = 200.0f / 255.0f;
+	const int nScheme = GetScheme();
+	const int nTitleY = vgui::scheme()->GetProportionalScaledValueEx( nScheme, GC_TITLEBAND_Y );
+	const int nTitleTall = vgui::scheme()->GetProportionalScaledValueEx( nScheme, GC_TITLEBAND_TALL );
+	const int nMsgY = vgui::scheme()->GetProportionalScaledValueEx( nScheme, GC_MSGBAND_Y );
+	const int nMsgTall = vgui::scheme()->GetProportionalScaledValueEx( nScheme, GC_MSGBAND_TALL );
 
-	// title
-	vgui::surface()->DrawSetColor(Color(0, 0, 0, 255 * flAlpha));
-	vgui::surface()->DrawFilledRect(0, 47, GetWide(), GetTall() / 6.2 + 2);
-
-	// message and buttons
-	vgui::surface()->DrawSetColor(Color(0, 0, 0, 255 * flAlpha));
-	vgui::surface()->DrawFilledRect(0, 8 * 23 + 20, GetWide(), GetTall() / 1.08 + 3);
+	// two translucent black bands across the screen: the title, then message + buttons
+	vgui::surface()->DrawSetColor( Color( 0, 0, 0, 160 ) );
+	vgui::surface()->DrawFilledRect( 0, nTitleY, GetWide(), nTitleY + nTitleTall );
+	vgui::surface()->DrawFilledRect( 0, nMsgY, GetWide(), nMsgY + nMsgTall );
 
 	if ( m_bNeedsMoveToFront )
 	{

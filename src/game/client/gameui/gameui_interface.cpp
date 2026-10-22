@@ -48,6 +48,7 @@
 #include "vgui/IVGui.h"
 #include "vgui/ISystem.h"
 #include "vgui/ISurface.h"
+#include <math.h>
 #include "vgui_controls/Menu.h"
 #include "vgui_controls/PHandle.h"
 #include "tier3/tier3.h"
@@ -686,9 +687,15 @@ void CGameUI::OnLevelLoadingStarted(bool bShowProgressDialog )
 	g_VModuleLoader.PostMessageToAllModules( new KeyValues( "LoadingStarted" ) );
 	
 	GetUiBaseModPanelClass().OnLevelLoadingStarted( engine->GetLevelName(), bShowProgressDialog );
-	ShowLoadingBackgroundDialog();
 
-	if ( bShowProgressDialog )
+	// Srcbox: a level transition (changelevel2) doesn't ask for the progress dialog;
+	// like Half-Life 2, the last frame stays up instead of a loading background
+	if ( bShowProgressDialog || !IsInLevel() )
+		ShowLoadingBackgroundDialog();
+
+	// (the Swarm loading screen opens for every load but a changelevel2 transition;
+	// the classic bar goes with it, whether or not the engine asked for a dialog)
+	if ( bShowProgressDialog || !IsInLevel() )
 	{
 		StartProgressBar();
 	}
@@ -717,9 +724,14 @@ void CGameUI::OnLevelLoadingFinished(bool bError, const char *failureReason, con
 // Purpose: Updates progress bar
 // Output : Returns true if screen should be redrawn
 //-----------------------------------------------------------------------------
+static bool ClassicLoadingBar_Update( float progress );	// below
+static void ClassicLoadingBar_Hide();
+
 bool CGameUI::UpdateProgressBar(float progress, const char *statusText)
 {
-	return GetUiBaseModPanelClass().UpdateProgressBar(progress, statusText);
+	bool bRedraw = GetUiBaseModPanelClass().UpdateProgressBar(progress, statusText);
+	bRedraw |= ClassicLoadingBar_Update( progress );
+	return bRedraw;
 }
 
 /*
@@ -746,8 +758,179 @@ void CGameUI::SetProgressLevelName( const char *levelName )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+// Srcbox: the Orange Box console loading bar (resource/ui/xboxdialogs.res: a
+// "LOADING..." label over a rounded bar, 250 x 40 at 720p, lower right), drawn by
+// this panel over the loading screen's background instead of the Swarm screen's bar
+ConVar ui_loadingbar_classic( "ui_loadingbar_classic", "1", FCVAR_ARCHIVE, "Use the Orange Box loading bar on the loading screen" );
+
+// The engine issues these after a video mode change for its own GameUI.dll.
+// BaseModUI re-lays itself out from ApplySchemeSettings, so they only need to exist.
+CON_COMMAND_F( refresh_gameui_dialogs_modeset, "Engine notification after a video mode change", FCVAR_HIDDEN | FCVAR_CLIENTCMD_CAN_EXECUTE ) {}
+CON_COMMAND_F( vmodule_resetparents, "Engine notification after a video mode change", FCVAR_HIDDEN | FCVAR_CLIENTCMD_CAN_EXECUTE ) {}
+
+class CClassicLoadingBar : public vgui::Panel
+{
+	DECLARE_CLASS_SIMPLE( CClassicLoadingBar, vgui::Panel );
+public:
+	CClassicLoadingBar( vgui::Panel *pParent ) : BaseClass( pParent, "ClassicLoadingBar" )
+	{
+		SetPaintBackgroundEnabled( false );
+		SetPaintBorderEnabled( false );
+		SetKeyBoardInputEnabled( false );
+		SetMouseInputEnabled( false );
+		m_flFraction = 0.0f;
+		m_hFont = vgui::INVALID_FONT;
+		m_nFontTall = 0;
+		m_nTextX = 0;
+		m_nLabelTall = m_nBarTall = m_nBarWide = 0;
+	}
+
+	void Start()
+	{
+		// The Swarm loading screen is a popup and draws over every non-popup panel, and
+		// two popups swap order whenever one is activated. As a child of the loading
+		// screen the bar is always painted after (over) its background.
+		vgui::Panel *pLoadingScreen = GetUiBaseModPanelClass().GetWindow( BaseModUI::WT_LOADINGPROGRESS );
+		SetParent( pLoadingScreen ? pLoadingScreen : (vgui::Panel *)&GetUiBaseModPanelClass() );
+
+		m_flFraction = 0.0f;
+		SetVisible( true );
+		InvalidateLayout( true );
+		MoveToFront();
+	}
+
+	// true if the fill moved by a pixel
+	bool SetFraction( float flFraction )
+	{
+		const int nOld = (int)( m_nBarWide * m_flFraction );
+		m_flFraction = MAX( m_flFraction, clamp( flFraction, 0.0f, 1.0f ) );
+		MoveToFront();
+		return (int)( m_nBarWide * m_flFraction ) != nOld;
+	}
+
+	virtual void PerformLayout()
+	{
+		BaseClass::PerformLayout();
+
+		int screenWide, screenTall;
+		vgui::surface()->GetScreenSize( screenWide, screenTall );
+		// Measured off The Orange Box at 1920x1080 (Xenia): bar 374 x 23 with its top at
+		// y 912, centred; "LOADING..." caps 13 px tall, 27 px above the bar, 4 px in
+		const float flScale = screenTall / 1080.0f;
+		const int wide = (int)( 374 * flScale + 0.5f );
+		m_nBarTall = MAX( 6, (int)( 23 * flScale + 0.5f ) );
+		m_nLabelTall = (int)( 35 * flScale + 0.5f );	// text cell top to bar top
+		const int tall = m_nLabelTall + m_nBarTall;
+		m_nBarWide = wide;
+		m_nTextX = (int)( 3 * flScale + 0.5f );
+
+		// screen position, made relative to whichever panel it's in
+		int nParentX = 0, nParentY = 0;
+		if ( GetVParent() )
+			vgui::ipanel()->GetAbsPos( GetVParent(), nParentX, nParentY );
+		SetBounds( ( screenWide - wide ) / 2 - nParentX, (int)( screenTall * ( 912.0f / 1080.0f ) ) - m_nLabelTall - nParentY, wide, tall );
+
+		// Verdana sized so "LOADING..." is ~27% of the bar's width, as in the capture
+		const int nFontTall = MAX( 8, (int)( 23 * flScale + 0.5f ) );
+		if ( m_hFont == vgui::INVALID_FONT || nFontTall != m_nFontTall )
+		{
+			if ( m_hFont == vgui::INVALID_FONT )
+				m_hFont = vgui::surface()->CreateFont();
+			vgui::surface()->SetFontGlyphSet( m_hFont, "Verdana", nFontTall, 400, 0, 0, vgui::ISurface::FONTFLAG_ANTIALIAS );
+			m_nFontTall = nFontTall;
+		}
+	}
+
+	virtual void Paint()
+	{
+		int wide, tall;
+		GetSize( wide, tall );
+
+		// "LOADING..."
+		const wchar_t *pszText = g_pVGuiLocalize->Find( "#GameUI_Loading" );
+		if ( !pszText )
+			pszText = L"LOADING...";
+		vgui::surface()->DrawSetTextFont( m_hFont );
+		vgui::surface()->DrawSetTextColor( 255, 255, 255, 255 );
+		vgui::surface()->DrawSetTextPos( m_nTextX, 0 );
+		vgui::surface()->DrawPrintText( pszText, V_wcslen( pszText ) );
+
+		// black outline (~2.5 px at 1080), grey track, orange fill inside it. Inside the
+		// outline the top and bottom rows are a band at ~84% brightness (track 90 vs
+		// 107, fill 171,90,6 vs 204,107,6 in the capture); the ends have none.
+		const int y = tall - m_nBarTall;
+		const int nEdge = MAX( 1, (int)( m_nBarTall * ( 2.5f / 23.0f ) + 0.5f ) );
+		const int nBand = MAX( 1, (int)( m_nBarTall / 23.0f + 0.5f ) );
+		const int nInnerWide = wide - nEdge * 2;
+		const int nInnerTall = m_nBarTall - nEdge * 2;
+		DrawPill( 0, y, wide, m_nBarTall, Color( 6, 6, 6, 255 ) );
+		DrawBandedPill( nEdge, y + nEdge, nInnerWide, nInnerTall, nBand, Color( 107, 107, 107, 255 ), Color( 90, 90, 90, 255 ) );
+		if ( m_flFraction > 0.0f )
+		{
+			const int nFill = MAX( nInnerTall, (int)( nInnerWide * m_flFraction ) );
+			DrawBandedPill( nEdge, y + nEdge, MIN( nFill, nInnerWide ), nInnerTall, nBand, Color( 204, 107, 6, 255 ), Color( 171, 90, 6, 255 ) );
+		}
+	}
+
+private:
+	// a pill in the band colour, then the main colour over it minus nBand rows top
+	// and bottom: the band shows along the long edges but not at the round ends
+	void DrawBandedPill( int x, int y, int wide, int tall, int nBand, Color main, Color band )
+	{
+		DrawPill( x, y, wide, tall, band );
+		if ( tall - nBand * 2 > 0 )
+			DrawPill( x, y + nBand, wide, tall - nBand * 2, main );
+	}
+
+	// square middle, half-circle ends, a row at a time
+	void DrawPill( int x, int y, int wide, int tall, Color color )
+	{
+		if ( wide <= 0 || tall <= 0 )
+			return;
+		vgui::surface()->DrawSetColor( color );
+		const float flRadius = MIN( tall, wide ) * 0.5f;
+		for ( int row = 0; row < tall; row++ )
+		{
+			const float dy = ( row + 0.5f ) - tall * 0.5f;
+			const float flInside = flRadius * flRadius - dy * dy;
+			const int inset = ( flInside > 0.0f ) ? (int)( flRadius - sqrtf( flInside ) + 0.5f ) : (int)flRadius;
+			if ( wide - inset * 2 > 0 )
+				vgui::surface()->DrawFilledRect( x + inset, y + row, x + wide - inset, y + row + 1 );
+		}
+	}
+
+	float			m_flFraction;
+	vgui::HFont		m_hFont;
+	int				m_nFontTall;
+	int				m_nLabelTall;
+	int				m_nBarTall;
+	int				m_nBarWide;
+	int				m_nTextX;
+};
+
+static vgui::DHANDLE< CClassicLoadingBar > s_hClassicLoadingBar;
+
+static bool ClassicLoadingBar_Update( float progress )
+{
+	if ( !s_hClassicLoadingBar.Get() || !s_hClassicLoadingBar->IsVisible() )
+		return false;
+	return s_hClassicLoadingBar->SetFraction( progress );
+}
+
+static void ClassicLoadingBar_Hide()
+{
+	if ( s_hClassicLoadingBar.Get() )
+		s_hClassicLoadingBar->SetVisible( false );
+}
+
 void CGameUI::StartProgressBar()
 {
+	if ( !ui_loadingbar_classic.GetBool() )
+		return;
+
+	if ( !s_hClassicLoadingBar.Get() )
+		s_hClassicLoadingBar = new CClassicLoadingBar( &GetUiBaseModPanelClass() );
+	s_hClassicLoadingBar->Start();
 }
 
 //-----------------------------------------------------------------------------
@@ -767,6 +950,8 @@ bool CGameUI::ContinueProgressBar( float progressFraction )
 //-----------------------------------------------------------------------------
 void CGameUI::StopProgressBar(bool bError, const char *failureReason, const char *extendedReason)
 {
+	ClassicLoadingBar_Hide();
+
 	if (!g_hLoadingDialog.Get())
 		return;
 

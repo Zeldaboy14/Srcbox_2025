@@ -426,6 +426,16 @@ void LoadingProgress::SetupControlStates()
 		break;
 	}
 
+	// Srcbox: the Orange Box loading bar (gameui_interface.cpp) is drawn on top instead
+	{
+		extern ConVar ui_loadingbar_classic;
+		if ( ui_loadingbar_classic.GetBool() )
+		{
+			m_bDrawProgress = false;
+			m_bDrawSpinner = false;
+		}
+	}
+
 	m_pFooter = dynamic_cast< vgui::EditablePanel* >( FindChildByName( "CampaignFooter" ) );
 
 	m_pBGImage = dynamic_cast< vgui::ImagePanel* >( FindChildByName( "BGImage" ) );

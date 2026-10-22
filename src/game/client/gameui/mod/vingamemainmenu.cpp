@@ -34,7 +34,7 @@ using namespace BaseModUI;
 
 extern IVEngineClient *engine;
 
-static ConVar ui_old_options_menu("ui_old_options_menu", "1", FCVAR_HIDDEN, "Brings up the old tabbed options dialog from Keyboard/Mouse when set to 1.");
+static ConVar ui_old_options_menu("ui_old_options_menu", "0", FCVAR_HIDDEN, "Brings up the old tabbed options dialog from Keyboard/Mouse when set to 1.");
 
 void OpenGammaDialog( VPANEL parent );
 
