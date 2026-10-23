@@ -432,25 +432,27 @@ void BaseModHybridButton::PaintButtonEx()
 				//col.SetColor( 135, 170, 193, 255 );
 				col.SetColor( 205, 205, 205, 255 );	// Orange Box unselected item
 			}
-			else if ( bSwarmLook )
+			// we shouldn't have this
+			/*else if (bSwarmLook)
 			{
 				col.SetColor( 83, 148, 192, 255 );	// Alien Swarm
-			}
+			}*/
 			else // Not focused
 			{
 				//col.SetColor( 125, 125, 125, 255 );
 				//col.SetColor( 83, 148, 192, 255 );
-				col.SetColor(204, 204, 204, 255);
+				col.SetColor(177, 177, 177, 255);
 			}
 			break;
 		case Disabled:
 			//col.SetColor( 88, 97, 104, 255 );
 			//col.SetColor( 65, 74, 96, 255 );
 			//col.SetColor( 32, 59, 82, 255 );
-			if ( bSwarmLook )
+			/*if (bSwarmLook)
 				col.SetColor( 32, 59, 82, 255 );
-			else
-				col.SetColor(255, 255, 255, 255);
+			else*/
+			//col.SetColor(255, 255, 255, 255);
+			col.SetColor(177, 177, 177, 255);
 			bDrawText = true;
 			bDrawGlow = false;
 			break;
@@ -465,6 +467,13 @@ void BaseModHybridButton::PaintButtonEx()
 			col.SetColor( 169, 213, 255, 255 );
 			bDrawGlow = true;
 			bDrawCursor = true;
+			if ( IsOrangeBoxMenuStyle() )
+			{
+				// Srcbox: an Orange Box menu item with its flyout open looks like the
+				// highlighted item (white, no glow, which also wasn't letter-spaced)
+				col.SetColor( 255, 255, 255, 255 );
+				bDrawGlow = false;
+			}
 			break;
 		case Focus:
 			// active item
@@ -720,8 +729,15 @@ void BaseModHybridButton::PaintButtonEx()
 		vgui::surface()->DrawSetTextFont( m_hTextBlurFont );
 		vgui::surface()->DrawSetTextPos( x + textInsetX, nTextY );
 
+		int glowX = x + textInsetX;
 		for ( int i=0; i<len && i < iLabelCharsDrawn; i++ )
 		{
+			if ( nTracking )
+			{
+				// keep the glow on the letter-spaced text
+				vgui::surface()->DrawSetTextPos( glowX, nTextY );
+				glowX += vgui::surface()->GetCharacterWidth( m_hTextFont, szUnicode[i] ) + nTracking;
+			}
 			vgui::surface()->DrawUnicodeChar( szUnicode[i] );
 		}
 	}
