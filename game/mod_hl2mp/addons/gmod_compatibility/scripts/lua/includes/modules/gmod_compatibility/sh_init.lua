@@ -444,6 +444,20 @@ util.TraceHull = Traces.TraceHull
 util.TraceEntity = Traces.TraceEntity
 util.PointContents = Traces.PointContents
 
+-- GMod's util.IsInWorld: false when the position is outside the map (in the void or inside world brushes)
+if (not util.IsInWorld) then
+	function util.IsInWorld(position)
+		-- Only the world's brushes count, not props sitting at the position
+		local trace = util.TraceLine({
+			start = position,
+			endpos = position,
+			mask = MASK_SOLID_BRUSHONLY,
+		})
+
+		return not (trace.StartSolid or trace.AllSolid)
+	end
+end
+
 util.Compress = Serializers.LzmaCompress
 util.Decompress = Serializers.LzmaDecompress
 
@@ -1641,7 +1655,55 @@ function USER_COMMAND_META:IsForced()
 	return not self:IsNew()
 end
 
+-- GMod's global WorldToLocal / LocalToWorld: convert a position and angle between world space and
+-- the space of another origin + angles (ragdoll mover, many tools and SENTs use them every frame)
+if (not WorldToLocal) then
+	local function makeTransform(position, angles)
+		local matrix = Matrix()
+		matrix:SetTranslation(position or Vector(0, 0, 0))
+		matrix:SetAngles(angles or Angle(0, 0, 0))
+		return matrix
+	end
+
+	function WorldToLocal(position, angles, newSystemOrigin, newSystemAngles)
+		local localMatrix = makeTransform(newSystemOrigin, newSystemAngles):GetInverseTR() * makeTransform(position, angles)
+		return localMatrix:GetTranslation(), localMatrix:GetAngles()
+	end
+end
+
+if (not LocalToWorld) then
+	function LocalToWorld(localPosition, localAngles, originPosition, originAngles)
+		local origin = Matrix()
+		origin:SetTranslation(originPosition or Vector(0, 0, 0))
+		origin:SetAngles(originAngles or Angle(0, 0, 0))
+
+		local localMatrix = Matrix()
+		localMatrix:SetTranslation(localPosition or Vector(0, 0, 0))
+		localMatrix:SetAngles(localAngles or Angle(0, 0, 0))
+
+		local worldMatrix = origin * localMatrix
+		return worldMatrix:GetTranslation(), worldMatrix:GetAngles()
+	end
+end
+
 local VECTOR_META = FindMetaTable("Vector")
+
+-- GMod prints vectors and angles as "x y z" / "p y r". Addons rely on that format: the constraint
+-- library passes tostring(vector) as entity keyvalues ("attachpoint", rope "StartOffset", spring
+-- "springaxis", ...), which the engine parses as three numbers. Ours printed "Vector: (x, y, z)".
+VECTOR_META.__tostring = function(vector)
+	return string.format("%f %f %f", vector.x, vector.y, vector.z)
+end
+
+do
+	local ANGLE_META = FindMetaTable("Angle")
+
+	if (ANGLE_META) then
+		ANGLE_META.__tostring = function(angle)
+			return string.format("%f %f %f", angle.p, angle.y, angle.r)
+		end
+	end
+end
 VECTOR_META.AngleEx = VECTOR_META.AngleWithUp
 VECTOR_META.Distance = VECTOR_META.DistanceTo
 VECTOR_META.DistToSqr = VECTOR_META.DistanceToAsSqr
@@ -1671,7 +1733,316 @@ function ANGLE_META:Set(angleToCopy)
 	self:Initialize(angleToCopy.p, angleToCopy.y, angleToCopy.r)
 end
 
+-- GMod Vector/Angle methods we don't have natively (ragdoll mover and other tools use these)
+do
+	local function define(meta, name, func)
+		if (rawget(meta, name) == nil) then
+			meta[name] = func
+		end
+	end
+
+	define(VECTOR_META, "IsEqualTol", function(self, other, tolerance)
+		tolerance = tolerance or 0
+		return math.abs(self.x - other.x) <= tolerance
+			and math.abs(self.y - other.y) <= tolerance
+			and math.abs(self.z - other.z) <= tolerance
+	end)
+	define(VECTOR_META, "IsZero", function(self) return self.x == 0 and self.y == 0 and self.z == 0 end)
+	define(VECTOR_META, "Unpack", function(self) return self.x, self.y, self.z end)
+	define(VECTOR_META, "ToTable", function(self) return { self.x, self.y, self.z } end)
+	define(VECTOR_META, "ToColor", function(self) return Color(self.x * 255, self.y * 255, self.z * 255) end)
+	define(VECTOR_META, "GetNegated", function(self) return Vector(-self.x, -self.y, -self.z) end)
+	define(VECTOR_META, "Length2D", function(self) return math.sqrt(self.x * self.x + self.y * self.y) end)
+	define(VECTOR_META, "Length2DSqr", function(self) return self.x * self.x + self.y * self.y end)
+	define(VECTOR_META, "Sub", function(self, other)
+		self:Initialize(self.x - other.x, self.y - other.y, self.z - other.z)
+		return self
+	end)
+	-- Rotates the vector in place by the angle (x forward, y left, z up)
+	define(VECTOR_META, "Rotate", function(self, angle)
+		local forward, right, up = angle:Forward(), angle:Right(), angle:Up()
+		local x, y, z = self.x, self.y, self.z
+		self:Initialize(
+			forward.x * x - right.x * y + up.x * z,
+			forward.y * x - right.y * y + up.y * z,
+			forward.z * x - right.z * y + up.z * z
+		)
+		return self
+	end)
+
+	define(ANGLE_META, "IsEqualTol", function(self, other, tolerance)
+		if (self.IsEqualWithTolerance) then
+			return self:IsEqualWithTolerance(other, tolerance or 0)
+		end
+
+		tolerance = tolerance or 0
+		return math.abs(math.AngleDifference(self.p, other.p)) <= tolerance
+			and math.abs(math.AngleDifference(self.y, other.y)) <= tolerance
+			and math.abs(math.AngleDifference(self.r, other.r)) <= tolerance
+	end)
+	define(ANGLE_META, "IsZero", function(self) return self.p == 0 and self.y == 0 and self.r == 0 end)
+	define(ANGLE_META, "Zero", function(self) self:Initialize(0, 0, 0) return self end)
+	define(ANGLE_META, "Unpack", function(self) return self.p, self.y, self.r end)
+	define(ANGLE_META, "ToTable", function(self) return { self.p, self.y, self.r } end)
+	define(ANGLE_META, "Sub", function(self, other)
+		self:Initialize(self.p - other.p, self.y - other.y, self.r - other.r)
+		return self
+	end)
+	define(ANGLE_META, "SnapTo", function(self, component, target)
+		local key = ({ p = "p", pitch = "p", y = "y", yaw = "y", r = "r", roll = "r" })[string.lower(component)]
+
+		if (key and target and target ~= 0) then
+			self[key] = math.Round(self[key] / target) * target
+		end
+
+		return self
+	end)
+end
+
 local ENTITY_META = FindMetaTable("Entity")
+
+local nativeGetInternalVariable = ENTITY_META.GetInternalVariable
+
+-- GMod's GetInternalVariable accepts KeyName values as well as datamap field names.
+-- The native binding searches fieldName only, so map the keys used by Sandbox's
+-- env_sun and env_fog_controller copy hooks to their Source datamap fields.
+local internalVariableAliases = {
+	["env_sun"] = {
+		size = "m_nSize",
+		overlaysize = "m_nOverlaySize",
+		rendercolor = "m_clrRender",
+		overlaycolor = "m_clrOverlay",
+	},
+	["env_fog_controller"] = {
+		fogstart = "m_fog.start",
+		fogend = "m_fog.end",
+		fogmaxdensity = "m_fog.maxdensity",
+		fogcolor = "m_fog.colorPrimary",
+	},
+}
+
+local function normalizeInternalVariable(className, name, value)
+	if not istable(value) then return value end
+
+	-- The native datamap binding currently exposes FIELD_VECTOR as { x, y, z }.
+	if isnumber(value.x) and isnumber(value.y) and isnumber(value.z) then
+		return Vector(value.x, value.y, value.z)
+	end
+
+	local isColor = (className == "env_sun" and (name == "rendercolor" or name == "overlaycolor"))
+		or (className == "env_fog_controller" and name == "fogcolor")
+	if isColor then
+		local r, g, b = value.r or value.x, value.g or value.y, value.b or value.z
+		if isnumber(r) and isnumber(g) and isnumber(b) then
+			return Vector(r, g, b)
+		end
+	end
+
+	return value
+end
+
+if nativeGetInternalVariable then
+	function ENTITY_META:GetInternalVariable(name)
+		local value = nativeGetInternalVariable(self, name)
+		local className = self:GetClass()
+		if value ~= nil then
+			return normalizeInternalVariable(className, name, value)
+		end
+
+		local aliases = internalVariableAliases[className]
+		local fieldName = aliases and aliases[name]
+		if fieldName then
+			value = nativeGetInternalVariable(self, fieldName)
+			if value ~= nil then
+				return normalizeInternalVariable(className, name, value)
+			end
+		end
+
+		if className ~= "env_sun" then return nil end
+
+		-- Fall back to the env_sun key value when the datamap field lookup misses.
+		local found, raw = self:GetKeyValue(name)
+		if found and raw ~= "" then
+			if name == "rendercolor" or name == "overlaycolor" then
+				local r, g, b = raw:match("^%s*(%d+)%s+(%d+)%s+(%d+)")
+				if r then
+					return Vector(tonumber(r), tonumber(g), tonumber(b))
+				end
+			else
+				local number = tonumber(raw)
+				if number then return number end
+			end
+		end
+
+		-- Match CSun's defaults; overlay size defaults to the main sun size.
+		if name == "size" then return 16 end
+		if name == "overlaysize" then
+			local _, rawSize = self:GetKeyValue("size")
+			return tonumber(rawSize) or 16
+		end
+		if name == "rendercolor" or name == "overlaycolor" then
+			return Vector(255, 255, 255)
+		end
+	end
+end
+
+-- Map-placed env_skypaint is native and does not get the Get* methods generated
+-- by the Lua NetworkVar declarations in GMod's base gamemode.
+local skyPaintGetters = {
+	TopColor = "m_vTopColor",
+	BottomColor = "m_vBottomColor",
+	FadeBias = "m_flFadeBias",
+	SunSize = "m_flSunSize",
+	SunNormal = "m_vSunNormal",
+	SunColor = "m_vSunColor",
+	DuskScale = "m_flDuskScale",
+	DuskIntensity = "m_flDuskIntensity",
+	DuskColor = "m_vDuskColor",
+	DrawStars = "m_bDrawStars",
+	StarTexture = "m_szStarTexture",
+	StarLayers = "m_nStarLayers",
+	HDRScale = "m_flHDRScale",
+}
+
+local skyPaintVectorGetters = {
+	GetTopColor = true,
+	GetBottomColor = true,
+	GetSunNormal = true,
+	GetSunColor = true,
+	GetDuskColor = true,
+}
+
+for getterName, fieldName in pairs(skyPaintGetters) do
+	local methodName = "Get" .. getterName
+	local nativeGetter = ENTITY_META[methodName]
+	local internalFieldName = fieldName
+
+	ENTITY_META[methodName] = function(self, ...)
+		if self:GetClass() == "env_skypaint" then
+			local value = self:GetInternalVariable(internalFieldName)
+			if skyPaintVectorGetters[methodName] and istable(value)
+				and isnumber(value.x) and isnumber(value.y) and isnumber(value.z) then
+				return Vector(value.x, value.y, value.z)
+			end
+			return value
+		end
+
+		local entityTable = self:GetTable()
+		local entityGetter = entityTable and entityTable[methodName]
+		if entityGetter then return entityGetter(self, ...) end
+		if nativeGetter then return nativeGetter(self, ...) end
+	end
+end
+
+local function getSkyPaintStarParameter(self, component, methodName, nativeGetter, ...)
+	if self:GetClass() == "env_skypaint" then
+		-- m_vStarParams is a QAngle (p = scale, y = fade, r = speed). GetInternalVariable
+		-- hands it back as an Angle, which istable() rejected, so these returned nil and
+		-- the sky editor errored copying them. Angles, Vectors and tables all index by x/y/z.
+		local params = self:GetInternalVariable("m_vStarParams")
+		local value = nil
+
+		if params ~= nil and (istable(params) or isangle(params) or isvector(params)) then
+			value = params[component]
+		end
+
+		if not isnumber(value) then
+			-- The C++ entity's defaults
+			value = ({ x = 0.5, y = 1.5, z = 0.01 })[component]
+		end
+
+		return value
+	end
+
+	local entityTable = self:GetTable()
+	local entityGetter = entityTable and entityTable[methodName]
+	if entityGetter then return entityGetter(self, ...) end
+	if nativeGetter then return nativeGetter(self, ...) end
+end
+
+for _, getterInfo in ipairs({
+	{ "GetStarScale", "x" },
+	{ "GetStarFade", "y" },
+	{ "GetStarSpeed", "z" },
+}) do
+	local methodName = getterInfo[1]
+	local component = getterInfo[2]
+	local nativeGetter = ENTITY_META[methodName]
+	ENTITY_META[methodName] = function(self, ...)
+		return getSkyPaintStarParameter(self, component, methodName, nativeGetter, ...)
+	end
+end
+
+-- Minimal Entity:AddCallback support for OnAngleChange.
+-- Other GMod callback types need their own implementation.
+if SERVER then
+	local angleCallbacks = setmetatable({}, { __mode = "k" })
+	local nextCallbackId = 0
+
+	function ENTITY_META:AddCallback(name, callback)
+		if name ~= "OnAngleChange" or type(callback) ~= "function" then
+			return nil
+		end
+
+		local callbacks = angleCallbacks[self]
+		if not callbacks then
+			callbacks = {
+				lastAngles = self:GetAngles(),
+				entries = {}
+			}
+			angleCallbacks[self] = callbacks
+		end
+
+		nextCallbackId = nextCallbackId + 1
+		callbacks.entries[#callbacks.entries + 1] = {
+			id = nextCallbackId,
+			func = callback
+		}
+
+		return nextCallbackId
+	end
+
+	function ENTITY_META:RemoveCallback(name, id)
+		if name ~= "OnAngleChange" then return end
+
+		local callbacks = angleCallbacks[self]
+		if not callbacks then return end
+
+		for i = #callbacks.entries, 1, -1 do
+			if callbacks.entries[i].id == id then
+				table.remove(callbacks.entries, i)
+				break
+			end
+		end
+
+		if #callbacks.entries == 0 then
+			angleCallbacks[self] = nil
+		end
+	end
+
+	hook.Add("Think", "GModCompatibility.OnAngleChange", function()
+		for ent, callbacks in pairs(angleCallbacks) do
+			if not IsValid(ent) then
+				angleCallbacks[ent] = nil
+			else
+				local angles = ent:GetAngles()
+				local previous = callbacks.lastAngles
+
+				if angles.p ~= previous.p
+					or angles.y ~= previous.y
+					or angles.r ~= previous.r then
+
+					callbacks.lastAngles = angles
+
+					for _, entry in ipairs(callbacks.entries) do
+						ProtectedCall(entry.func, ent, angles)
+					end
+				end
+			end
+		end
+	end)
+end
+
 ENTITY_META.EntIndex = ENTITY_META.GetEntityIndex
 ENTITY_META.Health = ENTITY_META.GetHealth
 ENTITY_META.GetPos = ENTITY_META.GetPosition
@@ -1684,6 +2055,51 @@ ENTITY_META.GetModel = rawget(ENTITY_META, "GetModel") or ENTITY_META.GetModelNa
 ENTITY_META.SetModelScale = rawget(ENTITY_META, "SetModelScale") or function() end
 ENTITY_META.GetModelScale = rawget(ENTITY_META, "GetModelScale") or function() return 1 end
 ENTITY_META.GetTable = ENTITY_META.GetRefTable
+
+-- GMod's Entity:SetTable replaces the entity's Lua table; the constraint library stores each
+-- constraint's description this way (Type, Ent1, Ent2, ...). Copy the fields into ours.
+if (not ENTITY_META.SetTable) then
+	function ENTITY_META:SetTable(newTable)
+		local entityTable = self:GetTable()
+
+		if (not istable(entityTable) or not istable(newTable)) then
+			return
+		end
+
+		for key, value in pairs(newTable) do
+			entityTable[key] = value
+		end
+	end
+end
+
+-- GMod's Entity:IsConstrained: whether constraint.lua recorded any (still valid) constraint on it
+if (not ENTITY_META.IsConstrained) then
+	function ENTITY_META:IsConstrained()
+		local entityTable = self:GetTable()
+		local constraints = istable(entityTable) and entityTable.Constraints
+
+		if (not istable(constraints)) then
+			return false
+		end
+
+		for key, constraintEntity in pairs(constraints) do
+			if (IsValid(constraintEntity)) then
+				return true
+			end
+
+			constraints[key] = nil
+		end
+
+		return false
+	end
+end
+
+-- GMod's Entity:Input fires an input right away
+if (SERVER and not ENTITY_META.Input and ENTITY_META.Fire) then
+	function ENTITY_META:Input(inputName, activator, caller, param)
+		self:Fire(inputName, param ~= nil and tostring(param) or "", 0, activator, caller)
+	end
+end
 ENTITY_META.NearestPoint = ENTITY_META.CalculateNearestPoint
 ENTITY_META.OBBCenter = ENTITY_META.GetOBBCenter
 ENTITY_META.OBBMaxs = ENTITY_META.GetOBBMaxs
@@ -1877,6 +2293,10 @@ function ENTITY_META:DrawShadow(bBool)
 	else
 		self:AddEffects(_E.ENTITY_EFFECT.NO_SHADOW)
 	end
+end
+
+function ENTITY_META:EnableForwardArrow()
+    self:SetBodygroup(1, 1)
 end
 
 -- TODO: Actually implement these bone manipulation functions
@@ -2904,7 +3324,22 @@ else
 	surface.GetTextPos = Surfaces.DrawGetTextPosition
 	surface.SetTextPos = Surfaces.DrawSetTextPosition
 	surface.SetTextColor = Surfaces.DrawSetTextColor
-	surface.DrawText = Surfaces.DrawPrintText
+	-- GMod's surface functions translate "#phrase" text (e.g. the tool gun's "#tool.balloon.name")
+	local function localizeText(text)
+		if (isstring(text) and text:sub(1, 1) == "#") then
+			local translated = Localizations.Find(text:sub(2)) or Localizations.Find(text)
+
+			if (isstring(translated) and translated ~= "") then
+				return translated
+			end
+		end
+
+		return text
+	end
+
+	surface.DrawText = function(text, ...)
+		return Surfaces.DrawPrintText(localizeText(text), ...)
+	end
 	surface.SetTexture = Surfaces.DrawSetTexture
 
 	local currentFont
@@ -2916,7 +3351,7 @@ else
 	local oldTextSize = Surfaces.GetTextSize
 
 	surface.GetTextSize = function(text)
-		return oldTextSize(currentFont, text)
+		return oldTextSize(currentFont, localizeText(text))
 	end
 
 	surface.SetMaterial = function(material)
@@ -4591,6 +5026,570 @@ if (CLIENT and not ENTITY_META.GetSpawnFlags) then
 	end
 end
 
+-- Userinfo convars (CreateClientConVar(..., userinfo = true)) made by Lua after the client connected
+-- don't always reach the server's copy of the client's userinfo, so Player:GetInfo returned nothing.
+-- The tool gun reads the selected tool with GetInfo("gmod_toolmode") every Think, and tools read
+-- their settings with GetClientInfo/GetClientNumber, so tools did nothing. Mirror those convars to the
+-- server over the net library and use the mirrored value when the engine doesn't have one.
+do
+	local PLAYER = FindMetaTable("Player")
+	local USERINFO_MESSAGE = "__SrcboxUserInfo"
+
+	if (SERVER) then
+		util.AddNetworkString(USERINFO_MESSAGE)
+
+		net.Receive(USERINFO_MESSAGE, function(length, client)
+			if (not IsValid(client)) then
+				return
+			end
+
+			client.m_SrcboxUserInfo = client.m_SrcboxUserInfo or {}
+
+			local count = net.ReadUInt(16)
+
+			for i = 1, count do
+				local name = net.ReadString()
+				local value = net.ReadString()
+				client.m_SrcboxUserInfo[name] = value
+			end
+		end)
+
+		local engineGetInfo = PLAYER._SrcboxEngineGetInfo or PLAYER.GetInfo
+		PLAYER._SrcboxEngineGetInfo = engineGetInfo
+
+		function PLAYER:GetInfo(name)
+			local mirrored = self.m_SrcboxUserInfo and self.m_SrcboxUserInfo[name]
+
+			if (mirrored ~= nil) then
+				return mirrored
+			end
+
+			return engineGetInfo(self, name)
+		end
+
+		local engineGetInfoNum = PLAYER._SrcboxEngineGetInfoNum or PLAYER.GetInfoNum
+		PLAYER._SrcboxEngineGetInfoNum = engineGetInfoNum
+
+		function PLAYER:GetInfoNum(name, default)
+			local mirrored = self.m_SrcboxUserInfo and self.m_SrcboxUserInfo[name]
+
+			if (mirrored ~= nil) then
+				return tonumber(mirrored) or default
+			end
+
+			return engineGetInfoNum(self, name, default)
+		end
+	else
+		local userInfoConVars = {}
+		local lastSent = {}
+
+		local originalCreateClientConVar = _SrcboxOriginalCreateClientConVar or CreateClientConVar
+		_SrcboxOriginalCreateClientConVar = originalCreateClientConVar
+
+		if (originalCreateClientConVar) then
+			function CreateClientConVar(name, default, shouldSave, userInfo, ...)
+				local conVar = originalCreateClientConVar(name, default, shouldSave, userInfo, ...)
+
+				if (userInfo and isstring(name)) then
+					userInfoConVars[name] = conVar or true
+				end
+
+				return conVar
+			end
+		end
+
+		timer.Create("GModCompatibility.SyncUserInfo", 0.2, 0, function()
+			if (not IsValid(LocalPlayer())) then
+				return
+			end
+
+			local changed = {}
+
+			for name, conVar in pairs(userInfoConVars) do
+				if (conVar == true) then
+					conVar = GetConVar(name)
+					userInfoConVars[name] = conVar or true
+				end
+
+				if (conVar and conVar ~= true) then
+					local value = conVar:GetString()
+
+					if (lastSent[name] ~= value) then
+						changed[#changed + 1] = { name, value }
+					end
+				end
+			end
+
+			if (#changed == 0) then
+				return
+			end
+
+			-- Keep each message small
+			local count = math.min(#changed, 64)
+
+			net.Start(USERINFO_MESSAGE)
+			net.WriteUInt(count, 16)
+
+			for i = 1, count do
+				net.WriteString(changed[i][1])
+				net.WriteString(changed[i][2])
+				lastSent[changed[i][1]] = changed[i][2]
+			end
+
+			net.SendToServer()
+		end)
+	end
+end
+
+-- GMod's constraint library groups constraints into phys_constraintsystem entities: it calls
+-- SetPhysConstraintSystem(system) before creating constraints and SetPhysConstraintSystem(NULL) after.
+-- Constraints find their system by name, so name the system and point new constraints at it.
+if (SERVER) then
+	-- GMod's Entity:GetName (the targetname)
+	if (not ENTITY_META.GetName and ENTITY_META.GetEntityName) then
+		ENTITY_META.GetName = ENTITY_META.GetEntityName
+	end
+
+	local currentConstraintSystem = nil
+
+	function SetPhysConstraintSystem(system)
+		if (IsValid(system)) then
+			if (system:GetName() == "") then
+				system:SetName("__lua_constraintsystem_" .. system:EntIndex())
+			end
+
+			currentConstraintSystem = system
+		else
+			currentConstraintSystem = nil
+		end
+	end
+
+	local nativeSetPhysConstraintObjects = ENTITY_META._SrcboxSetPhysConstraintObjects or ENTITY_META.SetPhysConstraintObjects
+	ENTITY_META._SrcboxSetPhysConstraintObjects = nativeSetPhysConstraintObjects
+
+	if (nativeSetPhysConstraintObjects) then
+		function ENTITY_META:SetPhysConstraintObjects(physicsObject1, physicsObject2)
+			if (IsValid(currentConstraintSystem)) then
+				self:SetKeyValue("constraintsystem", currentConstraintSystem:GetName())
+			end
+
+			return nativeSetPhysConstraintObjects(self, physicsObject1, physicsObject2)
+		end
+	end
+end
+
+-- Lua scripted effects (GMod's EFFECT tables in entities/effects/*.lua and lua/effects/*.lua), used
+-- through util.Effect (the tool gun's "ToolTracer" and "selection_indicator", "balloon_pop", ...).
+-- The engine asks Lua through the DispatchLuaEffect hook when no C++ effect has the name. Effects are
+-- loaded on first use, and each one is a light entity-like object that thinks every frame and renders
+-- in PostDrawTranslucentRenderables.
+if (CLIENT) then
+	effects = effects or {}
+
+	local effectList = {}
+
+	if (not effects.Register) then
+		function effects.Register(effectTable, name)
+			effectList[string.lower(name)] = effectTable
+		end
+	end
+
+	if (not effects.Create) then
+		function effects.Create(name, retval)
+			name = string.lower(name)
+
+			if (not effectList[name]) then
+				return nil
+			end
+
+			local newEffect = retval or {}
+
+			for k, v in pairs(effectList[name]) do
+				newEffect[k] = v
+			end
+
+			if (effectList["base"]) then
+				table.Merge(newEffect, effectList["base"])
+			end
+
+			return newEffect
+		end
+	end
+
+	local loadedEffects = {}
+
+	local function currentGamemodeFolders()
+		local folders = {}
+		local seen = {}
+
+		local function add(name)
+			if (isstring(name) and name ~= "" and not seen[name]) then
+				seen[name] = true
+				folders[#folders + 1] = name
+			end
+		end
+
+		local gamemodeConVar = GetConVar_Internal and GetConVar_Internal("gamemode")
+		add(gamemodeConVar and gamemodeConVar:GetString())
+		add("sandbox")
+		add("base")
+
+		return folders
+	end
+
+	local function readEffectSource(name)
+		local candidates = {
+			{ "effects/" .. name .. ".lua", "LUA" },
+			{ "effects/" .. name .. "/init.lua", "LUA" },
+		}
+
+		for _, folder in ipairs(currentGamemodeFolders()) do
+			candidates[#candidates + 1] = { "gamemodes/" .. folder .. "/entities/effects/" .. name .. ".lua", "GAME" }
+			candidates[#candidates + 1] = { "gamemodes/" .. folder .. "/entities/effects/" .. name .. "/init.lua", "GAME" }
+		end
+
+		for _, candidate in ipairs(candidates) do
+			if (file.Exists(candidate[1], candidate[2])) then
+				local source = file.Read(candidate[1], candidate[2])
+
+				if (source) then
+					return source, candidate[1]
+				end
+			end
+		end
+	end
+
+	local function loadEffect(name)
+		name = string.lower(name)
+
+		if (loadedEffects[name] ~= nil) then
+			return loadedEffects[name]
+		end
+
+		loadedEffects[name] = false
+
+		-- Effects merge in the "base" effect, so load it first
+		if (name ~= "base") then
+			loadEffect("base")
+		end
+
+		local source, path = readEffectSource(name)
+
+		if (not source) then
+			return false
+		end
+
+		local previousEffect = EFFECT
+		EFFECT = {}
+
+		local chunk = CompileString(source, path, false)
+
+		if (isfunction(chunk)) then
+			local success, err = pcall(chunk)
+
+			if (success) then
+				effects.Register(EFFECT, name)
+				loadedEffects[name] = true
+			else
+				ErrorNoHalt("[GModCompatibility] Effect '" .. name .. "' failed to load: " .. tostring(err) .. "\n")
+			end
+		else
+			ErrorNoHalt("[GModCompatibility] Effect '" .. name .. "' failed to compile: " .. tostring(chunk) .. "\n")
+		end
+
+		EFFECT = previousEffect
+
+		return loadedEffects[name]
+	end
+
+	-- The entity-like object an effect runs as (GMod uses a CLuaEffect entity)
+	local EFFECT_OBJECT = {}
+	local noop = function() end
+
+	local effectObjectMeta = {
+		__index = EFFECT_OBJECT,
+		__tostring = function(self)
+			return "LuaEffect [" .. tostring(rawget(self, "m_EffectName")) .. "]"
+		end,
+	}
+
+	function EFFECT_OBJECT:IsValid() return not rawget(self, "m_bRemoved") end
+	function EFFECT_OBJECT:Remove() rawset(self, "m_bRemoved", true) end
+	function EFFECT_OBJECT:EntIndex() return -1 end
+	function EFFECT_OBJECT:GetClass() return "class CLuaEffect" end
+	function EFFECT_OBJECT:IsWorld() return false end
+	function EFFECT_OBJECT:IsPlayer() return false end
+	function EFFECT_OBJECT:IsWeapon() return false end
+	function EFFECT_OBJECT:IsNPC() return false end
+	function EFFECT_OBJECT:GetTable() return self end
+
+	function EFFECT_OBJECT:SetPos(position)
+		rawset(self, "m_Pos", Vector(position.x, position.y, position.z))
+
+		local parent = rawget(self, "m_Parent")
+
+		if (IsValid(parent)) then
+			rawset(self, "m_LocalPos", parent:WorldToLocal(position))
+		end
+	end
+
+	function EFFECT_OBJECT:GetPos()
+		local parent = rawget(self, "m_Parent")
+		local localPos = rawget(self, "m_LocalPos")
+
+		if (localPos and IsValid(parent)) then
+			return parent:LocalToWorld(localPos)
+		end
+
+		return rawget(self, "m_Pos") or Vector(0, 0, 0)
+	end
+
+	EFFECT_OBJECT.GetAbsOrigin = EFFECT_OBJECT.GetPos
+	EFFECT_OBJECT.SetAbsOrigin = EFFECT_OBJECT.SetPos
+	EFFECT_OBJECT.WorldSpaceCenter = EFFECT_OBJECT.GetPos
+
+	function EFFECT_OBJECT:SetAngles(angles) rawset(self, "m_Ang", Angle(angles.p, angles.y, angles.r)) end
+	function EFFECT_OBJECT:GetAngles() return rawget(self, "m_Ang") or Angle(0, 0, 0) end
+
+	function EFFECT_OBJECT:SetParent(parent)
+		rawset(self, "m_Parent", parent)
+
+		if (IsValid(parent)) then
+			rawset(self, "m_LocalPos", parent:WorldToLocal(self:GetPos()))
+		else
+			rawset(self, "m_LocalPos", nil)
+		end
+	end
+
+	function EFFECT_OBJECT:GetParent() return rawget(self, "m_Parent") or NULL end
+
+	function EFFECT_OBJECT:SetColor(color) rawset(self, "m_Color", color) end
+	function EFFECT_OBJECT:GetColor() return rawget(self, "m_Color") or Color(255, 255, 255, 255) end
+	function EFFECT_OBJECT:SetNoDraw(noDraw) rawset(self, "m_bNoDraw", noDraw) end
+	function EFFECT_OBJECT:GetNoDraw() return rawget(self, "m_bNoDraw") or false end
+	function EFFECT_OBJECT:SetModel(model) rawset(self, "m_Model", model) end
+	function EFFECT_OBJECT:GetModel() return rawget(self, "m_Model") end
+
+	function EFFECT_OBJECT:SetRenderBounds(mins, maxs) rawset(self, "m_RenderMins", mins) rawset(self, "m_RenderMaxs", maxs) end
+	function EFFECT_OBJECT:GetRenderBounds() return rawget(self, "m_RenderMins") or Vector(-8, -8, -8), rawget(self, "m_RenderMaxs") or Vector(8, 8, 8) end
+	-- Entity functions effects commonly call that don't matter for a Lua-drawn effect
+	for _, name in ipairs({
+		"SetRenderBoundsWS", "SetCollisionBounds", "SetParentPhysNum", "SetModelScale", "DrawModel",
+		"SetMaterial", "SetSkin", "SetBodygroup", "SetupBones", "SetRenderMode", "DrawShadow", "SetLOD",
+		"AddEffects", "RemoveEffects", "SetMoveType", "SetRenderOrigin", "SetRenderAngles", "SetSequence",
+		"SetCycle", "FrameAdvance", "SetPlaybackRate", "InvalidateBoneCache", "SetOwner", "SetSolid",
+		"SetNotSolid", "SetNoDrawOnLocalPlayer", "SetPredictable", "DestroyShadow",
+	}) do
+		EFFECT_OBJECT[name] = noop
+	end
+
+	function EFFECT_OBJECT:GetOwner() return NULL end
+
+	function EFFECT_OBJECT:EmitSound(soundName, level, pitch, volume)
+		sound.Play(soundName, self:GetPos(), level, pitch, volume)
+	end
+
+	local activeEffects = {}
+	local MAX_ACTIVE_EFFECTS = 512
+
+	local function removeEffect(index)
+		local effect = activeEffects[index]
+		table.remove(activeEffects, index)
+
+		if (effect) then
+			rawset(effect, "m_bRemoved", true)
+		end
+	end
+
+	local function reportEffectError(effect, what, err)
+		local name = tostring(rawget(effect, "m_EffectName"))
+		ErrorNoHalt("[GModCompatibility] Effect '" .. name .. "' " .. what .. " failed: " .. tostring(err) .. "\n")
+	end
+
+	hook.Add("DispatchLuaEffect", "GModCompatibility.LuaEffects", function(name, data)
+		if (not isstring(name) or not loadEffect(name)) then
+			return
+		end
+
+		if (#activeEffects >= MAX_ACTIVE_EFFECTS) then
+			return true
+		end
+
+		local effect = setmetatable({}, effectObjectMeta)
+		effects.Create(name, effect)
+		rawset(effect, "m_EffectName", string.lower(name))
+		rawset(effect, "Entity", effect)
+
+		if (data and data.GetOrigin) then
+			effect:SetPos(data:GetOrigin())
+		end
+
+		if (isfunction(rawget(effect, "Init"))) then
+			local success, err = pcall(effect.Init, effect, data)
+
+			if (not success) then
+				reportEffectError(effect, "Init", err)
+				return true
+			end
+		end
+
+		if (not rawget(effect, "m_bRemoved")) then
+			activeEffects[#activeEffects + 1] = effect
+		end
+
+		return true
+	end)
+
+	hook.Add("Think", "GModCompatibility.LuaEffectsThink", function()
+		for i = #activeEffects, 1, -1 do
+			local effect = activeEffects[i]
+			local keep = not rawget(effect, "m_bRemoved")
+
+			if (keep and isfunction(rawget(effect, "Think"))) then
+				local success, result = pcall(effect.Think, effect)
+
+				if (not success) then
+					reportEffectError(effect, "Think", result)
+					keep = false
+				else
+					keep = result == true
+				end
+			elseif (keep) then
+				-- Effects without Think go away straight after rendering once
+				keep = not rawget(effect, "m_bRenderedOnce")
+			end
+
+			if (not keep) then
+				removeEffect(i)
+			end
+		end
+	end)
+
+	hook.Add("PostDrawTranslucentRenderables", "GModCompatibility.LuaEffectsRender", function(drawingDepth, drawingSkybox)
+		if (drawingDepth or drawingSkybox) then
+			return
+		end
+
+		for i = #activeEffects, 1, -1 do
+			local effect = activeEffects[i]
+
+			if (effect and not rawget(effect, "m_bRemoved") and not rawget(effect, "m_bNoDraw") and isfunction(rawget(effect, "Render"))) then
+				local success, err = pcall(effect.Render, effect)
+				rawset(effect, "m_bRenderedOnce", true)
+
+				if (not success) then
+					reportEffectError(effect, "Render", err)
+					removeEffect(i)
+				end
+			end
+		end
+	end)
+end
+
+-- GMod's engine calls SWEP:RenderScreen just before drawing the view model, so weapons can draw
+-- into a render target used by their view model (the tool gun's screen shows the tool name this
+-- way). Srcbox doesn't, so call it from the hook that runs before the view models are drawn.
+if (CLIENT) then
+	local renderScreenErrorShown = {}
+
+	hook.Add("PreDrawViewModels", "GModCompatibility.CallRenderScreen", function()
+		local client = LocalPlayer()
+
+		if (not IsValid(client)) then
+			return
+		end
+
+		local weapon = client:GetActiveWeapon()
+
+		if (not IsValid(weapon) or not isfunction(weapon.RenderScreen)) then
+			return
+		end
+
+		local success, err = pcall(weapon.RenderScreen, weapon)
+
+		if (not success) then
+			local class = weapon:GetClass()
+
+			if (not renderScreenErrorShown[class]) then
+				renderScreenErrorShown[class] = true
+				ErrorNoHalt("[GModCompatibility] " .. tostring(class) .. ":RenderScreen failed: " .. tostring(err) .. "\n")
+			end
+		end
+	end)
+end
+
+-- Debug helper: prints what the server sees for your tool gun
+if (SERVER) then
+	CreateConVar("srcbox_tooldebug_click", "0", 0, "srcbox_tooldebug also runs the tool's LeftClick")
+
+	concommand.Add("srcbox_tooldebug", function(client)
+		if (not IsValid(client)) then
+			return
+		end
+
+		local weapon = client:GetActiveWeapon()
+		local lines = {
+			"gmod_toolmode (GetInfo): " .. tostring(client:GetInfo("gmod_toolmode")),
+			"active weapon: " .. (IsValid(weapon) and weapon:GetClass() or "none"),
+		}
+
+		if (IsValid(weapon) and weapon:GetClass() == "gmod_tool") then
+			local toolCount = 0
+
+			if (istable(weapon.Tool)) then
+				for _ in pairs(weapon.Tool) do
+					toolCount = toolCount + 1
+				end
+			end
+
+			lines[#lines + 1] = "weapon.Mode: " .. tostring(weapon.Mode)
+			lines[#lines + 1] = "tools loaded: " .. toolCount
+			lines[#lines + 1] = "GetToolObject: " .. tostring(weapon.GetToolObject and weapon:GetToolObject())
+			lines[#lines + 1] = "PrimaryAttack: " .. tostring(weapon.PrimaryAttack)
+
+			-- Count how often the engine calls PrimaryAttack (run this command again after clicking)
+			if (not weapon.m_SrcboxAttackCounted and isfunction(weapon.PrimaryAttack)) then
+				local originalPrimaryAttack = weapon.PrimaryAttack
+				weapon.m_SrcboxAttackCounted = true
+				weapon.m_SrcboxAttackCount = 0
+				weapon.PrimaryAttack = function(...)
+					weapon.m_SrcboxAttackCount = (weapon.m_SrcboxAttackCount or 0) + 1
+					return originalPrimaryAttack(...)
+				end
+			end
+			lines[#lines + 1] = "PrimaryAttack calls since first debug run: " .. tostring(weapon.m_SrcboxAttackCount)
+
+			-- Walk through SWEP:PrimaryAttack step by step
+			local success, trace = pcall(weapon.DoToolTrace, weapon)
+			lines[#lines + 1] = "DoToolTrace: " .. (success and tostring(trace) or ("ERROR " .. tostring(trace)))
+
+			if (success and trace) then
+				lines[#lines + 1] = "  trace.Hit=" .. tostring(trace.Hit) .. " HitPos=" .. tostring(trace.HitPos) .. " Entity=" .. tostring(trace.Entity)
+
+				local tool = weapon:GetToolObject()
+				local okCheck, errCheck = pcall(tool.CheckObjects, tool)
+				lines[#lines + 1] = "CheckObjects: " .. (okCheck and "ok" or ("ERROR " .. tostring(errCheck)))
+
+				local okAllowed, allowed = pcall(tool.Allowed, tool)
+				lines[#lines + 1] = "Allowed: " .. (okAllowed and tostring(allowed) or ("ERROR " .. tostring(allowed)))
+
+				local okCan, canTool = pcall(gamemode.Call, "CanTool", client, trace, weapon:GetMode(), tool, 1)
+				lines[#lines + 1] = "CanTool: " .. (okCan and tostring(canTool) or ("ERROR " .. tostring(canTool)))
+
+				if (client:GetInfoNum("srcbox_tooldebug_click", 0) ~= 0 or GetConVarNumber("srcbox_tooldebug_click") ~= 0) then
+					local okClick, clicked = pcall(tool.LeftClick, tool, trace)
+					lines[#lines + 1] = "LeftClick: " .. (okClick and tostring(clicked) or ("ERROR " .. tostring(clicked)))
+				end
+			end
+		end
+
+		for _, line in ipairs(lines) do
+			print("[srcbox_tooldebug] " .. line)
+			client:PrintMessage(HUD_PRINTCONSOLE, "[srcbox_tooldebug] " .. line .. "\n")
+		end
+	end)
+end
+
 -- properties.OpenEntityMenu runs every property's Filter while building the menu, and it only
 -- calls menu:Open() at the end. One Filter erroring (an addon property using a function we
 -- lack) aborted that, leaving the half-built menu in the top-left corner. Treat an erroring
@@ -4629,6 +5628,83 @@ if (properties and properties.Add) then
 			guardFilter(name, property)
 		end
 	end
+end
+
+-- GMod creates a convar for every entry in the gamemode's "settings" (gamemodes/<name>/<name>.txt),
+-- e.g. sandbox's sbox_maxropeconstraints and sbox_maxconstraints. Without them the limit read as 0,
+-- so every rope or weld hit "You have hit the ... limit!". Create the ones that don't exist yet.
+do
+	local SETTING_FLAGS = { FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE }
+
+	local function createSetting(name, default, helpText)
+		if (not isstring(name) or name == "" or GetConVar(name)) then
+			return
+		end
+
+		CreateConVar(name, tostring(default or "0"), SETTING_FLAGS, helpText or "")
+	end
+
+	local gamemodeNames = {}
+	local seenGamemodes = {}
+
+	local function addGamemode(name)
+		if (isstring(name) and name ~= "" and not seenGamemodes[name]) then
+			seenGamemodes[name] = true
+			gamemodeNames[#gamemodeNames + 1] = name
+		end
+	end
+
+	local gamemodeConVar = GetConVar_Internal and GetConVar_Internal("gamemode")
+	addGamemode(gamemodeConVar and gamemodeConVar:GetString())
+	addGamemode("sandbox")
+	addGamemode("base")
+
+	for _, gamemodeName in ipairs(gamemodeNames) do
+		local path = "gamemodes/" .. gamemodeName .. "/" .. gamemodeName .. ".txt"
+		local content = file.Exists(path, "GAME") and file.Read(path, "GAME")
+
+		if (content and util.KeyValuesToTable) then
+			local success, info = pcall(util.KeyValuesToTable, content)
+
+			if (success and istable(info) and istable(info.settings)) then
+				for _, setting in pairs(info.settings) do
+					if (istable(setting)) then
+						createSetting(setting.name, setting.default, setting.text)
+					end
+				end
+			end
+		end
+	end
+
+	-- Sandbox's defaults, in case its .txt couldn't be read
+	createSetting("physgun_limited", "0", "If enabled, the Physics Gun will not be able to pick up certain map entities")
+	createSetting("sbox_maxconstraints", "2000", "Maximum constraints a single player can create")
+	createSetting("sbox_maxropeconstraints", "1000", "Maximum rope constraints a single player can create")
+	createSetting("sbox_maxtextscreens", "50", "Maximum text screens a single player can create")
+	createSetting("sbox_maxprops", "200", "Maximum text screens a single player can create")
+	createSetting("sbox_maxragdolls", "200", "Maximum props a single player can create")
+	createSetting("sbox_maxvehicles", "200", "Maximum ragdolls a single player can create")
+	createSetting("sbox_maxeffects", "200", "Maximum effect props a single player can create")
+	createSetting("sbox_maxballons", "200", "Maximum balloons a single player can create")
+	createSetting("sbox_maxcameras", "200", "Maximum cameras a single player can create")
+	createSetting("sbox_maxnpcs", "200", "Maximum NPCs a single player can create")
+	--createSetting("sbox_maxsents", "200", "Maximum entities a single player can create")
+	--createSetting("sbox_maxdynamite", "200", "Maximum dynamites a single player can create")
+	--createSetting("sbox_maxlamps", "200", "Maximum lamps a single player can create")
+	--createSetting("sbox_maxlights", "200", "Maximum lights a single player can create")
+	--createSetting("sbox_maxwheels", "200", "Maximum wheels a single player can create")
+	--createSetting("sbox_maxthrusters", "200", "Maximum thrusters a single player can create")
+	--createSetting("sbox_maxbuttons", "200", "Maximum buttons a single player can create")
+	--createSetting("gmod_maxammo", "9999", "Forces amount of maximum ammo reserves for all weapons of each player. Values 0 and below mean use weapon's ammo type maximum ammo setting instead.")
+	createSetting("sbox_noclip", "1", "If enabled, players will be able to use noclip")
+	--createSetting("gmod_suit", "1", "Set to non zero to enable Half-Life 2 aux suit power stuff.")
+	--createSetting("mp_falldamange", "0", "Enable realistic fall damage")
+	--createSetting("sbox_playershurtplayers", "0", "If enabled, players will be able to hurt each other")
+	--createSetting("sbox_godmode", "0", "If enabled, all players will be invincible")
+	--createSetting("sbox_weapons", "1", "If enabled, each player will receive default Half-Life 2 weapons on each spawn")
+	createSetting("sbox_bonemanip_npc", "1", "If enabled then manipulating NPC bones will be allowed")
+	createSetting("sbox_bonemanip_player", "0", "If enabled then manipulating Player bones will be allowed")
+	createSetting("sbox_bonemanip_misc", "0", "If enabled then manipulating the bones of other entities will be allowed")
 end
 
 --[[
@@ -4678,6 +5754,8 @@ local differentBase = {
 	["weapon_fists"] = "weapon_base",
 	["weapon_flechettegun"] = "weapon_base",
 	["weapon_medkit"] = "weapon_base",
+	-- Garry changed these to weapons_. remap accordingly
+	["weapons_ar2"] = "weapon_base",
 
 	-- Entities
 	["base_edit"] = "base_entity",
