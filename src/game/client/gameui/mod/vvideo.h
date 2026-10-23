@@ -111,6 +111,7 @@ private:
 	int iBtnDoneYPos;
 
 	bool	m_bDirtyValues;
+	bool	m_bReactivatePending;	// controls were re-laid out (e.g. resolution change), refill them next think
 	int		m_iAspectRatio;
 	int		m_iResolutionWidth;
 	int		m_iResolutionHeight;

@@ -107,6 +107,9 @@ private:
 	int			m_originalTall;
 	int			m_textInsetX;
 	int			m_textInsetY;
+	bool		IsOrangeBoxMenuStyle() const;
+	bool		m_bSchemeStyle;		// Srcbox: its style was found in the scheme
+	bool		m_bAllCaps;			// Srcbox: "AllCaps" from the resource file	// Srcbox: the AlienSwarmMenuButton styles draw the Orange Box look
 
 	bool		m_isOpen;
 	bool		m_isNavigateTo; //to help cure flashing
