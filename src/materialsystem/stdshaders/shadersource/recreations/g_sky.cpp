@@ -98,6 +98,7 @@ SHADER_DRAW
 
 	if (IsSnapshotting())
 	{
+		// GMod sets exactly this and nothing else (no SetInitialShadowState)
 		pShaderShadow->EnableDepthWrites(false);
 		pShaderShadow->EnableBlending(false);
 		pShaderShadow->EnableSRGBWrite(true);
@@ -128,8 +129,9 @@ SHADER_DRAW
 		float3 f3SunColor	= GetFloat3(SunColor);
 		float3 f3DuskColor	= GetFloat3(DuskColor);
 
-		// GMod only honours $HDRScale with HDR on
-		float f1HDRScale = (g_pHardwareConfig->GetHDRType() != HDR_TYPE_NONE) ? GetFloat(HDRScale) : 1.0f;
+		// GMod only honours $HDRScale with HDR on. Ask whether HDR is actually enabled, like the
+		// rest of LUX does: GetHDRType() said HDR_TYPE_NONE here even in HDR, so the scale was ignored.
+		float f1HDRScale = IsHDREnabled() ? GetFloat(HDRScale) : 1.0f;
 
 		// GMod sends 1 / $StarScale and skips the update when it is 0
 		float f1StarScale = GetFloat(StarScale);
