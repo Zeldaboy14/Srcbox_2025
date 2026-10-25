@@ -288,118 +288,109 @@ LUA_BINDING_BEGIN( Colors, Create, "library", "Creates a new color." )
 }
 LUA_BINDING_END( "Color", "The created color." )
 
-LUA_BINDING_BEGIN( Colors, HsvToColor, "library", "Converts HSV to RGB." )
+// Srcbox: GMod's scales for the colour conversions: RGB 0-255, hue 0-360, the rest 0-1.
+// (These used to mix the mathlib 0-1 RGB with 0-255 Colors, so HsvToColor made black.)
+static float SrcboxHueOf( float r, float g, float b, float flMax, float flDelta )
+{
+    if ( flDelta <= 0.0f )
+        return 0.0f;
+
+    float h;
+    if ( flMax == r )
+        h = 60.0f * fmodf( ( g - b ) / flDelta, 6.0f );
+    else if ( flMax == g )
+        h = 60.0f * ( ( b - r ) / flDelta + 2.0f );
+    else
+        h = 60.0f * ( ( r - g ) / flDelta + 4.0f );
+
+    if ( h < 0.0f )
+        h += 360.0f;
+    return h;
+}
+
+static void SrcboxHueToRGB( float h, float chroma, float x, float &r, float &g, float &b )
+{
+    h = fmodf( h, 360.0f );
+    if ( h < 0.0f )
+        h += 360.0f;
+
+    if ( h < 60.0f )       { r = chroma; g = x;      b = 0.0f; }
+    else if ( h < 120.0f ) { r = x;      g = chroma; b = 0.0f; }
+    else if ( h < 180.0f ) { r = 0.0f;   g = chroma; b = x; }
+    else if ( h < 240.0f ) { r = 0.0f;   g = x;      b = chroma; }
+    else if ( h < 300.0f ) { r = x;      g = 0.0f;   b = chroma; }
+    else                   { r = chroma; g = 0.0f;   b = x; }
+}
+
+static void SrcboxPushColor01( lua_State *L, float r, float g, float b )
+{
+    lua_pushcolor( L, lua_Color( ( int )( clamp( r, 0.0f, 1.0f ) * 255.0f + 0.5f ),
+                                 ( int )( clamp( g, 0.0f, 1.0f ) * 255.0f + 0.5f ),
+                                 ( int )( clamp( b, 0.0f, 1.0f ) * 255.0f + 0.5f ), 255 ) );
+}
+
+LUA_BINDING_BEGIN( Colors, HsvToColor, "library", "Converts HSV (hue 0-360, saturation 0-1, value 0-1) to a color." )
 {
     float hue = LUA_BINDING_ARGUMENT( luaL_checknumber, 1, "hue" );
     float saturation = LUA_BINDING_ARGUMENT( luaL_checknumber, 2, "saturation" );
     float value = LUA_BINDING_ARGUMENT( luaL_checknumber, 3, "value" );
-    Vector rgb;
-    HSVtoRGB( Vector( hue, saturation, value ), rgb );
-    lua_pushcolor( L, lua_Color( rgb.x, rgb.y, rgb.z, 255 ) );
+
+    float chroma = value * saturation;
+    float x = chroma * ( 1.0f - fabsf( fmodf( hue / 60.0f, 2.0f ) - 1.0f ) );
+    float m = value - chroma;
+    float r, g, b;
+    SrcboxHueToRGB( hue, chroma, x, r, g, b );
+
+    SrcboxPushColor01( L, r + m, g + m, b + m );
     return 1;
 }
 LUA_BINDING_END( "Color", "The converted color." )
 
-LUA_BINDING_BEGIN( Colors, ColorToHsv, "library", "Converts RGB to HSV." )
+LUA_BINDING_BEGIN( Colors, ColorToHsv, "library", "Converts a color to HSV (hue 0-360, saturation 0-1, value 0-1)." )
 {
     lua_Color clr = luaL_checkcolor( L, 1 );
-    Vector hsv;
-    RGBtoHSV( Vector( clr.r(), clr.g(), clr.b() ), hsv );
-    lua_pushnumber( L, hsv.x );
-    lua_pushnumber( L, hsv.y );
-    lua_pushnumber( L, hsv.z );
+    float r = clr.r() / 255.0f, g = clr.g() / 255.0f, b = clr.b() / 255.0f;
+    float flMax = max( r, max( g, b ) );
+    float flMin = min( r, min( g, b ) );
+    float flDelta = flMax - flMin;
+
+    lua_pushnumber( L, SrcboxHueOf( r, g, b, flMax, flDelta ) );
+    lua_pushnumber( L, flMax > 0.0f ? flDelta / flMax : 0.0f );
+    lua_pushnumber( L, flMax );
     return 3;
 }
 LUA_BINDING_END( "number", "The hue.", "number", "The saturation.", "number", "The value." )
 
-LUA_BINDING_BEGIN( Colors, ColorToHsl, "library", "Converts RGB to HSL." )
+LUA_BINDING_BEGIN( Colors, ColorToHsl, "library", "Converts a color to HSL (hue 0-360, saturation 0-1, lightness 0-1)." )
 {
     lua_Color clr = luaL_checkcolor( L, 1 );
-    float h, s;
-    float flMax = max( clr.r(), max( clr.g(), clr.b() ) );
-    float flMin = min( clr.r(), min( clr.g(), clr.b() ) );
-
+    float r = clr.r() / 255.0f, g = clr.g() / 255.0f, b = clr.b() / 255.0f;
+    float flMax = max( r, max( g, b ) );
+    float flMin = min( r, min( g, b ) );
+    float flDelta = flMax - flMin;
     float l = ( flMax + flMin ) / 2.0f;
+    float flDenominator = 1.0f - fabsf( 2.0f * l - 1.0f );
 
-    if ( flMax == flMin )  // achromatic case
-    {
-        s = h = 0;
-    }
-    else  // chromatic case
-    {
-        // Next, calculate the hue
-        float delta = flMax - flMin;
-
-        // First, calculate the saturation
-        if ( l < 0.5f )  // If we're in the lower hexcone
-        {
-            s = delta / ( flMax + flMin );
-        }
-        else
-        {
-            s = delta / ( 2 - flMax - flMin );
-        }
-
-        if ( clr.r() == flMax )
-        {
-            h = ( clr.g() - clr.b() ) / delta;  // color between yellow and magenta
-        }
-        else if ( clr.g() == flMax )
-        {
-            h = 2 + ( clr.b() - clr.r() ) / delta;  // color between cyan and yellow
-        }
-        else  // blue must be max
-        {
-            h = 4 + ( clr.r() - clr.g() ) / delta;  // color between magenta and cyan
-        }
-
-        h *= 60.0f;
-
-        if ( h < 0.0f )
-        {
-            h += 360.0f;
-        }
-
-        h /= 360.0f;
-    }
-
-    lua_pushnumber( L, h );
-    lua_pushnumber( L, s );
+    lua_pushnumber( L, SrcboxHueOf( r, g, b, flMax, flDelta ) );
+    lua_pushnumber( L, ( flDelta > 0.0f && flDenominator > 0.0f ) ? flDelta / flDenominator : 0.0f );
     lua_pushnumber( L, l );
-
     return 3;
 }
 LUA_BINDING_END( "number", "The hue.", "number", "The saturation.", "number", "The lightness." )
 
-LUA_BINDING_BEGIN( Colors, HslToColor, "library", "Converts HSL to RGB." )
+LUA_BINDING_BEGIN( Colors, HslToColor, "library", "Converts HSL (hue 0-360, saturation 0-1, lightness 0-1) to a color." )
 {
+    float h = LUA_BINDING_ARGUMENT( luaL_checknumber, 1, "hue" );
+    float s = LUA_BINDING_ARGUMENT( luaL_checknumber, 2, "saturation" );
+    float l = LUA_BINDING_ARGUMENT( luaL_checknumber, 3, "lightness" );
+
+    float chroma = ( 1.0f - fabsf( 2.0f * l - 1.0f ) ) * s;
+    float x = chroma * ( 1.0f - fabsf( fmodf( h / 60.0f, 2.0f ) - 1.0f ) );
+    float m = l - chroma / 2.0f;
     float r, g, b;
-    float h = luaL_checknumber( L, 1 );
-    float s = luaL_checknumber( L, 2 );
-    float l = luaL_checknumber( L, 3 );
+    SrcboxHueToRGB( h, chroma, x, r, g, b );
 
-    if ( s == 0 )
-    {
-        r = g = b = l;
-    }
-    else
-    {
-        float v1, v2;
-
-        if ( l < 0.5f )
-            v2 = l * ( 1.0f + s );
-        else
-            v2 = ( l + s ) - ( s * l );
-
-        v1 = 2 * l - v2;
-
-        r = HueToRGB( v1, v2, h + ( 1.0f / 3.0f ) );
-        g = HueToRGB( v1, v2, h );
-        b = HueToRGB( v1, v2, h - ( 1.0f / 3.0f ) );
-    }
-
-    lua_pushcolor( L, lua_Color( r, g, b, 255 ) );
-
+    SrcboxPushColor01( L, r + m, g + m, b + m );
     return 1;
 }
 LUA_BINDING_END( "Color", "The converted color." )

@@ -4736,6 +4736,15 @@ void CRendering3dView::DrawTranslucentRenderables( bool bInSkybox, bool bShadowD
 	// Draw any queued-up detail props from previously visited leaves
 	DetailObjectSystem()->RenderTranslucentDetailObjects( CurrentViewOrigin(), CurrentViewForward(), CurrentViewRight(), CurrentViewUp(), nDetailLeafCount, pDetailLeafList );
 
+#ifdef LUA_SDK
+	// Srcbox: GMod's PostDrawTranslucentRenderables( bDrawingDepth, bDrawingSkybox ), drawn in the 3D view
+	// (Lua scripted effects render from here)
+	LUA_CALL_HOOK_BEGIN( "PostDrawTranslucentRenderables" );
+	lua_pushboolean( L, bShadowDepth );
+	lua_pushboolean( L, bInSkybox );
+	LUA_CALL_HOOK_END( 2, 0 );
+#endif
+
 	// Reset the blend state.
 	render->SetBlend( 1 );
 }
@@ -4748,6 +4757,27 @@ void CRendering3dView::EnableWorldFog( void )
 {
 	VPROF("CViewRender::EnableWorldFog");
 	CMatRenderContextPtr pRenderContext( materials );
+
+#ifdef LUA_SDK
+	// GMod's SetupWorldFog hook: Lua sets the fog itself (edit_fog, StormFox, ...) through
+	// render.Fog*; returning true replaces the map's fog for this view.
+	if ( L )
+	{
+		bool bLuaFog = false;
+		int iLuaTop = lua_gettop( L );
+
+		LUA_CALL_HOOK_BEGIN( "SetupWorldFog" );
+		LUA_CALL_HOOK_END( 0, 1 );
+
+		if ( lua_gettop( L ) > iLuaTop && lua_isboolean( L, -1 ) )
+			bLuaFog = lua_toboolean( L, -1 ) != 0;
+
+		lua_settop( L, iLuaTop );
+
+		if ( bLuaFog )
+			return;
+	}
+#endif
 
 	fogparams_t *pFogParams = NULL;
 	C_BasePlayer *pbp = C_BasePlayer::GetLocalPlayer();
@@ -4852,6 +4882,33 @@ void CSkyboxView::Enable3dSkyboxFog( void )
 	CPlayerLocalData	*local		= &pbp->m_Local;
 
 	CMatRenderContextPtr pRenderContext( materials );
+
+#ifdef LUA_SDK
+	// GMod's SetupSkyboxFog( skyboxscale ) hook: returning true replaces the 3D skybox fog.
+	if ( L )
+	{
+		float flLuaSkyScale = 1.0f;
+		if ( local->m_skybox3d.scale > 0.0f )
+		{
+			flLuaSkyScale = 1.0f / local->m_skybox3d.scale;
+		}
+
+		bool bLuaFog = false;
+		int iLuaTop = lua_gettop( L );
+
+		LUA_CALL_HOOK_BEGIN( "SetupSkyboxFog" );
+		lua_pushnumber( L, flLuaSkyScale );
+		LUA_CALL_HOOK_END( 1, 1 );
+
+		if ( lua_gettop( L ) > iLuaTop && lua_isboolean( L, -1 ) )
+			bLuaFog = lua_toboolean( L, -1 ) != 0;
+
+		lua_settop( L, iLuaTop );
+
+		if ( bLuaFog )
+			return;
+	}
+#endif
 
 	if( GetSkyboxFogEnable() )
 	{

@@ -33,6 +33,9 @@
 // Srcbox: GMod mesh library, IMesh, ParticleEmitter and render.GetSunInfo (client)
 #include "lgmod_render_ext.inl"
 
+// Srcbox: GMod matproxy library (Lua material proxies, client)
+#include "lgmod_matproxy.inl"
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -238,9 +241,23 @@ LUA_BINDING_BEGIN( Renders, UpdateScreenEffectTexture, "library", "Update the sc
 }
 LUA_BINDING_END()
 
+// Srcbox: the render target Lua pushed with render.PushRenderTarget (NULL when none is active).
+// cam.Start2D/Start3D inside one must keep drawing into it, sized to it (the tool gun screen).
+static ITexture *LuaActiveRenderTarget();
+
 LUA_BINDING_BEGIN( Renders, PushView3D, "library", "Push a 3D view.", "client" )
 {
     CViewSetup playerView = *view->GetPlayerViewSetup();
+    ITexture *pLuaRenderTarget = LuaActiveRenderTarget();
+
+    if ( pLuaRenderTarget )
+    {
+        playerView.x = playerView.m_nUnscaledX = 0;
+        playerView.y = playerView.m_nUnscaledY = 0;
+        playerView.width = playerView.m_nUnscaledWidth = pLuaRenderTarget->GetActualWidth();
+        playerView.height = playerView.m_nUnscaledHeight = pLuaRenderTarget->GetActualHeight();
+        playerView.m_flAspectRatio = ( float )playerView.width / ( float )MAX( playerView.height, 1 );
+    }
 
     Vector origin = LUA_BINDING_ARGUMENT_WITH_DEFAULT( luaL_optvector, 1, &playerView.origin, "origin" );
     QAngle angles = LUA_BINDING_ARGUMENT_WITH_DEFAULT( luaL_optangle, 2, &playerView.angles, "angles" );
@@ -263,7 +280,7 @@ LUA_BINDING_BEGIN( Renders, PushView3D, "library", "Push a 3D view.", "client" )
     viewSetup.zNear = zNear;
     viewSetup.zFar = zFar;
 
-    render->Push3DView( viewSetup, 0, NULL, view->GetFrustum() );
+    render->Push3DView( viewSetup, 0, pLuaRenderTarget, view->GetFrustum() );
 
     return 0;
 }
@@ -279,7 +296,17 @@ LUA_BINDING_END()
 LUA_BINDING_BEGIN( Renders, PushView2D, "library", "Push a 2D view.", "client" )
 {
     CViewSetup viewSetup = *view->GetPlayerViewSetup();
-    render->Push2DView( viewSetup, 0, NULL, view->GetFrustum() );
+    ITexture *pLuaRenderTarget = LuaActiveRenderTarget();
+
+    if ( pLuaRenderTarget )
+    {
+        viewSetup.x = viewSetup.m_nUnscaledX = 0;
+        viewSetup.y = viewSetup.m_nUnscaledY = 0;
+        viewSetup.width = viewSetup.m_nUnscaledWidth = pLuaRenderTarget->GetActualWidth();
+        viewSetup.height = viewSetup.m_nUnscaledHeight = pLuaRenderTarget->GetActualHeight();
+    }
+
+    render->Push2DView( viewSetup, 0, pLuaRenderTarget, view->GetFrustum() );
     return 0;
 }
 LUA_BINDING_END()
@@ -747,6 +774,15 @@ LUA_BINDING_END()
 //-----------------------------------------------------------------------------
 static int s_nLuaRenderTargetDepth = 0;
 
+static ITexture *LuaActiveRenderTarget()
+{
+    if ( s_nLuaRenderTargetDepth <= 0 )
+        return NULL;
+
+    CMatRenderContextPtr pRenderContext( materials );
+    return pRenderContext->GetRenderTarget();
+}
+
 void LuaRender_RecoverLeakedRenderTargets()
 {
     if ( s_nLuaRenderTargetDepth <= 0 )
@@ -1121,6 +1157,7 @@ LUALIB_API int luaopen_render( lua_State *L )
 
 #if defined( CLIENT_DLL ) && defined( LUA_SDK )
     luaopen_RenderExtensions( L );
+    luaopen_MaterialProxies( L );
 #endif
 
 #ifdef CLIENT_DLL

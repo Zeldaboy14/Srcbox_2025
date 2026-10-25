@@ -32,6 +32,13 @@ public:
 
 	virtual int UpdateTransmitState();
 
+#ifdef LUA_SDK
+	// GMod's edit_sun changes the sun at runtime through SetKeyValue. Plain keyfields are written
+	// straight into memory, which never marks the network vars as changed, so the client kept the
+	// map's sun. Handle those keys here and assign through the network vars.
+	virtual bool KeyValue( const char *szKeyName, const char *szValue );
+#endif
+
 public:
 	CNetworkVector( m_vDirection );
 	
@@ -194,6 +201,72 @@ void CSun::InputSetColor( inputdata_t &inputdata )
 {
 	m_clrRender = inputdata.value.Color32();
 }
+
+#ifdef LUA_SDK
+static bool Sun_ParseColor( const char *szValue, color32 &clr )
+{
+	int r = 255, g = 255, b = 255, a = 255;
+	int nRead = sscanf( szValue, "%d %d %d %d", &r, &g, &b, &a );
+	if ( nRead < 3 )
+		return false;
+
+	clr.r = clamp( r, 0, 255 );
+	clr.g = clamp( g, 0, 255 );
+	clr.b = clamp( b, 0, 255 );
+	clr.a = ( nRead >= 4 ) ? clamp( a, 0, 255 ) : 255;
+	return true;
+}
+
+bool CSun::KeyValue( const char *szKeyName, const char *szValue )
+{
+	if ( FStrEq( szKeyName, "sun_dir" ) )
+	{
+		Vector vecDir;
+		UTIL_StringToVector( vecDir.Base(), szValue );
+
+		if ( VectorNormalize( vecDir ) > 0.0f )
+		{
+			m_vDirection = vecDir;
+		}
+		return true;
+	}
+
+	if ( FStrEq( szKeyName, "size" ) )
+	{
+		m_nSize = clamp( atoi( szValue ), 0, 1023 );
+		return true;
+	}
+
+	if ( FStrEq( szKeyName, "overlaysize" ) )
+	{
+		int nSize = atoi( szValue );
+		m_nOverlaySize = ( nSize < 0 ) ? -1 : MIN( nSize, 1023 );
+		return true;
+	}
+
+	if ( FStrEq( szKeyName, "overlaycolor" ) )
+	{
+		color32 clr;
+		if ( Sun_ParseColor( szValue, clr ) )
+		{
+			m_clrOverlay = clr;
+		}
+		return true;
+	}
+
+	if ( FStrEq( szKeyName, "suncolor" ) )
+	{
+		color32 clr;
+		if ( Sun_ParseColor( szValue, clr ) )
+		{
+			SetRenderColor( clr.r, clr.g, clr.b );
+		}
+		return true;
+	}
+
+	return BaseClass::KeyValue( szKeyName, szValue );
+}
+#endif
 
 int CSun::UpdateTransmitState()
 {

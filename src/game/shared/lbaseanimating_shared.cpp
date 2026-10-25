@@ -209,7 +209,13 @@ LUA_BINDING_BEGIN( CBaseAnimating, GetBoneCount, "class", "Get the amount of bon
     if ( !pstudiohdr )
     {
         Warning( "CBaseAnimating::GetBoneCount failed: no model\n" );
+#ifdef LUA_SDK
+        // Return 0 rather than nothing: GMod code compares it (bone_manipulate's "bonecount <= 1")
+        lua_pushinteger( L, 0 );
+        return 1;
+#else
         return 0;
+#endif
     }
 
     lua_pushinteger( L, pstudiohdr->numbones() );

@@ -264,6 +264,11 @@ IMPLEMENT_SERVERCLASS_ST(CBaseAnimating, DT_BaseAnimating)
 	SendPropFloat( SENDINFO( m_fadeMaxDist ), 0, SPROP_NOSCALE ),
 	SendPropFloat( SENDINFO( m_flFadeScale ), 0, SPROP_NOSCALE ),
 
+#ifdef LUA_SDK
+	// GMod's Entity:SetMaterial
+	SendPropString( SENDINFO( m_MaterialOverride ) ),
+#endif
+
 END_SEND_TABLE()
 
 BEGIN_ENT_SCRIPTDESC( CBaseAnimating, CBaseEntity, "Animating models" )
@@ -333,6 +338,10 @@ CBaseAnimating::CBaseAnimating()
 	m_fadeMaxDist = 0;
 	m_flFadeScale = 0.0f;
 	m_fBoneCacheFlags = 0;
+
+#ifdef LUA_SDK
+	m_MaterialOverride.GetForModify()[0] = 0;
+#endif
 }
 
 CBaseAnimating::~CBaseAnimating()

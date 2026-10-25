@@ -57,6 +57,15 @@ virtual RenderGroup_t GetRenderGroup() OVERRIDE;
 #ifdef LUA_SDK
 #ifndef CLIENT_DLL
 	virtual int UpdateTransmitState();
+
+	// GMod's ENT:KeyValue( key, value ). Map keyvalues arrive before Spawn, when the Lua side
+	// isn't set up yet, so those are kept and replayed once SetupDataTables has run.
+	using BaseClass::KeyValue;
+	virtual bool KeyValue( const char *szKeyName, const char *szValue );
+	bool CallLuaKeyValue( const char *szKeyName, const char *szValue );
+
+	CUtlVector< CUtlString > m_PendingLuaKeyValues; // key, value, key, value, ...
+	bool m_bLuaKeyValuesReady = false;
 #endif
 #endif
 

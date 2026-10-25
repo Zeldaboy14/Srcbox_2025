@@ -203,6 +203,11 @@ IMPLEMENT_CLIENTCLASS_DT(C_BaseAnimating, DT_BaseAnimating, CBaseAnimating)
 	RecvPropFloat( RECVINFO( m_fadeMaxDist ) ), 
 	RecvPropFloat( RECVINFO( m_flFadeScale ) ), 
 
+#ifdef LUA_SDK
+	// GMod's Entity:SetMaterial set on the server
+	RecvPropString( RECVINFO( m_MaterialOverride ) ),
+#endif
+
 END_RECV_TABLE()
 
 BEGIN_PREDICTION_DATA( C_BaseAnimating )
@@ -677,6 +682,15 @@ C_BaseAnimating::C_BaseAnimating() :
 {
 	m_vecForce.Init();
 	m_nForceBone = -1;
+
+#ifdef LUA_SDK
+	m_MaterialOverride[0] = 0;
+	m_szMaterialOverrideLoaded[0] = 0;
+	for ( int iSub = 0; iSub < MAX_SUB_MATERIAL_OVERRIDES; iSub++ )
+	{
+		m_SubMaterialOverrides[iSub][0] = 0;
+	}
+#endif
 	
 	m_ClientSideAnimationListHandle = INVALID_CLIENTSIDEANIMATION_LIST_HANDLE;
 
@@ -3353,7 +3367,7 @@ void C_BaseAnimating::DoInternalDrawModel( ClientModelRenderInfo_t *pInfo, DrawM
 	}
 }
 
-#ifdef TF_CLIENT_DLL
+#if defined( TF_CLIENT_DLL ) || defined( LUA_SDK )
 // Move this elsewhere if we ever need it again.
 class MaterialOverrideRestore
 {
@@ -3384,6 +3398,42 @@ private:
 	IMaterial* m_pOverrideMaterial;
 	OverrideType_t m_nOverrideType;
 };
+#endif
+
+#ifdef LUA_SDK
+IMaterial *C_BaseAnimating::GetLuaMaterialOverride()
+{
+	if ( !m_MaterialOverride[0] )
+		return NULL;
+
+	// Reload only when the name changes
+	if ( Q_strcmp( m_szMaterialOverrideLoaded, m_MaterialOverride ) != 0 )
+	{
+		Q_strncpy( m_szMaterialOverrideLoaded, m_MaterialOverride, sizeof( m_szMaterialOverrideLoaded ) );
+
+		char szName[MAX_PATH];
+		Q_strncpy( szName, m_MaterialOverride, sizeof( szName ) );
+		Q_FixSlashes( szName, '/' );
+
+		// GMod accepts "materials/x.vmt" as well as "x"
+		const char *pszName = szName;
+		if ( Q_strnicmp( pszName, "materials/", 10 ) == 0 )
+			pszName += 10;
+		char szStripped[MAX_PATH];
+		Q_StripExtension( pszName, szStripped, sizeof( szStripped ) );
+
+		IMaterial *pMaterial = materials->FindMaterial( szStripped, TEXTURE_GROUP_MODEL, false );
+		if ( pMaterial && !IsErrorMaterial( pMaterial ) )
+			m_MaterialOverrideReference.Init( pMaterial );
+		else
+			m_MaterialOverrideReference.Shutdown();
+	}
+
+	if ( !m_MaterialOverrideReference.IsValid() )
+		return NULL;
+
+	return m_MaterialOverrideReference;
+}
 #endif
 
 ConVar classiclighting("cl_hl1_classic_lighting", "1", FCVAR_ARCHIVE);
@@ -3445,6 +3495,27 @@ int C_BaseAnimating::InternalDrawModel( int flags )
 
 		modelrender->ForcedMaterialOverride( pOverrideMaterial );
 		flags |= STUDIO_NO_OVERRIDE_FOR_ATTACH; // Don't apply override materials to attachments. 
+	}
+#endif
+
+#ifdef LUA_SDK
+	// GMod's Entity:SetMaterial: draw the whole model with one material. Depth-only passes keep
+	// their own materials, and an override something else already set (halo, glow) wins.
+	MaterialOverrideRestore luaOverrideRestore;
+	if ( m_MaterialOverride[0] && ( flags & STUDIO_RENDER ) &&
+		!( flags & ( STUDIO_SHADOWDEPTHTEXTURE | STUDIO_SSAODEPTHTEXTURE ) ) )
+	{
+		IMaterial *pCurrentOverride = NULL;
+		OverrideType_t nCurrentOverrideType = OVERRIDE_NORMAL;
+		modelrender->GetMaterialOverride( &pCurrentOverride, &nCurrentOverrideType );
+
+		IMaterial *pLuaOverride = pCurrentOverride ? NULL : GetLuaMaterialOverride();
+		if ( pLuaOverride )
+		{
+			luaOverrideRestore.RestoreOverride( NULL, OVERRIDE_NORMAL );
+			modelrender->ForcedMaterialOverride( pLuaOverride );
+			flags |= STUDIO_NO_OVERRIDE_FOR_ATTACH;
+		}
 	}
 #endif
 

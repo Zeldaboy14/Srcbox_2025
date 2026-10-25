@@ -559,7 +559,21 @@ LUA_BINDING_BEGIN( Material, SetTexture, "class", "Set texture." )
         return 0;
     }
 
-    ITexture *texture = luaL_checkitexture( L, 3 );
+    ITexture *texture = NULL;
+
+#ifdef LUA_SDK
+    // GMod also takes a texture name here (e.g. sky_paint.lua's $STARTEXTURE)
+    if ( lua_type( L, 3 ) == LUA_TSTRING )
+    {
+        texture = g_pMaterialSystem->FindTexture( lua_tostring( L, 3 ), TEXTURE_GROUP_OTHER, false );
+
+        if ( !texture || texture->IsError() )
+            return 0;
+    }
+    else
+#endif
+        texture = luaL_checkitexture( L, 3 );
+
     materialVar->SetTextureValue( texture );
 
     return 0;

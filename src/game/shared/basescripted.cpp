@@ -103,6 +103,11 @@ CBaseScripted::~CBaseScripted(void)
 #ifdef LUA_SDK
     if (L)
         lua_unref(L, m_nTableReference);
+
+    // CBaseEntity's destructor unrefs it again: a second unref of the same ref corrupts
+    // Lua's free list, and later entities then share one ref table (one entity's
+    // fields and NetworkVar accessors showing up on another).
+    m_nTableReference = LUA_NOREF;
 #endif
 }
 
@@ -144,7 +149,8 @@ void CBaseScripted::InitScriptedEntity(void)
 
     SetThink(&CBaseScripted::Think);
 #ifdef CLIENT_DLL
-    SetNextClientThink(gpGlobals->curtime);
+    // GMod calls ENT:Think on the client every frame
+    SetNextClientThink(CLIENT_THINK_ALWAYS);
 #endif
     SetNextThink(gpGlobals->curtime);
 
@@ -165,7 +171,10 @@ void CBaseScripted::InitScriptedEntity(void)
 
     if (!lua_isrefvalid(L, m_nTableReference))
     {
-        LoadScriptedEntity();
+        // Srcbox: give every entity its own table (set up below to fall back to the class
+        // table) instead of using the class table itself. Sharing it meant two entities of
+        // one class overwrote each other's fields and NetworkVar accessors.
+        lua_newtable(L);
         m_nTableReference = luaL_ref(L, LUA_REGISTRYINDEX);
     }
     else
@@ -192,6 +201,32 @@ void CBaseScripted::InitScriptedEntity(void)
         }
     }
 
+    // Look up anything the entity's own table lacks in the class table, like GMod's
+    // per-entity copy of ENT. The class table carries the Base-chain lookup (the GMod
+    // compatibility layer sets that up), so base fields such as base_edit's Editable resolve.
+    // The table can already exist before this runs (something touched the entity from Lua
+    // first, e.g. a NetworkVar change arriving), so this is done for both cases above.
+    {
+        int iTop = lua_gettop(L);
+
+        lua_getref(L, m_nTableReference);
+        if (lua_istable(L, -1) && !lua_getmetatable(L, -1))
+        {
+            int iBeforeLoad = lua_gettop(L);
+            LoadScriptedEntity();
+
+            if (lua_gettop(L) == iBeforeLoad + 1 && lua_istable(L, -1))
+            {
+                lua_newtable(L);           // metatable
+                lua_pushvalue(L, -2);      // class table
+                lua_setfield(L, -2, "__index");
+                lua_setmetatable(L, -3);   // instance table
+            }
+        }
+
+        lua_settop(L, iTop);
+    }
+
     // Get (or init) the ref table
     LUA_GET_REF_TABLE(L, this);
 
@@ -213,6 +248,17 @@ void CBaseScripted::InitScriptedEntity(void)
     LUA_CALL_HOOK_BEGIN("PreEntityInitialize");
     CBaseEntity::PushLuaInstanceSafe(L, this);
     LUA_CALL_HOOK_END(1, 0);
+
+#ifndef CLIENT_DLL
+    // Like GMod: keyvalues reach ENT:KeyValue after SetupDataTables and before Initialize,
+    // so a map-placed Lua entity (env_skypaint) gets the values the mapper set.
+    m_bLuaKeyValuesReady = true;
+    for (int i = 0; i + 1 < m_PendingLuaKeyValues.Count(); i += 2)
+    {
+        CallLuaKeyValue(m_PendingLuaKeyValues[i].Get(), m_PendingLuaKeyValues[i + 1].Get());
+    }
+    m_PendingLuaKeyValues.Purge();
+#endif
 
     LUA_CALL_ENTITY_METHOD_BEGIN("Initialize");
     LUA_CALL_ENTITY_METHOD_END(0, 0);
@@ -265,6 +311,45 @@ const char* CBaseScripted::GetScriptedClassname(void)
 }
 #endif
 
+#ifndef CLIENT_DLL
+// Calls ENT:KeyValue( key, value ); true when it returned true (GMod: suppress the keyvalue)
+bool CBaseScripted::CallLuaKeyValue(const char *szKeyName, const char *szValue)
+{
+    if (!L || !lua_isrefvalid(L, m_nTableReference))
+        return false;
+
+    int iTop = lua_gettop(L);
+    bool bSuppress = false;
+
+    LUA_CALL_ENTITY_METHOD_BEGIN("KeyValue");
+    lua_pushstring(L, szKeyName);
+    lua_pushstring(L, szValue);
+    LUA_CALL_ENTITY_METHOD_END(2, 1);
+
+    if (lua_gettop(L) > iTop && lua_isboolean(L, -1))
+        bSuppress = lua_toboolean(L, -1) != 0;
+
+    lua_settop(L, iTop);
+    return bSuppress;
+}
+
+bool CBaseScripted::KeyValue(const char *szKeyName, const char *szValue)
+{
+    if (!m_bLuaKeyValuesReady)
+    {
+        // Not set up yet (map spawn): the engine still gets it now, Lua gets it after SetupDataTables
+        m_PendingLuaKeyValues.AddToTail(CUtlString(szKeyName));
+        m_PendingLuaKeyValues.AddToTail(CUtlString(szValue));
+        return BaseClass::KeyValue(szKeyName, szValue);
+    }
+
+    if (CallLuaKeyValue(szKeyName, szValue))
+        return true;
+
+    return BaseClass::KeyValue(szKeyName, szValue);
+}
+#endif
+
 void CBaseScripted::Spawn(void)
 {
     BaseClass::Spawn();
@@ -296,6 +381,11 @@ void CBaseScripted::Remove()
 void CBaseScripted::ClientThink()
 {
 #ifdef LUA_SDK
+    // GMod: the client side of ENT:Think (env_skypaint takes over g_SkyPaint there).
+    // It only ever ran once and only called ClientThink before.
+    LUA_CALL_ENTITY_METHOD_BEGIN("Think");
+    LUA_CALL_ENTITY_METHOD_END(0, 0);
+
     LUA_CALL_ENTITY_METHOD_BEGIN("ClientThink");
     LUA_CALL_ENTITY_METHOD_END(0, 0);
 #endif

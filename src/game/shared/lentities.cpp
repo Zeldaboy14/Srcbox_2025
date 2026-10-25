@@ -4,6 +4,9 @@
 #include "lbaseentity_shared.h"
 #include "basescripted.h"
 #include "mathlib/lVector.h"
+#if defined( CLIENT_DLL ) && defined( LUA_SDK )
+#include "weapon_hl2mpbase_scriptedweapon.h"
+#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -549,6 +552,36 @@ LUA_BINDING_BEGIN( Entities, GetAll, "library", "Gets all entities in the list" 
 }
 LUA_BINDING_END( "table", "A table of all entities in the entity list." )
 
+#if defined( CLIENT_DLL ) && defined( LUA_SDK )
+const char *LuaClientEntityNameFromNetworkClass( C_BaseEntity *pEntity ); // lbaseentity_shared.cpp
+
+// The class name Entity:GetClass returns. On the client, GetClassname of a scripted entity is
+// its C++ class, so ents.FindByClass( "edit_sun" ) found nothing there.
+static const char *LuaEntityClassName( CBaseEntity *pEntity )
+{
+    if ( pEntity->IsScripted() )
+    {
+        CBaseScripted *pScripted = dynamic_cast< CBaseScripted * >( pEntity );
+        if ( pScripted )
+            return pScripted->GetScriptedClassname();
+
+        CHL2MPScriptedWeapon *pWeapon = dynamic_cast< CHL2MPScriptedWeapon * >( pEntity );
+        if ( pWeapon )
+            return pWeapon->GetScriptedClassname();
+    }
+
+    if ( const char *pszNetworkEntityName = LuaClientEntityNameFromNetworkClass( pEntity ) )
+        return pszNetworkEntityName;
+
+    return pEntity->GetClassname();
+}
+#else
+static const char *LuaEntityClassName( CBaseEntity *pEntity )
+{
+    return pEntity->GetClassname();
+}
+#endif
+
 LUA_BINDING_BEGIN( Entities, GetByClass, "library", "Gets all entities in the list by their class name" )
 {
     const char *className = LUA_BINDING_ARGUMENT( luaL_checkstring, 1, "className" );
@@ -563,7 +596,7 @@ LUA_BINDING_BEGIN( Entities, GetByClass, "library", "Gets all entities in the li
     while ( ( pEnt = gEntList.NextEnt( pEnt ) ) != NULL )
 #endif
     {
-        if ( !Q_strcmp( pEnt->GetClassname(), className ) )
+        if ( !Q_strcmp( LuaEntityClassName( pEnt ), className ) )
         {
             lua_pushinteger( L, ++i );  // 1-based index for Lua
             CBaseEntity::PushLuaInstanceSafe( L, pEnt );

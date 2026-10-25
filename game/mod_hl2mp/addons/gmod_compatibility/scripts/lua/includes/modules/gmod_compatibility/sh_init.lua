@@ -986,6 +986,38 @@ function RegisterMetaTable(name, table)
 	registry[name] = table
 end
 
+-- GMod's TypeID() reads MetaID off a value's metatable, and util.TypeToString / the
+-- property editors rely on it (a vector printed as "1.000000 ..." instead of "1.00 ...").
+-- The native metatables never had one, so give them GMod's TYPE_* ids.
+do
+	local nativeMetaIds = {
+		Vector = TYPE_VECTOR,
+		Angle = TYPE_ANGLE,
+		Entity = TYPE_ENTITY,
+		Player = TYPE_ENTITY,
+		Weapon = TYPE_ENTITY,
+		Panel = TYPE_PANEL,
+		Material = TYPE_MATERIAL,
+		Texture = TYPE_TEXTURE,
+		ConVar = TYPE_CONVAR,
+		Matrix = TYPE_MATRIX,
+		PhysicsObject = TYPE_PHYSOBJ,
+		TakeDamageInfo = TYPE_DAMAGEINFO,
+		EffectData = TYPE_EFFECTDATA,
+		MoveData = TYPE_MOVEDATA,
+		RecipientFilter = TYPE_RECIPIENTFILTER,
+		UserCommand = TYPE_USERCMD,
+	}
+
+	for metaName, metaId in pairs(nativeMetaIds) do
+		local meta = registry[metaName]
+
+		if (type(meta) == "table" and metaId ~= nil and rawget(meta, "MetaID") == nil) then
+			rawset(meta, "MetaID", metaId)
+		end
+	end
+end
+
 -- TODO: Actually implement SQLite
 sql = {
 	Begin = function() end,
@@ -1030,6 +1062,82 @@ HSVToColor = Colors.HsvToColor
 ColorToHSV = Colors.ColorToHsv
 ColorToHSL = Colors.ColorToHsl
 HslToColor = Colors.HslToColor
+
+-- GMod's colour conversions work in 0-255 RGB, hue 0-360 and saturation/value/lightness 0-1.
+-- Colors.HsvToColor returns the mathlib 0-1 RGB packed into a 0-255 Color (so every colour came
+-- out black or 1/255) and Colors.ColorToHsv fed 0-255 into a 0-1 conversion. Derma's colour
+-- picker (DColorCube, DRGBPicker) goes through these, which is why picking a colour in the
+-- property editors sent black. Done in Lua instead, matching GMod.
+do
+	local function hueToRGB(hue, chroma, x)
+		hue = hue % 360
+
+		if (hue < 60) then return chroma, x, 0 end
+		if (hue < 120) then return x, chroma, 0 end
+		if (hue < 180) then return 0, chroma, x end
+		if (hue < 240) then return 0, x, chroma end
+		if (hue < 300) then return x, 0, chroma end
+		return chroma, 0, x
+	end
+
+	function HSVToColor(hue, saturation, value)
+		hue, saturation, value = tonumber(hue) or 0, tonumber(saturation) or 0, tonumber(value) or 0
+
+		local chroma = value * saturation
+		local x = chroma * (1 - math.abs((hue / 60) % 2 - 1))
+		local m = value - chroma
+		local r, g, b = hueToRGB(hue, chroma, x)
+
+		return Color((r + m) * 255, (g + m) * 255, (b + m) * 255, 255)
+	end
+
+	function HSLToColor(hue, saturation, lightness)
+		hue, saturation, lightness = tonumber(hue) or 0, tonumber(saturation) or 0, tonumber(lightness) or 0
+
+		local chroma = (1 - math.abs(2 * lightness - 1)) * saturation
+		local x = chroma * (1 - math.abs((hue / 60) % 2 - 1))
+		local m = lightness - chroma / 2
+		local r, g, b = hueToRGB(hue, chroma, x)
+
+		return Color((r + m) * 255, (g + m) * 255, (b + m) * 255, 255)
+	end
+
+	local function hueOf(r, g, b, maxValue, delta)
+		if (delta == 0) then return 0 end
+
+		local hue
+
+		if (maxValue == r) then
+			hue = 60 * (((g - b) / delta) % 6)
+		elseif (maxValue == g) then
+			hue = 60 * ((b - r) / delta + 2)
+		else
+			hue = 60 * ((r - g) / delta + 4)
+		end
+
+		return hue % 360
+	end
+
+	function ColorToHSV(color)
+		local r, g, b = (color.r or 0) / 255, (color.g or 0) / 255, (color.b or 0) / 255
+		local maxValue, minValue = math.max(r, g, b), math.min(r, g, b)
+		local delta = maxValue - minValue
+
+		return hueOf(r, g, b, maxValue, delta), (maxValue == 0) and 0 or delta / maxValue, maxValue
+	end
+
+	function ColorToHSL(color)
+		local r, g, b = (color.r or 0) / 255, (color.g or 0) / 255, (color.b or 0) / 255
+		local maxValue, minValue = math.max(r, g, b), math.min(r, g, b)
+		local delta = maxValue - minValue
+		local lightness = (maxValue + minValue) / 2
+		local saturation = (delta == 0) and 0 or delta / (1 - math.abs(2 * lightness - 1))
+
+		return hueOf(r, g, b, maxValue, delta), saturation, lightness
+	end
+
+	HslToColor = HSLToColor
+end
 
 SetClipboardText = Systems.SetClipboardText
 
@@ -2684,6 +2792,53 @@ MATERIAL_META.GetShader = MATERIAL_META.GetShaderName
 MATERIAL_META.IsError = MATERIAL_META.IsErrorMaterial
 MATERIAL_META.Recompute = MATERIAL_META.RecomputeStateSnapshots
 MATERIAL_META.SetInt = MATERIAL_META.SetInteger
+
+-- Integer parameters often pick a static shader combo ($starlayers on the painted sky picks
+-- how many cloud/star layers g_sky draws). Those only take effect once the material's state
+-- snapshots are rebuilt, so rebuild them when SetInt actually changes the value. GMod's
+-- sky_paint.lua sets $STARLAYERS every frame, so this has to skip unchanged values.
+do
+	local nativeSetInteger = MATERIAL_META._SrcboxNativeSetInteger or MATERIAL_META.SetInteger
+	MATERIAL_META._SrcboxNativeSetInteger = nativeSetInteger
+
+	if (nativeSetInteger) then
+		function MATERIAL_META:SetInt(name, value)
+			local previous = self:GetInteger(name)
+			nativeSetInteger(self, name, value)
+
+			if (previous ~= nil and tonumber(value) ~= nil and math.floor(tonumber(value)) ~= previous) then
+				self:RecomputeStateSnapshots()
+			end
+		end
+
+		MATERIAL_META.SetInteger = MATERIAL_META.SetInt
+	end
+end
+
+-- GMod's IMaterial:SetTexture takes a texture name as well as an ITexture (sky_paint.lua sets
+-- $STARTEXTURE from g_SkyPaint:GetStarTexture(), a string). The native one only took ITexture.
+do
+	local nativeSetTexture = MATERIAL_META._SrcboxNativeSetTexture or MATERIAL_META.SetTexture
+	MATERIAL_META._SrcboxNativeSetTexture = nativeSetTexture
+
+	if (nativeSetTexture) then
+		function MATERIAL_META:SetTexture(name, texture)
+			if (isstring(texture)) then
+				if (texture == "" or not (Renders and Renders.FindTexture)) then
+					return
+				end
+
+				texture = Renders.FindTexture(texture, "Other")
+
+				if (not texture) then
+					return
+				end
+			end
+
+			return nativeSetTexture(self, name, texture)
+		end
+	end
+end
 MATERIAL_META.GetInt = MATERIAL_META.GetInteger
 
 -- GMod's Material:SetString parses numbers/vectors (halo.lua does SetString("$color", "1 1 1") and
@@ -3429,7 +3584,15 @@ else
 	end
 end
 
+-- Which base each SENT file declared with DEFINE_BASECLASS. GMod's sandbox editors (edit_sun, ...)
+-- never set ENT.Base and rely on DEFINE_BASECLASS( "base_edit" ) for it.
+GModCompatibilityDeclaredBase = GModCompatibilityDeclaredBase or setmetatable({}, { __mode = "k" })
+
 function baseclassGetCompatibility(name)
+	if (istable(ENT) and isstring(name)) then
+		GModCompatibilityDeclaredBase[ENT] = name
+	end
+
 	if (name:sub(1, 9) == "gamemode_") then
 		name = name:sub(10)
 
@@ -3475,9 +3638,115 @@ if (CLIENT) then
 	AUDIO_CHANNEL_META.GetTagsOGG = AUDIO_CHANNEL_META.GetTagsOfOgg
 	AUDIO_CHANNEL_META.GetTagsVendor = AUDIO_CHANNEL_META.GetTagsOfVendor
 
+	-- GMod's matproxy library: Lua material proxies (lua/matproxy/*.lua, e.g. sky_paint.lua).
+	-- MaterialProxies.Register (C++, lgmod_matproxy.inl) makes materials using the proxy name get a
+	-- Lua-backed proxy, which calls matproxy.Init once, matproxy.Call on every bind and
+	-- matproxy.Remove when the material lets go of it.
 	matproxy = {
-		Add = function(name, data) end -- TODO: Implement
+		ProxyList = {},
+		ActiveList = {},
 	}
+
+	-- Materials loaded before a proxy was registered (the map's, the sky) never asked for it,
+	-- so reload those once per batch of new proxies.
+	local pendingMaterialRefresh = nil
+
+	local function refreshMaterialsForNewProxies()
+		local names = pendingMaterialRefresh
+		pendingMaterialRefresh = nil
+
+		if (not names or not MaterialProxies or not MaterialProxies.RefreshMaterialsUsing) then
+			return
+		end
+
+		local nameList = {}
+
+		for name in pairs(names) do
+			nameList[#nameList + 1] = name
+		end
+
+		local success, result = pcall(MaterialProxies.RefreshMaterialsUsing, nameList)
+
+		if (not success) then
+			ErrorNoHalt("[matproxy] Reloading materials for new proxies failed: " .. tostring(result) .. "\n")
+		end
+	end
+
+	local function queueMaterialRefresh(name)
+		local isFirst = (pendingMaterialRefresh == nil)
+		pendingMaterialRefresh = pendingMaterialRefresh or {}
+		pendingMaterialRefresh[name] = true
+
+		if (isFirst) then
+			if (timer and timer.Simple) then
+				timer.Simple(0, refreshMaterialsForNewProxies)
+			else
+				refreshMaterialsForNewProxies()
+			end
+		end
+	end
+
+	function matproxy.ShouldOverrideProxy(name)
+		return matproxy.ProxyList[name] ~= nil
+	end
+
+	function matproxy.Add(proxyTable)
+		if (not istable(proxyTable) or not isstring(proxyTable.name) or not isfunction(proxyTable.bind)) then
+			return
+		end
+
+		local isReloading = (matproxy.ProxyList[proxyTable.name] ~= nil)
+		matproxy.ProxyList[proxyTable.name] = proxyTable
+
+		if (MaterialProxies and MaterialProxies.Register and MaterialProxies.Register(proxyTable.name)) then
+			queueMaterialRefresh(proxyTable.name)
+		end
+
+		-- Re-initialise the proxies already running with the new table
+		if (isReloading) then
+			for uniqueName, active in pairs(matproxy.ActiveList) do
+				if (active.name == proxyTable.name) then
+					matproxy.Init(proxyTable.name, uniqueName, active.Material, active.Values)
+				end
+			end
+		end
+	end
+
+	function matproxy.Init(name, uniqueName, material, values)
+		local proxy = matproxy.ProxyList[name]
+
+		if (not proxy) then
+			return
+		end
+
+		local active = table.Copy(proxy)
+		matproxy.ActiveList[uniqueName] = active
+
+		-- Kept for reloading
+		active.Values = values
+		active.Material = material
+
+		if (active.init) then
+			active:init(material, values)
+		end
+	end
+
+	function matproxy.Call(uniqueName, material, entity)
+		local active = matproxy.ActiveList[uniqueName]
+
+		if (not active or not active.bind) then
+			return
+		end
+
+		active:bind(material, entity)
+	end
+
+	function matproxy.Remove(uniqueName)
+		matproxy.ActiveList[uniqueName] = nil
+	end
+
+	-- GMod's includes/init.lua requires "matproxy"; that must give this one
+	package.loaded.matproxy = matproxy
 
 	spawnmenu = {
 		PopulateFromTextFiles = function(callback)
@@ -4171,6 +4440,7 @@ local filter = {
 		-- ["weapons"] = true,
 		-- ["scripted_ents"] = true,
 		["usermessage"] = true,
+		["matproxy"] = true, -- ours (client), defined above
 	},
 	include = {
 		["extensions/net.lua"] = true, -- We implement networking using luasocket
@@ -4219,6 +4489,11 @@ local experimentIsEntity = isentity
 include("includes/init.lua")
 
 include = originalInclude
+
+-- GMod's matproxy module loads lua/matproxy/*.lua (sky_paint.lua, addons' proxies) when it's required
+if (CLIENT and matproxy and matproxy.Add) then
+	includeFolder("lua/matproxy")
+end
 
 -- table.Copy on a color (now reported as a table) has to make a new color, not a
 -- table carrying the userdata metatable
@@ -5799,6 +6074,119 @@ hook.Add(
 		scripted_ents.Register(scriptedEntity, className)
 	end
 )
+
+-- GMod gives every SENT instance its whole Base chain (scripted_ents.Get + table.Inherit), but
+-- Srcbox uses the class's stored table as the instance table, so fields defined only on a base
+-- were missing. base_edit's "ENT.Editable = true" is why "Edit Properties" never showed on
+-- edit_sun/edit_sky/edit_fog. Look up missing fields through the Base chain instead. The chain
+-- stops at the engine-level bases, whose fields were never inherited before (they're handled
+-- by the C++ entity), so only intermediate Lua bases like base_edit are affected.
+do
+	local STOP_AT_BASE = {
+		prop_scripted = true, trigger_scripted = true,
+		base_entity = true, base_anim = true, base_point = true, base_brush = true,
+		base_ai = true, base_nextbot = true, base_filter = true,
+	}
+
+	-- Spawn menu listings read these off the stored table; don't let them come from a base
+	local NOT_INHERITED = {
+		Base = true, BaseClass = true, ClassName = true, ClassNameOverride = true,
+		Folder = true, Factory = true, Type = true,
+		Spawnable = true, AdminOnly = true, Category = true, PrintName = true, Information = true,
+	}
+
+	local function getBaseName(entityTable)
+		local baseName = rawget(entityTable, "Base")
+
+		-- prop_scripted is only the C++ default, and PreRegisterSENT fills a missing Base in with
+		-- base_entity (edit_fog/edit_sky have theirs cleared by differentBase), so prefer what
+		-- DEFINE_BASECLASS declared
+		-- (but keep base_entity where differentBase deliberately remaps to it)
+		local className = rawget(entityTable, "ClassName")
+		local remapped = isstring(className) and differentBase[className] == "base_entity"
+
+		if (not isstring(baseName) or baseName == "prop_scripted" or (baseName == "base_entity" and not remapped)) then
+			local declaredBase = GModCompatibilityDeclaredBase and GModCompatibilityDeclaredBase[entityTable]
+			if (isstring(declaredBase)) then
+				baseName = declaredBase
+			end
+		end
+
+		if (not isstring(baseName) and scripted_ents and scripted_ents.GetStored) then
+			local className = rawget(entityTable, "ClassName")
+			local gmodStored = isstring(className) and scripted_ents.GetStored(className)
+			baseName = istable(gmodStored) and gmodStored.Base or nil
+		end
+
+		return isstring(baseName) and baseName or nil
+	end
+
+	local function getBaseTable(entityTable)
+		local baseName = getBaseName(entityTable)
+
+		if (not baseName or STOP_AT_BASE[baseName] or baseName == rawget(entityTable, "ClassName")) then
+			return nil
+		end
+
+		local baseTable = ScriptedEntities.GetStored(baseName)
+
+		if (not istable(baseTable) and scripted_ents and scripted_ents.GetStored) then
+			local gmodStored = scripted_ents.GetStored(baseName)
+			baseTable = istable(gmodStored) and gmodStored.t or nil
+		end
+
+		return istable(baseTable) and baseTable ~= entityTable and baseTable or nil
+	end
+
+	-- Every method call on a scripted entity misses its table first, so keep this cheap
+	local baseCache = setmetatable({}, { __mode = "k" })
+	local lookingUp = {}
+
+	local inheritMeta = {
+		__index = function(entityTable, key)
+			if (NOT_INHERITED[key] or lookingUp[entityTable]) then
+				return nil
+			end
+
+			local baseTable = baseCache[entityTable]
+
+			if (baseTable == nil) then
+				baseTable = getBaseTable(entityTable)
+
+				if (not baseTable) then
+					return nil -- not cached: the base may not be registered yet
+				end
+
+				baseCache[entityTable] = baseTable
+			end
+
+			lookingUp[entityTable] = true
+			local value = baseTable[key]
+			lookingUp[entityTable] = nil
+
+			return value
+		end
+	}
+
+	local function installInheritance(entityTable)
+		if (istable(entityTable) and getmetatable(entityTable) == nil) then
+			setmetatable(entityTable, inheritMeta)
+		end
+	end
+
+	hook.Add("ScriptedEntityRegistered", "GModCompatibility.ScriptedEntityRegistered.InheritBase", function(className, scriptedEntity)
+		installInheritance(scriptedEntity)
+
+		-- A (re)registered class may be someone's base
+		for cachedTable in pairs(baseCache) do
+			baseCache[cachedTable] = nil
+		end
+	end)
+
+	for className, entityTable in pairs(ScriptedEntities.GetStoredList()) do
+		installInheritance(entityTable)
+	end
+end
 
 hook.Add(
 	"ScriptedWeaponRegistered",

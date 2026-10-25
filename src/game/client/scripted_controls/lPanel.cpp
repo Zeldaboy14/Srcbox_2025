@@ -1629,7 +1629,13 @@ LUA_BINDING_END()
 LUA_BINDING_BEGIN( Panel, SetEnabled, "class", "Sets whether the panel is enabled" )
 {
     lua_Panel *panel = LUA_BINDING_ARGUMENT( luaL_checkpanel, 1, "panel" );
+#ifdef LUA_SDK
+    // GMod accepts any value here (nil = false). GMod's own prop_vectorcolor.lua calls
+    // oldSetEnabled( b ) without self, which errored and aborted the "Edit Properties" window.
+    bool enabled = lua_toboolean( L, 2 ) != 0;
+#else
     bool enabled = LUA_BINDING_ARGUMENT( luaL_checkboolean, 2, "enabled" );
+#endif
     panel->SetEnabled( enabled );
     return 0;
 }

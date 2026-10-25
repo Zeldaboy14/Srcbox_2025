@@ -31,13 +31,15 @@ end
 --- Convert the color to its components as 3 HSL values
 --- @return number, number, number
 function COLOR:ToHSL()
-	return Colors.ColorToHsl(self)
+	-- sh_init.lua's GMod-scale version (Colors.ColorToHsl expects 0-1 RGB)
+	return (ColorToHSL or Colors.ColorToHsl)(self)
 end
 
 --- Convert the color to its components as 3 HSV values
 --- @return number, number, number
 function COLOR:ToHSV()
-	return Colors.ColorToHsv(self)
+	-- sh_init.lua's GMod-scale version (Colors.ColorToHsv expects 0-1 RGB)
+	return (ColorToHSV or Colors.ColorToHsv)(self)
 end
 
 --- Converts the color to a vector (alpha is ignored)

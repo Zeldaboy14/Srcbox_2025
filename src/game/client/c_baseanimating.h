@@ -468,6 +468,9 @@ public:
 
 #ifdef LUA_SDK
 
+	// The material set with SetMaterialOverride (GMod's Entity:SetMaterial), or NULL
+	IMaterial *GetLuaMaterialOverride();
+
 	void SetMaterialOverride(const char* pMaterialName)
 	{
 		Q_strncpy(m_MaterialOverride, pMaterialName, sizeof(m_MaterialOverride));
@@ -602,6 +605,7 @@ protected:
     // Experiment; Material override
     char							m_MaterialOverride[MAX_PATH];
     CMaterialReference				m_MaterialOverrideReference;
+    char							m_szMaterialOverrideLoaded[MAX_PATH]; // name m_MaterialOverrideReference was loaded from
     char							m_SubMaterialOverrides[MAX_SUB_MATERIAL_OVERRIDES][MAX_PATH];
     CMaterialReference				m_SubMaterialOverridesReferences[MAX_SUB_MATERIAL_OVERRIDES];
 #endif
