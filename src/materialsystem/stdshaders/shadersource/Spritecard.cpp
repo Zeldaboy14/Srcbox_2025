@@ -1,7 +1,7 @@
 //===================== File of the LUX Shader Project =====================//
 //
 //	Initial D.	:	20.01.2023 DMY
-//	Last Change :	01.02.2026 DMY
+//	Last Change :	18.05.2026 DMY
 //
 //==========================================================================//
 
@@ -98,6 +98,7 @@ BEGIN_SHADER_PARAMS
 	SHADER_PARAM(InverseDepthBlend,		SHADER_PARAM_TYPE_BOOL,		"",	"Flip DepthBlend so that Particles appear when they are NEAR Geometry instead of disappearing.")
 	SHADER_PARAM(Mod2X,					SHADER_PARAM_TYPE_BOOL,		"", "Modulates the Background. Colors above Grey will brighten the Background, below they will darken them.")
 	SHADER_PARAM(AlphaFuncValue,		SHADER_PARAM_TYPE_FLOAT,	"", "Overrides the default AlphaFunc Value for AlphaTesting")
+	SHADER_PARAM(CropFactor,			SHADER_PARAM_TYPE_VEC2,		"[1 1]", "Scales the Sprite's Quad and its Texture Coordinates around their Center by the same Amount, cropping the Frame. [1 1] = off.")
 END_SHADER_PARAMS
 
 SHADER_INIT_PARAMS()
@@ -117,6 +118,11 @@ SHADER_INIT_PARAMS()
 	// Great so despite command line you can still force depth blending anyways
 	DefaultInt(DepthBlend, GetDefaultDepthFeatheringValue());
 	DefaultInt(BlendFrames, 1);
+
+	if (!params[CropFactor]->IsDefined())
+	{
+		params[CropFactor]->SetVecValue(1.0f, 1.0f);
+	}
 
 	// x360 not supported any longer. Farewell
 //	DefaultInt(UseInstancing, IsX360() ? 1 : 0);
@@ -156,6 +162,15 @@ SHADER_INIT
 // Removed dx8 references and xbox considerations
 SHADER_DRAW
 {
+#ifdef ASWSDK
+	// Not doing this here
+	if (ShouldDrawNormalsForSSAO())
+	{
+		Draw(false); // Without this crash + "No render states in shader ".."
+		return;
+	}
+#endif
+
 	bool bHasRampTexture = IsTextureLoaded(RampTexture);
 
 	float f1ZoomAnimSeq2 = GetFloat(ZoomAnimateSeq2);
@@ -167,6 +182,9 @@ SHADER_DRAW
 	bool bAddSelf = f1AddSelf != 0.0;
 	bool bDepthBlend = GetBool(DepthBlend);
 	bool bIsSplineType = GetInt(SplineType) != 0; // Stock Shader had an int that it used like a bool
+
+	bool bCrop = ( params[CropFactor]->GetVecValue()[0] != 1.0f ) || ( params[CropFactor]->GetVecValue()[1] != 1.0f );
+
 	
 	//==========================================================================//
 	// Static Snapshot of the Shader Settings
@@ -319,6 +337,7 @@ SHADER_DRAW
 			SET_STATIC_VERTEX_SHADER_COMBO(DUALSEQUENCE, bSecondSequence);
 			SET_STATIC_VERTEX_SHADER_COMBO(ZOOM_ANIMATE_SEQ2, bZoomSeq2);
 			SET_STATIC_VERTEX_SHADER_COMBO(EXTRACTGREENALPHA, bExtractGreenAlpha);
+			SET_STATIC_VERTEX_SHADER_COMBO(CROP, bCrop);
 			SET_STATIC_VERTEX_SHADER_COMBO(ADDBASETEXTURE2, bAdditive2ndTexture && !bAddSelf);
 			SET_STATIC_VERTEX_SHADER(lux_spritecard_vs30);
 		}
@@ -416,6 +435,18 @@ SHADER_DRAW
 		pShaderAPI->SetVertexShaderConstant(LUX_VS_FLOAT_SET1_8, cSizeControls1);
 		pShaderAPI->SetVertexShaderConstant(LUX_VS_FLOAT_SET1_9, cSizeControls2);
 		// }
+
+		if (bCrop)
+		{
+			float vCropFactors[4];
+			params[CropFactor]->GetVecValue(vCropFactors, 2);
+			vCropFactors[2] = -0.5f * vCropFactors[0] + 0.5f;
+			vCropFactors[3] = -0.5f * vCropFactors[1] + 0.5f;
+			// Must match g_vCropFactor in lux_spritecard_vs30.fxc. The stock register
+			// ( VERTEX_SHADER_SHADER_SPECIFIC_CONST_11 ) is c15, LUX_VS_FLOAT_SET0_0 here: the viewport transform.
+			pShaderAPI->SetVertexShaderConstant(LUX_VS_FLOAT_SET2_11, vCropFactors, 1);
+		}
+
 
 		float4 f4_PS_C0 = 0.0f;
 		f4_PS_C0.x = f1AddBaseTexture2;

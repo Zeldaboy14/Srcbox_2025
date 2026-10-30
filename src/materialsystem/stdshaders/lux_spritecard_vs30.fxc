@@ -12,6 +12,7 @@
 //	STATIC:		"ZOOM_ANIMATE_SEQ2"			"0..1"
 //	STATIC:		"EXTRACTGREENALPHA"			"0..1"
 //	STATIC:		"ADDBASETEXTURE2"			"0..1"
+//  STATIC: 	"CROP"						"0..1"
 
 //==========================================================================//
 //	Available Dynamic Combos to the Shader
@@ -51,10 +52,11 @@ const float4 cSizeParams			: register(LUX_VS_FLOAT_SET1_8);
 #define END_FADE_SIZE_FACTOR			(cSizeParams.w)
 
 const float4 cSizeParams2			: register(LUX_VS_FLOAT_SET1_9);
+const float4 g_vCropFactor			: register(LUX_VS_FLOAT_SET2_11);
 // "alpha fade w/ distance"
 #define START_FAR_FADE  (cSizeParams2.x)
 
-// "alpha = 1-min(1,max(0, (dist-start_fade)*factor))"
+// "alpha = 1-MIN(1,MAX(0, (dist-start_fade)*factor))"
 #define FAR_FADE_FACTOR (cSizeParams2.y)
 
 //==========================================================================//
@@ -201,7 +203,7 @@ VS_OUTPUT main( const VS_INPUT v )
 		f1Radius = 0.0f;
 
 	// if the Maximum Size Factor is smaller use that instead
-	f1Radius = min(f1Radius, MAXIMUM_SIZE_FACTOR * f1DistanceToSurface);
+    f1Radius = min(f1Radius, MAXIMUM_SIZE_FACTOR * f1DistanceToSurface);
 
 	// Prepare some extra variables for Orientation
 	// {
@@ -213,6 +215,13 @@ VS_OUTPUT main( const VS_INPUT v )
 		// Determine what Corner we are dealing with(?)
 		// Unfortunately documentation for this is rather lacking.
 		float2 ix = 2.0f * v.vCornerID.xy - 1.0f;
+		
+		#if ( CROP )
+		{
+			ix *= g_vCropFactor.xy;
+		}
+		#endif
+	
 		float x1 = dot(ix, sc);
 		float y1 = sc.x * ix.y - sc.y * ix.x;
 	// }
@@ -276,7 +285,11 @@ VS_OUTPUT main( const VS_INPUT v )
 	o.ARGB_Color = f4Tint;
 
     o.WorldPos_ProjPosZ.xyz = f3WorldPos;
-    o.WorldPos_ProjPosZ.w = dot(float4(f3WorldPos, 1.0f), cViewProjZ);
+	#if defined(ASWSDK)
+		o.WorldPos_ProjPosZ.w = ProjPos.z;
+	#else
+		o.WorldPos_ProjPosZ.w = dot(float4(f3WorldPos, 1.0f), cViewProjZ);
+	#endif
 
 	// "Map projected position to the refraction texture"
 	float2 f2ScreenPos;
@@ -293,10 +306,17 @@ VS_OUTPUT main( const VS_INPUT v )
 
 	// Texcoord shenanigans
 	// No idea what is going on here, would love for someone to spill the beans.
+	#if ( CROP )
+	o.TexCoord1And2.x	= lerp( v.vTexCoord0.z, v.vTexCoord0.x, v.vCornerID.x * g_vCropFactor.x + g_vCropFactor.z );
+	o.TexCoord1And2.y	= lerp( v.vTexCoord0.w, v.vTexCoord0.y, v.vCornerID.y * g_vCropFactor.y + g_vCropFactor.w );
+	o.TexCoord1And2.z	= lerp( v.vTexCoord1.z, v.vTexCoord1.x, v.vCornerID.x * g_vCropFactor.x + g_vCropFactor.z );
+	o.TexCoord1And2.w	= lerp( v.vTexCoord1.w, v.vTexCoord1.y, v.vCornerID.y * g_vCropFactor.y + g_vCropFactor.w );
+	#else
 	o.TexCoord1And2.x	= lerp( v.vTexCoord0.z, v.vTexCoord0.x, v.vCornerID.x );
 	o.TexCoord1And2.y	= lerp( v.vTexCoord0.w, v.vTexCoord0.y, v.vCornerID.y );
 	o.TexCoord1And2.z	= lerp( v.vTexCoord1.z, v.vTexCoord1.x, v.vCornerID.x );
 	o.TexCoord1And2.w	= lerp( v.vTexCoord1.w, v.vTexCoord1.y, v.vCornerID.y );
+	#endif
 	#if ADDBASETEXTURE2
 	o.TexCoord3.x		= lerp( v.vTexCoord2.z, v.vTexCoord2.x, v.vCornerID.x );
 	o.TexCoord3.y		= lerp( v.vTexCoord2.w, v.vTexCoord2.y, v.vCornerID.y );

@@ -1,0 +1,99 @@
+//-----------------------------------------------------------------------------
+//	PARTICLES.VPC
+//
+//	Builds particles.lib entirely from the reconstructed sources.
+//
+//	The SDK's original particles.lib also bundled the bitmap library (bitmap,
+//	S3TC, ATI_Compress objects). Those members were byte-identical to
+//	lib\public\bitmap.lib, so the librarian merges bitmap.lib back in, keeping
+//	the output a drop-in replacement (the server links particles.lib but not
+//	bitmap.lib).
+//
+//	The blobulator (render_blobs' metaball polygonizer) is built from
+//	src\blobulator, with its shared headers in src\common\blobulator.
+//-----------------------------------------------------------------------------
+
+$macro SRCDIR		".."
+
+$include "$SRCDIR\vpc_scripts\source_lib_base.vpc"
+
+$Configuration
+{
+	$Compiler
+	{
+		$AdditionalIncludeDirectories		"$BASE;$SRCDIR\public\particles"
+		$PreprocessorDefinitions			"$BASE;GAME_DLL;VECTOR;VERSION_SAFE_STEAM_API_INTERFACES;PROTECTED_THINGS_ENABLE;sprintf=use_Q_snprintf_instead_of_sprintf;strncpy=use_Q_strncpy_instead;_snprintf=use_Q_snprintf_instead;USE_NEW_PARTICLE_SYSTEM"
+	}
+
+	$Librarian
+	{
+		// lib.exe copies every member of an input .lib into the output
+		$AdditionalDependencies				"$BASE $SRCDIR\lib\public\x64\bitmap.lib"
+
+	}
+}
+
+$Project "particles"
+{
+	$Folder	"Source Files"
+	{
+		$File	"particles.cpp"
+		$File	"particle_sort.cpp"
+		$File	"particle_snapshot.cpp"
+		$File	"addbuiltin_ops.cpp"
+		$File	"builtin_constraints.cpp"
+		$File	"builtin_initializers.cpp"
+		$File	"builtin_particle_emitters.cpp"
+		$File	"builtin_particle_forces.cpp"
+		$File	"builtin_particle_ops.cpp"
+		$File	"builtin_particle_render_ops.cpp"
+		$File	"psheet.cpp"
+	}
+
+	$Folder	"Header Files"
+	{
+		$File	"particles_internal.h"
+		$File	"random_floats.h"
+	}
+
+	$Folder	"Public Header Files"
+	{
+		$File	"$SRCDIR\public\particles\particles.h"
+	}
+	
+	$Folder	"Blobulator"
+	{
+		$Folder	"Source Files"
+		{
+			$File	"$SRCDIR\blobulator\implicit\impparticle.cpp"
+			$File	"$SRCDIR\blobulator\implicit\imprenderer.cpp"
+			$File	"$SRCDIR\blobulator\implicit\imptiler.cpp"
+			$File	"$SRCDIR\blobulator\implicit\projectingparticlecache.cpp"
+			$File	"$SRCDIR\blobulator\implicit\sweeprenderer.cpp"
+			$File	"$SRCDIR\blobulator\implicit\userfunctions.cpp"
+			$File	"$SRCDIR\blobulator\vertexbuffers\indextrivertexbuffer.cpp"
+		}
+
+		$Folder	"Header Files"
+		{
+			$File	"$SRCDIR\blobulator\implicit\impconsttable_winding_ccw2_tris.h"
+			$File	"$SRCDIR\blobulator\util\constants.h"
+			$File	"$SRCDIR\blobulator\util\rand.h"
+			$File	"$SRCDIR\blobulator\vertexbuffers\indextrivertexbuffer_inl.h"
+			$File	"$SRCDIR\blobulator\vertexbuffers\vertexbuffer_inl.h"
+			$File	"$SRCDIR\common\blobulator\point3d.h"
+			$File	"$SRCDIR\common\blobulator\smartarray.h"
+			$File	"$SRCDIR\common\blobulator\util\fasttrunc.h"
+			$File	"$SRCDIR\common\blobulator\implicit\impdefines.h"
+			$File	"$SRCDIR\common\blobulator\implicit\impparticle.h"
+			$File	"$SRCDIR\common\blobulator\implicit\imprenderer.h"
+			$File	"$SRCDIR\common\blobulator\implicit\imptiler.h"
+			$File	"$SRCDIR\common\blobulator\implicit\particlecache.h"
+			$File	"$SRCDIR\common\blobulator\implicit\projectingparticlecache.h"
+			$File	"$SRCDIR\common\blobulator\implicit\sweeprenderer.h"
+			$File	"$SRCDIR\common\blobulator\implicit\userfunctions.h"
+			$File	"$SRCDIR\common\blobulator\vertexbuffers\indextrivertexbuffer.h"
+			$File	"$SRCDIR\common\blobulator\vertexbuffers\vertexbuffer.h"
+		}
+	}
+}

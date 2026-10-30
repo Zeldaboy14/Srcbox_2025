@@ -9,6 +9,7 @@
 #include <KeyValues.h>
 #include "particle_parse.h"
 #include "particles/particles.h"
+#include "tier0/icommandline.h"
 
 #ifdef GAME_DLL
 #include "te_effect_dispatch.h"
@@ -93,6 +94,389 @@ void GetParticleManifest(CUtlVector<CUtlString>& list)
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+#ifdef SRCBOX
+//-----------------------------------------------------------------------------
+// Srcbox: appends particle systems from every mounted game ( mountdepots, gamepacks, gameinfo
+// search paths, mount.cfg ). Each game's own particles/particles_manifest.txt is read from that
+// game's search paths only, and only systems that aren't defined yet are added, so the mod's
+// manifest always wins, then games in search path order. Disable with -noparticleappend.
+//-----------------------------------------------------------------------------
+// Reads files from one mounted game's folders and VPKs directly ( by absolute path ), so the
+// search paths are never touched.
+class CParticleAppendSource
+{
+public:
+	struct VPKEntry_t
+	{
+		CUtlString m_Path;		// lowercase, forward slashes
+		int m_nArchive;
+		unsigned int m_nOffset;
+		unsigned int m_nLength;
+		int m_nPreloadOffset;	// into m_Tree
+		int m_nPreloadBytes;
+	};
+
+	struct VPK_t
+	{
+		CUtlString m_DirFile;
+		CUtlString m_ArchiveBase;	// "<path>/<name>" for "<name>_%03d.vpk"
+		CUtlBuffer m_Tree;			// header + tree
+		int m_nDataStart;			// where embedded ( 0x7fff ) data starts in the dir file
+		CUtlVector< VPKEntry_t > m_Entries;
+	};
+
+	~CParticleAppendSource()
+	{
+		m_VPKs.PurgeAndDeleteElements();
+	}
+
+	void AddPath( const char *pPath )
+	{
+		const char *pExt = V_GetFileExtension( pPath );
+		if ( pExt && !V_stricmp( pExt, "vpk" ) )
+			AddVPK( pPath );
+		else
+			m_Folders.AddToTail( CUtlString( pPath ) );
+	}
+
+	bool ReadFile( const char *pRelative, CUtlBuffer &buf )
+	{
+		char szRel[ MAX_PATH ];
+		V_strncpy( szRel, pRelative, sizeof( szRel ) );
+		V_FixSlashes( szRel, '/' );
+		V_strlower( szRel );
+
+		for ( int i = 0; i < m_Folders.Count(); ++i )
+		{
+			char szFull[ MAX_PATH ];
+			V_snprintf( szFull, sizeof( szFull ), "%s/%s", m_Folders[ i ].Get(), szRel );
+			V_FixSlashes( szFull );
+			if ( g_pFullFileSystem->FileExists( szFull ) && g_pFullFileSystem->ReadFile( szFull, NULL, buf ) )
+				return true;
+		}
+
+		for ( int i = 0; i < m_VPKs.Count(); ++i )
+		{
+			VPK_t *pVPK = m_VPKs[ i ];
+			for ( int e = 0; e < pVPK->m_Entries.Count(); ++e )
+			{
+				if ( V_strcmp( pVPK->m_Entries[ e ].m_Path.Get(), szRel ) )
+					continue;
+				return ReadVPKEntry( pVPK, pVPK->m_Entries[ e ], buf );
+			}
+		}
+		return false;
+	}
+
+private:
+	void AddVPK( const char *pPath )
+	{
+		// Search paths can name either "name.vpk" or "name_dir.vpk"
+		char szBase[ MAX_PATH ];
+		V_StripExtension( pPath, szBase, sizeof( szBase ) );
+		int nBaseLen = V_strlen( szBase );
+		if ( nBaseLen > 4 && !V_stricmp( szBase + nBaseLen - 4, "_dir" ) )
+			szBase[ nBaseLen - 4 ] = 0;
+
+		char szDir[ MAX_PATH ];
+		V_snprintf( szDir, sizeof( szDir ), "%s_dir.vpk", szBase );
+		V_FixSlashes( szDir );
+		if ( !g_pFullFileSystem->FileExists( szDir ) )
+		{
+			V_strncpy( szDir, pPath, sizeof( szDir ) );	// single file VPK
+			V_FixSlashes( szDir );
+		}
+
+		for ( int i = 0; i < m_VPKs.Count(); ++i )
+		{
+			if ( !V_stricmp( m_VPKs[ i ]->m_DirFile.Get(), szDir ) )
+				return;
+		}
+
+		FileHandle_t hFile = g_pFullFileSystem->Open( szDir, "rb" );
+		if ( !hFile )
+			return;
+
+		unsigned int nHeader[ 7 ] = { 0 };
+		if ( g_pFullFileSystem->Read( nHeader, 12, hFile ) != 12 || nHeader[ 0 ] != 0x55aa1234 || ( nHeader[ 1 ] != 1 && nHeader[ 1 ] != 2 ) )
+		{
+			g_pFullFileSystem->Close( hFile );
+			return;
+		}
+		int nHeaderSize = ( nHeader[ 1 ] == 2 ) ? 28 : 12;
+		unsigned int nTreeSize = nHeader[ 2 ];
+		if ( nTreeSize == 0 || nTreeSize > ( 256u << 20 ) )
+		{
+			g_pFullFileSystem->Close( hFile );
+			return;
+		}
+
+		VPK_t *pVPK = new VPK_t;
+		pVPK->m_DirFile = szDir;
+		pVPK->m_ArchiveBase = szBase;
+		pVPK->m_nDataStart = nHeaderSize + nTreeSize;
+		pVPK->m_Tree.EnsureCapacity( nHeaderSize + nTreeSize );
+		g_pFullFileSystem->Seek( hFile, 0, FILESYSTEM_SEEK_HEAD );
+		int nRead = g_pFullFileSystem->Read( pVPK->m_Tree.Base(), nHeaderSize + nTreeSize, hFile );
+		g_pFullFileSystem->Close( hFile );
+		if ( nRead != (int)( nHeaderSize + nTreeSize ) )
+		{
+			delete pVPK;
+			return;
+		}
+
+		ParseTree( pVPK, (const unsigned char *)pVPK->m_Tree.Base(), nHeaderSize, nHeaderSize + nTreeSize );
+		m_VPKs.AddToTail( pVPK );
+	}
+
+	static const char *TreeString( const unsigned char *pData, int &nPos, int nEnd )
+	{
+		int nStart = nPos;
+		while ( nPos < nEnd && pData[ nPos ] )
+			++nPos;
+		if ( nPos >= nEnd )
+			return NULL;
+		++nPos;
+		return (const char *)( pData + nStart );
+	}
+
+	// Only .pcf and .txt entries are kept ( manifests and particle files )
+	static void ParseTree( VPK_t *pVPK, const unsigned char *pData, int nPos, int nEnd )
+	{
+		for ( ;; )
+		{
+			const char *pExt = TreeString( pData, nPos, nEnd );
+			if ( !pExt || !pExt[ 0 ] )
+				return;
+			bool bWanted = !V_stricmp( pExt, "pcf" ) || !V_stricmp( pExt, "txt" );
+			for ( ;; )
+			{
+				const char *pDir = TreeString( pData, nPos, nEnd );
+				if ( !pDir )
+					return;
+				if ( !pDir[ 0 ] )
+					break;
+				for ( ;; )
+				{
+					const char *pName = TreeString( pData, nPos, nEnd );
+					if ( !pName )
+						return;
+					if ( !pName[ 0 ] )
+						break;
+					if ( nPos + 18 > nEnd )
+						return;
+
+					unsigned short nPreload, nArchive;
+					unsigned int nOffset, nLength;
+					memcpy( &nPreload, pData + nPos + 4, 2 );
+					memcpy( &nArchive, pData + nPos + 6, 2 );
+					memcpy( &nOffset, pData + nPos + 8, 4 );
+					memcpy( &nLength, pData + nPos + 12, 4 );
+					nPos += 18;
+					int nPreloadOffset = nPos;
+					nPos += nPreload;
+					if ( nPos > nEnd )
+						return;
+
+					if ( bWanted && ( !V_stricmp( pExt, "txt" ) ? !V_stricmp( pName, "particles_manifest" ) : true ) )
+					{
+						char szPath[ MAX_PATH ];
+						if ( !V_strcmp( pDir, " " ) )
+							V_snprintf( szPath, sizeof( szPath ), "%s.%s", pName, pExt );
+						else
+							V_snprintf( szPath, sizeof( szPath ), "%s/%s.%s", pDir, pName, pExt );
+						V_FixSlashes( szPath, '/' );
+						V_strlower( szPath );
+
+						VPKEntry_t &entry = pVPK->m_Entries[ pVPK->m_Entries.AddToTail() ];
+						entry.m_Path = szPath;
+						entry.m_nArchive = nArchive;
+						entry.m_nOffset = nOffset;
+						entry.m_nLength = nLength;
+						entry.m_nPreloadOffset = nPreloadOffset;
+						entry.m_nPreloadBytes = nPreload;
+					}
+				}
+			}
+		}
+	}
+
+	static bool ReadVPKEntry( VPK_t *pVPK, const VPKEntry_t &entry, CUtlBuffer &buf )
+	{
+		buf.Purge();
+		if ( entry.m_nPreloadBytes )
+			buf.Put( (const unsigned char *)pVPK->m_Tree.Base() + entry.m_nPreloadOffset, entry.m_nPreloadBytes );
+		if ( !entry.m_nLength )
+			return true;
+
+		char szArchive[ MAX_PATH ];
+		unsigned int nOffset = entry.m_nOffset;
+		if ( entry.m_nArchive == 0x7fff )
+		{
+			V_strncpy( szArchive, pVPK->m_DirFile.Get(), sizeof( szArchive ) );
+			nOffset += pVPK->m_nDataStart;
+		}
+		else
+		{
+			V_snprintf( szArchive, sizeof( szArchive ), "%s_%03d.vpk", pVPK->m_ArchiveBase.Get(), entry.m_nArchive );
+			V_FixSlashes( szArchive );
+		}
+
+		FileHandle_t hFile = g_pFullFileSystem->Open( szArchive, "rb" );
+		if ( !hFile )
+			return false;
+
+		int nOld = buf.TellPut();
+		buf.EnsureCapacity( nOld + entry.m_nLength );
+		g_pFullFileSystem->Seek( hFile, nOffset, FILESYSTEM_SEEK_HEAD );
+		int nRead = g_pFullFileSystem->Read( (unsigned char *)buf.Base() + nOld, entry.m_nLength, hFile );
+		g_pFullFileSystem->Close( hFile );
+		if ( nRead != (int)entry.m_nLength )
+			return false;
+		buf.SeekPut( CUtlBuffer::SEEK_HEAD, nOld + entry.m_nLength );
+		return true;
+	}
+
+	CUtlVector< CUtlString > m_Folders;
+	CUtlVector< VPK_t * > m_VPKs;
+};
+
+static void NormalizeParticleAppendPath( char *pPath )
+{
+	V_FixSlashes( pPath, '/' );
+	V_strlower( pPath );
+	int nLen = V_strlen( pPath );
+	while ( nLen > 0 && pPath[ nLen - 1 ] == '/' )
+		pPath[ --nLen ] = 0;
+}
+
+static void AppendMountedGameParticles()
+{
+	if ( CommandLine()->FindParm( "-noparticleappend" ) )
+		return;
+
+	// The mod's own folder ( its particles come from the main manifest )
+	char szModPath[ MAX_PATH ] = { 0 };
+	{
+		char szModPaths[ 4096 ];
+		if ( g_pFullFileSystem->GetSearchPath( "MOD", false, szModPaths, sizeof( szModPaths ) ) > 0 )
+		{
+			char *pSemi = strchr( szModPaths, ';' );
+			if ( pSemi )
+				*pSemi = 0;
+			V_strncpy( szModPath, szModPaths, sizeof( szModPath ) );
+			NormalizeParticleAppendPath( szModPath );
+		}
+	}
+
+	// Every GAME search path, including VPKs
+	CUtlVector< char > searchPaths;
+	searchPaths.SetCount( 1 << 16 );
+	int nLen = g_pFullFileSystem->GetSearchPath( "GAME", true, searchPaths.Base(), searchPaths.Count() );
+	if ( nLen >= searchPaths.Count() )
+	{
+		searchPaths.SetCount( nLen + 1 );
+		g_pFullFileSystem->GetSearchPath( "GAME", true, searchPaths.Base(), searchPaths.Count() );
+	}
+	searchPaths[ searchPaths.Count() - 1 ] = 0;
+
+	// Group the paths by game folder ( a VPK belongs to the folder it's in ), keeping search order
+	CUtlVector< CUtlString > groupKeys;
+	CUtlVector< CParticleAppendSource * > groupSources;
+
+	CUtlStringList entries;
+	V_SplitString( searchPaths.Base(), ";", entries );
+	for ( int i = 0; i < entries.Count(); ++i )
+	{
+		char szEntry[ MAX_PATH ];
+		V_strncpy( szEntry, entries[ i ], sizeof( szEntry ) );
+		NormalizeParticleAppendPath( szEntry );
+		if ( !szEntry[ 0 ] )
+			continue;
+
+		const char *pExt = V_GetFileExtension( szEntry );
+		if ( pExt && !V_stricmp( pExt, "bsp" ) )
+			continue;	// map pak files
+
+		char szKey[ MAX_PATH ];
+		V_strncpy( szKey, szEntry, sizeof( szKey ) );
+		if ( pExt && !V_stricmp( pExt, "vpk" ) )
+		{
+			V_StripFilename( szKey );
+			NormalizeParticleAppendPath( szKey );
+		}
+
+		if ( szModPath[ 0 ] && !V_strnicmp( szKey, szModPath, V_strlen( szModPath ) ) )
+			continue;	// the mod's own folder, custom/ and anything under it
+
+		int nGroup = -1;
+		for ( int g = 0; g < groupKeys.Count(); ++g )
+		{
+			if ( !V_stricmp( groupKeys[ g ].Get(), szKey ) )
+			{
+				nGroup = g;
+				break;
+			}
+		}
+		if ( nGroup < 0 )
+		{
+			nGroup = groupKeys.AddToTail( CUtlString( szKey ) );
+			groupSources.AddToTail( new CParticleAppendSource );
+		}
+		groupSources[ nGroup ]->AddPath( szEntry );
+	}
+
+	SetParticleSkipExistingDefinitions( true );
+
+	int nTotalAdded = 0;
+	for ( int g = 0; g < groupKeys.Count(); ++g )
+	{
+		CParticleAppendSource *pSource = groupSources[ g ];
+
+		CUtlBuffer manifestBuf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+		if ( !pSource->ReadFile( PARTICLES_MANIFEST_FILE, manifestBuf ) )
+			continue;
+
+		KeyValues *pManifest = new KeyValues( PARTICLES_MANIFEST_FILE );
+		if ( pManifest->LoadFromBuffer( PARTICLES_MANIFEST_FILE, manifestBuf ) )
+		{
+			int nBefore = g_pParticleSystemMgr->GetParticleSystemCount();
+			int nFiles = 0;
+
+			for ( KeyValues *pSub = pManifest->GetFirstSubKey(); pSub != NULL; pSub = pSub->GetNextKey() )
+			{
+				if ( Q_stricmp( pSub->GetName(), "file" ) )
+					continue;
+
+				const char *pFile = pSub->GetString();
+				if ( pFile[ 0 ] == '!' )
+					++pFile;
+				if ( !pFile[ 0 ] )
+					continue;
+
+				CUtlBuffer buf;
+				if ( !pSource->ReadFile( pFile, buf ) )
+					continue;
+
+				g_pParticleSystemMgr->ReadParticleConfigFile( buf, false, false, pFile );
+				++nFiles;
+			}
+
+			int nAdded = g_pParticleSystemMgr->GetParticleSystemCount() - nBefore;
+			nTotalAdded += nAdded;
+			DevMsg( "Particles: appended %d new system(s) from %d file(s) in %s\n", nAdded, nFiles, groupKeys[ g ].Get() );
+		}
+		pManifest->deleteThis();
+	}
+
+	SetParticleSkipExistingDefinitions( false );
+	groupSources.PurgeAndDeleteElements();
+
+	if ( nTotalAdded )
+		Msg( "Particles: appended %d particle system(s) from mounted games\n", nTotalAdded );
+}
+#endif // SRCBOX
+
 void ParseParticleEffects( bool bLoadSheets, bool bPrecache )
 {
 	MEM_ALLOC_CREDIT();
@@ -107,6 +491,10 @@ void ParseParticleEffects( bool bLoadSheets, bool bPrecache )
 	{
 		g_pParticleSystemMgr->ReadParticleConfigFile( files[i], bPrecache, false );
 	}
+
+#ifdef SRCBOX
+	AppendMountedGameParticles();
+#endif
 
 	g_pParticleSystemMgr->DecommitTempMemory();
 }

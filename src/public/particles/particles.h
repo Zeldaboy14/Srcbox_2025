@@ -60,6 +60,11 @@ void GetParticleManifest( CUtlVector<CUtlString>& list );
 void GetParticleManifest( CUtlVector<CUtlString>& list, const char* pFile );
 #endif
 
+// Srcbox: while set, reading particle files only adds systems whose names aren't already defined
+// ( used to append particles from mounted games without overriding the mod's own ).
+void SetParticleSkipExistingDefinitions( bool bSkip );
+bool GetParticleSkipExistingDefinitions();
+
 //-----------------------------------------------------------------------------
 // Particle attributes
 //-----------------------------------------------------------------------------
@@ -2559,7 +2564,7 @@ public:
 class CM128InterpolatedAttributeIterator : public CM128AttributeIterator
 {
 protected:
-	intp m_nOldDataOffset;
+	intp m_nOldDataOffset;	// Srcbox: was int, truncated on x64 when the two attribute blocks are >2GB apart ( crashed in GenerateExtendedData )
 
 	FORCEINLINE fltx4 const *PreviousData( void ) const
 	{

@@ -7,3 +7,5 @@ if errorlevel 1 (
     echo VPC failed with exit code %ERRORLEVEL%.
     pause
 )
+
+pause
