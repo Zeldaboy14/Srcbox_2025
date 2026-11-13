@@ -299,6 +299,33 @@ public:
 	bool HasAttributes( int bits ) const	{ return ( m_attributeFlags & bits ) ? true : false; }
 	void RemoveAttributes( int bits )		{ m_attributeFlags &= ( ~bits ); }
 
+#ifdef SRCBOX
+	// Srcbox: L4D/L4D2 (TerrorNavArea) spawn attributes, read from subversion 10-14 .nav files
+	// when this game's mesh has no custom data of its own. Zero for every other nav.
+	enum L4DSpawnAttributeType
+	{
+		L4D_SPAWN_EMPTY				= 0x00000002,
+		L4D_SPAWN_STOP_SCAN			= 0x00000004,
+		L4D_SPAWN_BATTLESTATION		= 0x00000020,
+		L4D_SPAWN_FINALE			= 0x00000040,
+		L4D_SPAWN_MISSION_START		= 0x00000080,	// "PLAYER_START" in nav_mark_attribute
+		L4D_SPAWN_BATTLEFIELD		= 0x00000100,
+		L4D_SPAWN_NOT_CLEARABLE		= 0x00000400,
+		L4D_SPAWN_CHECKPOINT		= 0x00000800,
+		L4D_SPAWN_OBSCURED			= 0x00001000,
+		L4D_SPAWN_NO_MOBS			= 0x00002000,
+		L4D_SPAWN_THREAT			= 0x00004000,
+		L4D_SPAWN_RESCUE_VEHICLE	= 0x00008000,
+		L4D_SPAWN_RESCUE_CLOSET		= 0x00010000,
+		L4D_SPAWN_ESCAPE_ROUTE		= 0x00020000,
+		L4D_SPAWN_DOOR				= 0x00040000,
+		L4D_SPAWN_NOTHREAT			= 0x00080000,
+		L4D_SPAWN_LYINGDOWN			= 0x00100000,
+	};
+	unsigned int GetL4DSpawnAttributes( void ) const	{ return m_l4dSpawnAttributes; }
+	bool HasL4DSpawnAttributes( unsigned int bits ) const { return ( m_l4dSpawnAttributes & bits ) != 0; }
+#endif
+
 	void SetPlace( Place place )		{ m_place = place; }	// set place descriptor
 	Place GetPlace( void ) const		{ return m_place; }		// get place descriptor
 
@@ -747,6 +774,9 @@ private:
 	typedef CUtlVector<AreaBindInfo> CAreaBindInfoArray; // Need to use this on 360 to support external allocation pattern
 #endif
 
+#ifdef SRCBOX
+	unsigned int m_l4dSpawnAttributes;							// Srcbox: TerrorNavArea spawn attributes from L4D navs
+#endif
 	AreaBindInfo m_inheritVisibilityFrom;						// if non-NULL, m_potentiallyVisibleAreas becomes a list of additions and deletions (NOT_VISIBLE) to the list of this area
 	CAreaBindInfoArray m_potentiallyVisibleAreas;				// list of areas potentially visible from inside this area (after PostLoad(), use area portion of union)
 	bool m_isInheritedFrom;										// latch used during visibility inheritance computation

@@ -1429,12 +1429,48 @@ game = {
 
 	ConsoleCommand = RunConsoleCommand,
 
-	AddParticles = function(filePath)
-		-- Remove particles/ from the start of the file path
-		filePath = filePath:sub(11)
+	AddParticles = (function()
+		-- Base names of the .pcf files the mod's own particles_manifest.txt loads (e.g. l4d2_stock/fire_01.pcf -> fire_01.pcf).
+		-- GMod addons call game.AddParticles("particles/fire_01.pcf") expecting GMod's stock files; here that resolves to
+		-- the mounted HL2 copy and overrides the mod's versions of the same systems (env_fire etc.), so skip those.
+		local manifestFiles
 
-		return ParticleSystems.ReadConfigFile("particles/" .. tostring(filePath))
-	end,
+		local function getManifestFiles()
+			if manifestFiles then return manifestFiles end
+			manifestFiles = {}
+
+			local text = file.Read("particles/particles_manifest.txt", "GAME")
+			if text then
+				for line in text:gmatch("[^\r\n]+") do
+					if not line:match("^%s*//") then
+						local path = line:match('"[Ff][Ii][Ll][Ee]"%s+"!?([^"]+)"')
+						if path then
+							path = path:gsub("\\", "/"):lower()
+							local base = path:match("([^/]+)$")
+							if base then manifestFiles[base] = path end
+						end
+					end
+				end
+			end
+
+			return manifestFiles
+		end
+
+		return function(filePath)
+			-- Remove particles/ from the start of the file path
+			filePath = tostring(filePath):sub(11)
+
+			local fullPath = ("particles/" .. filePath):gsub("\\", "/"):lower()
+			local base = fullPath:match("([^/]+)$")
+			local manifestPath = base and getManifestFiles()[base]
+			if manifestPath and manifestPath ~= fullPath then
+				-- The mod already loaded its own version of this file from the manifest
+				return true
+			end
+
+			return ParticleSystems.ReadConfigFile("particles/" .. filePath)
+		end
+	end)(),
 
 	-- GMod returns just the map name; the client's engine gives "maps/<name>.bsp"
 	GetMap = function()

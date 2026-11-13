@@ -187,6 +187,9 @@ CNavArea::CNavArea( void )
 	m_parent = NULL;
 	m_parentHow = GO_NORTH;
 	m_attributeFlags = 0;
+#ifdef SRCBOX
+	m_l4dSpawnAttributes = 0;
+#endif
 	m_place = TheNavMesh->GetNavPlace();
 	m_isUnderwater = false;
 	m_avoidanceObstacleHeight = 0.0f;

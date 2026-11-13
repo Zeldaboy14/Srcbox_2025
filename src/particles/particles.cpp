@@ -3786,6 +3786,53 @@ namespace
 	}
 }
 
+// The 2013 dmxloader reads binary 1 - 2 and text ( keyvalues2 ). Anything else, a binary 3 - 5
+// file the converter failed on, or a file too short to hold a header is refused with a warning.
+static bool IsReadableParticleDMX( CUtlBuffer &buf, const char *pFileName )
+{
+	const char *pData = (const char *)buf.PeekGet();
+	const int nSize = buf.GetBytesRemaining();
+	const char *pszName = pFileName ? pFileName : "?";
+
+	static const char s_szDMX[] = "<!-- dmx encoding ";
+	if ( !pData || nSize < (int)sizeof( s_szDMX ) + 8 || V_strncmp( pData, s_szDMX, sizeof( s_szDMX ) - 1 ) )
+	{
+		Warning( "Particles: '%s' isn't a DMX file, not loaded\n", pszName );
+		return false;
+	}
+
+	char szHeader[ 256 ];
+	int nLen = 0;
+	while ( nLen < nSize && nLen < (int)sizeof( szHeader ) - 1 && pData[ nLen ] != '\n' )
+	{
+		szHeader[ nLen ] = pData[ nLen ];
+		++nLen;
+	}
+	szHeader[ nLen ] = 0;
+
+	char szEncoding[ 64 ] = { 0 };
+	int nEncodingVersion = 0;
+	if ( sscanf( szHeader, "<!-- dmx encoding %63s %d", szEncoding, &nEncodingVersion ) < 2 )
+	{
+		Warning( "Particles: '%s' has an unreadable DMX header, not loaded\n", pszName );
+		return false;
+	}
+
+	if ( !V_stricmp( szEncoding, "binary" ) && ( nEncodingVersion < 1 || nEncodingVersion > 2 ) )
+	{
+		Warning( "Particles: '%s' is dmx binary %d, which can't be read or converted, not loaded\n", pszName, nEncodingVersion );
+		return false;
+	}
+
+	if ( V_stricmp( szEncoding, "binary" ) && V_stricmp( szEncoding, "keyvalues2" ) && V_stricmp( szEncoding, "keyvalues2_flat" ) )
+	{
+		Warning( "Particles: '%s' uses DMX encoding '%s', not loaded\n", pszName, szEncoding );
+		return false;
+	}
+
+	return true;
+}
+
 // Returns true and fills 'out' when buf holds a binary 3 - 5 DMX that was converted to binary 2
 static bool UpgradeParticleDMXEncoding( CUtlBuffer &buf, CUtlBuffer &out, const char *pFileName )
 {
@@ -3941,6 +3988,12 @@ bool CParticleSystemMgr::ReadParticleDefinitions( CUtlBuffer &buf, const char *p
 	if ( UpgradeParticleDMXEncoding( buf, upgradedBuf, pFileName ) )
 	{
 		pReadBuf = &upgradedBuf;
+	}
+	else if ( !IsReadableParticleDMX( buf, pFileName ) )
+	{
+		// Never hand the 2013 dmxloader data it can't parse: it reads the wrong layout as counts
+		// and sizes and corrupts its allocator ( GMod addons ship L4D2 / Portal 2 / CS:GO pcfs ).
+		return false;
 	}
 
 	CDmxElement *pRoot;

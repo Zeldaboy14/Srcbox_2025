@@ -325,6 +325,32 @@ bool IsTakingTriggerHurtDamageAtPoint( const Vector &vecPoint );
 #define SF_SC_DISABLE_WHEN_MOVE_FINISHED	(1 << 0)
 #define SF_SC_PLAYER_SETFOV					(1 << 1)
 
+//-----------------------------------------------------------------------------
+// Srcbox: makes a camera follow an attachment of its parent on the server, instead of
+// being parented to it. L4D intros ride attachments of animated rigs ( L4D2's invisible
+// ghostanim: c2m1_highway's ghostanim_intro "Attachment_1" ), and the client can't
+// resolve the attachment of a rig it never draws: the camera either stayed put or, when
+// forced to update, landed on the map origin. Following on the server and sending a plain
+// moving origin works for any rig.
+//-----------------------------------------------------------------------------
+class CAttachmentFollower
+{
+public:
+	CAttachmentFollower() : m_iAttachment( 0 ), m_bActive( false ) { SetIdentityMatrix( m_matOffset ); }
+
+	// Like CBaseEntity::SetParentAttachment, on pEntity's current move parent
+	bool Start( CBaseEntity *pEntity, const char *pszAttachment, bool bMaintainOffset );
+	// Puts pEntity on the attachment; false when there's nothing to follow any more
+	bool Update( CBaseEntity *pEntity );
+	void Stop( void ) { m_bActive = false; m_hParent = NULL; }
+	bool IsActive( void ) const { return m_bActive; }
+
+	EHANDLE			m_hParent;
+	int				m_iAttachment;
+	matrix3x4_t		m_matOffset;	// entity in attachment space
+	bool			m_bActive;
+};
+
 class CSurvivorCamera : public CBaseEntity
 {
 public:
@@ -351,6 +377,12 @@ public:
 
 	// Always transmit to clients so they know where to move the view to
 	virtual int UpdateTransmitState();
+
+	// SetParentAttachment( MaintainOffset ): followed on the server, see CAttachmentFollower
+	void InputSetParentAttachment( inputdata_t &inputdata );
+	void InputSetParentAttachmentMaintainOffset( inputdata_t &inputdata );
+	void AttachmentFollowThink( void );
+	CAttachmentFollower m_AttachmentFollower;
 
 private:
 

@@ -18,7 +18,7 @@
 //#include "terror/TerrorShared.h"
 #include "fmtstr.h"
 
-#ifdef TERROR
+#if defined( TERROR ) || defined( HL2MP )
 #include "func_simpleladder.h"
 #endif
 
@@ -148,9 +148,13 @@ void CNavMesh::BuildLadders( void )
 	// remove any left-over ladders
 	DestroyLadders();
 
-#ifdef TERROR
+#if defined( TERROR ) || defined( HL2MP )
+	// func_simpleladder is the L4D nav-ladder marker. The class is registered in
+	// this target (see game/server/func_simpleladder.cpp), so build nav ladders
+	// from it. Nothing else in the nav mesh references the classname, so HL2/SDK
+	// maps are unaffected.
 	CFuncSimpleLadder *ladder = NULL;
-	while( (ladder = dynamic_cast< CFuncSimpleLadder * >(gEntList.FindEntityByClassname( ladder, "func_simpleladder" ))) != NULL )
+	while( (ladder = static_cast< CFuncSimpleLadder * >(gEntList.FindEntityByClassname( ladder, "func_simpleladder" ))) != NULL )
 	{
 		Vector mins, maxs;
 		ladder->CollisionProp()->WorldSpaceSurroundingBounds( &mins, &maxs );

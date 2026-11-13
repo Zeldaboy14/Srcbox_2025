@@ -21,11 +21,15 @@ $Group "gamedlls"
 $Group "game"
 {
 	"client"
+	"game_shader_generic_example"
+	"game_shader_generic_garrysmod"
+	//"gamepadui"
 	"gameui_stub"
 	"hlmv"
 	"launcher_main"
 	"mathlib"
 	"matsys_controls"
+	"particles"
 	"raytrace"
 	"server"
 	"tier1"
@@ -40,6 +44,7 @@ $Group "game"
 $Group "shaders"
 {
 	"game_shader_generic_example"
+	"game_shader_generic_garrysmod"
 	//"game_shader_generic_std"
 }
 
@@ -57,6 +62,7 @@ $Group "everything"
 	"mathlib"
 	"matsys_controls"
 	"motionmapper"
+	"particles"
 	"phonemeextractor"
 	"qc_eyes"
 	"raytrace"
@@ -80,6 +86,7 @@ $Group "everything"
     "helloworldmodule"
 
 	"game_shader_generic_example"
+	"game_shader_generic_garrysmod"
 
 	// You probably don't want to override all shaders by default.
 	// This is just an example mainly! Pick and choose what you want from this project. :D
@@ -91,6 +98,8 @@ $Group "dedicated"
 	"mathlib"
 	"server"
 	"tier1"
+	"game_shader_generic_example"
+	"game_shader_generic_garrysmod"
 	
 	"lua54"
     "luasocket"

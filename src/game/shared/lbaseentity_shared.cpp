@@ -5,10 +5,12 @@
 #define CRecipientFilter C_RecipientFilter
 #else
 #include "recipientfilter.h"
+#include "physics_shared.h"
 #endif
 #include "takedamageinfo.h"
 #include "luamanager.h"
 #include "vphysics_interface.h"
+#include "model_types.h"
 #include "luasrclib.h"
 #include "lbaseentity_shared.h"
 #include "lrecipientfilter.h"
@@ -712,7 +714,7 @@ LUA_BINDING_END( "boolean", "True if check untouch, false otherwise." )
 // Srcbox: the client has no map classname for most networked entities, so C_BaseEntity::GetClassname
 // falls back to the class map name of the nearest prediction datamap (a server ragdoll reported
 // itself as a dynamic prop). Map the common server classes to their real entity names, like GMod does.
-static const char *LuaClientEntityNameFromNetworkClass( C_BaseEntity *pEntity )
+const char *LuaClientEntityNameFromNetworkClass( C_BaseEntity *pEntity )
 {
     ClientClass *pClientClass = pEntity->GetClientClass();
 
@@ -1697,6 +1699,76 @@ LUA_BINDING_BEGIN( Entity, IsWorld, "class", "Whether entity is world." )
     return 1;
 }
 LUA_BINDING_END( "boolean", "true if world, false otherwise." )
+
+LUA_BINDING_BEGIN( Entity, AddEFlags, "class", "Adds engine flags (EFL_*) to the entity." )
+{
+    lua_CBaseEntity *pEntity = LUA_BINDING_ARGUMENT( luaL_checkentity, 1, "entity" );
+    pEntity->AddEFlags( ( int )LUA_BINDING_ARGUMENT( luaL_checknumber, 2, "flags" ) );
+    return 0;
+}
+LUA_BINDING_END()
+
+LUA_BINDING_BEGIN( Entity, RemoveEFlags, "class", "Removes engine flags (EFL_*) from the entity." )
+{
+    lua_CBaseEntity *pEntity = LUA_BINDING_ARGUMENT( luaL_checkentity, 1, "entity" );
+    pEntity->RemoveEFlags( ( int )LUA_BINDING_ARGUMENT( luaL_checknumber, 2, "flags" ) );
+    return 0;
+}
+LUA_BINDING_END()
+
+LUA_BINDING_BEGIN( Entity, IsEFlagSet, "class", "Whether any of the given engine flags (EFL_*) are set." )
+{
+    lua_CBaseEntity *pEntity = LUA_BINDING_ARGUMENT( luaL_checkentity, 1, "entity" );
+    lua_pushboolean( L, pEntity->IsEFlagSet( ( int )LUA_BINDING_ARGUMENT( luaL_checknumber, 2, "flags" ) ) );
+    return 1;
+}
+LUA_BINDING_END( "boolean", "true if set" )
+
+LUA_BINDING_BEGIN( Entity, GetEFlags, "class", "Gets the entity's engine flags (EFL_*)." )
+{
+    lua_CBaseEntity *pEntity = LUA_BINDING_ARGUMENT( luaL_checkentity, 1, "entity" );
+    lua_pushinteger( L, pEntity->GetEFlags() );
+    return 1;
+}
+LUA_BINDING_END( "integer", "The engine flags" )
+
+// GMod's Entity:GetBrushPlaneCount: 0 for anything that isn't a brush model. For brush
+// models we count the collision triangles' faces, which is non-zero like GMod's plane count.
+LUA_BINDING_BEGIN( Entity, GetBrushPlaneCount, "class", "Number of brush planes of a brush entity (0 for others)." )
+{
+    lua_CBaseEntity *pEntity = LUA_BINDING_ARGUMENT( luaL_checkentity, 1, "entity" );
+    const model_t *pModel = pEntity->GetModel();
+    int nCount = 0;
+
+    if ( pModel && modelinfo->GetModelType( pModel ) == mod_brush )
+    {
+        vcollide_t *pCollide = modelinfo->GetVCollide( pModel );
+
+        if ( pCollide && pCollide->solidCount > 0 )
+        {
+            for ( int iSolid = 0; iSolid < pCollide->solidCount; iSolid++ )
+            {
+                ICollisionQuery *pQuery = physcollision->CreateQueryModel( pCollide->solids[iSolid] );
+
+                if ( pQuery )
+                {
+                    for ( int iConvex = 0; iConvex < pQuery->ConvexCount(); iConvex++ )
+                        nCount += pQuery->TriangleCount( iConvex );
+
+                    physcollision->DestroyQueryModel( pQuery );
+                }
+            }
+        }
+
+        // A brush model always has planes, even without collision data
+        if ( nCount == 0 )
+            nCount = 1;
+    }
+
+    lua_pushinteger( L, nCount );
+    return 1;
+}
+LUA_BINDING_END( "integer", "The number of planes" )
 
 LUA_BINDING_BEGIN( Entity, IsVehicle, "class", "Whether the entity is a vehicle." )
 {
@@ -2915,7 +2987,15 @@ LUA_BINDING_BEGIN( Entity, GetPhysicsObject, "class", "Get physics object." )
 {
     lua_CBaseEntity *pEntity = LUA_BINDING_ARGUMENT( luaL_checkentity, 1, "entity" );
 
-    lua_pushphysicsobject( L, pEntity->VPhysicsGetObject() );
+    IPhysicsObject *pPhysicsObject = pEntity->VPhysicsGetObject();
+
+#ifdef GAME_DLL
+    // Srcbox: GMod gives the world its static physics object (constraints to the world need it)
+    if ( !pPhysicsObject && pEntity->IsWorld() )
+        pPhysicsObject = g_PhysWorldObject;
+#endif
+
+    lua_pushphysicsobject( L, pPhysicsObject );
     return 1;
 }
 LUA_BINDING_END()
@@ -2925,6 +3005,15 @@ LUA_BINDING_BEGIN( Entity, GetPhysicsObjects, "class", "Get physics object list.
     lua_CBaseEntity *pEntity = LUA_BINDING_ARGUMENT( luaL_checkentity, 1, "entity" );
     IPhysicsObject *pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
     int count = pEntity->VPhysicsGetObjectList( pList, ARRAYSIZE( pList ) );
+
+#ifdef GAME_DLL
+    // Srcbox: GMod gives the world its static physics object (constraints to the world need it)
+    if ( count == 0 && pEntity->IsWorld() && g_PhysWorldObject )
+    {
+        pList[0] = g_PhysWorldObject;
+        count = 1;
+    }
+#endif
 
     lua_pushinteger( L, count );
     lua_newtable( L );

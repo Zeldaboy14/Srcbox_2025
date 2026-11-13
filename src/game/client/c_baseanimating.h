@@ -497,16 +497,15 @@ public:
 		}
 	}
 
+	// The slot's material name: one set here ( client Lua ) wins, then the server's
+	const char *GetSubMaterialOverrideName(int iIndex);
+
 	void GetSubMaterialOverride(int iIndex, char* pOut, int nLength)
 	{
-		if (iIndex < 0 || iIndex >= MAX_SUB_MATERIAL_OVERRIDES)
-		{
-			pOut[0] = 0;
-			return;
-		}
-
-		Q_strncpy(pOut, m_SubMaterialOverrides[iIndex], nLength);
+		const char *pszName = GetSubMaterialOverrideName(iIndex);
+		Q_strncpy(pOut, pszName ? pszName : "", nLength);
 	}
+
 #endif
 
 protected:
@@ -608,6 +607,8 @@ protected:
     char							m_szMaterialOverrideLoaded[MAX_PATH]; // name m_MaterialOverrideReference was loaded from
     char							m_SubMaterialOverrides[MAX_SUB_MATERIAL_OVERRIDES][MAX_PATH];
     CMaterialReference				m_SubMaterialOverridesReferences[MAX_SUB_MATERIAL_OVERRIDES];
+    CUtlString						m_SubMaterialOverridesLoaded[MAX_SUB_MATERIAL_OVERRIDES]; // name each reference was loaded from
+    int								m_nSubMaterialIndex[MAX_SUB_MATERIAL_OVERRIDES]; // from the server: "Materials" string table index + 1, 0 = none
 #endif
 
 private:

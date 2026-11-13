@@ -1,0 +1,36 @@
+//===================== File of the Srcbox Shader Project (Under LUX) =====================//
+//
+//	Initial D.	:	29.10.2026 DMY
+//	Last Change :	29.10.2026 DMY
+//
+//	Recreation of Garry's Mod's g_sharpen pixel shader ( g_sharpen_ps20.vcs ).
+//
+//=========================================================================================//
+
+//==========================================================================//
+//	Declare Static Combos
+//==========================================================================//
+// NONE
+
+//==========================================================================//
+//	Declare Dynamic Combos
+//==========================================================================//
+// NONE
+
+struct PS_INPUT
+{
+	float2 TexCoord			: TEXCOORD0;
+};
+
+sampler Sampler_FullScreen	: register(s0);
+
+const float g_flContrast	: register(c0);	// $contrast
+const float g_flDistance	: register(c1);	// $distance ( UV, added to both Axes )
+
+float4 main( PS_INPUT i ) : COLOR
+{
+	float4 f4Center = tex2D( Sampler_FullScreen, i.TexCoord );
+	float4 f4Ahead	= tex2D( Sampler_FullScreen, i.TexCoord + g_flDistance );
+	float4 f4Behind = tex2D( Sampler_FullScreen, i.TexCoord - g_flDistance );
+	return f4Center + ( f4Ahead - f4Behind ) * g_flContrast;
+}

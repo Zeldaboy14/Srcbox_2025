@@ -64,6 +64,9 @@ virtual RenderGroup_t GetRenderGroup() OVERRIDE;
 	virtual bool KeyValue( const char *szKeyName, const char *szValue );
 	bool CallLuaKeyValue( const char *szKeyName, const char *szValue );
 
+	// GMod's ENT:AcceptInput( inputName, activator, caller, data ); true suppresses the input
+	virtual bool AcceptInput( const char *szInputName, CBaseEntity *pActivator, CBaseEntity *pCaller, variant_t Value, int outputID );
+
 	CUtlVector< CUtlString > m_PendingLuaKeyValues; // key, value, key, value, ...
 	bool m_bLuaKeyValuesReady = false;
 #endif

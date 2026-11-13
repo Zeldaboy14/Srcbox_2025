@@ -1,0 +1,149 @@
+//===================== File of the Srcbox Shader Project (Under LUX) =====================//
+//
+//	Initial D.	:	29.10.2026 DMY
+//	Last Change :	29.10.2026 DMY
+//
+//	Recreation of Garry's Mod's g_bokehblur pixel shader ( g_bokehblur_ps30.vcs ),
+//	the Bokeh Depth of Field Post Process.
+//
+//	Per Pixel, from its Depth ( $depthtexture .r ):
+//		CoC = 2 * pow( abs( Depth - $focus ), $focusradius ) * $size		( in Texels )
+//	then 60 Taps on hexagonal Rings ( the Table below, Garry's Mod's own ), each at
+//	Offset * CoC Texels. Every Tap ( and the Center ) is weighted by its Luminance, by
+//	1 / ( 1 + CoC^2 ) of the Tap, and by a smoothstep Falloff when the Tap's own CoC
+//	( times the Ring's Edge Factor ) doesn't reach this Pixel. Output = weighted Average, Alpha 1.
+//
+//=========================================================================================//
+
+//==========================================================================//
+//	Declare Static Combos
+//==========================================================================//
+// NONE
+
+//==========================================================================//
+//	Declare Dynamic Combos
+//==========================================================================//
+// NONE
+
+struct PS_INPUT
+{
+	float2 TexCoord			: TEXCOORD0;
+};
+
+sampler Sampler_Frame	: register(s0);	// $basetexture
+sampler Sampler_Depth	: register(s1);	// $depthtexture
+
+const float2 g_f2TexelSize		: register(c0);	// 1 / Back Buffer Size
+const float  g_flRadius			: register(c1);	// $size
+const float  g_flFocusPoint		: register(c2);	// $focus
+const float  g_flFocusRadius	: register(c3);	// $focusradius
+
+static const float3 g_f3Luma = float3( 0.2126f, 0.7152f, 0.0722f );
+
+// xy = Offset ( in CoC ), z = its Distance, w = the Ring's Edge Factor
+static const float4 g_f4Taps[60] =
+{
+	float4(   0.2165,   0.1250, 0.249995, 1.0000 ),
+	float4(   0.0000,   0.2500, 0.250000, 1.0000 ),
+	float4(  -0.2165,   0.1250, 0.249995, 1.0000 ),
+	float4(  -0.2165,  -0.1250, 0.249995, 1.0000 ),
+	float4(   0.0000,  -0.2500, 0.250000, 1.0000 ),
+	float4(   0.2165,  -0.1250, 0.249995, 1.0000 ),
+	float4(   0.4330,   0.2500, 0.499989, 1.0000 ),
+	float4(   0.0000,   0.5000, 0.500000, 1.0000 ),
+	float4(  -0.4330,   0.2500, 0.499989, 1.0000 ),
+	float4(  -0.4330,  -0.2500, 0.499989, 1.0000 ),
+	float4(   0.0000,  -0.5000, 0.500000, 1.0000 ),
+	float4(   0.4330,  -0.2500, 0.499989, 1.0000 ),
+	float4(   0.6495,   0.3750, 0.749983, 1.0000 ),
+	float4(   0.0000,   0.7500, 0.750000, 1.0000 ),
+	float4(  -0.6495,   0.3750, 0.749983, 1.0000 ),
+	float4(  -0.6495,  -0.3750, 0.749983, 1.0000 ),
+	float4(   0.0000,  -0.7500, 0.750000, 1.0000 ),
+	float4(   0.6495,  -0.3750, 0.749983, 1.0000 ),
+	float4(   0.8660,   0.5000, 0.999978, 1.0000 ),
+	float4(   0.0000,   1.0000, 0.999978, 1.0000 ),
+	float4(  -0.8660,   0.5000, 0.999978, 1.0000 ),
+	float4(  -0.8660,  -0.5000, 0.999978, 1.0000 ),
+	float4(   0.0000,  -1.0000, 0.999978, 1.0000 ),
+	float4(   0.8660,  -0.5000, 0.999978, 1.0000 ),
+	float4(   0.2163,   0.3754, 0.433256, 0.8670 ),
+	float4(  -0.2170,   0.3750, 0.433260, 0.8670 ),
+	float4(  -0.4333,  -0.0004, 0.433300, 0.8670 ),
+	float4(  -0.2163,  -0.3754, 0.433256, 0.8670 ),
+	float4(   0.2170,  -0.3750, 0.433260, 0.8670 ),
+	float4(   0.4333,   0.0004, 0.433300, 0.8670 ),
+	float4(   0.4328,   0.5004, 0.661601, 0.8847 ),
+	float4(  -0.2170,   0.6250, 0.661600, 0.8847 ),
+	float4(  -0.6498,   0.1246, 0.661638, 0.8847 ),
+	float4(  -0.4328,  -0.5004, 0.661601, 0.8847 ),
+	float4(   0.2170,  -0.6250, 0.661600, 0.8847 ),
+	float4(   0.6498,  -0.1246, 0.661638, 0.8847 ),
+	float4(   0.6493,   0.6254, 0.901507, 0.9065 ),
+	float4(  -0.2170,   0.8750, 0.901507, 0.9065 ),
+	float4(  -0.8663,   0.2496, 0.901541, 0.9065 ),
+	float4(  -0.6493,  -0.6254, 0.901507, 0.9065 ),
+	float4(   0.2170,  -0.8750, 0.901507, 0.9065 ),
+	float4(   0.8663,  -0.2496, 0.901541, 0.9065 ),
+	float4(   0.2160,   0.6259, 0.662123, 0.8851 ),
+	float4(  -0.4340,   0.5000, 0.662085, 0.8851 ),
+	float4(  -0.6500,  -0.1259, 0.662081, 0.8851 ),
+	float4(  -0.2160,  -0.6259, 0.662123, 0.8851 ),
+	float4(   0.4340,  -0.5000, 0.662085, 0.8851 ),
+	float4(   0.6500,   0.1259, 0.662081, 0.8851 ),
+	float4(   0.4325,   0.7509, 0.866549, 0.8670 ),
+	float4(  -0.4340,   0.7500, 0.866519, 0.8670 ),
+	float4(  -0.8665,  -0.0009, 0.866500, 0.8670 ),
+	float4(  -0.4325,  -0.7509, 0.866549, 0.8670 ),
+	float4(   0.4340,  -0.7500, 0.866519, 0.8670 ),
+	float4(   0.8665,   0.0009, 0.866500, 0.8670 ),
+	float4(   0.2158,   0.8763, 0.902481, 0.9070 ),
+	float4(  -0.6510,   0.6250, 0.902456, 0.9070 ),
+	float4(  -0.8668,  -0.2513, 0.902493, 0.9070 ),
+	float4(  -0.2158,  -0.8763, 0.902481, 0.9070 ),
+	float4(   0.6510,  -0.6250, 0.902456, 0.9070 ),
+	float4(   0.8668,   0.2513, 0.902493, 0.9070 ),
+};
+
+// CoC of a Depth, in Texels ( Garry's Mod: 2 * pow( |Depth - Focus|, FocusRadius ) * Radius )
+float CircleOfConfusion( float flDepth )
+{
+	return 2.0f * pow( abs( flDepth - g_flFocusPoint ), g_flFocusRadius ) * g_flRadius;
+}
+
+float4 main( PS_INPUT i ) : COLOR
+{
+	float2 f2UV = i.TexCoord;
+
+	float3 f3Center = tex2D( Sampler_Frame, f2UV ).rgb;
+	float flCenterCoC = CircleOfConfusion( tex2D( Sampler_Depth, f2UV ).r );
+	float flCenterReach = abs( flCenterCoC );
+	float2 f2Scale = flCenterCoC * g_f2TexelSize;
+
+	// The Center: Luminance / ( 1 + CoC^2 )
+	float flCenterWeight = max( dot( f3Center + 0.01f, g_f3Luma ) / ( flCenterCoC * flCenterCoC + 1.0f ), 0.0f );
+	float3 f3Sum = f3Center * flCenterWeight;
+	float flWeightSum = flCenterWeight;
+
+	[unroll]
+	for ( int k = 0; k < 60; k++ )
+	{
+		float2 f2TapUV = f2UV + f2Scale * g_f4Taps[k].xy;
+		float3 f3Tap = tex2D( Sampler_Frame, f2TapUV ).rgb;
+		float flTapCoC = CircleOfConfusion( tex2D( Sampler_Depth, f2TapUV ).r );
+
+		// Garry's Mod: the Tap's own CoC, unless the Center's is negative ( a negative $size )
+		flTapCoC = ( flCenterCoC * 0.5f >= 0.0f ) ? flTapCoC : max( flCenterReach, flTapCoC );
+
+		// How far past the Tap's ( Edge Factor scaled ) CoC this Pixel is, 10% soft Edge
+		float flEdge = flTapCoC * g_f4Taps[k].w;
+		float t = saturate( ( flCenterReach * g_f4Taps[k].z - flEdge ) / ( flEdge * 0.1f ) );
+		float flFalloff = saturate( 1.0f - t * t * ( 3.0f - 2.0f * t ) );
+
+		float flWeight = max( flFalloff * dot( f3Tap + 0.01f, g_f3Luma ) / ( flTapCoC * flTapCoC + 1.0f ), 0.0f );
+		f3Sum += f3Tap * flWeight;
+		flWeightSum += flWeight;
+	}
+
+	return float4( f3Sum / flWeightSum, 1.0f );
+}

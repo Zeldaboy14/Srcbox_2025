@@ -1,0 +1,6 @@
+UnlitGeneric
+{
+	"$basetexture" "vgui/loading/bar_terror"
+	"$translucent" 1
+	"$ignorez" 1
+}

@@ -370,22 +370,10 @@ public:
 		Q_strncpy(pOut, m_MaterialOverride.Get(), nLength);
 	}
 
-	void SetSubMaterialOverride(int iIndex, const char* pMaterialName)
-	{
-		if (iIndex < 0 || iIndex >= MAX_SUB_MATERIAL_OVERRIDES)
-			return;
-
-		// Experiment; TODO: Won't this cause a memory leak?
-		m_SubMaterialOverrides.Set(iIndex, AllocPooledString(pMaterialName));
-	}
-
-	void ClearSubMaterialOverrides()
-	{
-		for (int i = 0; i < MAX_SUB_MATERIAL_OVERRIDES; i++)
-		{
-			m_SubMaterialOverrides.Set(i, NULL_STRING);
-		}
-	}
+	// GMod's Entity:SetSubMaterial. The names stay here for GetSubMaterial; the client gets
+	// an index into the "Materials" string table per slot ( m_nSubMaterialIndex, 0 = none ).
+	void SetSubMaterialOverride(int iIndex, const char* pMaterialName);
+	void ClearSubMaterialOverrides();
 
 	void GetSubMaterialOverride(int iIndex, char* pOut, int nLength)
 	{
@@ -490,7 +478,8 @@ protected:
 #ifdef LUA_SDK
 	// Experiment; Material overrides
 	CNetworkString(m_MaterialOverride, MAX_PATH);
-	CNetworkArray(string_t, m_SubMaterialOverrides, MAX_SUB_MATERIAL_OVERRIDES);
+	string_t m_SubMaterialOverrides[MAX_SUB_MATERIAL_OVERRIDES];
+	CNetworkArray(int, m_nSubMaterialIndex, MAX_SUB_MATERIAL_OVERRIDES); // "Materials" string table index + 1, 0 = none
 #endif
 
 public:

@@ -27,6 +27,11 @@ $Project "fgdlib"
 	"fgdlib\fgdlib.vpc" [$WINDOWS]
 }
 
+$Project "game_shader_generic_garrysmod"
+{
+	"materialsystem\stdshaders\game_shader_generic_garrysmod_hl2mp.vpc" [$HL2MP]
+}
+
 $Project "game_shader_generic_example"
 {
 	"materialsystem\stdshaders\game_shader_generic_example_hl2mp.vpc" [$HL2MP]
@@ -38,6 +43,7 @@ $Project "game_shader_generic_example"
 
 // Use this project if you want to override all std shaders with your own.
 // By default it will override ALL of them. So feel free to cut it down if you want :)
+
 $Project "game_shader_generic_std"
 {
 	"materialsystem\stdshaders\game_shader_generic_std_hl2mp.vpc" [$HL2MP]
@@ -108,6 +114,11 @@ $Project "matsys_controls"
 $Project "motionmapper"
 {
 	"utils\motionmapper\motionmapper.vpc" [$WINDOWS]
+}
+
+$Project "particles"
+{
+	"particles\particles.vpc"
 }
 
 $Project "phonemeextractor"

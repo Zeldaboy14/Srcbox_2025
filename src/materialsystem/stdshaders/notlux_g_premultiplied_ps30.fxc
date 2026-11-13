@@ -1,0 +1,31 @@
+//===================== File of the Srcbox Shader Project (Under LUX) =====================//
+//
+//	Initial D.	:	29.10.2026 DMY
+//	Last Change :	29.10.2026 DMY
+//
+//	Recreation of Garry's Mod's g_premultiplied pixel shader ( g_premultiplied_ps20.vcs ).
+//	Passes $basetexture through; the C++ blends it as premultiplied Alpha.
+//
+//=========================================================================================//
+
+//==========================================================================//
+//	Declare Static Combos
+//==========================================================================//
+// NONE
+
+//==========================================================================//
+//	Declare Dynamic Combos
+//==========================================================================//
+// NONE
+
+struct PS_INPUT
+{
+	float2 TexCoord			: TEXCOORD0;
+};
+
+sampler Sampler_RT	: register(s0);
+
+float4 main( PS_INPUT i ) : COLOR
+{
+	return tex2D( Sampler_RT, i.TexCoord );
+}

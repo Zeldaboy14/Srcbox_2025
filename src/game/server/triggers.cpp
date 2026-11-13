@@ -658,6 +658,292 @@ void CAutoTrigger::Think(void)
 	}
 }
 
+// HL1 stuff
+
+
+#define SF_RELAY_FIREONCE		0x0001
+
+#if 0
+
+class CTriggerRelay : public CBaseEntity
+{
+public:
+	void KeyValue( KeyValueData *pkvd );
+	void Spawn( void );
+	void Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+
+	int ObjectCaps( void ) { return CBaseEntity::ObjectCaps() & ~FCAP_ACROSS_TRANSITION; }
+	virtual int		Save( CSave &save );
+	virtual int		Restore( CRestore &restore );
+
+	//static	TYPEDESCRIPTION m_SaveData[];
+
+//private:
+	USE_TYPE	triggerType;
+};
+LINK_ENTITY_TO_CLASS( trigger_relay, CTriggerRelay );
+
+/*TYPEDESCRIPTION	CTriggerRelay::m_SaveData[] =
+{
+	DEFINE_FIELD( CTriggerRelay, triggerType, FIELD_INTEGER ),
+};
+
+IMPLEMENT_SAVERESTORE(CTriggerRelay,CBaseDelay);*/
+
+BEGIN_DATADESC( CTriggerRelay )
+DEFINE_FIELD( triggerType, FIELD_INTEGER ),
+END_DATADESC()
+
+void CTriggerRelay::KeyValue( KeyValueData *pkvd )
+{
+	if (FStrEq(pkvd->szKeyName, "triggerstate"))
+	{
+		int type = atoi( pkvd->szValue );
+		switch( type )
+		{
+		case 0:
+			triggerType = USE_OFF;
+			break;
+		case 2:
+			triggerType = USE_TOGGLE;
+			break;
+		default:
+			triggerType = USE_ON;
+			break;
+		}
+		pkvd->fHandled = TRUE;
+	}
+	else
+		CBaseEntity::KeyValue( pkvd );
+}
+
+
+void CTriggerRelay::Spawn( void )
+{
+}
+
+
+
+
+void CTriggerRelay::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+{
+	SUB_UseTargets( this, triggerType, 0 );
+	if ( pev->spawnflags & SF_RELAY_FIREONCE )
+		UTIL_Remove( this );
+}
+
+
+//**********************************************************
+// The Multimanager Entity - when fired, will fire up to 16 targets 
+// at specified times.
+// FLAG:		THREAD (create clones when triggered)
+// FLAG:		CLONE (this is a clone for a threaded execution)
+
+#define SF_MULTIMAN_CLONE		0x80000000
+#define SF_MULTIMAN_THREAD		0x00000001
+
+class CMultiManager : public CBaseToggle
+{
+public:
+	void KeyValue( KeyValueData *pkvd );
+	void Spawn ( void );
+	void EXPORT ManagerThink ( void );
+	void EXPORT ManagerUse   ( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+
+#if _DEBUG
+	void EXPORT ManagerReport( void );
+#endif
+
+	bool		HasTarget( string_t targetname );
+	
+	int ObjectCaps( void ) { return CBaseToggle::ObjectCaps() & ~FCAP_ACROSS_TRANSITION; }
+
+	virtual int		Save( CSave &save );
+	virtual int		Restore( CRestore &restore );
+
+	//static	TYPEDESCRIPTION m_SaveData[];
+
+	int		m_cTargets;	// the total number of targets in this manager's fire list.
+	int		m_index;	// Current target
+	float	m_startTime;// Time we started firing
+	int		m_iTargetName	[ MAX_MULTI_TARGETS ];// list if indexes into global string array
+	float	m_flTargetDelay [ MAX_MULTI_TARGETS ];// delay (in seconds) from time of manager fire to target fire
+private:
+	inline bool IsClone( void ) { return (this->spawnflags & SF_MULTIMAN_CLONE) ? TRUE : FALSE; }
+	inline bool ShouldClone( void )
+	{ 
+		if ( IsClone() )
+			return FALSE;
+
+		return (this->spawnflags & SF_MULTIMAN_THREAD) ? TRUE : FALSE; 
+	}
+
+	CMultiManager *Clone( void );
+};
+LINK_ENTITY_TO_CLASS( multi_manager, CMultiManager );
+
+// Global Savedata for multi_manager
+/*TYPEDESCRIPTION	CMultiManager::m_SaveData[] =
+{
+	DEFINE_FIELD( CMultiManager, m_cTargets, FIELD_INTEGER ),
+	DEFINE_FIELD( CMultiManager, m_index, FIELD_INTEGER ),
+	DEFINE_FIELD( CMultiManager, m_startTime, FIELD_TIME ),
+	DEFINE_ARRAY( CMultiManager, m_iTargetName, FIELD_STRING, MAX_MULTI_TARGETS ),
+	DEFINE_ARRAY( CMultiManager, m_flTargetDelay, FIELD_FLOAT, MAX_MULTI_TARGETS ),
+};*/
+
+//IMPLEMENT_SAVERESTORE(CMultiManager,CBaseToggle);
+
+void CMultiManager :: KeyValue( KeyValueData *pkvd )
+{
+	// UNDONE: Maybe this should do something like this:
+	//CBaseToggle::KeyValue( pkvd );
+	// if ( !pkvd->fHandled )
+	// ... etc.
+
+	if (FStrEq(pkvd->szKeyName, "wait"))
+	{
+		m_flWait = atof(pkvd->szValue);
+		pkvd->fHandled = TRUE;
+	}
+	else // add this field to the target list
+	{
+		// this assumes that additional fields are targetnames and their values are delay values.
+		if ( m_cTargets < MAX_MULTI_TARGETS )
+		{
+			char tmp[128];
+
+			UTIL_StripToken( pkvd->szKeyName, tmp, sizeof( tmp ) );
+			m_iTargetName [ m_cTargets ] = ALLOC_STRING( tmp );
+			m_flTargetDelay [ m_cTargets ] = atof (pkvd->szValue);
+			m_cTargets++;
+			pkvd->fHandled = TRUE;
+		}
+	}
+}
+
+
+void CMultiManager :: Spawn( void )
+{
+	pev->solid = SOLID_NOT;
+	SetUse ( &CMultiManager::ManagerUse );
+	SetThink ( &CMultiManager::ManagerThink);
+
+	// Sort targets
+	// Quick and dirty bubble sort
+	int swapped = 1;
+
+	while ( swapped )
+	{
+		swapped = 0;
+		for ( int i = 1; i < m_cTargets; i++ )
+		{
+			if ( m_flTargetDelay[i] < m_flTargetDelay[i-1] )
+			{
+				// Swap out of order elements
+				int name = m_iTargetName[i];
+				float delay = m_flTargetDelay[i];
+				m_iTargetName[i] = m_iTargetName[i-1];
+				m_flTargetDelay[i] = m_flTargetDelay[i-1];
+				m_iTargetName[i-1] = name;
+				m_flTargetDelay[i-1] = delay;
+				swapped = 1;
+			}
+		}
+	}
+}
+
+
+BOOL CMultiManager::HasTarget( string_t targetname )
+{ 
+	for ( int i = 0; i < m_cTargets; i++ )
+		if ( FStrEq(STRING(targetname), STRING(m_iTargetName[i])) )
+			return TRUE;
+	
+	return FALSE;
+}
+
+
+// Designers were using this to fire targets that may or may not exist -- 
+// so I changed it to use the standard target fire code, made it a little simpler.
+void CMultiManager :: ManagerThink ( void )
+{
+	float	time;
+
+	time = gpGlobals->time - m_startTime;
+	while ( m_index < m_cTargets && m_flTargetDelay[ m_index ] <= time )
+	{
+		FireTargets( STRING( m_iTargetName[ m_index ] ), m_hActivator, this, USE_TOGGLE, 0 );
+		m_index++;
+	}
+
+	if ( m_index >= m_cTargets )// have we fired all targets?
+	{
+		SetThink( NULL );
+		if ( IsClone() )
+		{
+			UTIL_Remove( this );
+			return;
+		}
+		SetUse ( &CMultiManager::ManagerUse );// allow manager re-use 
+	}
+	else
+		pev->nextthink = m_startTime + m_flTargetDelay[ m_index ];
+}
+
+CMultiManager *CMultiManager::Clone( void )
+{
+	CMultiManager *pMulti = GetClassPtr( (CMultiManager *)NULL );
+
+	edict_t *pEdict = pMulti->pev->pContainingEntity;
+	memcpy( pMulti->pev, pev, sizeof(*pev) );
+	pMulti->pev->pContainingEntity = pEdict;
+
+	pMulti->this->spawnflags |= SF_MULTIMAN_CLONE;
+	pMulti->m_cTargets = m_cTargets;
+	memcpy( pMulti->m_iTargetName, m_iTargetName, sizeof( m_iTargetName ) );
+	memcpy( pMulti->m_flTargetDelay, m_flTargetDelay, sizeof( m_flTargetDelay ) );
+
+	return pMulti;
+}
+
+
+// The USE function builds the time table and starts the entity thinking.
+void CMultiManager :: ManagerUse ( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+{
+	// In multiplayer games, clone the MM and execute in the clone (like a thread)
+	// to allow multiple players to trigger the same multimanager
+	if ( ShouldClone() )
+	{
+		CMultiManager *pClone = Clone();
+		pClone->ManagerUse( pActivator, pCaller, useType, value );
+		return;
+	}
+
+	m_hActivator = pActivator;
+	m_index = 0;
+	m_startTime = gpGlobals->time;
+
+	SetUse( NULL );// disable use until all targets have fired
+
+	SetThink ( &CMultiManager::ManagerThink );
+	this->nextthink = gpGlobals->time;
+}
+
+#if _DEBUG
+void CMultiManager :: ManagerReport ( void )
+{
+	int	cIndex;
+
+	for ( cIndex = 0 ; cIndex < m_cTargets ; cIndex++ )
+	{
+		ALERT ( at_console, "%s %f\n", STRING(m_iTargetName[cIndex]), m_flTargetDelay[cIndex] );
+	}
+}
+#endif
+
+#endif
+
 //-----------------------------------------------------------------------------
 // Purpose: Removes anything that touches it. If the trigger has a targetname,
 //			firing it will toggle state.
@@ -2933,6 +3219,8 @@ const float CTriggerCamera::kflPosInterpTime = 2.0f;
 #endif
 
 LINK_ENTITY_TO_CLASS( point_viewcontrol, CTriggerCamera );
+// point_viewcontrol_multiplayer is its own class now ( CPointViewControlMultiplayer, below )
+//LINK_ENTITY_TO_CLASS( point_viewcontrol_multiplayer, CTriggerCamera );
 
 BEGIN_DATADESC( CTriggerCamera )
 
@@ -3734,12 +4022,86 @@ void CTriggerCamera::Move()
 
 //#ifdef TERROR
 #ifdef SRCBOX
+bool CAttachmentFollower::Start( CBaseEntity *pEntity, const char *pszAttachment, bool bMaintainOffset )
+{
+	Stop();
+
+	CBaseEntity *pParent = pEntity->GetMoveParent();
+	CBaseAnimating *pAnimating = pParent ? pParent->GetBaseAnimating() : NULL;
+	if ( !pAnimating )
+	{
+		Warning( "%s: SetParentAttachment %s without an animating parent\n", pEntity->GetDebugName(), pszAttachment );
+		return false;
+	}
+
+	int iAttachment = pAnimating->LookupAttachment( pszAttachment );
+	if ( iAttachment <= 0 )
+	{
+		Warning( "%s: parent %s has no attachment '%s'\n", pEntity->GetDebugName(), pAnimating->GetDebugName(), pszAttachment );
+		return false;
+	}
+
+	matrix3x4_t matAttachment;
+	if ( !pAnimating->GetAttachment( iAttachment, matAttachment ) )
+		return false;
+
+	if ( bMaintainOffset )
+	{
+		// Where the entity is now, in the attachment's space
+		matrix3x4_t matInvAttachment;
+		MatrixInvert( matAttachment, matInvAttachment );
+		ConcatTransforms( matInvAttachment, pEntity->EntityToWorldTransform(), m_matOffset );
+	}
+	else
+	{
+		SetIdentityMatrix( m_matOffset );
+	}
+
+	// Unparent where it stands; from here the follower moves it
+	pEntity->SetParent( NULL );
+
+	m_hParent = pAnimating;
+	m_iAttachment = iAttachment;
+	m_bActive = true;
+	return Update( pEntity );
+}
+
+bool CAttachmentFollower::Update( CBaseEntity *pEntity )
+{
+	CBaseAnimating *pAnimating = m_hParent.Get() ? m_hParent->GetBaseAnimating() : NULL;
+	if ( !m_bActive || !pAnimating )
+	{
+		Stop();
+		return false;
+	}
+
+	// prop_dynamic only advances its animation every 0.1s; bring it up to now so the camera
+	// moves every tick instead of in steps
+	pAnimating->StudioFrameAdvance();
+
+	matrix3x4_t matAttachment, matWorld;
+	if ( !pAnimating->GetAttachment( m_iAttachment, matAttachment ) )
+		return true;	// try again next tick
+
+	ConcatTransforms( matAttachment, m_matOffset, matWorld );
+
+	Vector vecOrigin;
+	QAngle angAngles;
+	MatrixAngles( matWorld, angAngles, vecOrigin );
+	pEntity->SetAbsOrigin( vecOrigin );
+	pEntity->SetAbsAngles( angAngles );
+	return true;
+}
+
 BEGIN_DATADESC(CSurvivorCamera)
 
 // Inputs
 DEFINE_INPUTFUNC(FIELD_VOID, "Enable", InputEnable),
 DEFINE_INPUTFUNC(FIELD_VOID, "Disable", InputDisable),
 DEFINE_INPUTFUNC(FIELD_VOID, "StartMovement", InputStartMovement),
+DEFINE_INPUTFUNC(FIELD_STRING, "SetParentAttachment", InputSetParentAttachment),
+DEFINE_INPUTFUNC(FIELD_STRING, "SetParentAttachmentMaintainOffset", InputSetParentAttachmentMaintainOffset),
+DEFINE_THINKFUNC(AttachmentFollowThink),
 
 // Function Pointers
 DEFINE_FUNCTION(FollowTarget),
@@ -3809,6 +4171,9 @@ void CSurvivorCamera::Enable(void)
 
 		// Hide the player's viewmodel
 		pPlayer->m_Local.m_bDrawViewmodel = false;
+
+		// L4D intros show the survivors: draw this player's own model while the camera has the view
+		pPlayer->SetForceLocalDraw(true);
 	}
 
 	DispatchUpdateTransmitState();
@@ -3829,14 +4194,17 @@ void CSurvivorCamera::Disable(void)
 	{
 		CBasePlayer* pBasePlayer = (CBasePlayer*)m_hPlayer.Get();
 
-		if (pBasePlayer->IsAlive())
+		// Only give the view back if it's still ours: the map may already have enabled
+		// another camera ( e.g. the intro's point_viewcontrol_multiplayer hand-off )
+		if (pBasePlayer->IsAlive() && (pBasePlayer->GetViewEntity() == this || pBasePlayer->GetViewEntity() == NULL))
 		{
 			pBasePlayer->SetViewEntity(NULL);
 			pBasePlayer->EnableControl(TRUE);
 			pBasePlayer->m_Local.m_bDrawViewmodel = true;
+			pBasePlayer->SetForceLocalDraw(false);
 		}
 
-		if (HasSpawnFlags(SF_SC_PLAYER_SETFOV))
+		if (HasSpawnFlags(SF_SC_PLAYER_SETFOV) && pBasePlayer->GetFOVOwner() == this)
 		{
 			pBasePlayer->SetFOV(this, 0, m_fovSpeed);
 		}
@@ -3892,6 +4260,10 @@ void CSurvivorCamera::StartMovement(void)
 		return;
 	}
 
+	// Leave the intro rig: move from where it is now
+	m_AttachmentFollower.Stop();
+	SetContextThink(NULL, TICK_NEVER_THINK, "AttachmentFollow");
+
 	SetParent(NULL);
 	SetMoveType(MOVETYPE_NOCLIP);
 	m_vStartPos = GetAbsOrigin();
@@ -3914,9 +4286,41 @@ int CSurvivorCamera::UpdateTransmitState()
 	}
 }
 
+// The player this camera is for. L4D relays often enable these without a player as the
+// activator, so then: the nearest living player that no other enabled survivor camera has.
+static CBasePlayer *FindSurvivorCameraPlayer( CSurvivorCamera *pCamera, CBaseEntity *pActivator )
+{
+	if ( pActivator && pActivator->IsPlayer() )
+		return ToBasePlayer( pActivator );
+
+	CBasePlayer *pBest = NULL;
+	float flBestDist = FLT_MAX;
+	for ( int i = 1; i <= gpGlobals->maxClients; i++ )
+	{
+		CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+		if ( !pPlayer || !pPlayer->IsAlive() )
+			continue;
+
+		// Already looking through another survivor camera
+		CBaseEntity *pView = pPlayer->GetViewEntity();
+		if ( pView && pView != pCamera && FClassnameIs( pView, "point_viewcontrol_survivor" ) )
+			continue;
+
+		float flDist = ( pPlayer->EyePosition() - pCamera->GetAbsOrigin() ).LengthSqr();
+		if ( flDist < flBestDist )
+		{
+			flBestDist = flDist;
+			pBest = pPlayer;
+		}
+	}
+
+	// Everyone taken: fall back to the first player
+	return pBest ? pBest : UTIL_PlayerByIndex( 1 );
+}
+
 void CSurvivorCamera::InputEnable(inputdata_t& inputdata)
 {
-	m_hPlayer = inputdata.pActivator;
+	m_hPlayer = FindSurvivorCameraPlayer( this, inputdata.pActivator );
 	Enable();
 }
 
@@ -3928,6 +4332,24 @@ void CSurvivorCamera::InputDisable(inputdata_t& inputdata)
 void CSurvivorCamera::InputStartMovement(inputdata_t& inputdata)
 {
 	StartMovement();
+}
+
+void CSurvivorCamera::InputSetParentAttachment(inputdata_t& inputdata)
+{
+	if (m_AttachmentFollower.Start(this, inputdata.value.String(), false))
+		SetContextThink(&CSurvivorCamera::AttachmentFollowThink, gpGlobals->curtime, "AttachmentFollow");
+}
+
+void CSurvivorCamera::InputSetParentAttachmentMaintainOffset(inputdata_t& inputdata)
+{
+	if (m_AttachmentFollower.Start(this, inputdata.value.String(), true))
+		SetContextThink(&CSurvivorCamera::AttachmentFollowThink, gpGlobals->curtime, "AttachmentFollow");
+}
+
+void CSurvivorCamera::AttachmentFollowThink(void)
+{
+	if (m_AttachmentFollower.Update(this))
+		SetNextThink(gpGlobals->curtime, "AttachmentFollow");
 }
 
 void CSurvivorCamera::Move()
@@ -3957,6 +4379,310 @@ void CSurvivorCamera::Move()
 
 		m_bMovementStarted = false;
 	}
+}
+
+//-----------------------------------------------------------------------------
+// point_viewcontrol_multiplayer ( L4D / Portal 2 ): a camera for every player at once.
+//
+//	fov / fov_rate		FOV while viewing, and seconds to reach it ( applied with the "Set FOV"
+//						flag, or whenever the map gives fov: L4D's FGD has no flag for it )
+//	target_entity		StartMovement moves the camera to this entity's origin and angles...
+//	interp_time			...over this many seconds ( eased )
+//	target_team			-1 = every player ( default ), otherwise only that team
+//	Flags: 1 = Disable when the move is finished, 2 = Set FOV
+//	Inputs: Enable, Disable, StartMovement, AddPlayer ( !activator ), RemovePlayer ( !activator )
+//
+// Disable only gives a player their view back if this camera still has it, so handing off
+// to a point_viewcontrol_survivor in either order works.
+//-----------------------------------------------------------------------------
+#define SF_PVCM_DISABLE_WHEN_MOVE_FINISHED	( 1 << 0 )
+#define SF_PVCM_SET_FOV						( 1 << 1 )
+
+class CPointViewControlMultiplayer : public CBaseEntity
+{
+public:
+	DECLARE_CLASS( CPointViewControlMultiplayer, CBaseEntity );
+	DECLARE_DATADESC();
+
+	CPointViewControlMultiplayer();
+
+	virtual void Spawn( void );
+	virtual bool KeyValue( const char *szKeyName, const char *szValue );
+	virtual int UpdateTransmitState( void ) { return SetTransmitState( FL_EDICT_ALWAYS ); }
+	virtual void UpdateOnRemove( void );
+
+	void Enable( void );
+	void Disable( void );
+	void AddPlayer( CBasePlayer *pPlayer );
+	void RemovePlayer( CBasePlayer *pPlayer, bool bForget );
+	void StartMovement( void );
+	void MoveThink( void );
+
+	void InputEnable( inputdata_t &inputdata )			{ Enable(); }
+	void InputDisable( inputdata_t &inputdata )			{ Disable(); }
+	void InputStartMovement( inputdata_t &inputdata )	{ StartMovement(); }
+	void InputAddPlayer( inputdata_t &inputdata );
+	void InputRemovePlayer( inputdata_t &inputdata );
+
+	// SetParentAttachment( MaintainOffset ): followed on the server, see CAttachmentFollower
+	void InputSetParentAttachment( inputdata_t &inputdata );
+	void InputSetParentAttachmentMaintainOffset( inputdata_t &inputdata );
+	void AttachmentFollowThink( void );
+	CAttachmentFollower m_AttachmentFollower;
+
+private:
+	bool UsesFOV( void ) const { return HasSpawnFlags( SF_PVCM_SET_FOV ) || m_bFOVGiven; }
+
+	float		m_flFOV;
+	float		m_flFOVRate;
+	string_t	m_iszTargetEntity;
+	float		m_flInterpTime;
+	int			m_iTargetTeam;
+	bool		m_bFOVGiven;
+
+	bool		m_bEnabled;
+	CUtlVector< CHandle< CBasePlayer > > m_Players;
+
+	// StartMovement
+	bool		m_bMoving;
+	float		m_flMoveStartTime;
+	Vector		m_vecMoveStart;
+	QAngle		m_angMoveStart;
+	EHANDLE		m_hMoveTarget;
+};
+
+LINK_ENTITY_TO_CLASS( point_viewcontrol_multiplayer, CPointViewControlMultiplayer );
+
+BEGIN_DATADESC( CPointViewControlMultiplayer )
+	DEFINE_KEYFIELD( m_flFOV, FIELD_FLOAT, "fov" ),
+	DEFINE_KEYFIELD( m_flFOVRate, FIELD_FLOAT, "fov_rate" ),
+	DEFINE_KEYFIELD( m_iszTargetEntity, FIELD_STRING, "target_entity" ),
+	DEFINE_KEYFIELD( m_flInterpTime, FIELD_FLOAT, "interp_time" ),
+	DEFINE_KEYFIELD( m_iTargetTeam, FIELD_INTEGER, "target_team" ),
+	DEFINE_FIELD( m_bFOVGiven, FIELD_BOOLEAN ),
+	DEFINE_FIELD( m_bEnabled, FIELD_BOOLEAN ),
+	DEFINE_UTLVECTOR( m_Players, FIELD_EHANDLE ),
+	DEFINE_FIELD( m_bMoving, FIELD_BOOLEAN ),
+	DEFINE_FIELD( m_flMoveStartTime, FIELD_TIME ),
+	DEFINE_FIELD( m_vecMoveStart, FIELD_POSITION_VECTOR ),
+	DEFINE_FIELD( m_angMoveStart, FIELD_VECTOR ),
+	DEFINE_FIELD( m_hMoveTarget, FIELD_EHANDLE ),
+
+	DEFINE_THINKFUNC( MoveThink ),
+
+	DEFINE_INPUTFUNC( FIELD_VOID, "Enable", InputEnable ),
+	DEFINE_INPUTFUNC( FIELD_VOID, "Disable", InputDisable ),
+	DEFINE_INPUTFUNC( FIELD_VOID, "StartMovement", InputStartMovement ),
+	DEFINE_INPUTFUNC( FIELD_VOID, "AddPlayer", InputAddPlayer ),
+	DEFINE_INPUTFUNC( FIELD_VOID, "RemovePlayer", InputRemovePlayer ),
+	DEFINE_INPUTFUNC( FIELD_STRING, "SetParentAttachment", InputSetParentAttachment ),
+	DEFINE_INPUTFUNC( FIELD_STRING, "SetParentAttachmentMaintainOffset", InputSetParentAttachmentMaintainOffset ),
+	DEFINE_THINKFUNC( AttachmentFollowThink ),
+END_DATADESC()
+
+void CPointViewControlMultiplayer::InputSetParentAttachment( inputdata_t &inputdata )
+{
+	if ( m_AttachmentFollower.Start( this, inputdata.value.String(), false ) )
+		SetContextThink( &CPointViewControlMultiplayer::AttachmentFollowThink, gpGlobals->curtime, "AttachmentFollow" );
+}
+
+void CPointViewControlMultiplayer::InputSetParentAttachmentMaintainOffset( inputdata_t &inputdata )
+{
+	if ( m_AttachmentFollower.Start( this, inputdata.value.String(), true ) )
+		SetContextThink( &CPointViewControlMultiplayer::AttachmentFollowThink, gpGlobals->curtime, "AttachmentFollow" );
+}
+
+void CPointViewControlMultiplayer::AttachmentFollowThink( void )
+{
+	if ( m_AttachmentFollower.Update( this ) )
+		SetNextThink( gpGlobals->curtime, "AttachmentFollow" );
+}
+
+CPointViewControlMultiplayer::CPointViewControlMultiplayer()
+{
+	m_flFOV = 90.0f;
+	m_flFOVRate = 1.0f;
+	m_iszTargetEntity = NULL_STRING;
+	m_flInterpTime = 1.0f;
+	m_iTargetTeam = -1;
+	m_bFOVGiven = false;
+	m_bEnabled = false;
+	m_bMoving = false;
+}
+
+bool CPointViewControlMultiplayer::KeyValue( const char *szKeyName, const char *szValue )
+{
+	if ( FStrEq( szKeyName, "fov" ) )
+		m_bFOVGiven = true;
+	return BaseClass::KeyValue( szKeyName, szValue );
+}
+
+void CPointViewControlMultiplayer::Spawn( void )
+{
+	BaseClass::Spawn();
+
+	SetMoveType( MOVETYPE_NONE );
+	SetSolid( SOLID_NONE );
+	AddEffects( EF_NODRAW );
+
+	DispatchUpdateTransmitState();
+}
+
+void CPointViewControlMultiplayer::UpdateOnRemove( void )
+{
+	Disable();
+	BaseClass::UpdateOnRemove();
+}
+
+void CPointViewControlMultiplayer::AddPlayer( CBasePlayer *pPlayer )
+{
+	if ( !pPlayer )
+		return;
+
+	CHandle< CBasePlayer > hPlayer( pPlayer );
+	if ( m_Players.Find( hPlayer ) == m_Players.InvalidIndex() )
+		m_Players.AddToTail( hPlayer );
+
+	if ( UsesFOV() )
+	{
+		if ( pPlayer->GetFOVOwner() && pPlayer->GetFOVOwner() != this &&
+			( FClassnameIs( pPlayer->GetFOVOwner(), "point_viewcontrol_multiplayer" ) || FClassnameIs( pPlayer->GetFOVOwner(), "point_viewcontrol_survivor" ) ) )
+		{
+			pPlayer->ClearZoomOwner();
+		}
+		pPlayer->SetFOV( this, (int)m_flFOV, m_flFOVRate );
+	}
+
+	pPlayer->SetViewEntity( this );
+	pPlayer->m_Local.m_bDrawViewmodel = false;
+
+	// L4D intros show the survivors: draw this player's own model while the camera has the view
+	pPlayer->SetForceLocalDraw( true );
+}
+
+// bForget: also take them off the list ( RemovePlayer ), rather than just restoring the view ( Disable )
+void CPointViewControlMultiplayer::RemovePlayer( CBasePlayer *pPlayer, bool bForget )
+{
+	if ( !pPlayer )
+		return;
+
+	// Only give the view back if it's still ours ( another camera may have taken over )
+	if ( pPlayer->GetViewEntity() == this )
+	{
+		pPlayer->SetViewEntity( NULL );
+		pPlayer->m_Local.m_bDrawViewmodel = true;
+		pPlayer->SetForceLocalDraw( false );
+	}
+
+	if ( UsesFOV() && pPlayer->GetFOVOwner() == this )
+		pPlayer->SetFOV( this, 0, m_flFOVRate );
+
+	if ( bForget )
+		m_Players.FindAndRemove( CHandle< CBasePlayer >( pPlayer ) );
+}
+
+void CPointViewControlMultiplayer::Enable( void )
+{
+	m_bEnabled = true;
+
+	for ( int i = 1; i <= gpGlobals->maxClients; i++ )
+	{
+		CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+		if ( !pPlayer || !pPlayer->IsConnected() )
+			continue;
+		if ( m_iTargetTeam >= 0 && pPlayer->GetTeamNumber() != m_iTargetTeam )
+			continue;
+
+		AddPlayer( pPlayer );
+	}
+
+	DispatchUpdateTransmitState();
+}
+
+void CPointViewControlMultiplayer::Disable( void )
+{
+	for ( int i = 0; i < m_Players.Count(); i++ )
+	{
+		RemovePlayer( m_Players[i].Get(), false );
+	}
+	m_Players.RemoveAll();
+
+	m_bEnabled = false;
+	m_bMoving = false;
+	SetThink( NULL );
+}
+
+void CPointViewControlMultiplayer::InputAddPlayer( inputdata_t &inputdata )
+{
+	if ( inputdata.pActivator && inputdata.pActivator->IsPlayer() )
+		AddPlayer( ToBasePlayer( inputdata.pActivator ) );
+}
+
+void CPointViewControlMultiplayer::InputRemovePlayer( inputdata_t &inputdata )
+{
+	if ( inputdata.pActivator && inputdata.pActivator->IsPlayer() )
+		RemovePlayer( ToBasePlayer( inputdata.pActivator ), true );
+}
+
+void CPointViewControlMultiplayer::StartMovement( void )
+{
+	CBaseEntity *pTarget = gEntList.FindEntityByName( NULL, m_iszTargetEntity, this );
+	if ( !pTarget )
+	{
+		DevWarning( "%s ( point_viewcontrol_multiplayer ): no target_entity '%s' to move to\n", GetDebugName(), STRING( m_iszTargetEntity ) );
+		return;
+	}
+
+	// Leave the intro rig: move from where it is now
+	m_AttachmentFollower.Stop();
+	SetContextThink( NULL, TICK_NEVER_THINK, "AttachmentFollow" );
+
+	m_hMoveTarget = pTarget;
+	m_vecMoveStart = GetAbsOrigin();
+	m_angMoveStart = GetAbsAngles();
+	m_flMoveStartTime = gpGlobals->curtime;
+	m_bMoving = true;
+
+	SetParent( NULL );
+	SetThink( &CPointViewControlMultiplayer::MoveThink );
+	SetNextThink( gpGlobals->curtime );
+}
+
+void CPointViewControlMultiplayer::MoveThink( void )
+{
+	CBaseEntity *pTarget = m_hMoveTarget.Get();
+	if ( !m_bMoving || !pTarget )
+	{
+		m_bMoving = false;
+		return;
+	}
+
+	float t = ( m_flInterpTime > 0.0f ) ? ( gpGlobals->curtime - m_flMoveStartTime ) / m_flInterpTime : 1.0f;
+	if ( t >= 1.0f )
+	{
+		SetAbsOrigin( pTarget->GetAbsOrigin() );
+		SetAbsAngles( pTarget->GetAbsAngles() );
+		m_bMoving = false;
+
+		if ( HasSpawnFlags( SF_PVCM_DISABLE_WHEN_MOVE_FINISHED ) )
+			Disable();
+		return;
+	}
+
+	// Eased in and out; angles through quaternions so they take the short way round
+	const float flFrac = SimpleSpline( t );
+
+	SetAbsOrigin( Lerp( flFrac, m_vecMoveStart, pTarget->GetAbsOrigin() ) );
+
+	Quaternion qStart, qEnd, qNow;
+	AngleQuaternion( m_angMoveStart, qStart );
+	AngleQuaternion( pTarget->GetAbsAngles(), qEnd );
+	QuaternionSlerp( qStart, qEnd, flFrac, qNow );
+	QAngle angNow;
+	QuaternionAngles( qNow, angNow );
+	SetAbsAngles( angNow );
+
+	SetNextThink( gpGlobals->curtime );
 }
 #endif // TERROR
 

@@ -14,6 +14,9 @@
 #include "nav_node.h"
 #include "nav_pathfind.h"
 #include "nav_colors.h"
+#ifdef SRCBOX
+#include "collisionutils.h"
+#endif
 #ifdef TERROR
 #include "TerrorShared.h"
 #endif
@@ -457,7 +460,35 @@ void CNavLadder::OnRoundRestart( void )
 //--------------------------------------------------------------------------------------------------------------
 void CNavLadder::FindLadderEntity( void )
 {
+#ifdef SRCBOX
+	// Srcbox: func_simpleladder is a brush entity whose origin is 0 0 0 in every L4D map
+	// (the brush is in world space), so the old nearest-origin search never matched.
+	// Match on the brush bounds instead: the nav ladder's midpoint sits inside (or within
+	// half a hull of) the brush it was built from.
+	Vector vecMid = ( m_top + m_bottom ) * 0.5f;
+	CBaseEntity *pBest = NULL;
+	float flBestDistSqr = FLT_MAX;
+	CBaseEntity *pLadder = NULL;
+	while ( ( pLadder = gEntList.FindEntityByClassname( pLadder, "func_simpleladder" ) ) != NULL )
+	{
+		Vector mins, maxs;
+		pLadder->CollisionProp()->WorldSpaceSurroundingBounds( &mins, &maxs );
+		mins -= Vector( HalfHumanWidth, HalfHumanWidth, HalfHumanWidth );
+		maxs += Vector( HalfHumanWidth, HalfHumanWidth, HalfHumanWidth );
+		if ( !IsPointInBox( vecMid, mins, maxs ) )
+			continue;
+
+		float flDistSqr = vecMid.DistToSqr( pLadder->WorldSpaceCenter() );
+		if ( flDistSqr < flBestDistSqr )
+		{
+			pBest = pLadder;
+			flBestDistSqr = flDistSqr;
+		}
+	}
+	m_ladderEntity = pBest;
+#else
 	m_ladderEntity = gEntList.FindEntityByClassnameNearest( "func_simpleladder", (m_top + m_bottom) * 0.5f, HalfHumanWidth );
+#endif
 }
 
 

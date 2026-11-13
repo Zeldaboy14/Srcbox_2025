@@ -35,6 +35,10 @@ LoadingProgress::LoadingProgress(Panel *parent, const char *panelName, LoadingWi
 	m_LoadingWindowType( eLoadingType )
 {
 	memset( m_szGameMode, 0, sizeof( m_szGameMode ) );
+	m_szLayoutGamemode[0] = '\0';
+	m_szBGTexture[0] = '\0';
+	m_nBGTextureID = -1;
+	m_flNextGamemodeCheck = 0.0f;
 
 	if ( eLoadingType == LWT_LOADINGPLAQUE )
 	{
@@ -91,6 +95,11 @@ LoadingProgress::LoadingProgress(Panel *parent, const char *panelName, LoadingWi
 		m_pDefaultPosterDataKV->deleteThis();
 		m_pDefaultPosterDataKV = NULL;
 	}
+
+	// Srcbox: pick the gamemode's layout now, before ApplySchemeSettings loads the .res
+	char szGamemode[64];
+	GetCurrentGamemode( szGamemode, sizeof( szGamemode ) );
+	SelectGamemodeLayout( szGamemode );
 }
 
 //=============================================================================
@@ -104,6 +113,7 @@ LoadingProgress::~LoadingProgress()
 //=============================================================================
 void LoadingProgress::OnThink()
 {
+	CheckGamemodeChanged();
 	UpdateWorkingAnim();
 }
 
@@ -115,6 +125,12 @@ void LoadingProgress::OnCommand(const char *command)
 //=============================================================================
 void LoadingProgress::ApplySchemeSettings( IScheme *pScheme )
 {
+	// Srcbox: the base class (re)loads the .res, which deletes and recreates every child.
+	// Drop the cached child pointers first so nothing can touch a deleted control, and
+	// SetupControlStates() fetches the new ones below.
+	ClearControlPointers();
+	m_bValid = false;
+
 	// will cause the controls to be instanced
 	BaseClass::ApplySchemeSettings( pScheme );
 
@@ -123,26 +139,7 @@ void LoadingProgress::ApplySchemeSettings( IScheme *pScheme )
 	// now have controls, can now do further initing
 	m_bValid = true;
 
-	// find or create pattern
-	// purposely not freeing these, not worth the i/o hitch for something so small
-	// TODO: check for a gamemode. we can swap on the fly (i hope)
-	const char *pImageName = "vgui/loadingbar_orangebox";
-	m_textureID_LoadingBar = vgui::surface()->DrawGetTextureId( pImageName );
-	if ( m_textureID_LoadingBar == -1 )
-	{
-		m_textureID_LoadingBar = vgui::surface()->CreateNewTextureID();
-		vgui::surface()->DrawSetTextureFile( m_textureID_LoadingBar, pImageName, true, false );	
-	}
-
-	// find or create pattern
-	// purposely not freeing these, not worth the i/o hitch for something so small
-	pImageName = "vgui/loadingbar_bg_orangebox";
-	m_textureID_LoadingBarBG = vgui::surface()->DrawGetTextureId( pImageName );
-	if ( m_textureID_LoadingBarBG == -1 )
-	{
-		m_textureID_LoadingBarBG = vgui::surface()->CreateNewTextureID();
-		vgui::surface()->DrawSetTextureFile( m_textureID_LoadingBarBG, pImageName, true, false );	
-	}
+	// (the loading bar textures are picked per gamemode in ApplyGamemodeVisuals, below)
 
 	// need to get the default image loaded now
 	// find or create pattern
@@ -172,6 +169,7 @@ void LoadingProgress::ApplySchemeSettings( IScheme *pScheme )
 #endif
 
 	SetupControlStates();
+	ApplyGamemodeVisuals();
 }
 
 void LoadingProgress::Close()
@@ -219,6 +217,7 @@ void LoadingProgress::SetProgress( float progress )
 		m_pProTotalProgress->SetProgress( m_flPeakProgress );
 	}
 	
+	CheckGamemodeChanged();
 	UpdateWorkingAnim();
 }
 
@@ -237,6 +236,13 @@ float LoadingProgress::GetProgress()
 
 #include "hl2mp_gamerules.h"
 
+// Srcbox: the full-screen image behind the loading screen (also faded out over the menu's background map
+// by CBaseModPanel once the startup load is done)
+const char *LoadingProgress::GetBackgroundImageName()
+{
+	return "vgui/appchooser/background_hl2";
+}
+
 void LoadingProgress::PaintBackground()
 {
 	int screenWide, screenTall;
@@ -249,29 +255,19 @@ void LoadingProgress::PaintBackground()
 		int x, y, wide, tall;
 		m_pBGImage->GetBounds( x, y, wide, tall );
 		surface()->DrawSetColor( Color( 255, 255, 255, 255 ) );
-		s_nBGTextureID = vgui::surface()->CreateNewTextureID(true); // procedural
-		//vgui::surface()->DrawSetTextureFile(s_nBGTextureID, "vgui/loadingscreen_background", true, 0);
-		//if (GetGameDescription)
-		//vgui::surface()->DrawSetTextureFile(s_nBGTextureID, "vgui/appchooser/background_hl2", true, 0);
-				//const char* pszGame = HL2MPRules()->GetGameDescription();
-
-		const char* pszGameMode = "";
-
-		CHL2MPRules* pRules = dynamic_cast<CHL2MPRules*>(GameRules());
-		// If gamerules aren't ready (null) or description is empty, choose a safe default background.
-		if (!pRules)
+		// Srcbox: this created a new texture ID and reloaded the image every frame (leaking IDs).
+		// The gamemode's background (ApplyGamemodeVisuals) wins, else the default one.
+		int nTexture = m_nBGTextureID;
+		if ( nTexture == -1 )
 		{
-			DevMsg("LoadingProgress::PaintBackground: HL2MPRules() not ready, using default background\n");
-			vgui::surface()->DrawSetTextureFile(s_nBGTextureID, "vgui/appchooser/background_hl2", true, 0);
-		} 
-		//else if (!Q_stricmp(pszGameMode, "Terror (L4D)")) {
-		else if (!Q_stricmp(pszGameMode, "Terror (L4D)")) {
-			vgui::surface()->DrawSetTextureFile(s_nBGTextureID, "vgui/loadingscreen_background", true, 0);
-		} else if (!Q_stricmp(pszGameMode, "Half-Life 2")) {
-			vgui::surface()->DrawSetTextureFile(s_nBGTextureID, "vgui/appchooser/background_hl2", true, 0);
-		} else {
-			vgui::surface()->DrawSetTextureFile(s_nBGTextureID, "vgui/appchooser/background_hl2", true, 0);
+			if ( s_nBGTextureID == -1 )
+			{
+				s_nBGTextureID = vgui::surface()->CreateNewTextureID();
+				vgui::surface()->DrawSetTextureFile( s_nBGTextureID, GetBackgroundImageName(), true, false );
+			}
+			nTexture = s_nBGTextureID;
 		}
+		surface()->DrawSetTexture( nTexture );
 		//surface()->DrawSetTexture( m_pBGImage->GetImage()->GetID() );
 		surface()->DrawTexturedRect( x, y, x+wide, y+tall );
 	}
@@ -312,10 +308,11 @@ void LoadingProgress::PaintBackground()
 	}
 
 	// this is where the spinner draws
-	bool bRenderSpinner = ( m_bDrawSpinner && m_pWorkingAnim );
+	// (a gamemode .res can leave WorkingAnim without an image; GetImage() is NULL then)
+	bool bRenderSpinner = ( m_bDrawSpinner && m_pWorkingAnim && m_pWorkingAnim->GetImage() );
 	Panel *pWaitscreen = CBaseModPanel::GetSingleton().GetWindow( WT_GENERICWAITSCREEN );
 	if ( pWaitscreen && pWaitscreen->IsVisible() && ( m_LoadingWindowType == LWT_BKGNDSCREEN ) )
-		bRenderSpinner = true;	// Don't render spinner if the progress screen is displaying progress
+		bRenderSpinner = ( m_pWorkingAnim && m_pWorkingAnim->GetImage() );	// Don't render spinner if the progress screen is displaying progress
 	if ( bRenderSpinner  )
 	{
 		int x, y, wide, tall;
@@ -427,13 +424,10 @@ void LoadingProgress::SetupControlStates()
 	}
 
 	// Srcbox: the Orange Box loading bar (gameui_interface.cpp) is drawn on top instead
+	if ( UsesClassicLoadingBar() )
 	{
-		extern ConVar ui_loadingbar_classic;
-		if ( ui_loadingbar_classic.GetBool() )
-		{
-			m_bDrawProgress = false;
-			m_bDrawSpinner = false;
-		}
+		m_bDrawProgress = false;
+		m_bDrawSpinner = false;
 	}
 
 	m_pFooter = dynamic_cast< vgui::EditablePanel* >( FindChildByName( "CampaignFooter" ) );
@@ -486,9 +480,13 @@ void LoadingProgress::SetupControlStates()
 		pLoadingLabel->SetVisible( m_bDrawProgress );
 	}
 
+	ApplyLoadingBarLayout();
+
 	SetControlVisible( "PlayerNames", m_bDrawPoster );
 	SetControlVisible( "StarringLabel", m_bDrawPoster );
-	SetControlVisible( "GameModeLabel", false );
+	// Srcbox: gamemode name on everything but the startup/menu load (a gamemode .res can
+	// leave the control out entirely to hide it)
+	SetControlVisible( "GameModeLabel", m_LoadingType != LT_MAINMENU && m_szGameMode[0] != '\0' );
 
 	if ( m_LoadingType == LT_POSTER )
 	{
@@ -674,9 +672,287 @@ void LoadingProgress::SetupPoster( void )
 	SetControlVisible( "PlayerNames", ( nNumNames > 1 ) );
 
 	SetControlVisible( "StarringLabel", ( nNumNames > 1 ) );
-	SetControlVisible( "GameModeLabel", true );
+	SetControlVisible( "GameModeLabel", m_szGameMode[0] != '\0' );
 
 	//SetControlString( "playernames", szPlayerNames );
 
 	SetControlEnabled( "LoadingTipPanel", false );
+}
+
+//=============================================================================
+// Srcbox: per-gamemode loading screen
+//
+// For the gamemode in the "gamemode" convar (replicated, so a remote server's value
+// arrives with the server info, before the client loads the map):
+//   layout:     resource/ui/basemodui/loadingprogress_<gamemode>.res  (else loadingprogress.res)
+//   background: set in code like ASW/L4D do (the .res BGImage is only a placement):
+//               materials/vgui/loading/<gamemode>.vmt, else the default (GetBackgroundImageName)
+//   label:      GameModeLabel = #Srcbox_Gamemode_<gamemode> if localized, else the folder name
+//   bar:        s_GamemodeLoadingBars below picks a style from s_LoadingBarStyles
+//               (classic / srcbox / swarm / terror); unlisted gamemodes follow ui_loadingbar_classic
+//
+// The layout is chosen in the constructor, before the .res is first loaded. If the
+// gamemode changes while the screen is up (joining a server: the window opens just before
+// the server's convars arrive) the .res is reloaded through InvalidateLayout, which runs
+// ApplySchemeSettings again. That path clears the cached child pointers before the reload.
+//=============================================================================
+// one texture ID per material for the whole session, never one per frame
+static int FindOrCreateLoadingTexture( const char *pszMaterial )
+{
+	int nID = vgui::surface()->DrawGetTextureId( pszMaterial );
+	if ( nID == -1 )
+	{
+		nID = vgui::surface()->CreateNewTextureID();
+		vgui::surface()->DrawSetTextureFile( nID, pszMaterial, true, false );
+	}
+	return nID;
+}
+
+//-----------------------------------------------------------------------------
+// Loading bar styles. "classic" is the Orange Box bar drawn by CClassicLoadingBar
+// (gameui_interface.cpp); the rest are this screen's own bar with their own textures,
+// spinner and placement. Swarm and L4D2 ship their bar as vgui/loadingbar(_bg) under the
+// same name, so Srcbox keeps its own copies in materials/vgui/loading/.
+//-----------------------------------------------------------------------------
+struct LoadingBarStyle_t
+{
+	const char	*m_pszName;
+	bool		m_bClassic;
+	const char	*m_pszBar;			// materials (relative to materials/)
+	const char	*m_pszBarBG;
+	const char	*m_pszSpinner;		// ImagePanel image (relative to materials/vgui/), NULL = the .res one
+	bool		m_bCornerLayout;	// bar and "Loading" text in the lower right like ASW/L4D2, else the .res placement
+};
+
+static const LoadingBarStyle_t s_LoadingBarStyles[] =
+{
+	//  name		classic	bar								bar bg								spinner						corner
+	{ "classic",	true,	NULL,							NULL,								NULL,						false },
+	{ "srcbox",		false,	"vgui/loadingbar_orangebox",	"vgui/loadingbar_bg_orangebox",		NULL,						false },	// this screen's bar with the .res layout
+	{ "swarm",		false,	"vgui/loading/bar_swarm",		"vgui/loading/bar_swarm_bg",		"loading/spinner_swarm",	true },
+	{ "terror",		false,	"vgui/loading/bar_terror",		"vgui/loading/bar_terror_bg",		"loading/spinner_terror",	true },
+};
+
+//-----------------------------------------------------------------------------
+// Which style each gamemode uses. Gamemodes not listed here get "classic", or "srcbox"
+// with ui_loadingbar_classic 0. Names are the gamemode folder names, lowercase.
+//-----------------------------------------------------------------------------
+struct GamemodeLoadingBar_t
+{
+	const char	*m_pszGamemode;
+	const char	*m_pszStyle;
+};
+
+static const GamemodeLoadingBar_t s_GamemodeLoadingBars[] =
+{
+	{ "base_hl2",	"classic" },
+	{ "terror",		"terror" },
+};
+
+extern ConVar ui_loadingbar_classic;
+
+static const LoadingBarStyle_t *FindLoadingBarStyle( const char *pszName )
+{
+	for ( int i = 0; i < ARRAYSIZE( s_LoadingBarStyles ); i++ )
+	{
+		if ( !V_stricmp( pszName, s_LoadingBarStyles[ i ].m_pszName ) )
+			return &s_LoadingBarStyles[ i ];
+	}
+	return NULL;
+}
+
+const LoadingBarStyle_t *LoadingProgress::GetLoadingBarStyle( void ) const
+{
+	for ( int i = 0; i < ARRAYSIZE( s_GamemodeLoadingBars ); i++ )
+	{
+		if ( !V_stricmp( m_szLayoutGamemode, s_GamemodeLoadingBars[ i ].m_pszGamemode ) )
+		{
+			const LoadingBarStyle_t *pStyle = FindLoadingBarStyle( s_GamemodeLoadingBars[ i ].m_pszStyle );
+			if ( pStyle )
+				return pStyle;
+			break;	// misspelled style: fall through to the default
+		}
+	}
+	return FindLoadingBarStyle( ui_loadingbar_classic.GetBool() ? "classic" : "srcbox" );
+}
+
+bool LoadingProgress::UsesClassicLoadingBar( void ) const
+{
+	return GetLoadingBarStyle()->m_bClassic;
+}
+
+// Places the screen's bar, "Loading" text and spinner for styles that don't use the .res
+// placement. Values are the ASW/L4D2 loadingprogress.res ones (640x480 proportional).
+void LoadingProgress::ApplyLoadingBarLayout( void )
+{
+	const LoadingBarStyle_t *pStyle = GetLoadingBarStyle();
+
+	if ( m_pWorkingAnim && pStyle->m_pszSpinner )
+	{
+		m_pWorkingAnim->SetImage( pStyle->m_pszSpinner );
+		m_nSpinnerFrame = 0;
+	}
+
+	if ( !pStyle->m_bCornerLayout )
+		return;
+
+	int screenWide, screenTall;
+	surface()->GetScreenSize( screenWide, screenTall );
+
+	if ( m_pProTotalProgress )
+	{
+		m_pProTotalProgress->SetBounds( screenWide - scheme()->GetProportionalScaledValue( 158 ),
+			screenTall - scheme()->GetProportionalScaledValue( 45 ),
+			scheme()->GetProportionalScaledValue( 135 ), scheme()->GetProportionalScaledValue( 33 ) );
+	}
+
+	vgui::Label *pLoadingLabel = dynamic_cast< vgui::Label * >( FindChildByName( "LoadingText" ) );
+	if ( pLoadingLabel )
+	{
+		pLoadingLabel->SetAutoResize( vgui::Panel::PIN_TOPLEFT, vgui::Panel::AUTORESIZE_NO, 0, 0, 0, 0 );
+		pLoadingLabel->SetBounds( screenWide - scheme()->GetProportionalScaledValue( 223 ),
+			screenTall - scheme()->GetProportionalScaledValue( 55 ),
+			scheme()->GetProportionalScaledValue( 200 ), scheme()->GetProportionalScaledValue( 20 ) );
+		pLoadingLabel->SetContentAlignment( vgui::Label::a_east );
+		pLoadingLabel->SetText( "#L4D360UI_Loading" );
+
+		vgui::IScheme *pScheme = scheme()->GetIScheme( GetScheme() );
+		if ( pScheme )
+			pLoadingLabel->SetFont( pScheme->GetFont( "DefaultBold", true ) );
+	}
+}
+
+// Asked by CClassicLoadingBar (gameui_interface.cpp) every paint, so a gamemode switch
+// while the screen is up (joining a server) switches the bar too.
+bool LoadingProgress_UseClassicLoadingBar( void )
+{
+	LoadingProgress *pScreen = static_cast< LoadingProgress* >( CBaseModPanel::GetSingleton().GetWindow( WT_LOADINGPROGRESS ) );
+	return pScreen ? pScreen->UsesClassicLoadingBar() : ui_loadingbar_classic.GetBool();
+}
+
+void LoadingProgress::GetCurrentGamemode( char *pszOut, int nOutSize )
+{
+	pszOut[0] = '\0';
+
+	// not static: a ref made before the Lua convars register would stay invalid forever
+	ConVarRef gamemodeVar( "gamemode", true );
+	if ( !gamemodeVar.IsValid() )
+		return;
+
+	// the value can come from a server, so only keep characters that are safe in a file name
+	const char *pszValue = gamemodeVar.GetString();
+	int n = 0;
+	for ( ; pszValue && *pszValue && n < nOutSize - 1; ++pszValue )
+	{
+		char c = *pszValue;
+		if ( ( c >= 'a' && c <= 'z' ) || ( c >= '0' && c <= '9' ) || c == '_' || c == '-' )
+			pszOut[ n++ ] = c;
+		else if ( c >= 'A' && c <= 'Z' )
+			pszOut[ n++ ] = c - 'A' + 'a';
+		else
+		{
+			n = 0;	// anything else (paths, spaces): treat as no gamemode
+			break;
+		}
+	}
+	pszOut[ n ] = '\0';
+}
+
+void LoadingProgress::SelectGamemodeLayout( const char *pszGamemode )
+{
+	V_strncpy( m_szLayoutGamemode, pszGamemode, sizeof( m_szLayoutGamemode ) );
+
+	char szRes[ sizeof( m_ResourceName ) ];
+	szRes[0] = '\0';
+	if ( pszGamemode[0] )
+	{
+		int nLen = V_snprintf( szRes, sizeof( szRes ), "Resource/UI/BaseModUI/LoadingProgress_%s.res", pszGamemode );
+		if ( nLen <= 0 || nLen >= (int)sizeof( szRes ) || !g_pFullFileSystem->FileExists( szRes, "GAME" ) )
+			szRes[0] = '\0';	// (too long for m_ResourceName, or no such file)
+	}
+
+	if ( !szRes[0] )
+		V_strncpy( szRes, "Resource/UI/BaseModUI/LoadingProgress.res", sizeof( szRes ) );
+
+	V_strncpy( m_ResourceName, szRes, sizeof( m_ResourceName ) );
+}
+
+void LoadingProgress::CheckGamemodeChanged( void )
+{
+	float flNow = Plat_FloatTime();
+	if ( flNow < m_flNextGamemodeCheck )
+		return;
+	m_flNextGamemodeCheck = flNow + 0.25f;
+
+	char szGamemode[64];
+	GetCurrentGamemode( szGamemode, sizeof( szGamemode ) );
+	if ( !V_strcmp( szGamemode, m_szLayoutGamemode ) )
+		return;
+
+	char szOldRes[ sizeof( m_ResourceName ) ];
+	V_strncpy( szOldRes, m_ResourceName, sizeof( szOldRes ) );
+	const LoadingBarStyle_t *pOldStyle = GetLoadingBarStyle();
+
+	SelectGamemodeLayout( szGamemode );
+
+	if ( m_bValid && ( V_stricmp( szOldRes, m_ResourceName ) || pOldStyle != GetLoadingBarStyle() ) )
+	{
+		// different .res or bar style: reload the .res on the next layout pass (never from
+		// inside a paint), so the new style starts from the .res placement. The bar refills
+		// to where the load is on the engine's next progress update.
+		InvalidateLayout( false, true );
+	}
+	else
+	{
+		ApplyGamemodeVisuals();
+	}
+}
+
+void LoadingProgress::ApplyGamemodeVisuals( void )
+{
+	// the screen's own bar textures (unused by the classic style, which draws its own)
+	{
+		const LoadingBarStyle_t *pStyle = GetLoadingBarStyle();
+		m_textureID_LoadingBar = FindOrCreateLoadingTexture( pStyle->m_pszBar ? pStyle->m_pszBar : "vgui/loadingbar_orangebox" );
+		m_textureID_LoadingBarBG = FindOrCreateLoadingTexture( pStyle->m_pszBarBG ? pStyle->m_pszBarBG : "vgui/loadingbar_bg_orangebox" );
+	}
+
+	// background
+	m_szBGTexture[0] = '\0';
+	if ( m_szLayoutGamemode[0] )
+	{
+		char szVMT[ MAX_PATH ];
+		V_snprintf( szVMT, sizeof( szVMT ), "materials/vgui/loading/%s.vmt", m_szLayoutGamemode );
+		if ( g_pFullFileSystem->FileExists( szVMT, "GAME" ) )
+			V_snprintf( m_szBGTexture, sizeof( m_szBGTexture ), "vgui/loading/%s", m_szLayoutGamemode );
+	}
+
+	m_nBGTextureID = m_szBGTexture[0] ? FindOrCreateLoadingTexture( m_szBGTexture ) : -1;
+
+	// label
+	m_szGameMode[0] = '\0';
+	if ( m_szLayoutGamemode[0] )
+	{
+		char szToken[ 96 ];
+		V_snprintf( szToken, sizeof( szToken ), "#Srcbox_Gamemode_%s", m_szLayoutGamemode );
+		if ( g_pVGuiLocalize->Find( szToken ) )
+			V_strncpy( m_szGameMode, szToken, sizeof( m_szGameMode ) );
+		else
+			V_strncpy( m_szGameMode, m_szLayoutGamemode, sizeof( m_szGameMode ) );
+	}
+
+	if ( m_bValid )
+	{
+		SetControlString( "GameModeLabel", m_szGameMode );
+		SetControlVisible( "GameModeLabel", m_LoadingType != LT_MAINMENU && m_szGameMode[0] != '\0' );
+	}
+}
+
+void LoadingProgress::ClearControlPointers( void )
+{
+	m_pProTotalProgress = NULL;
+	m_pWorkingAnim = NULL;
+	m_pBGImage = NULL;
+	m_pPoster = NULL;
+	m_pFooter = NULL;
 }

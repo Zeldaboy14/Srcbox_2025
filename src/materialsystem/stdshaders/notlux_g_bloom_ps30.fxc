@@ -1,0 +1,39 @@
+//===================== File of the Srcbox Shader Project (Under LUX) =====================//
+//
+//	Initial D.	:	29.10.2026 DMY
+//	Last Change :	29.10.2026 DMY
+//
+//	Recreation of Garry's Mod's g_bloom pixel shader ( g_bloom_ps20.vcs ).
+//	Tints the blurred Bloom Buffer per Channel, $colormul blends between the tinted Color
+//	and its Grey. Drawn additively by the C++.
+//
+//=========================================================================================//
+
+//==========================================================================//
+//	Declare Static Combos
+//==========================================================================//
+// NONE
+
+//==========================================================================//
+//	Declare Dynamic Combos
+//==========================================================================//
+// NONE
+
+struct PS_INPUT
+{
+	float2 TexCoord			: TEXCOORD0;
+};
+
+sampler Sampler_Bloom	: register(s0);
+
+const float g_flLevelR		: register(c0);
+const float g_flLevelG		: register(c1);
+const float g_flLevelB		: register(c2);
+const float g_flColorMul	: register(c3);
+
+float4 main( PS_INPUT i ) : COLOR
+{
+	float3 f3Bloom = tex2D( Sampler_Bloom, i.TexCoord ).rgb * float3( g_flLevelR, g_flLevelG, g_flLevelB );
+	float flGrey = dot( f3Bloom, float3( 1.0f / 3.0f, 1.0f / 3.0f, 1.0f / 3.0f ) ) * ( 1.0f - g_flColorMul );
+	return float4( f3Bloom * g_flColorMul + flGrey, 1.0f );
+}

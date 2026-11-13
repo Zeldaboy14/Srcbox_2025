@@ -91,6 +91,10 @@ CBaseScriptedTrigger::~CBaseScriptedTrigger( void )
 #ifdef LUA_SDK
     if ( L )
         lua_unref( L, m_nTableReference );
+
+    // CBaseEntity's destructor unrefs it again; a double unref corrupts Lua's
+    // free list and later entities end up sharing one ref table.
+    m_nTableReference = LUA_NOREF;
 #endif
 }
 
@@ -261,4 +265,31 @@ void CBaseScriptedTrigger::EndTouch(CBaseEntity *pOther)
 #endif
 }
 
+#ifdef LUA_SDK
+// GMod's ENT:AcceptInput( inputName, activator, caller, data ): returning true
+// means Lua handled the input, so the C++ inputs don't see it.
+bool CBaseScriptedTrigger::AcceptInput(const char *szInputName, CBaseEntity *pActivator, CBaseEntity *pCaller, variant_t Value, int outputID)
+{
+    if (L && lua_isrefvalid(L, m_nTableReference))
+    {
+        int iTop = lua_gettop(L);
+        bool bHandled = false;
 
+        LUA_CALL_TRIGGER_METHOD_BEGIN("AcceptInput");
+        lua_pushstring(L, szInputName);
+        CBaseEntity::PushLuaInstanceSafe(L, pActivator);
+        CBaseEntity::PushLuaInstanceSafe(L, pCaller);
+        lua_pushstring(L, Value.String());
+        LUA_CALL_TRIGGER_METHOD_END(4, 1);
+
+        if (lua_gettop(L) > iTop && lua_isboolean(L, -1))
+            bHandled = lua_toboolean(L, -1) != 0;
+
+        lua_settop(L, iTop);
+
+        if (bHandled)
+            return true;
+    }
+    return BaseClass::AcceptInput(szInputName, pActivator, pCaller, Value, outputID);
+}
+#endif

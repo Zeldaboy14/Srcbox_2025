@@ -768,6 +768,9 @@ ConVar ui_loadingbar_classic( "ui_loadingbar_classic", "1", FCVAR_ARCHIVE, "Use 
 CON_COMMAND_F( refresh_gameui_dialogs_modeset, "Engine notification after a video mode change", FCVAR_HIDDEN | FCVAR_CLIENTCMD_CAN_EXECUTE ) {}
 CON_COMMAND_F( vmodule_resetparents, "Engine notification after a video mode change", FCVAR_HIDDEN | FCVAR_CLIENTCMD_CAN_EXECUTE ) {}
 
+// Srcbox: the loading screen decides per gamemode which bar it uses (vloadingprogress.cpp)
+extern bool LoadingProgress_UseClassicLoadingBar( void );
+
 class CClassicLoadingBar : public vgui::Panel
 {
 	DECLARE_CLASS_SIMPLE( CClassicLoadingBar, vgui::Panel );
@@ -805,6 +808,8 @@ public:
 		const int nOld = (int)( m_nBarWide * m_flFraction );
 		m_flFraction = MAX( m_flFraction, clamp( flFraction, 0.0f, 1.0f ) );
 		MoveToFront();
+		if ( !LoadingProgress_UseClassicLoadingBar() )
+			return false;	// the screen's own bar is showing; nothing of ours to redraw
 		return (int)( m_nBarWide * m_flFraction ) != nOld;
 	}
 
@@ -843,6 +848,10 @@ public:
 
 	virtual void Paint()
 	{
+		// started for every load; only drawn while the gamemode's screen wants it
+		if ( !LoadingProgress_UseClassicLoadingBar() )
+			return;
+
 		int wide, tall;
 		GetSize( wide, tall );
 
@@ -925,9 +934,9 @@ static void ClassicLoadingBar_Hide()
 
 void CGameUI::StartProgressBar()
 {
-	if ( !ui_loadingbar_classic.GetBool() )
-		return;
-
+	// Srcbox: always started; whether it's drawn is decided per gamemode at paint time
+	// (LoadingProgress_UseClassicLoadingBar), since joining a server can switch gamemode
+	// after this runs
 	if ( !s_hClassicLoadingBar.Get() )
 		s_hClassicLoadingBar = new CClassicLoadingBar( &GetUiBaseModPanelClass() );
 	s_hClassicLoadingBar->Start();

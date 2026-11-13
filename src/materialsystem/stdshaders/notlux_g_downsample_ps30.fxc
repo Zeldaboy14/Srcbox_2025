@@ -1,0 +1,52 @@
+//===================== File of the Srcbox Shader Project (Under LUX) =====================//
+//
+//	Initial D.	:	29.10.2026 DMY
+//	Last Change :	29.10.2026 DMY
+//
+//	Recreation of Garry's Mod's g_downsample pixel shader ( g_downsample_ps20.vcs ).
+//	The Bloom Post Process' first Pass: 3x3 Box ( Center counted twice, /10 ), minus $darken,
+//	clamped to 0, times $multiply. Alpha 1. The Step is $scale / $fbtexture Size.
+//
+//=========================================================================================//
+
+//==========================================================================//
+//	Declare Static Combos
+//==========================================================================//
+// NONE
+
+//==========================================================================//
+//	Declare Dynamic Combos
+//==========================================================================//
+// NONE
+
+struct PS_INPUT
+{
+	float2 TexCoord			: TEXCOORD0;
+};
+
+sampler Sampler_BaseTexture	: register(s0);	// $fbtexture
+
+const float g_flDarken		: register(c0);	// $darken
+const float g_flMultiply	: register(c1);	// $multiply
+const float g_flSizeX		: register(c2);	// $scale / Width
+const float g_flSizeY		: register(c3);	// $scale / Height
+
+float4 main( PS_INPUT i ) : COLOR
+{
+	float2 f2UV = i.TexCoord;
+	float2 x = float2( g_flSizeX, 0.0f );
+	float2 y = float2( 0.0f, g_flSizeY );
+
+	float3 f3Sum = tex2D( Sampler_BaseTexture, f2UV ).rgb * 2.0f;
+	f3Sum += tex2D( Sampler_BaseTexture, f2UV + x - y ).rgb;
+	f3Sum += tex2D( Sampler_BaseTexture, f2UV + x + y ).rgb;
+	f3Sum += tex2D( Sampler_BaseTexture, f2UV - x - y ).rgb;
+	f3Sum += tex2D( Sampler_BaseTexture, f2UV - x + y ).rgb;
+	f3Sum += tex2D( Sampler_BaseTexture, f2UV - y ).rgb;
+	f3Sum += tex2D( Sampler_BaseTexture, f2UV + y ).rgb;
+	f3Sum += tex2D( Sampler_BaseTexture, f2UV + x ).rgb;
+	f3Sum += tex2D( Sampler_BaseTexture, f2UV - x ).rgb;
+
+	float3 f3Result = max( f3Sum * 0.1f - g_flDarken, 0.0f ) * g_flMultiply;
+	return float4( f3Result, 1.0f );
+}

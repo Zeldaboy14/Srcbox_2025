@@ -1,0 +1,64 @@
+//===================== File of the Srcbox Shader Project (Under LUX) =====================//
+//
+//	Initial D.	:	29.10.2026 DMY
+//	Last Change :	29.10.2026 DMY
+//
+//	Recreation of Garry's Mod's g_screenspace pixel shader ( g_screenspace_ps20.vcs ), for gmodscreenspace.
+//	Combo Order matches Garry's Mod's: TEXTUREALPHA, VERTEXALPHA, BLUR.
+//	The Vertex Color's RGB is never applied ( $vertexcolor does nothing in Garry's Mod either ),
+//	only its Alpha with $vertexalpha. Alpha = Texture Alpha ( or 1 ) * Vertex Alpha ( or 1 ) * $alpha.
+//	BLUR: the Texel and its 8 Neighbours ( c1 - c8 ), equally weighted.
+//
+//=========================================================================================//
+
+//==========================================================================//
+//	Declare Static Combos
+//==========================================================================//
+//  STATIC:  "TEXTUREALPHA"    "0..1"
+//  STATIC:  "VERTEXALPHA"     "0..1"
+//  STATIC:  "BLUR"            "0..1"
+
+//==========================================================================//
+//	Declare Dynamic Combos
+//==========================================================================//
+// NONE
+
+struct PS_INPUT
+{
+	float2 TexCoord			: TEXCOORD0;
+	float4 VertexColor		: TEXCOORD1;
+};
+
+sampler Sampler_Texture1		: register(s0);
+
+const float  g_flAlpha			: register(c0);	// $alpha
+const float4 g_f4BlurCoords[8]	: register(c1);	// .xy, ( -x,-y ) ( x,-y ) ( -x,y ) ( x,y ) ( -x,0 ) ( 0,-y ) ( x,0 ) ( 0,y )
+
+float4 main( PS_INPUT i ) : COLOR
+{
+	float2 f2UV = i.TexCoord.xy;
+
+	float4 f4Texture = tex2D( Sampler_Texture1, f2UV );
+#if BLUR
+	[unroll]
+	for ( int k = 0; k < 8; k++ )
+		f4Texture += tex2D( Sampler_Texture1, f2UV + g_f4BlurCoords[k].xy );
+	f4Texture *= ( 1.0f / 9.0f );
+#endif
+
+	float4 f4Result;
+	f4Result.rgb = f4Texture.rgb;
+
+#if TEXTUREALPHA
+	f4Result.a = f4Texture.a;
+#else
+	f4Result.a = 1.0f;
+#endif
+
+#if VERTEXALPHA
+	f4Result.a *= i.VertexColor.a;
+#endif
+
+	f4Result.a *= g_flAlpha;
+	return f4Result;
+}

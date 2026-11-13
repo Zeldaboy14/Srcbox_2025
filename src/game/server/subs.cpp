@@ -62,7 +62,7 @@ END_DATADESC()
 // These are the new entry points to entities. 
 LINK_ENTITY_TO_CLASS(info_player_deathmatch,CBaseDMStart);
 LINK_ENTITY_TO_CLASS(info_player_start,CPointEntity);
-LINK_ENTITY_TO_CLASS(info_survivor_position, CPointEntity); // L4D/2 info_player_starts. Game still has info_player_start for debugging.
+// info_survivor_position: L4D/2 info_player_starts, now in terror/director.cpp ( it reads "Order" for ForceSurvivorPositions )
 LINK_ENTITY_TO_CLASS(info_survivor_rescue, CPointEntity); // L4D/2 point for rescuing survivors
 LINK_ENTITY_TO_CLASS(info_gamemode, CPointEntity); // L4D/2 point for gamemodes. This seems to be a spawnpoint too????
 LINK_ENTITY_TO_CLASS(info_player_terrorist, CPointEntity); // Counter-Strike spawnpoint for terrorists

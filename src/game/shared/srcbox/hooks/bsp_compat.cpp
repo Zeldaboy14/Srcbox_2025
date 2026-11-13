@@ -26,6 +26,10 @@
 //    (L4D), v9 (L4D2/ASW/P2) and v10/v11 (CS:GO, Black Mesa). It goes in place
 //    when it fits (v9-v11); L4D's 68-byte props grow, so those go past the end
 //    of the file, and the view reports the larger size.
+//  - Black Mesa's HDR cubemaps in the pak lump ( materials/maps/<map>/c*.hdr.vtf ):
+//    16 bit integer texels labelled as half floats are converted to half floats
+//    in place ( same size ), see FixIntegerHDRCubemaps. This one also applies to
+//    version 19/20 maps, which otherwise get no view.
 // Every other lump, including the pak lump, keeps its original offset, so
 // the engine's map loader, the map CRC and filesystem_stdio's pak mount all
 // read the same bytes as the original file. Per-prop colors are read from the
@@ -42,11 +46,20 @@
 // are read as version 7. A .dx90.vtx the model doesn't have comes from its
 // .dx80.vtx (or .sw.vtx). The conversion itself is in mdl_compat.h.
 //
+// Maps inside VPKs aren't opened as files: filesystem_stdio reads them out of
+// the VPK's archive chunks. A chunk that holds maps is tracked instead, and each
+// map's view is built the first time a read reaches its bytes and laid over the
+// chunk at the map's offset ( see "Maps inside VPKs" ). Views that would make a
+// map bigger ( L4D static props, version 18 ) don't fit there and are skipped.
+// The TF2 filesystem only mounts a map's pak lump from a .bsp on disk, so a map
+// inside a VPK is also served as a file when its .bsp isn't on disk ( see
+// "Maps inside VPKs, as files" ), which gets its pak mounted.
+//
 // Hooked (KernelBase): CreateFileW/A, ReadFile, SetFilePointer(Ex),
 // GetFileSize(Ex), GetFileInformationByHandle(Ex), CloseHandle,
 // GetFileAttributes(Ex)W/A, FindFirstFileExW/A, FindNextFileW/A, FindClose.
-// Untracked handles pass straight through. Files inside VPKs aren't opened as
-// files and aren't redirected.
+// Untracked handles pass straight through. Other files inside VPKs aren't
+// redirected.
 //
 // The same hooks serve Garry's Mod addons (.gma) mounted in place; see
 // gma_mount.cpp.
@@ -78,6 +91,7 @@
 #define BC_LUMP_BRUSHSIDES			19
 #define BC_LUMP_GAME_LUMP			35
 #define BC_LUMP_WORLDLIGHTS_HDR		54
+#define BC_LUMP_PAKFILE				40
 
 // used by the version 18 conversion
 #define BC_LUMP_TEXINFO				6
@@ -975,6 +989,233 @@ static bool ConvertVersion18( BCReadFn_t pfnRead, void *pContext, BCLump_t *pLum
 // Returns the view of a map, or NULL if the map doesn't need one (already
 // v19/v20 in the v20 lump order) or can't be read.
 //-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+// Black Mesa HDR cubemaps
+//
+// Black Mesa packs its HDR cubemaps ( materials/maps/<map>/c*.hdr.vtf ) as 16 bit
+// unsigned integer texels, 65535 = 1.0, but labels them IMAGE_FORMAT_RGBA16161616F.
+// The TF2 SDK reads them as half floats: every reflection comes out nearly black,
+// and alpha is garbage ( NaN and Inf included ). Each one is converted to real half
+// floats in place, same size, alpha 1, and the two zip CRCs of the entry follow.
+// The pak's layout doesn't change, so filesystem_stdio's pak mount still works.
+//
+// Real half float cubemaps are left alone: their alpha is 1.0 everywhere ( Black
+// Mesa's is garbage, often Inf / NaN as a half ), and their lit texels sit around
+// 0x3C00 ( 1.0 ) while Black Mesa's integers top out near 0x2480. Cubemaps that
+// were already converted ( alpha 1.0 ) are never converted twice. sdk_tools/bms/bms_fix_cubemaps.py
+// does the same offline.
+//-----------------------------------------------------------------------------
+#define BC_IMAGE_FORMAT_RGBA16161616F	24
+#define BC_INTEGER_HDR_CUBEMAP_ONE		65535.0f	// texel value Black Mesa means as 1.0
+#define BC_ZIP_MAX_EOCD_SEARCH			( 65535 + 22 )
+
+static unsigned short FloatToHalf( float f )
+{
+	unsigned int x;
+	memcpy( &x, &f, 4 );
+	const unsigned int nSign = ( x >> 16 ) & 0x8000;
+	int nExp = (int)( ( x >> 23 ) & 0xFF ) - 127 + 15;
+	unsigned int nMant = x & 0x7FFFFF;
+
+	if ( ( ( x >> 23 ) & 0xFF ) == 0 || nExp <= 0 )
+	{
+		if ( nExp < -10 )
+			return (unsigned short)nSign;
+		nMant |= 0x800000;
+		const int nShift = 14 - nExp;
+		unsigned int nHalf = nMant >> nShift;
+		if ( ( nMant >> ( nShift - 1 ) ) & 1 )
+			nHalf++;
+		return (unsigned short)( nSign | nHalf );
+	}
+	if ( nExp >= 31 )
+		return (unsigned short)( nSign | 0x7BFF );	// largest finite half
+
+	unsigned int nHalf = nSign | ( nExp << 10 ) | ( nMant >> 13 );
+	if ( nMant & 0x1000 )
+		nHalf++;	// round to nearest
+	return (unsigned short)nHalf;
+}
+
+// Offset of the high res image data in a VTF ( 7.3+ keep it in a resource entry )
+static int VTFImageOffset( const unsigned char *pVTF, int nSize )
+{
+	if ( nSize < 80 )
+		return -1;
+	const int nMajor = *(const int *)( pVTF + 4 );
+	const int nMinor = *(const int *)( pVTF + 8 );
+	const int nHeaderSize = *(const int *)( pVTF + 12 );
+	if ( nMajor == 7 && nMinor >= 3 )
+	{
+		const int nResources = *(const int *)( pVTF + 68 );
+		for ( int r = 0; r < nResources && 80 + r * 8 + 8 <= nSize; r++ )
+		{
+			const unsigned char *pRes = pVTF + 80 + r * 8;
+			if ( pRes[0] == 0x30 && pRes[1] == 0 && pRes[2] == 0 )
+				return *(const int *)( pRes + 4 );
+		}
+	}
+	return nHeaderSize;
+}
+
+static bool IsIntegerHDRCubemap( const unsigned short *pTexels, int nTexels )
+{
+	// Real half float cubemaps ( and ones already converted, offline or here ) have
+	// alpha 1.0 everywhere. Black Mesa's integer ones have garbage there.
+	bool bAlphaOne = true;
+	for ( int i = 3; i < nTexels && bAlphaOne; i += 4 )
+		bAlphaOne = ( pTexels[i] == 0x3C00 );
+	if ( bAlphaOne )
+		return false;
+
+	int nColor = 0, nSmall = 0;
+	for ( int i = 0; i + 3 < nTexels; i += 4 )
+	{
+		for ( int c = 0; c < 4; c++ )
+		{
+			const unsigned short t = pTexels[i + c];
+			if ( ( t & 0x7C00 ) == 0x7C00 )
+				return true;	// Inf / NaN as a half
+			if ( c < 3 )
+			{
+				nColor++;
+				nSmall += ( t < 0x3000 );
+			}
+		}
+	}
+	return nColor > 0 && nSmall * 2 > nColor;
+}
+
+static int FixIntegerHDRCubemaps( BCReadFn_t pfnRead, void *pContext, const BCLump_t &pak, BCVirtualMap_t *pMap, const char *pszName )
+{
+	if ( pak.m_nLen < 22 || pak.m_nUncompressed != 0 )
+		return 0;
+
+	// End of central directory, in the last 64k of the pak
+	const int nTail = MIN( pak.m_nLen, BC_ZIP_MAX_EOCD_SEARCH );
+	CUtlVector< unsigned char > tail;
+	tail.SetCount( nTail );
+	if ( !pfnRead( pContext, (bc_int64)pak.m_nOfs + pak.m_nLen - nTail, tail.Base(), nTail ) )
+		return 0;
+
+	int nEOCD = -1;
+	for ( int i = nTail - 22; i >= 0; i-- )
+	{
+		if ( tail[i] == 'P' && tail[i + 1] == 'K' && tail[i + 2] == 5 && tail[i + 3] == 6 )
+		{
+			nEOCD = i;
+			break;
+		}
+	}
+	if ( nEOCD < 0 )
+		return 0;
+
+	const int nEntries = *(const unsigned short *)( tail.Base() + nEOCD + 10 );
+	const int nDirSize = *(const int *)( tail.Base() + nEOCD + 12 );
+	const int nDirOfs = *(const int *)( tail.Base() + nEOCD + 16 );
+	if ( nDirOfs < 0 || nDirSize <= 0 || nDirOfs + nDirSize > pak.m_nLen )
+		return 0;
+
+	CUtlVector< unsigned char > dir;
+	dir.SetCount( nDirSize );
+	if ( !pfnRead( pContext, (bc_int64)pak.m_nOfs + nDirOfs, dir.Base(), nDirSize ) )
+		return 0;
+
+	int nFixed = 0;
+	CUtlVector< unsigned char > vtf;
+	int p = 0;
+	for ( int e = 0; e < nEntries && p + 46 <= nDirSize; e++ )
+	{
+		const unsigned char *pEntry = dir.Base() + p;
+		if ( *(const unsigned int *)pEntry != 0x02014B50 )
+			break;
+
+		const int nMethod = *(const unsigned short *)( pEntry + 10 );
+		const int nCompSize = *(const int *)( pEntry + 20 );
+		const int nSize = *(const int *)( pEntry + 24 );
+		const int nNameLen = *(const unsigned short *)( pEntry + 28 );
+		const int nExtraLen = *(const unsigned short *)( pEntry + 30 );
+		const int nCommentLen = *(const unsigned short *)( pEntry + 32 );
+		const int nLocalOfs = *(const int *)( pEntry + 42 );
+		const int nDirEntry = p;
+		p += 46 + nNameLen + nExtraLen + nCommentLen;
+		if ( p > nDirSize )
+			break;
+
+		char szName[MAX_PATH];
+		const int nCopy = MIN( nNameLen, (int)sizeof( szName ) - 1 );
+		memcpy( szName, pEntry + 46, nCopy );
+		szName[nCopy] = 0;
+		Q_strlower( szName );
+		if ( Q_strncmp( szName, "materials/maps/", 15 ) || !Q_stristr( szName, ".hdr.vtf" ) )
+			continue;
+		if ( nMethod != 0 || nCompSize != nSize || nSize < 96 || nLocalOfs < 0 || nLocalOfs + 30 > pak.m_nLen )
+			continue;
+
+		unsigned char local[30];
+		if ( !pfnRead( pContext, (bc_int64)pak.m_nOfs + nLocalOfs, local, sizeof( local ) ) || *(const unsigned int *)local != 0x04034B50 )
+			continue;
+		const int nDataOfs = nLocalOfs + 30 + *(const unsigned short *)( local + 26 ) + *(const unsigned short *)( local + 28 );
+		if ( nDataOfs + nSize > pak.m_nLen )
+			continue;
+
+		// The header first: most maps' cubemaps are something else, or already half floats
+		// ( alpha 1.0 ), which the end of the file ( the largest mip ) shows without reading it all
+		unsigned char head[512];
+		const int nHead = MIN( nSize, (int)sizeof( head ) );
+		if ( !pfnRead( pContext, (bc_int64)pak.m_nOfs + nDataOfs, head, nHead ) )
+			continue;
+		if ( memcmp( head, "VTF\0", 4 ) || *(const int *)( head + 52 ) != BC_IMAGE_FORMAT_RGBA16161616F )
+			continue;
+		const int nImageOfs = VTFImageOffset( head, nHead );
+		if ( nImageOfs <= 0 || nImageOfs >= nSize )
+			continue;
+
+		{
+			unsigned short sample[2048];
+			const int nSampleBytes = MIN( (int)sizeof( sample ), ( nSize - nImageOfs ) & ~7 );
+			if ( nSampleBytes <= 0 || !pfnRead( pContext, (bc_int64)pak.m_nOfs + nDataOfs + nSize - nSampleBytes, sample, nSampleBytes ) )
+				continue;
+			bool bAlphaOne = true;
+			for ( int i = 3; i < nSampleBytes / 2 && bAlphaOne; i += 4 )
+				bAlphaOne = ( sample[i] == 0x3C00 );
+			if ( bAlphaOne )
+				continue;
+		}
+
+		vtf.SetCount( nSize );
+		if ( !pfnRead( pContext, (bc_int64)pak.m_nOfs + nDataOfs, vtf.Base(), nSize ) )
+			continue;
+		unsigned short *pTexels = (unsigned short *)( vtf.Base() + nImageOfs );
+		const int nTexels = ( ( nSize - nImageOfs ) / 2 ) & ~3;
+		if ( !IsIntegerHDRCubemap( pTexels, nTexels ) )
+			continue;
+
+		const unsigned short nOne = FloatToHalf( 1.0f );
+		for ( int i = 0; i + 3 < nTexels; i += 4 )
+		{
+			pTexels[i + 0] = FloatToHalf( pTexels[i + 0] / BC_INTEGER_HDR_CUBEMAP_ONE );
+			pTexels[i + 1] = FloatToHalf( pTexels[i + 1] / BC_INTEGER_HDR_CUBEMAP_ONE );
+			pTexels[i + 2] = FloatToHalf( pTexels[i + 2] / BC_INTEGER_HDR_CUBEMAP_ONE );
+			pTexels[i + 3] = nOne;
+		}
+
+		CRC32_t crc;
+		CRC32_Init( &crc );
+		CRC32_ProcessBuffer( &crc, vtf.Base(), nSize );
+		CRC32_Final( &crc );
+
+		AddPatch( pMap, (bc_int64)pak.m_nOfs + nLocalOfs + 14, &crc, 4 );
+		AddPatch( pMap, (bc_int64)pak.m_nOfs + nDataOfs, vtf.Base(), nSize );
+		AddPatch( pMap, (bc_int64)pak.m_nOfs + nDirOfs + nDirEntry + 16, &crc, 4 );
+		nFixed++;
+	}
+
+	if ( nFixed )
+		//DevMsg( "BSP compat: %s: converted %d integer HDR cubemaps\n", pszName, nFixed );
+	return nFixed;
+}
+
 static BCVirtualMap_t *BuildVirtualMap( BCReadFn_t pfnRead, void *pContext, bc_int64 nFileSize, const char *pszName )
 {
 	if ( nFileSize < BC_HEADER_SIZE || nFileSize > 0x7FFFFFFF )
@@ -1004,8 +1245,28 @@ static BCVirtualMap_t *BuildVirtualMap( BCReadFn_t pfnRead, void *pContext, bc_i
 	}
 
 	const bool bVersion18 = ( nVersion == 18 && !bL4D2Order );
-	if ( !bFound || ( nVersion <= 20 && !bL4D2Order && !bVersion18 ) )
+	if ( !bFound )
 		return NULL;
+
+	if ( nVersion <= 20 && !bL4D2Order && !bVersion18 )
+	{
+		// Version 19/20: the engine reads these as they are. Only Black Mesa's cubemaps
+		// need a view, which then patches nothing but the pak's contents ( no header ).
+		ReadLumpTable( &header[2], false, lumps );
+		const BCLump_t &pak = lumps[BC_LUMP_PAKFILE];
+		if ( pak.m_nLen <= 0 || pak.m_nOfs < BC_HEADER_SIZE || (bc_int64)pak.m_nOfs + pak.m_nLen > nFileSize )
+			return NULL;
+
+		BCVirtualMap_t *pMap = new BCVirtualMap_t;
+		pMap->m_nOriginalSize = nFileSize;
+		pMap->m_nVirtualSize = nFileSize;
+		if ( !FixIntegerHDRCubemaps( pfnRead, pContext, pak, pMap, pszName ) )
+		{
+			delete pMap;
+			return NULL;
+		}
+		return pMap;
+	}
 
 	ReadLumpTable( &header[2], bL4D2Order, lumps );
 	for ( int i = 0; i < BC_HEADER_LUMPS; i++ )
@@ -1145,6 +1406,14 @@ static BCVirtualMap_t *BuildVirtualMap( BCReadFn_t pfnRead, void *pContext, bc_i
 		Warning( "BSP v21: %s has a compressed game lump, static props left as they are\n", pszName );
 	}
 
+	// Black Mesa style cubemaps in the pak ( offsets unchanged ). Black Mesa's maps are version 20,
+	// handled above; v21 games ( L4D2, ASW, Portal 2, CS:GO ) write real half float cubemaps whose
+	// alpha isn't 1.0, and dark ones would pass the integer check, so they're left alone.
+	if ( nVersion <= 20 )
+	{
+		FixIntegerHDRCubemaps( pfnRead, pContext, lumps[BC_LUMP_PAKFILE], pMap, pszName );
+	}
+
 	// header
 	int newHeader[BC_HEADER_SIZE / 4];
 	newHeader[0] = BC_IDENT;
@@ -1263,6 +1532,9 @@ struct BCCachedMap_t
 };
 
 // A handle opened on a redirected map
+struct BCSharedReader_t;
+struct BCVPKChunk_t;
+
 struct BCTrackedHandle_t
 {
 	HANDLE			m_hFile;	// the caller's handle
@@ -1271,12 +1543,35 @@ struct BCTrackedHandle_t
 	bc_int64		m_nPosition;
 	bc_int64		m_nBaseOffset;	// > 0: a file inside a .gma, at this offset of it
 	bool			m_bOwnsMap;		// m_pMap belongs to this handle
+	BCSharedReader_t	*m_pShared;	// .gma files: the reader and view, released by the last user
+	BCVPKChunk_t		*m_pVPK;	// a VPK archive chunk holding maps ( m_pMap is its size only )
 };
 
 static SRWLOCK								s_Lock = SRWLOCK_INIT;
 static CUtlVector< BCCachedMap_t >			s_CachedMaps;
 static CUtlVector< BCTrackedHandle_t >		s_TrackedHandles;
 static volatile LONG						s_nTrackedHandles = 0;	// lock-free fast path
+
+// A file inside a .gma: its reader handle and view are counted, so a CloseHandle
+// on one thread can't close the reader or free the view while another thread is
+// still reading through it (the reader's handle value could otherwise be reused
+// by a new handle mid-read)
+struct BCSharedReader_t
+{
+	volatile LONG	m_nRefs;
+	HANDLE			m_hReader;
+	BCVirtualMap_t	*m_pOwnedMap;
+};
+
+static void ReleaseSharedReader( BCSharedReader_t *pShared, BOOL ( WINAPI *pfnClose )( HANDLE ) )
+{
+	if ( !pShared || InterlockedDecrement( &pShared->m_nRefs ) != 0 )
+		return;
+	if ( pShared->m_hReader && pShared->m_hReader != INVALID_HANDLE_VALUE )
+		pfnClose( pShared->m_hReader );
+	delete pShared->m_pOwnedMap;
+	delete pShared;
+}
 
 static bool ReaderRead( void *pContext, bc_int64 nOffset, void *pDest, int nSize )
 {
@@ -1698,7 +1993,8 @@ static BCVirtualMap_t *GetModelFileView( const wchar_t *szPath, bool bExists, wc
 	}
 }
 
-static void AddTrackedHandle( HANDLE hFile, HANDLE hReader, BCVirtualMap_t *pMap, bc_int64 nBaseOffset = 0, bool bOwnsMap = false )
+static void AddTrackedHandle( HANDLE hFile, HANDLE hReader, BCVirtualMap_t *pMap, bc_int64 nBaseOffset = 0, bool bOwnsMap = false, BCSharedReader_t *pShared = NULL,
+	BCVPKChunk_t *pVPK = NULL )
 {
 	AcquireSRWLockExclusive( &s_Lock );
 	BCTrackedHandle_t &tracked = s_TrackedHandles[s_TrackedHandles.AddToTail()];
@@ -1708,6 +2004,8 @@ static void AddTrackedHandle( HANDLE hFile, HANDLE hReader, BCVirtualMap_t *pMap
 	tracked.m_nPosition = 0;
 	tracked.m_nBaseOffset = nBaseOffset;
 	tracked.m_bOwnsMap = bOwnsMap;
+	tracked.m_pShared = pShared;
+	tracked.m_pVPK = pVPK;
 	InterlockedIncrement( &s_nTrackedHandles );
 	ReleaseSRWLockExclusive( &s_Lock );
 }
@@ -1773,9 +2071,13 @@ static bool IsNotFoundError( DWORD nError )
 	return nError == ERROR_FILE_NOT_FOUND;
 }
 
+static bool TrackIfVPK( HANDLE hFile, LPCWSTR pszPath, DWORD nAccess, DWORD nFlagsAndAttributes );
+
 static void TrackIfMap( HANDLE hFile, LPCWSTR pszPath, DWORD nAccess, DWORD nFlagsAndAttributes )
 {
 	if ( hFile == INVALID_HANDLE_VALUE )
+		return;
+	if ( TrackIfVPK( hFile, pszPath, nAccess, nFlagsAndAttributes ) )
 		return;
 	if ( IsModelPath( pszPath ) )
 	{
@@ -1833,7 +2135,7 @@ static void TrackIfMap( HANDLE hFile, LPCWSTR pszPath, DWORD nAccess, DWORD nFla
 		WideCharToMultiByte( CP_UTF8, 0, szPath, -1, szName, sizeof( szName ), NULL, NULL );
 		pMap = BuildVirtualMap( ReaderRead, hReader, nSize, szName );
 		if ( pMap )
-			DevMsg( "BSP v21: %s is read as a version 20 map\n", szName );
+			DevMsg( "BSP compat: %s is read through a converted view\n", szName );
 
 		AcquireSRWLockExclusive( &s_Lock );
 		BCCachedMap_t &cached = s_CachedMaps[s_CachedMaps.AddToTail()];
@@ -1875,34 +2177,52 @@ static void GMALog( const char *pszFormat, ... )
 		nLen = (int)strlen( szLine );
 	AcquireSRWLockExclusive( &s_GMALogLock );
 	DWORD nWritten;
-	WriteFile( s_hGMALog, szLine, (DWORD)nLen, &nWritten, NULL );
+	if ( s_hGMALog != INVALID_HANDLE_VALUE )	// gma_debuglog 0 may have closed it meanwhile
+		WriteFile( s_hGMALog, szLine, (DWORD)nLen, &nWritten, NULL );
 	ReleaseSRWLockExclusive( &s_GMALogLock );
 	SetLastError( nError );
 }
 
-static void OpenGMALog()
+// At startup with -gmadebug, or any time with the gma_debuglog command (bForce)
+static void OpenGMALog( bool bForce = false )
 {
-	if ( !CommandLine()->FindParm( "-gmadebug" ) || !GMAMount_GetRoot()[0] )
+	if ( s_hGMALog != INVALID_HANDLE_VALUE )
 		return;
+	if ( !bForce && !CommandLine()->FindParm( "-gmadebug" ) )
+		return;
+	if ( !GMAMount_GetRoot()[0] )
+	{
+		Warning( "GMA: no addons are mounted, nothing to log\n" );
+		return;
+	}
 	wchar_t szLog[MAX_PATH];
 	wcsncpy_s( szLog, GMAMount_GetRoot(), _TRUNCATE );
 	wchar_t *pSlash = wcsrchr( szLog, L'\\' );
 	if ( !pSlash )
 		return;
 	wcscpy_s( pSlash + 1, MAX_PATH - ( pSlash + 1 - szLog ), L"gma_debug.log" );
-	s_hGMALog = s_pfnCreateFileW( szLog, GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL );
+	HANDLE hLog = s_pfnCreateFileW( szLog, GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_WRITE_THROUGH, NULL );
+	if ( hLog == INVALID_HANDLE_VALUE )
+	{
+		Warning( "GMA: couldn't create %ls (error %u)\n", szLog, GetLastError() );
+		return;
+	}
+	s_hGMALog = hLog;
+	Msg( "GMA: logging addon file access to %ls\n", szLog );
 	GMALog( "gma debug log, thread %u\n", GetCurrentThreadId() );
 }
 
 static void CloseGMALog()
 {
-	if ( s_hGMALog != INVALID_HANDLE_VALUE )
-	{
-		s_pfnCloseHandle( s_hGMALog );
-		s_hGMALog = INVALID_HANDLE_VALUE;
-	}
+	AcquireSRWLockExclusive( &s_GMALogLock );
+	HANDLE hLog = s_hGMALog;
+	s_hGMALog = INVALID_HANDLE_VALUE;
+	ReleaseSRWLockExclusive( &s_GMALogLock );
+	if ( hLog != INVALID_HANDLE_VALUE )
+		CloseHandle( hLog );	// may run after the hooks are gone
 }
 
+#define GMA_LOGGING() ( s_hGMALog != INVALID_HANDLE_VALUE )
 struct BCWindow_t
 {
 	HANDLE		m_hReader;
@@ -1913,6 +2233,445 @@ static bool WindowRead( void *pContext, bc_int64 nOffset, void *pDest, int nSize
 {
 	const BCWindow_t *pWindow = (const BCWindow_t *)pContext;
 	return ReaderRead( pWindow->m_hReader, pWindow->m_nBase + nOffset, pDest, nSize );
+}
+
+//-----------------------------------------------------------------------------
+// Maps inside VPKs
+//
+// filesystem_stdio reads a file inside a VPK straight out of the archive chunk
+// that holds it ( <name>_NNN.vpk, or <name>_dir.vpk itself for archive index
+// 0x7FFF ), so the .bsp open TrackIfMap waits for never happens. Instead, a
+// chunk whose _dir.vpk lists maps in it is tracked. Each map's view is built
+// ( BuildVirtualMap, through a window at the map's offset ) the first time a
+// read reaches the map's bytes, so a chunk holding twenty maps only converts the
+// one being loaded. Its patches are laid over the chunk at the map's offset.
+//
+// A view has to keep the map's size: the bytes after it belong to other files.
+// That rules out the views that append ( L4D's 68-byte static props, version 18
+// maps ): those maps are left as they are, with a warning to extract them.
+// Maps with preload bytes ( kept in the _dir.vpk tree ) are left alone too.
+//-----------------------------------------------------------------------------
+#define BC_VPK_SIGNATURE		0x55AA1234
+#define BC_VPK_DIR_ARCHIVE		0x7FFF
+#define BC_VPK_MAX_TREE			( 512 * 1024 * 1024 )
+
+struct BCVPKDirEntry_t
+{
+	int			m_nArchive;
+	bc_int64	m_nOffset;		// in its chunk ( in the _dir.vpk: past the tree )
+	bc_int64	m_nLength;
+	char		m_szName[MAX_PATH];
+};
+
+struct BCVPKDir_t
+{
+	CUtlVector< BCVPKDirEntry_t >	m_Maps;
+};
+
+struct BCCachedVPKDir_t
+{
+	wchar_t		m_szPath[MAX_PATH];
+	bc_int64	m_nSize;
+	FILETIME	m_WriteTime;
+	BCVPKDir_t	*m_pDir;	// NULL: not a VPK we can read
+};
+
+struct BCVPKEntry_t
+{
+	wchar_t						m_szArchive[MAX_PATH];	// the chunk ( lowercase )
+	bc_int64					m_nOffset;
+	bc_int64					m_nLength;
+	char						m_szName[MAX_PATH];		// maps/<name>.bsp
+	BCVirtualMap_t * volatile	m_pMap;		// NULL: not built yet, &s_VPKNoView: needs nothing
+};
+
+struct BCVPKChunk_t
+{
+	BCVirtualMap_t					m_Size;		// no patches: the chunk's size, for seeks and size queries
+	CUtlVector< BCVPKEntry_t * >	m_Entries;	// sorted by offset
+};
+
+struct BCCachedVPK_t
+{
+	wchar_t			m_szPath[MAX_PATH];
+	bc_int64		m_nSize;
+	FILETIME		m_WriteTime;
+	BCVPKChunk_t	*m_pChunk;	// NULL: holds no maps
+};
+
+static BCVirtualMap_t						s_VPKNoView;
+static CUtlVector< BCCachedVPKDir_t >		s_CachedVPKDirs;	// under s_Lock
+static CUtlVector< BCCachedVPK_t >			s_CachedVPKs;		// under s_Lock
+static CUtlVector< BCVPKEntry_t * >			s_VPKEntries;		// under s_Lock: every map in a VPK seen so far, never freed
+
+// The one entry for the map at nOffset of szArchive, so the chunk redirect and the
+// .bsp served from a VPK ( OpenVPKMapPath ) share its view. Call without s_Lock.
+static BCVPKEntry_t *GetVPKEntry( const wchar_t *szArchive, bc_int64 nOffset, bc_int64 nLength, const char *pszName )
+{
+	BCVPKEntry_t *pNew = new BCVPKEntry_t;	// allocated before the lock
+	wcsncpy_s( pNew->m_szArchive, szArchive, _TRUNCATE );
+	pNew->m_nOffset = nOffset;
+	pNew->m_nLength = nLength;
+	V_strncpy( pNew->m_szName, pszName, sizeof( pNew->m_szName ) );
+	pNew->m_pMap = NULL;
+
+	BCVPKEntry_t *pFound = NULL;
+	AcquireSRWLockExclusive( &s_Lock );
+	for ( int i = 0; i < s_VPKEntries.Count() && !pFound; i++ )
+	{
+		if ( s_VPKEntries[i]->m_nOffset == nOffset && !wcscmp( s_VPKEntries[i]->m_szArchive, szArchive ) )
+			pFound = s_VPKEntries[i];
+	}
+	if ( !pFound )
+		s_VPKEntries.AddToTail( pNew );
+	ReleaseSRWLockExclusive( &s_Lock );
+
+	if ( pFound )
+	{
+		delete pNew;
+		return pFound;
+	}
+	return pNew;
+}
+
+// The chunk an entry of szDir ( a _dir.vpk, lowercase ) lives in
+static void GetVPKArchivePath( const wchar_t *szDir, int nArchive, wchar_t *szArchive )
+{
+	wcsncpy_s( szArchive, MAX_PATH, szDir, _TRUNCATE );
+	if ( nArchive == BC_VPK_DIR_ARCHIVE )
+		return;
+	const size_t nLen = wcslen( szArchive );
+	if ( nLen < 8 )
+		return;
+	swprintf_s( szArchive + nLen - 8, MAX_PATH - ( nLen - 8 ), L"_%03d.vpk", nArchive );
+}
+
+// pszPath lowercase. szDir gets the _dir.vpk, nArchive the chunk's index.
+static bool GetVPKDirPath( const wchar_t *pszPath, wchar_t *szDir, int *pnArchive )
+{
+	const size_t nLen = wcslen( pszPath );
+	if ( nLen < 9 || wcscmp( pszPath + nLen - 4, L".vpk" ) )
+		return false;
+
+	if ( !wcscmp( pszPath + nLen - 8, L"_dir.vpk" ) )
+	{
+		wcsncpy_s( szDir, MAX_PATH, pszPath, _TRUNCATE );
+		*pnArchive = BC_VPK_DIR_ARCHIVE;
+		return true;
+	}
+
+	const wchar_t *pIndex = pszPath + nLen - 7;	// "NNN.vpk"
+	if ( pIndex[-1] != L'_' || pIndex[0] < L'0' || pIndex[0] > L'9' || pIndex[1] < L'0' || pIndex[1] > L'9' || pIndex[2] < L'0' || pIndex[2] > L'9' )
+		return false;
+	if ( nLen - 8 + 8 >= MAX_PATH )
+		return false;
+
+	wcsncpy_s( szDir, MAX_PATH, pszPath, nLen - 8 );
+	wcscat_s( szDir, MAX_PATH, L"_dir.vpk" );
+	*pnArchive = ( pIndex[0] - L'0' ) * 100 + ( pIndex[1] - L'0' ) * 10 + ( pIndex[2] - L'0' );
+	return true;
+}
+
+static const char *VPKNextString( const unsigned char *pTree, int nTree, int &p )
+{
+	const int nStart = p;
+	while ( p < nTree && pTree[p] )
+		p++;
+	if ( p >= nTree )
+		return NULL;
+	p++;
+	return (const char *)pTree + nStart;
+}
+
+// The tree: extension { path { name { entry } "" } "" } ""
+static void ParseVPKTree( const unsigned char *pTree, int nTree, bc_int64 nDataStart, BCVPKDir_t *pDir )
+{
+	int p = 0;
+	for ( ;; )
+	{
+		const char *pszExt = VPKNextString( pTree, nTree, p );
+		if ( !pszExt || !*pszExt )
+			return;
+		const bool bMap = !V_stricmp( pszExt, "bsp" );
+
+		for ( ;; )
+		{
+			const char *pszPath = VPKNextString( pTree, nTree, p );
+			if ( !pszPath )
+				return;
+			if ( !*pszPath )
+				break;
+
+			for ( ;; )
+			{
+				const char *pszName = VPKNextString( pTree, nTree, p );
+				if ( !pszName )
+					return;
+				if ( !*pszName )
+					break;
+
+				// crc, preload bytes, archive index, offset, length, terminator, preload data
+				if ( p + 18 > nTree )
+					return;
+				const int nPreload = *(const unsigned short *)( pTree + p + 4 );
+				const int nArchive = *(const unsigned short *)( pTree + p + 6 );
+				const unsigned int nOfs = *(const unsigned int *)( pTree + p + 8 );
+				const unsigned int nLen = *(const unsigned int *)( pTree + p + 12 );
+				p += 18 + nPreload;
+
+				if ( !bMap || nLen == 0 )
+					continue;
+				if ( nPreload )
+				{
+					DevMsg( "BSP compat: %s/%s.bsp has preload bytes in its VPK, left as it is\n", pszPath, pszName );
+					continue;
+				}
+
+				BCVPKDirEntry_t &entry = pDir->m_Maps[pDir->m_Maps.AddToTail()];
+				entry.m_nArchive = nArchive;
+				entry.m_nOffset = ( nArchive == BC_VPK_DIR_ARCHIVE ) ? nDataStart + nOfs : nOfs;
+				entry.m_nLength = nLen;
+				if ( !V_strcmp( pszPath, " " ) )
+					V_snprintf( entry.m_szName, sizeof( entry.m_szName ), "%s.bsp", pszName );
+				else
+					V_snprintf( entry.m_szName, sizeof( entry.m_szName ), "%s/%s.bsp", pszPath, pszName );
+			}
+		}
+	}
+}
+
+static BCVPKDir_t *ParseVPKDir( const wchar_t *szDir )
+{
+	HANDLE hDir = s_pfnCreateFileW( szDir, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+		NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL );
+	if ( hDir == INVALID_HANDLE_VALUE )
+		return NULL;
+
+	BCVPKDir_t *pDir = NULL;
+	unsigned int header[3];
+	if ( ReaderRead( hDir, 0, header, sizeof( header ) ) && header[0] == BC_VPK_SIGNATURE && ( header[1] == 1 || header[1] == 2 ) &&
+		 header[2] > 0 && header[2] < BC_VPK_MAX_TREE )
+	{
+		const int nHeaderSize = ( header[1] == 1 ) ? 12 : 28;
+		const int nTree = (int)header[2];
+		CUtlVector< unsigned char > tree;
+		tree.SetCount( nTree );
+		if ( ReaderRead( hDir, nHeaderSize, tree.Base(), nTree ) )
+		{
+			pDir = new BCVPKDir_t;
+			ParseVPKTree( tree.Base(), nTree, (bc_int64)nHeaderSize + nTree, pDir );
+		}
+	}
+
+	s_pfnCloseHandle( hDir );
+	return pDir;
+}
+
+// The parsed _dir.vpk, cached per ( path, size, write time ). Call without s_Lock.
+static BCVPKDir_t *GetVPKDir( const wchar_t *szDir )
+{
+	WIN32_FILE_ATTRIBUTE_DATA attr;
+	if ( !s_pfnGetFileAttributesExW( szDir, GetFileExInfoStandard, &attr ) )
+		return NULL;
+	const bc_int64 nSize = ( (bc_int64)attr.nFileSizeHigh << 32 ) | attr.nFileSizeLow;
+
+	AcquireSRWLockShared( &s_Lock );
+	for ( int i = 0; i < s_CachedVPKDirs.Count(); i++ )
+	{
+		const BCCachedVPKDir_t &cached = s_CachedVPKDirs[i];
+		if ( cached.m_nSize == nSize && !CompareFileTime( &cached.m_WriteTime, &attr.ftLastWriteTime ) && !wcscmp( cached.m_szPath, szDir ) )
+		{
+			BCVPKDir_t *pDir = cached.m_pDir;
+			ReleaseSRWLockShared( &s_Lock );
+			return pDir;
+		}
+	}
+	ReleaseSRWLockShared( &s_Lock );
+
+	BCVPKDir_t *pDir = ParseVPKDir( szDir );
+
+	AcquireSRWLockExclusive( &s_Lock );
+	BCCachedVPKDir_t &cached = s_CachedVPKDirs[s_CachedVPKDirs.AddToTail()];
+	wcsncpy_s( cached.m_szPath, szDir, _TRUNCATE );
+	cached.m_nSize = nSize;
+	cached.m_WriteTime = attr.ftLastWriteTime;
+	cached.m_pDir = pDir;
+	ReleaseSRWLockExclusive( &s_Lock );
+	return pDir;
+}
+
+static BCVPKChunk_t *BuildVPKChunk( const BCVPKDir_t *pDir, int nArchive, bc_int64 nChunkSize, const wchar_t *szChunk )
+{
+	if ( !pDir )
+		return NULL;
+
+	BCVPKChunk_t *pChunk = NULL;
+	for ( int i = 0; i < pDir->m_Maps.Count(); i++ )
+	{
+		const BCVPKDirEntry_t &map = pDir->m_Maps[i];
+		if ( map.m_nArchive != nArchive || map.m_nOffset < 0 || map.m_nOffset + map.m_nLength > nChunkSize )
+			continue;
+
+		if ( !pChunk )
+		{
+			pChunk = new BCVPKChunk_t;
+			pChunk->m_Size.m_nOriginalSize = nChunkSize;
+			pChunk->m_Size.m_nVirtualSize = nChunkSize;
+		}
+
+		BCVPKEntry_t *pEntry = GetVPKEntry( szChunk, map.m_nOffset, map.m_nLength, map.m_szName );
+
+		int nInsert = 0;
+		while ( nInsert < pChunk->m_Entries.Count() && pChunk->m_Entries[nInsert]->m_nOffset < pEntry->m_nOffset )
+			nInsert++;
+		pChunk->m_Entries.InsertBefore( nInsert, pEntry );
+	}
+	return pChunk;
+}
+
+// A .vpk opened for reading. Returns true for any .vpk ( TrackIfMap has nothing more to do ).
+static bool TrackIfVPK( HANDLE hFile, LPCWSTR pszPath, DWORD nAccess, DWORD nFlagsAndAttributes )
+{
+	if ( !pszPath )
+		return false;
+	const size_t nLen = wcslen( pszPath );
+	if ( nLen < 4 || _wcsicmp( pszPath + nLen - 4, L".vpk" ) )
+		return false;
+	if ( ( nFlagsAndAttributes & BSPCOMPAT_BYPASS_ATTRIBUTE ) || IsWriteAccess( nAccess ) || !( nAccess & ( GENERIC_READ | FILE_READ_DATA ) ) )
+		return true;
+
+	wchar_t szPath[MAX_PATH];
+	if ( !GetFullPathNameW( pszPath, MAX_PATH, szPath, NULL ) )
+		wcsncpy_s( szPath, pszPath, _TRUNCATE );
+	_wcslwr_s( szPath );
+
+	wchar_t szDir[MAX_PATH];
+	int nArchive;
+	if ( !GetVPKDirPath( szPath, szDir, &nArchive ) )
+		return true;
+
+	HANDLE hReader = s_pfnCreateFileW( szPath, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+		NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL );
+	if ( hReader == INVALID_HANDLE_VALUE )
+		return true;
+
+	BY_HANDLE_FILE_INFORMATION info;
+	if ( !s_pfnGetFileInformationByHandle( hReader, &info ) )
+	{
+		s_pfnCloseHandle( hReader );
+		return true;
+	}
+	const bc_int64 nSize = ( (bc_int64)info.nFileSizeHigh << 32 ) | info.nFileSizeLow;
+
+	BCVPKChunk_t *pChunk = NULL;
+	bool bCached = false;
+	AcquireSRWLockShared( &s_Lock );
+	for ( int i = 0; i < s_CachedVPKs.Count(); i++ )
+	{
+		const BCCachedVPK_t &cached = s_CachedVPKs[i];
+		if ( cached.m_nSize == nSize && !CompareFileTime( &cached.m_WriteTime, &info.ftLastWriteTime ) && !wcscmp( cached.m_szPath, szPath ) )
+		{
+			pChunk = cached.m_pChunk;
+			bCached = true;
+			break;
+		}
+	}
+	ReleaseSRWLockShared( &s_Lock );
+
+	if ( !bCached )
+	{
+		pChunk = BuildVPKChunk( GetVPKDir( szDir ), nArchive, nSize, szPath );
+
+		AcquireSRWLockExclusive( &s_Lock );
+		BCCachedVPK_t &cached = s_CachedVPKs[s_CachedVPKs.AddToTail()];
+		wcsncpy_s( cached.m_szPath, szPath, _TRUNCATE );
+		cached.m_nSize = nSize;
+		cached.m_WriteTime = info.ftLastWriteTime;
+		cached.m_pChunk = pChunk;	// a second thread may have built the same one; both stay valid
+		ReleaseSRWLockExclusive( &s_Lock );
+	}
+
+	if ( !pChunk )
+	{
+		s_pfnCloseHandle( hReader );
+		return true;
+	}
+
+	AddTrackedHandle( hFile, hReader, &pChunk->m_Size, 0, false, NULL, pChunk );
+	return true;
+}
+
+// The view of one map in a chunk, built on first use. NULL: it needs none. Call without s_Lock.
+static BCVirtualMap_t *GetVPKEntryView( BCVPKEntry_t *pEntry, HANDLE hReader )
+{
+	BCVirtualMap_t *pMap = pEntry->m_pMap;
+	if ( pMap )
+		return ( pMap == &s_VPKNoView ) ? NULL : pMap;
+
+	BCWindow_t window = { hReader, pEntry->m_nOffset };
+	BCVirtualMap_t *pNew = BuildVirtualMap( WindowRead, &window, pEntry->m_nLength, pEntry->m_szName );
+	if ( pNew && ( pNew->m_nVirtualSize != pEntry->m_nLength || pNew->m_nOriginalSize != pEntry->m_nLength ) )
+	{
+		Warning( "BSP compat: %s needs to grow to be converted, which can't be done inside a VPK. Extract it to a loose .bsp.\n", pEntry->m_szName );
+		delete pNew;
+		pNew = NULL;
+	}
+
+	BCVirtualMap_t *pPublish = pNew ? pNew : &s_VPKNoView;
+	BCVirtualMap_t *pPrev = (BCVirtualMap_t *)InterlockedCompareExchangePointer( (PVOID volatile *)&pEntry->m_pMap, pPublish, NULL );
+	if ( pPrev )
+	{
+		delete pNew;	// another thread got there first
+		pPublish = pPrev;
+	}
+	else if ( pNew )
+	{
+		DevMsg( "BSP compat: %s ( in a VPK ) is read through a converted view\n", pEntry->m_szName );
+	}
+	return ( pPublish == &s_VPKNoView ) ? NULL : pPublish;
+}
+
+// Reads from a tracked chunk: the file's bytes, with the views of the maps in range laid over them
+static int VPKRead( BCVPKChunk_t *pChunk, HANDLE hReader, bc_int64 nOffset, void *pDest, int nSize )
+{
+	const bc_int64 nChunkSize = pChunk->m_Size.m_nVirtualSize;
+	if ( nOffset < 0 || nSize <= 0 || nOffset >= nChunkSize )
+		return 0;
+	if ( nOffset + nSize > nChunkSize )
+		nSize = (int)( nChunkSize - nOffset );
+	if ( !ReaderRead( hReader, nOffset, pDest, nSize ) )
+		return 0;
+
+	unsigned char *pOut = (unsigned char *)pDest;
+	const bc_int64 nEnd = nOffset + nSize;
+	for ( int i = 0; i < pChunk->m_Entries.Count(); i++ )
+	{
+		BCVPKEntry_t *pEntry = pChunk->m_Entries[i];
+		if ( pEntry->m_nOffset >= nEnd )
+			break;
+		if ( pEntry->m_nOffset + pEntry->m_nLength <= nOffset )
+			continue;
+
+		const BCVirtualMap_t *pMap = GetVPKEntryView( pEntry, hReader );
+		if ( !pMap )
+			continue;
+
+		for ( int k = 0; k < pMap->m_Patches.Count(); k++ )
+		{
+			const BCPatch_t *pPatch = pMap->m_Patches[k];
+			const bc_int64 nPatchStart = pEntry->m_nOffset + pPatch->m_nOffset;
+			const bc_int64 nPatchEnd = nPatchStart + pPatch->m_Data.Count();
+			if ( nPatchStart >= nEnd )
+				break;
+			if ( nPatchEnd <= nOffset )
+				continue;
+
+			const bc_int64 nFrom = MAX( nOffset, nPatchStart );
+			const bc_int64 nTo = MIN( nEnd, nPatchEnd );
+			memcpy( pOut + ( nFrom - nOffset ), pPatch->m_Data.Base() + ( nFrom - nPatchStart ), (size_t)( nTo - nFrom ) );
+		}
+	}
+	return nSize;
 }
 
 static bool IsOpenOnly( DWORD nAccess, DWORD nDisposition )
@@ -1955,11 +2714,18 @@ static bool OpenGMAPath( LPCWSTR pszPath, DWORD nAccess, DWORD nShare, LPSECURIT
 		return true;
 	}
 
-	// a file: a handle on its .gma, read through a window onto its bytes
-	HANDLE hFile = s_pfnCreateFileW( info.m_pszArchive, nAccess, nShare | FILE_SHARE_READ, pSecurity, OPEN_EXISTING,
-		nFlagsAndAttributes & ~FILE_FLAG_DELETE_ON_CLOSE, hTemplate );
+	// a file: a handle on its .gma, read through a window onto its bytes. Nothing
+	// is ever really read through this handle (the hooks serve it), so it's opened
+	// synchronous and buffered whatever the caller asked: an overlapped handle here
+	// could start real I/O on the whole .gma if anything reached it unhooked.
+	const DWORD nStripFlags = FILE_FLAG_DELETE_ON_CLOSE | FILE_FLAG_OVERLAPPED | FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH | FILE_FLAG_RANDOM_ACCESS | FILE_FLAG_SEQUENTIAL_SCAN;
+	HANDLE hFile = s_pfnCreateFileW( info.m_pszArchive, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, pSecurity, OPEN_EXISTING,
+		( nFlagsAndAttributes & ~nStripFlags ) | FILE_ATTRIBUTE_NORMAL, NULL );
 	if ( hFile == INVALID_HANDLE_VALUE )
+	{
+		GMALog( "  -> open failed, error %u: %ls\n", GetLastError(), info.m_pszArchive );
 		return true;
+	}
 	HANDLE hReader = s_pfnCreateFileW( info.m_pszArchive, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
 		NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL );
 	if ( hReader == INVALID_HANDLE_VALUE )
@@ -1973,10 +2739,270 @@ static bool OpenGMAPath( LPCWSTR pszPath, DWORD nAccess, DWORD nShare, LPSECURIT
 	BCVirtualMap_t *pView = new BCVirtualMap_t;
 	pView->m_nOriginalSize = info.m_nSize;
 	pView->m_nVirtualSize = info.m_nSize;
-	AddTrackedHandle( hFile, hReader, pView, info.m_nOffset, true );
+	BCSharedReader_t *pShared = new BCSharedReader_t;
+	pShared->m_nRefs = 1;	// the tracked handle's
+	pShared->m_hReader = hReader;
+	pShared->m_pOwnedMap = pView;
+	AddTrackedHandle( hFile, NULL, pView, info.m_nOffset, false, pShared );
 	GMALog( "  -> h=%p reader=%p size=%lld base=%lld archive=%ls\n", hFile, hReader, info.m_nSize, info.m_nOffset, info.m_pszArchive );
 	*phFile = hFile;
 	SetLastError( NO_ERROR );
+	return true;
+}
+
+
+//-----------------------------------------------------------------------------
+// Maps inside VPKs, as files
+//
+// The TF2 filesystem mounts a map's pak lump ( its cubemaps, the materials vbsp
+// made for them, ... ) by opening the .bsp as a file on disk. For a map inside a
+// VPK that open fails and the pak is quietly never mounted: brushes using those
+// materials go missing ( checkerboard ) and everything reflects the default
+// cubemap. So when a ...\maps\<name>.bsp open or attribute query finds nothing on
+// disk and a VPK holds maps/<name>.bsp, the answer comes from the VPK, through the
+// map's view ( Black Mesa's cubemaps converted, v21 converted ).
+//
+// Which VPK: the one whose copy has already been read ( the map being loaded ),
+// else the first _dir.vpk listing it, else the other _dir.vpks in the folders of
+// the VPKs seen so far.
+//-----------------------------------------------------------------------------
+
+// "maps/<name>.bsp" from a path ending in \maps\<name>.bsp
+static bool GetVPKMapName( LPCWSTR pszPath, char *szName, int nSize )
+{
+	if ( !pszPath || !IsMapPath( pszPath ) )
+		return false;
+	const wchar_t *pFile = wcsrchr( pszPath, L'\\' );
+	const wchar_t *pFileSlash = wcsrchr( pszPath, L'/' );
+	if ( pFileSlash > pFile )
+		pFile = pFileSlash;
+	if ( !pFile || pFile - pszPath < 4 || _wcsnicmp( pFile - 4, L"maps", 4 ) )
+		return false;
+	if ( pFile - pszPath > 4 && pFile[-5] != L'\\' && pFile[-5] != L'/' )
+		return false;
+
+	char szFile[MAX_PATH];
+	if ( !WideCharToMultiByte( CP_UTF8, 0, pFile + 1, -1, szFile, sizeof( szFile ), NULL, NULL ) )
+		return false;
+	V_snprintf( szName, nSize, "maps/%s", szFile );
+	V_strlower( szName );
+	return true;
+}
+
+static BCVPKEntry_t *FindVPKMapEntry( const char *pszName, bool bReadOnly )
+{
+	BCVPKEntry_t *pFound = NULL;
+	AcquireSRWLockShared( &s_Lock );
+	for ( int i = 0; i < s_VPKEntries.Count() && !pFound; i++ )
+	{
+		BCVPKEntry_t *pEntry = s_VPKEntries[i];
+		if ( ( !bReadOnly || pEntry->m_pMap ) && !V_stricmp( pEntry->m_szName, pszName ) )
+			pFound = pEntry;
+	}
+	ReleaseSRWLockShared( &s_Lock );
+	return pFound;
+}
+
+static BCVPKEntry_t *FindVPKMapInDirs( const char *pszName )
+{
+	// copy the dirs out, GetVPKEntry takes the lock
+	struct DirMap_t { wchar_t m_szArchive[MAX_PATH]; BCVPKDirEntry_t m_Map; };
+	CUtlVector< DirMap_t > found;
+	AcquireSRWLockShared( &s_Lock );
+	for ( int i = 0; i < s_CachedVPKDirs.Count() && !found.Count(); i++ )
+	{
+		const BCCachedVPKDir_t &dir = s_CachedVPKDirs[i];
+		if ( !dir.m_pDir )
+			continue;
+		for ( int k = 0; k < dir.m_pDir->m_Maps.Count(); k++ )
+		{
+			if ( V_stricmp( dir.m_pDir->m_Maps[k].m_szName, pszName ) )
+				continue;
+			DirMap_t &map = found[found.AddToTail()];
+			GetVPKArchivePath( dir.m_szPath, dir.m_pDir->m_Maps[k].m_nArchive, map.m_szArchive );
+			map.m_Map = dir.m_pDir->m_Maps[k];
+			break;
+		}
+	}
+	ReleaseSRWLockShared( &s_Lock );
+
+	if ( !found.Count() )
+		return NULL;
+	return GetVPKEntry( found[0].m_szArchive, found[0].m_Map.m_nOffset, found[0].m_Map.m_nLength, found[0].m_Map.m_szName );
+}
+
+// Parses the _dir.vpks next to the ones seen so far ( VPKs mounted before the hooks went in )
+static void ScanVPKFolders()
+{
+	CUtlVector< wchar_t * > folders;
+	AcquireSRWLockShared( &s_Lock );
+	const int nDirs = s_CachedVPKDirs.Count();
+	CUtlVector< wchar_t > paths;
+	paths.SetCount( nDirs * MAX_PATH );
+	for ( int i = 0; i < nDirs; i++ )
+		wcsncpy_s( paths.Base() + i * MAX_PATH, MAX_PATH, s_CachedVPKDirs[i].m_szPath, _TRUNCATE );
+	ReleaseSRWLockShared( &s_Lock );
+
+	for ( int i = 0; i < nDirs; i++ )
+	{
+		wchar_t *szFolder = paths.Base() + i * MAX_PATH;
+		wchar_t *pSlash = wcsrchr( szFolder, L'\\' );
+		if ( !pSlash )
+			continue;
+		pSlash[1] = 0;
+
+		bool bSeen = false;
+		for ( int k = 0; k < folders.Count() && !bSeen; k++ )
+			bSeen = !wcscmp( folders[k], szFolder );
+		if ( bSeen )
+			continue;
+		folders.AddToTail( szFolder );
+
+		wchar_t szPattern[MAX_PATH];
+		swprintf_s( szPattern, L"%s*_dir.vpk", szFolder );
+		WIN32_FIND_DATAW data;
+		HANDLE hFind = s_pfnFindFirstFileExW( szPattern, FindExInfoBasic, &data, FindExSearchNameMatch, NULL, 0 );
+		if ( hFind == INVALID_HANDLE_VALUE )
+			continue;
+		do
+		{
+			wchar_t szDir[MAX_PATH];
+			swprintf_s( szDir, L"%s%s", szFolder, data.cFileName );
+			_wcslwr_s( szDir );
+			GetVPKDir( szDir );
+		}
+		while ( s_pfnFindNextFileW( hFind, &data ) );
+		s_pfnFindClose( hFind );
+	}
+}
+
+// A map the engine probes for in every search path that no VPK holds ( any loose
+// map ) would otherwise go through the whole lookup on every probe. Misses are
+// remembered until another _dir.vpk is parsed, and the folders are scanned only
+// when _dir.vpks were added since the last scan.
+struct BCVPKMiss_t
+{
+	char	m_szName[MAX_PATH];
+};
+static CUtlVector< BCVPKMiss_t >	s_VPKMisses;			// under s_Lock
+static int							s_nVPKMissDirs = -1;	// s_CachedVPKDirs.Count() the misses are good for
+static int							s_nVPKScannedDirs = -1;	// s_CachedVPKDirs.Count() at the last folder scan
+
+static bool IsKnownVPKMiss( const char *pszName )
+{
+	bool bMiss = false;
+	AcquireSRWLockShared( &s_Lock );
+	if ( s_nVPKMissDirs == s_CachedVPKDirs.Count() )
+	{
+		for ( int i = 0; i < s_VPKMisses.Count() && !bMiss; i++ )
+			bMiss = !V_stricmp( s_VPKMisses[i].m_szName, pszName );
+	}
+	ReleaseSRWLockShared( &s_Lock );
+	return bMiss;
+}
+
+static void AddVPKMiss( const char *pszName )
+{
+	BCVPKMiss_t miss;
+	V_strncpy( miss.m_szName, pszName, sizeof( miss.m_szName ) );
+	AcquireSRWLockExclusive( &s_Lock );
+	if ( s_nVPKMissDirs != s_CachedVPKDirs.Count() )
+	{
+		s_VPKMisses.RemoveAll();
+		s_nVPKMissDirs = s_CachedVPKDirs.Count();
+	}
+	if ( s_VPKMisses.Count() < 1024 )
+		s_VPKMisses.AddToTail( miss );
+	ReleaseSRWLockExclusive( &s_Lock );
+}
+
+static BCVPKEntry_t *FindVPKMap( LPCWSTR pszPath )
+{
+	char szName[MAX_PATH];
+	if ( !GetVPKMapName( pszPath, szName, sizeof( szName ) ) )
+		return NULL;
+
+	BCVPKEntry_t *pEntry = FindVPKMapEntry( szName, true );
+	if ( !pEntry )
+		pEntry = FindVPKMapEntry( szName, false );
+	if ( pEntry )
+		return pEntry;
+	if ( IsKnownVPKMiss( szName ) )
+		return NULL;
+
+	pEntry = FindVPKMapInDirs( szName );
+	if ( !pEntry )
+	{
+		AcquireSRWLockShared( &s_Lock );
+		const int nDirs = s_CachedVPKDirs.Count();
+		const bool bScan = ( nDirs != s_nVPKScannedDirs );
+		ReleaseSRWLockShared( &s_Lock );
+		if ( bScan )
+		{
+			ScanVPKFolders();
+			AcquireSRWLockExclusive( &s_Lock );
+			s_nVPKScannedDirs = s_CachedVPKDirs.Count();	// what the scan added counts as scanned
+			ReleaseSRWLockExclusive( &s_Lock );
+			pEntry = FindVPKMapInDirs( szName );
+		}
+	}
+	if ( !pEntry )
+		AddVPKMiss( szName );
+	return pEntry;
+}
+
+// A handle on the VPK chunk, read through a window at the map's offset, through its view
+static HANDLE OpenVPKMapPath( BCVPKEntry_t *pEntry, LPCWSTR pszPath, LPSECURITY_ATTRIBUTES pSecurity, DWORD nFlagsAndAttributes )
+{
+	const DWORD nStripFlags = FILE_FLAG_DELETE_ON_CLOSE | FILE_FLAG_OVERLAPPED | FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH | FILE_FLAG_RANDOM_ACCESS | FILE_FLAG_SEQUENTIAL_SCAN;
+	HANDLE hFile = s_pfnCreateFileW( pEntry->m_szArchive, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, pSecurity, OPEN_EXISTING,
+		( nFlagsAndAttributes & ~nStripFlags & ~BSPCOMPAT_BYPASS_ATTRIBUTE ) | FILE_ATTRIBUTE_NORMAL, NULL );
+	if ( hFile == INVALID_HANDLE_VALUE )
+		return INVALID_HANDLE_VALUE;
+	HANDLE hReader = s_pfnCreateFileW( pEntry->m_szArchive, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+		NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL );
+	if ( hReader == INVALID_HANDLE_VALUE )
+	{
+		s_pfnCloseHandle( hFile );
+		return INVALID_HANDLE_VALUE;
+	}
+
+	// BSPCOMPAT_BYPASS_ATTRIBUTE ( staticprop_colormod ): the original bytes
+	BCVirtualMap_t *pView = ( nFlagsAndAttributes & BSPCOMPAT_BYPASS_ATTRIBUTE ) ? NULL : GetVPKEntryView( pEntry, hReader );
+	BCVirtualMap_t *pOwned = NULL;
+	if ( !pView )
+	{
+		pOwned = new BCVirtualMap_t;
+		pOwned->m_nOriginalSize = pEntry->m_nLength;
+		pOwned->m_nVirtualSize = pEntry->m_nLength;
+		pView = pOwned;
+	}
+
+	BCSharedReader_t *pShared = new BCSharedReader_t;
+	pShared->m_nRefs = 1;	// the tracked handle's
+	pShared->m_hReader = hReader;
+	pShared->m_pOwnedMap = pOwned;
+	AddTrackedHandle( hFile, NULL, pView, pEntry->m_nOffset, false, pShared );
+
+	DevMsg( "BSP compat: %ls is served from %ls ( %s )\n", pszPath, pEntry->m_szArchive, pEntry->m_szName );
+	return hFile;
+}
+
+static bool GetVPKMapAttributes( LPCWSTR pszPath, WIN32_FILE_ATTRIBUTE_DATA *pData )
+{
+	BCVPKEntry_t *pEntry = FindVPKMap( pszPath );
+	if ( !pEntry )
+		return false;
+	WIN32_FILE_ATTRIBUTE_DATA archive;
+	if ( !s_pfnGetFileAttributesExW( pEntry->m_szArchive, GetFileExInfoStandard, &archive ) )
+		return false;
+	memset( pData, 0, sizeof( *pData ) );
+	pData->dwFileAttributes = FILE_ATTRIBUTE_ARCHIVE | FILE_ATTRIBUTE_READONLY;
+	pData->ftCreationTime = archive.ftCreationTime;
+	pData->ftLastAccessTime = archive.ftLastAccessTime;
+	pData->ftLastWriteTime = archive.ftLastWriteTime;
+	pData->nFileSizeHigh = (DWORD)( (unsigned long long)pEntry->m_nLength >> 32 );
+	pData->nFileSizeLow = (DWORD)( pEntry->m_nLength & 0xFFFFFFFF );
 	return true;
 }
 
@@ -1988,7 +3014,7 @@ static bool GetGMAAttributes( LPCWSTR pszPath, WIN32_FILE_ATTRIBUTE_DATA *pData,
 	if ( nKind == GMA_PATH_OUTSIDE || nKind == GMA_PATH_ROOT )
 		return false;
 
-	GMALog( "ATTR kind=%d %ls\n", (int)nKind, pszPath );
+	//GMALog( "ATTR kind=%d %ls\n", (int)nKind, pszPath );
 	if ( nKind == GMA_PATH_MISSING )
 	{
 		*pbResult = FALSE;
@@ -2033,6 +3059,16 @@ static HANDLE WINAPI Hook_CreateFileW( LPCWSTR pszPath, DWORD nAccess, DWORD nSh
 	{
 		TrackIfMap( hFile, pszPath, nAccess, nFlagsAndAttributes );
 	}
+	else if ( IsNotFoundError( nError ) && IsOpenOnly( nAccess, nDisposition ) && IsMapPath( pszPath ) )
+	{
+		BCVPKEntry_t *pEntry = FindVPKMap( pszPath );
+		if ( pEntry )
+		{
+			hFile = OpenVPKMapPath( pEntry, pszPath, pSecurity, nFlagsAndAttributes );
+			if ( hFile != INVALID_HANDLE_VALUE )
+				nError = NO_ERROR;
+		}
+	}
 	else if ( IsNotFoundError( nError ) && IsModelPath( pszPath ) )
 	{
 		hFile = OpenMadeUpModelFile( pszPath, nAccess, nShare, pSecurity, nDisposition, nFlagsAndAttributes, hTemplate );
@@ -2056,7 +3092,15 @@ static HANDLE WINAPI Hook_CreateFileA( LPCSTR pszPath, DWORD nAccess, DWORD nSha
 	{
 		DWORD nError = GetLastError();
 		wchar_t szPath[MAX_PATH];
-		if ( IsNotFoundError( nError ) && MultiByteToWideChar( CP_ACP, 0, pszPath, -1, szPath, MAX_PATH ) && IsModelPath( szPath ) )
+		BCVPKEntry_t *pEntry = NULL;
+		if ( IsNotFoundError( nError ) && IsOpenOnly( nAccess, nDisposition ) && MultiByteToWideChar( CP_ACP, 0, pszPath, -1, szPath, MAX_PATH ) &&
+			 IsMapPath( szPath ) && ( pEntry = FindVPKMap( szPath ) ) != NULL )
+		{
+			hFile = OpenVPKMapPath( pEntry, szPath, pSecurity, nFlagsAndAttributes );
+			if ( hFile != INVALID_HANDLE_VALUE )
+				nError = NO_ERROR;
+		}
+		else if ( IsNotFoundError( nError ) && MultiByteToWideChar( CP_ACP, 0, pszPath, -1, szPath, MAX_PATH ) && IsModelPath( szPath ) )
 		{
 			hFile = OpenMadeUpModelFile( szPath, nAccess, nShare, pSecurity, nDisposition, nFlagsAndAttributes, hTemplate );
 			if ( hFile != INVALID_HANDLE_VALUE )
@@ -2093,7 +3137,11 @@ static BOOL WINAPI Hook_ReadFile( HANDLE hFile, LPVOID pBuffer, DWORD nToRead, L
 	int nTracked = FindTracked( hFile );
 	BCTrackedHandle_t tracked;
 	if ( nTracked >= 0 )
+	{
 		tracked = s_TrackedHandles[nTracked];
+		if ( tracked.m_pShared )
+			InterlockedIncrement( &tracked.m_pShared->m_nRefs );	// kept alive until this read is done
+	}
 	ReleaseSRWLockShared( &s_Lock );
 
 	if ( nTracked < 0 )
@@ -2101,12 +3149,31 @@ static BOOL WINAPI Hook_ReadFile( HANDLE hFile, LPVOID pBuffer, DWORD nToRead, L
 
 	bc_int64 nOffset = pOverlapped ? ( ( (bc_int64)pOverlapped->OffsetHigh << 32 ) | pOverlapped->Offset ) : tracked.m_nPosition;
 	int nRead;
-	if ( tracked.m_nBaseOffset > 0 )
+	bool bReadError = false;
+	if ( tracked.m_pShared )
 	{
-		BCWindow_t window = { tracked.m_hReader, tracked.m_nBaseOffset };
-		nRead = VirtualRead( tracked.m_pMap, WindowRead, &window, nOffset, pBuffer, (int)MIN( nToRead, (DWORD)0x7FFFFFFF ) );
-		GMALog( "READ h=%p ofs=%lld want=%u got=%d ov=%d ev=%p pnRead=%d crc=%08x tid=%u\n", hFile, nOffset, nToRead, nRead, pOverlapped != NULL,
-			pOverlapped ? pOverlapped->hEvent : NULL, pnRead != NULL, nRead > 0 ? CRC32_ProcessSingleBuffer( pBuffer, nRead ) : 0, GetCurrentThreadId() );
+		BCWindow_t window = { tracked.m_pShared->m_hReader, tracked.m_nBaseOffset };
+		const int nWant = (int)MIN( nToRead, (DWORD)0x7FFFFFFF );
+		nRead = VirtualRead( tracked.m_pMap, WindowRead, &window, nOffset, pBuffer, nWant );
+		// VirtualRead gives 0 both at the end of the file and when the .gma couldn't be read
+		const bc_int64 nLeft = tracked.m_pMap->m_nVirtualSize - nOffset;
+		bReadError = ( nRead == 0 && nWant > 0 && nOffset >= 0 && nLeft > 0 );
+		const DWORD nReadError = bReadError ? GetLastError() : 0;
+		if ( GMA_LOGGING() || bReadError )
+			GMALog( "READ h=%p ofs=%lld want=%u got=%d ov=%d ev=%p tid=%u%s\n", hFile, nOffset, nToRead, nRead, pOverlapped != NULL,
+				pOverlapped ? pOverlapped->hEvent : NULL, GetCurrentThreadId(), bReadError ? " ** READ ERROR **" : "" );
+		if ( bReadError )
+		{
+			static volatile LONG s_nReadWarnings = 0;
+			if ( InterlockedIncrement( &s_nReadWarnings ) <= 20 )
+				Warning( "GMA: reading %d bytes at %lld of a mounted addon file failed (error %u)\n", nWant, nOffset, nReadError );
+			SetLastError( nReadError );
+		}
+		ReleaseSharedReader( tracked.m_pShared, s_pfnCloseHandle );
+	}
+	else if ( tracked.m_pVPK )
+	{
+		nRead = VPKRead( tracked.m_pVPK, tracked.m_hReader, nOffset, pBuffer, (int)MIN( nToRead, (DWORD)0x7FFFFFFF ) );
 	}
 	else
 	{
@@ -2122,6 +3189,20 @@ static BOOL WINAPI Hook_ReadFile( HANDLE hFile, LPVOID pBuffer, DWORD nToRead, L
 
 	if ( pnRead )
 		*pnRead = (DWORD)nRead;
+
+	if ( bReadError )
+	{
+		// a real failure, not the end of the file: say so rather than pass it off as EOF
+		if ( pOverlapped )
+		{
+			pOverlapped->Internal = 0xC00000E9;	// STATUS_UNEXPECTED_IO_ERROR
+			pOverlapped->InternalHigh = 0;
+			if ( pOverlapped->hEvent )
+				SetEvent( (HANDLE)( (ULONG_PTR)pOverlapped->hEvent & ~(ULONG_PTR)1 ) );
+		}
+		SetLastError( ERROR_READ_FAULT );
+		return FALSE;
+	}
 
 	if ( pOverlapped )
 	{
@@ -2218,8 +3299,8 @@ static bool GetTrackedSize( HANDLE hFile, bc_int64 *pnSize )
 		bGMA = s_TrackedHandles[nTracked].m_nBaseOffset > 0;
 	}
 	ReleaseSRWLockShared( &s_Lock );
-	if ( bGMA )
-		GMALog( "SIZE h=%p -> %lld\n", hFile, *pnSize );
+	//if ( bGMA )
+		//GMALog( "SIZE h=%p -> %lld\n", hFile, *pnSize );
 	return nTracked >= 0;
 }
 
@@ -2275,12 +3356,14 @@ static BOOL WINAPI Hook_CloseHandle( HANDLE hObject )
 	{
 		HANDLE hReader = NULL;
 		BCVirtualMap_t *pOwnedMap = NULL;
+		BCSharedReader_t *pShared = NULL;
 		AcquireSRWLockExclusive( &s_Lock );
 		int nTracked = FindTracked( hObject );
 		if ( nTracked >= 0 )
 		{
+			pShared = s_TrackedHandles[nTracked].m_pShared;
 			if ( s_TrackedHandles[nTracked].m_nBaseOffset > 0 )
-				GMALog( "CLOSE h=%p\n", hObject );
+				GMALog( "CLOSE h=%p tid=%u\n", hObject, GetCurrentThreadId() );
 			hReader = s_TrackedHandles[nTracked].m_hReader;
 			if ( s_TrackedHandles[nTracked].m_bOwnsMap )
 				pOwnedMap = s_TrackedHandles[nTracked].m_pMap;
@@ -2291,6 +3374,7 @@ static BOOL WINAPI Hook_CloseHandle( HANDLE hObject )
 		if ( hReader )
 			s_pfnCloseHandle( hReader );
 		delete pOwnedMap;
+		ReleaseSharedReader( pShared, s_pfnCloseHandle );	// a read still going on another thread keeps it until it's done
 	}
 	return s_pfnCloseHandle( hObject );
 }
@@ -2306,6 +3390,17 @@ static BOOL WINAPI Hook_GetFileAttributesExW( LPCWSTR pszPath, GET_FILEEX_INFO_L
 	if ( nLevel == GetFileExInfoStandard && pInfo && GetGMAAttributes( pszPath, (WIN32_FILE_ATTRIBUTE_DATA *)pInfo, &bGMA ) )
 		return bGMA;
 	BOOL bResult = s_pfnGetFileAttributesExW( pszPath, nLevel, pInfo );
+	if ( !bResult && nLevel == GetFileExInfoStandard && pInfo && IsMapPath( pszPath ) )
+	{
+		const DWORD nMapError = GetLastError();
+		if ( IsNotFoundError( nMapError ) && GetVPKMapAttributes( pszPath, (WIN32_FILE_ATTRIBUTE_DATA *)pInfo ) )
+		{
+			SetLastError( NO_ERROR );
+			return TRUE;
+		}
+		SetLastError( nMapError );
+		return bResult;
+	}
 	if ( nLevel != GetFileExInfoStandard || !pInfo || !IsModelPath( pszPath ) )
 		return bResult;
 
@@ -2333,6 +3428,17 @@ static BOOL WINAPI Hook_GetFileAttributesExA( LPCSTR pszPath, GET_FILEEX_INFO_LE
 		return bGMA;
 	BOOL bResult = s_pfnGetFileAttributesExA( pszPath, nLevel, pInfo );
 	wchar_t szPath[MAX_PATH];
+	if ( !bResult && nLevel == GetFileExInfoStandard && pInfo && pszPath && MultiByteToWideChar( CP_ACP, 0, pszPath, -1, szPath, MAX_PATH ) && IsMapPath( szPath ) )
+	{
+		const DWORD nMapError = GetLastError();
+		if ( IsNotFoundError( nMapError ) && GetVPKMapAttributes( szPath, (WIN32_FILE_ATTRIBUTE_DATA *)pInfo ) )
+		{
+			SetLastError( NO_ERROR );
+			return TRUE;
+		}
+		SetLastError( nMapError );
+		return bResult;
+	}
 	if ( nLevel != GetFileExInfoStandard || !pInfo || !pszPath || !MultiByteToWideChar( CP_ACP, 0, pszPath, -1, szPath, MAX_PATH ) || !IsModelPath( szPath ) )
 		return bResult;
 
@@ -2359,6 +3465,18 @@ static DWORD WINAPI Hook_GetFileAttributesW( LPCWSTR pszPath )
 	if ( GetGMAAttributes( pszPath, &gmaData, &bGMA ) )
 		return bGMA ? gmaData.dwFileAttributes : INVALID_FILE_ATTRIBUTES;
 	DWORD nAttributes = s_pfnGetFileAttributesW( pszPath );
+	if ( nAttributes == INVALID_FILE_ATTRIBUTES && IsMapPath( pszPath ) )
+	{
+		const DWORD nMapError = GetLastError();
+		WIN32_FILE_ATTRIBUTE_DATA mapData;
+		if ( IsNotFoundError( nMapError ) && GetVPKMapAttributes( pszPath, &mapData ) )
+		{
+			SetLastError( NO_ERROR );
+			return mapData.dwFileAttributes;
+		}
+		SetLastError( nMapError );
+		return nAttributes;
+	}
 	if ( nAttributes != INVALID_FILE_ATTRIBUTES || !IsModelPath( pszPath ) )
 		return nAttributes;
 	DWORD nError = GetLastError();
@@ -2381,6 +3499,18 @@ static DWORD WINAPI Hook_GetFileAttributesA( LPCSTR pszPath )
 		return bGMA ? gmaData.dwFileAttributes : INVALID_FILE_ATTRIBUTES;
 	DWORD nAttributes = s_pfnGetFileAttributesA( pszPath );
 	wchar_t szPath[MAX_PATH];
+	if ( nAttributes == INVALID_FILE_ATTRIBUTES && pszPath && MultiByteToWideChar( CP_ACP, 0, pszPath, -1, szPath, MAX_PATH ) && IsMapPath( szPath ) )
+	{
+		const DWORD nMapError = GetLastError();
+		WIN32_FILE_ATTRIBUTE_DATA mapData;
+		if ( IsNotFoundError( nMapError ) && GetVPKMapAttributes( szPath, &mapData ) )
+		{
+			SetLastError( NO_ERROR );
+			return mapData.dwFileAttributes;
+		}
+		SetLastError( nMapError );
+		return nAttributes;
+	}
 	if ( nAttributes != INVALID_FILE_ATTRIBUTES || !pszPath || !MultiByteToWideChar( CP_ACP, 0, pszPath, -1, szPath, MAX_PATH ) || !IsModelPath( szPath ) )
 		return nAttributes;
 	DWORD nError = GetLastError();
@@ -3014,6 +4144,104 @@ static bool InstallFileHooks()
 	return true;
 }
 
+
+//-----------------------------------------------------------------------------
+// VPK handles opened before the hooks went in
+//
+// filesystem_stdio can open an archive chunk before whichever DLL installs the
+// hooks is loaded, and keep reading through that handle. Reads through it would
+// get the original bytes while reads through handles opened later get the view,
+// so the engine sees a mix. Every open file handle is checked once, right after
+// the hooks go in, and the VPKs among them are tracked from their current file
+// position. GetFileType first: only disk files get a name lookup ( a pipe's
+// can block ).
+//-----------------------------------------------------------------------------
+#define BC_MAX_HANDLE_VALUE		0x40000
+
+static bool GetOpenFilePath( HANDLE hFile, wchar_t *szPath )
+{
+	if ( GetFileType( hFile ) != FILE_TYPE_DISK )
+		return false;
+	wchar_t szFinal[MAX_PATH + 8];
+	const DWORD nLen = GetFinalPathNameByHandleW( hFile, szFinal, MAX_PATH, FILE_NAME_NORMALIZED | VOLUME_NAME_DOS );
+	if ( !nLen || nLen >= MAX_PATH )
+		return false;
+	const wchar_t *p = szFinal;
+	if ( !wcsncmp( p, L"\\\\?\\", 4 ) )
+		p += 4;
+	wcsncpy_s( szPath, MAX_PATH, p, _TRUNCATE );
+	const size_t n = wcslen( szPath );
+	return n > 4 && !_wcsicmp( szPath + n - 4, L".vpk" );
+}
+
+// Returns how many it started tracking. pnOpen: VPK handles open in the process. With bAdopt false
+// nothing is tracked, and pnMissed counts handles on chunks holding maps that aren't redirected.
+static int AdoptOpenVPKHandles( int *pnOpen = NULL, bool bAdopt = true, int *pnMissed = NULL )
+{
+	int nAdopted = 0, nOpen = 0, nMissed = 0;
+	for ( ULONG_PTR nValue = 4; nValue < BC_MAX_HANDLE_VALUE; nValue += 4 )
+	{
+		HANDLE hFile = (HANDLE)nValue;
+		wchar_t szPath[MAX_PATH];
+		if ( !GetOpenFilePath( hFile, szPath ) )
+			continue;
+		nOpen++;
+
+		AcquireSRWLockShared( &s_Lock );
+		const bool bTracked = ( FindTracked( hFile ) >= 0 );
+		bool bMapChunk = false;
+		if ( !bTracked && !bAdopt )
+		{
+			_wcslwr_s( szPath );
+			bool bReaderHandle = false;
+			for ( int i = 0; i < s_TrackedHandles.Count() && !bReaderHandle; i++ )
+				bReaderHandle = ( s_TrackedHandles[i].m_hReader == hFile );
+			for ( int i = 0; i < s_CachedVPKs.Count() && !bReaderHandle && !bMapChunk; i++ )
+				bMapChunk = s_CachedVPKs[i].m_pChunk && !wcscmp( s_CachedVPKs[i].m_szPath, szPath );
+		}
+		ReleaseSRWLockShared( &s_Lock );
+		if ( bMapChunk )
+		{
+			nMissed++;
+			Msg( "  NOT redirected: handle %p on %ls\n", hFile, szPath );
+		}
+		if ( bTracked || !bAdopt )
+			continue;
+
+		// our own reader handles are never in s_TrackedHandles as m_hFile, but they are
+		// as m_hReader: leave those alone
+		bool bReader = false;
+		AcquireSRWLockShared( &s_Lock );
+		for ( int i = 0; i < s_TrackedHandles.Count() && !bReader; i++ )
+			bReader = ( s_TrackedHandles[i].m_hReader == hFile );
+		ReleaseSRWLockShared( &s_Lock );
+		if ( bReader )
+			continue;
+
+		LARGE_INTEGER zero, position;
+		zero.QuadPart = 0;
+		if ( !s_pfnSetFilePointerEx( hFile, zero, &position, FILE_CURRENT ) )
+			position.QuadPart = 0;
+
+		TrackIfVPK( hFile, szPath, GENERIC_READ, 0 );
+
+		AcquireSRWLockExclusive( &s_Lock );
+		const int nTracked = FindTracked( hFile );
+		if ( nTracked >= 0 )
+			s_TrackedHandles[nTracked].m_nPosition = position.QuadPart;
+		ReleaseSRWLockExclusive( &s_Lock );
+		if ( nTracked >= 0 )
+			nAdopted++;
+	}
+	if ( pnOpen )
+		*pnOpen = nOpen;
+	if ( pnMissed )
+		*pnMissed = nMissed;
+	return nAdopted;
+}
+
+static void PublishGMALogToggle( bool bPublish );
+
 void BSPCompat_Install()
 {
 	// The variable holds the process ID, so a child process that inherits it still installs
@@ -3039,6 +4267,15 @@ void BSPCompat_Install()
 	s_bOwnsHooks = true;
 	SetEnvironmentVariableA( BSPCOMPAT_INSTALLED_VAR, szProcess );
 
+	// Archive chunks the filesystem opened before now
+	if ( bFiles )
+	{
+		const int nAdopted = AdoptOpenVPKHandles();
+		if ( nAdopted )
+			DevMsg( "BSP compat: %d VPK handles opened before the hooks are redirected now\n", nAdopted );
+	}
+	PublishGMALogToggle( true );
+
 	// Garry's Mod's cfg/mount.cfg: plain search paths, so it doesn't need the hooks.
 	// First, so a Garry's Mod folder mounted there is found by the addon mount.
 	MountCfg_Init();
@@ -3053,6 +4290,161 @@ void BSPCompat_Install()
 		Warning( "GMA: couldn't hook the folder listing functions, Garry's Mod addons won't be mounted\n" );
 }
 
+// The hooks (and so the log) live in whichever DLL installed them first. The
+// server's commands don't run at the main menu, so both DLLs have the command:
+// the owner publishes its toggle in an environment variable (same process, so
+// the address is valid in the other DLL) and the other one calls through it.
+#define GMA_LOGFN_VAR	"SRCBOX_GMA_LOGFN"
+typedef void ( *GMALogToggle_t )( int nState );	// 1 on, 0 off, -1 toggle
+
+static void GMALogToggle( int nState )
+{
+	const bool bOn = ( nState < 0 ) ? ( s_hGMALog == INVALID_HANDLE_VALUE ) : ( nState != 0 );
+	if ( bOn )
+	{
+		if ( s_hGMALog != INVALID_HANDLE_VALUE )
+			Msg( "GMA: already logging\n" );
+		OpenGMALog( true );
+	}
+	else if ( s_hGMALog != INVALID_HANDLE_VALUE )
+	{
+		CloseGMALog();
+		Msg( "GMA: logging stopped\n" );
+	}
+}
+
+static void BSPCompatStatus();
+#define BSPCOMPAT_STATUSFN_VAR	"SRCBOX_BSP_STATUSFN"
+
+static void PublishGMALogToggle( bool bPublish )
+{
+	if ( !bPublish )
+	{
+		SetEnvironmentVariableA( GMA_LOGFN_VAR, NULL );
+		SetEnvironmentVariableA( BSPCOMPAT_STATUSFN_VAR, NULL );
+		return;
+	}
+	char szStatus[32];
+	V_snprintf( szStatus, sizeof( szStatus ), "%llx", (unsigned long long)(uintptr_t)&BSPCompatStatus );
+	SetEnvironmentVariableA( BSPCOMPAT_STATUSFN_VAR, szStatus );
+
+	char szAddress[32];
+	V_snprintf( szAddress, sizeof( szAddress ), "%llx", (unsigned long long)(uintptr_t)&GMALogToggle );
+	SetEnvironmentVariableA( GMA_LOGFN_VAR, szAddress );
+}
+
+static void GMADebugLogCommand( const CCommand &args )
+{
+	const int nState = ( args.ArgC() < 2 ) ? -1 : ( atoi( args[1] ) != 0 ? 1 : 0 );
+	if ( s_bOwnsHooks )
+	{
+		GMALogToggle( nState );
+		return;
+	}
+	char szAddress[32];
+	if ( GetEnvironmentVariableA( GMA_LOGFN_VAR, szAddress, sizeof( szAddress ) ) == 0 )
+	{
+		Warning( "GMA: the file hooks aren't installed, so there's nothing to log\n" );
+		return;
+	}
+	GMALogToggle_t pfnToggle = (GMALogToggle_t)(uintptr_t)_strtoui64( szAddress, NULL, 16 );
+	if ( pfnToggle )
+		pfnToggle( nState );
+}
+
+#ifdef CLIENT_DLL
+CON_COMMAND( gma_debuglog, "Log every access to files inside mounted .gma addons to <mod>/cache/gma_debug.log (1/0)" )
+#else
+CON_COMMAND( sv_gma_debuglog, "Log every access to files inside mounted .gma addons to <mod>/cache/gma_debug.log (1/0)" )
+#endif
+{
+	GMADebugLogCommand( args );
+}
+
+//-----------------------------------------------------------------------------
+// bspcompat_status: what the redirect has seen ( VPKs holding maps, map views )
+//-----------------------------------------------------------------------------
+// Like gma_debuglog: the owner publishes this function's address ( BSPCOMPAT_STATUSFN_VAR ), the other DLL calls through it
+typedef void ( *BSPCompatStatus_t )();
+
+static void BSPCompatStatus()
+{
+	if ( !s_bOwnsHooks )
+	{
+		char szAddress[32];
+		if ( GetEnvironmentVariableA( BSPCOMPAT_STATUSFN_VAR, szAddress, sizeof( szAddress ) ) > 0 )
+		{
+			BSPCompatStatus_t pfnStatus = (BSPCompatStatus_t)(uintptr_t)_strtoui64( szAddress, NULL, 16 );
+			if ( pfnStatus && pfnStatus != &BSPCompatStatus )
+			{
+				pfnStatus();
+				return;
+			}
+		}
+		Msg( "BSP compat: the hooks aren't installed\n" );
+		return;
+	}
+
+	// Copy what's needed under the lock, print after ( Msg can come back into the hooks )
+	struct Line_t { char m_szText[MAX_PATH + 128]; };
+	CUtlVector< Line_t > lines;
+	int nTracked = 0, nTrackedVPK = 0;
+
+	AcquireSRWLockShared( &s_Lock );
+	for ( int i = 0; i < s_TrackedHandles.Count(); i++ )
+	{
+		nTracked++;
+		nTrackedVPK += ( s_TrackedHandles[i].m_pVPK != NULL );
+	}
+	for ( int i = 0; i < s_CachedVPKDirs.Count(); i++ )
+	{
+		const BCCachedVPKDir_t &dir = s_CachedVPKDirs[i];
+		if ( !dir.m_pDir || !dir.m_pDir->m_Maps.Count() )
+			continue;
+		Line_t &line = lines[lines.AddToTail()];
+		V_snprintf( line.m_szText, sizeof( line.m_szText ), "  dir   %ls: %d maps\n", dir.m_szPath, dir.m_pDir->m_Maps.Count() );
+	}
+	for ( int i = 0; i < s_CachedVPKs.Count(); i++ )
+	{
+		const BCCachedVPK_t &chunk = s_CachedVPKs[i];
+		if ( !chunk.m_pChunk )
+			continue;
+		Line_t &line = lines[lines.AddToTail()];
+		V_snprintf( line.m_szText, sizeof( line.m_szText ), "  chunk %ls: %d maps\n", chunk.m_szPath, chunk.m_pChunk->m_Entries.Count() );
+		for ( int k = 0; k < chunk.m_pChunk->m_Entries.Count(); k++ )
+		{
+			const BCVPKEntry_t *pEntry = chunk.m_pChunk->m_Entries[k];
+			const BCVirtualMap_t *pMap = pEntry->m_pMap;
+			if ( !pMap )
+				continue;	// never read
+			Line_t &mapLine = lines[lines.AddToTail()];
+			V_snprintf( mapLine.m_szText, sizeof( mapLine.m_szText ), "        %s: %s\n", pEntry->m_szName,
+				pMap == &s_VPKNoView ? "read as it is" : "converted view" );
+		}
+	}
+	const int nVPKsSeen = s_CachedVPKs.Count();
+	ReleaseSRWLockShared( &s_Lock );
+
+	Msg( "BSP compat: hooks installed. %d open handles redirected ( %d VPK chunks ), %d VPK files opened since\n", nTracked, nTrackedVPK, nVPKsSeen );
+
+	int nOpenVPK = 0, nMissed = 0;
+	AdoptOpenVPKHandles( &nOpenVPK, false, &nMissed );
+	Msg( "  %d VPK handles open in the process, %d on chunks holding maps that are NOT redirected\n", nOpenVPK, nMissed );
+	for ( int i = 0; i < lines.Count(); i++ )
+		Msg( "%s", lines[i].m_szText );
+	if ( !lines.Count() )
+		Msg( "  no VPK holding maps has been opened since the hooks went in\n" );
+}
+
+#ifdef CLIENT_DLL
+CON_COMMAND( bspcompat_status, "Show which VPKs holding maps the BSP redirect has seen, and which maps it converted" )
+#else
+CON_COMMAND( sv_bspcompat_status, "Show which VPKs holding maps the BSP redirect has seen, and which maps it converted" )
+#endif
+{
+	BSPCompatStatus();
+}
+
 void BSPCompat_Shutdown()
 {
 	if ( !s_bOwnsHooks )
@@ -3064,6 +4456,7 @@ void BSPCompat_Shutdown()
 	CloseGMALog();
 	s_bOwnsHooks = false;
 	SetEnvironmentVariableA( BSPCOMPAT_INSTALLED_VAR, NULL );
+	PublishGMALogToggle( false );
 
 	// Handles still open now read the original file; their reader handles are released
 	AcquireSRWLockExclusive( &s_Lock );
@@ -3071,6 +4464,7 @@ void BSPCompat_Shutdown()
 	{
 		if ( s_TrackedHandles[i].m_hReader )
 			CloseHandle( s_TrackedHandles[i].m_hReader );
+		ReleaseSharedReader( s_TrackedHandles[i].m_pShared, CloseHandle );	// the hooks are gone: the real CloseHandle
 	}
 	s_TrackedHandles.Purge();
 	s_nTrackedHandles = 0;

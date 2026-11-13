@@ -267,6 +267,8 @@ IMPLEMENT_SERVERCLASS_ST(CBaseAnimating, DT_BaseAnimating)
 #ifdef LUA_SDK
 	// GMod's Entity:SetMaterial
 	SendPropString( SENDINFO( m_MaterialOverride ) ),
+	// GMod's Entity:SetSubMaterial ( 11 bits: up to 1024 material strings, plus 0 for none )
+	SendPropArray3( SENDINFO_ARRAY3( m_nSubMaterialIndex ), SendPropInt( SENDINFO_ARRAY( m_nSubMaterialIndex ), 11, SPROP_UNSIGNED ) ),
 #endif
 
 END_SEND_TABLE()
@@ -341,8 +343,47 @@ CBaseAnimating::CBaseAnimating()
 
 #ifdef LUA_SDK
 	m_MaterialOverride.GetForModify()[0] = 0;
+	for ( int i = 0; i < MAX_SUB_MATERIAL_OVERRIDES; i++ )
+	{
+		m_SubMaterialOverrides[i] = NULL_STRING;
+		m_nSubMaterialIndex.Set( i, 0 );
+	}
 #endif
 }
+
+#ifdef LUA_SDK
+//-----------------------------------------------------------------------------
+// GMod's Entity:SetSubMaterial( index, material ): "" or NULL clears the slot.
+// The name goes into the networked "Materials" string table and the client gets its index.
+//-----------------------------------------------------------------------------
+void CBaseAnimating::SetSubMaterialOverride( int iIndex, const char *pMaterialName )
+{
+	if ( iIndex < 0 || iIndex >= MAX_SUB_MATERIAL_OVERRIDES )
+		return;
+
+	if ( !pMaterialName || !pMaterialName[0] )
+	{
+		m_SubMaterialOverrides[iIndex] = NULL_STRING;
+		m_nSubMaterialIndex.Set( iIndex, 0 );
+		return;
+	}
+
+	m_SubMaterialOverrides[iIndex] = AllocPooledString( pMaterialName );
+
+	PrecacheMaterial( pMaterialName );
+	int nStringIndex = GetMaterialIndex( pMaterialName );
+	m_nSubMaterialIndex.Set( iIndex, ( nStringIndex > 0 ) ? nStringIndex + 1 : 0 );
+}
+
+void CBaseAnimating::ClearSubMaterialOverrides()
+{
+	for ( int i = 0; i < MAX_SUB_MATERIAL_OVERRIDES; i++ )
+	{
+		m_SubMaterialOverrides[i] = NULL_STRING;
+		m_nSubMaterialIndex.Set( i, 0 );
+	}
+}
+#endif
 
 CBaseAnimating::~CBaseAnimating()
 {

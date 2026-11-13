@@ -333,6 +333,35 @@ bool CBaseScripted::CallLuaKeyValue(const char *szKeyName, const char *szValue)
     return bSuppress;
 }
 
+// GMod's ENT:AcceptInput( inputName, activator, caller, data ): returning true
+// means Lua handled the input, so the C++ inputs don't see it.
+bool CBaseScripted::AcceptInput(const char *szInputName, CBaseEntity *pActivator, CBaseEntity *pCaller, variant_t Value, int outputID)
+{
+#ifdef LUA_SDK
+    if (L && lua_isrefvalid(L, m_nTableReference))
+    {
+        int iTop = lua_gettop(L);
+        bool bHandled = false;
+
+        LUA_CALL_ENTITY_METHOD_BEGIN("AcceptInput");
+        lua_pushstring(L, szInputName);
+        CBaseEntity::PushLuaInstanceSafe(L, pActivator);
+        CBaseEntity::PushLuaInstanceSafe(L, pCaller);
+        lua_pushstring(L, Value.String());
+        LUA_CALL_ENTITY_METHOD_END(4, 1);
+
+        if (lua_gettop(L) > iTop && lua_isboolean(L, -1))
+            bHandled = lua_toboolean(L, -1) != 0;
+
+        lua_settop(L, iTop);
+
+        if (bHandled)
+            return true;
+    }
+#endif
+    return BaseClass::AcceptInput(szInputName, pActivator, pCaller, Value, outputID);
+}
+
 bool CBaseScripted::KeyValue(const char *szKeyName, const char *szValue)
 {
     if (!m_bLuaKeyValuesReady)

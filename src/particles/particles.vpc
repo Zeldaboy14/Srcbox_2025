@@ -13,6 +13,7 @@
 //	src\blobulator, with its shared headers in src\common\blobulator.
 //-----------------------------------------------------------------------------
 
+$Macro OUTLIBNAME	"particles_asw"
 $macro SRCDIR		".."
 
 $include "$SRCDIR\vpc_scripts\source_lib_base.vpc"

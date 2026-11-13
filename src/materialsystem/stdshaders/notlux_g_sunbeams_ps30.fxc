@@ -1,0 +1,55 @@
+//===================== File of the Srcbox Shader Project (Under LUX) =====================//
+//
+//	Initial D.	:	29.10.2026 DMY
+//	Last Change :	29.10.2026 DMY
+//
+//	Recreation of Garry's Mod's g_sunbeams pixel shader ( g_sunbeams_ps20.vcs ).
+//	8 Taps from the Sun towards the Pixel ( at most $sunsize UV long ), each darkened by
+//	$darken, clamped to [0, 10], faded by ( 1 - Distance ) and added times $multiply.
+//
+//=========================================================================================//
+
+//==========================================================================//
+//	Declare Static Combos
+//==========================================================================//
+// NONE
+
+//==========================================================================//
+//	Declare Dynamic Combos
+//==========================================================================//
+// NONE
+
+struct PS_INPUT
+{
+	float2 TexCoord			: TEXCOORD0;
+};
+
+sampler Sampler_FullScreen	: register(s0);
+
+const float g_flDarken		: register(c0);	// $darken
+const float g_flMultiply	: register(c1);	// $multiply
+const float g_flSunSize		: register(c2);	// $sunsize
+const float g_flSunX		: register(c3);	// $sunx
+const float g_flSunY		: register(c4);	// $suny
+
+float4 main( PS_INPUT i ) : COLOR
+{
+	float2 f2UV = i.TexCoord;
+	float2 f2Sun = float2( g_flSunX, g_flSunY );
+
+	float2 f2Delta = f2UV - f2Sun;
+	float flDistance = length( f2Delta );
+	float2 f2Step = ( f2Delta / flDistance ) * min( g_flSunSize, flDistance );
+	float flFade = 1.0f - flDistance;
+
+	float4 f4Result = tex2D( Sampler_FullScreen, f2UV );
+
+	[unroll]
+	for ( int k = 0; k < 8; k++ )
+	{
+		float4 f4Tap = tex2D( Sampler_FullScreen, f2Sun + f2Step * ( k * 0.125f ) );
+		f4Result += clamp( f4Tap - g_flDarken, 0.0f, 10.0f ) * flFade * g_flMultiply;
+	}
+
+	return f4Result;
+}

@@ -22,14 +22,9 @@ void C_FuncSimpleLadder::Activate( void )
 //int C_FuncSimpleLadder::DrawModel( int flags, const RenderableInstance_t &instance )
 int C_FuncSimpleLadder::DrawModel( int flags )
 {
-	const int stdFlags = STUDIO_SHADOWDEPTHTEXTURE | STUDIO_RENDER;
-	//if ( ( flags & stdFlags ) == stdFlags || !CHL2MPRules()->IsVersusMode() )
-	if ( ( flags & stdFlags ) == stdFlags )
-	{
-		return 0;
-	}
-
-	//return BaseClass::DrawModel( flags, instance );
+	// This is a real ladder brush (ladder texture), so it has to be drawn.
+	// Earlier versions of this class were an invisible ladder volume and
+	// skipped the normal render pass.
 	return BaseClass::DrawModel( flags );
 }
 

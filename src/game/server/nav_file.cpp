@@ -646,6 +646,38 @@ NavErrorType CNavArea::Load( CUtlBuffer &fileBuffer, unsigned int version, unsig
 		m_lightIntensity[i] = fileBuffer.GetFloat();
 	}
 
+#ifdef SRCBOX
+	// Srcbox: nav files saved by another game's derived mesh carry per-area custom data that
+	// our plain CNavMesh doesn't know about. Without skipping it every area after the first
+	// misparses. Only done when this game's mesh has no sub-version (custom data) of its own.
+	const bool bForeignCustomData = ( subVersion != 0 && TheNavMesh->GetSubVersionNumber() == 0 );
+
+	// L4D (13) / L4D2 (14): TerrorNavArea's data sits *before* the visibility list, which
+	// TerrorNavArea::Load reads itself (CNavArea::Load stops after light intensity under TERROR).
+	if ( bForeignCustomData && subVersion >= 10 && subVersion <= 14 )
+	{
+		m_l4dSpawnAttributes = fileBuffer.GetUnsignedInt();
+		fileBuffer.GetUnsignedShort();				// fog place index (TerrorNavMesh fog place directory)
+		m_attributeFlags &= 0xFFFCFFFF;			// L4D-only custom bits (NAV_MOB_ONLY etc.)
+
+		unsigned int nL4DVisible = fileBuffer.GetUnsignedInt();
+		if ( !fileBuffer.IsValid() )
+			return NAV_INVALID_FILE;
+
+		m_potentiallyVisibleAreas.EnsureCapacity( nL4DVisible );
+		for ( unsigned int j = 0; j < nL4DVisible; ++j )
+		{
+			AreaBindInfo info;
+			info.id = fileBuffer.GetUnsignedInt();
+			info.attributes = fileBuffer.GetUnsignedChar();
+			m_potentiallyVisibleAreas.AddToTail( info );
+		}
+
+		m_inheritVisibilityFrom.id = ( subVersion > 10 ) ? fileBuffer.GetUnsignedInt() : 0;
+		return fileBuffer.IsValid() ? NAV_OK : NAV_INVALID_FILE;
+	}
+#endif
+
 	if ( version < 16 )
 		return NAV_OK;
 
@@ -675,6 +707,34 @@ NavErrorType CNavArea::Load( CUtlBuffer &fileBuffer, unsigned int version, unsig
 
 	// read area from which we inherit visibility
 	m_inheritVisibilityFrom.id = fileBuffer.GetUnsignedInt();
+
+#ifdef SRCBOX
+	if ( bForeignCustomData )
+	{
+		if ( subVersion == 1 )
+		{
+			// CS:S (CSNavArea): one byte per area, always 0 in the navs checked
+			fileBuffer.GetUnsignedChar();
+		}
+		else if ( subVersion == 2 )
+		{
+			// TF2 (CTFNavArea): TF attribute flags
+			fileBuffer.GetUnsignedInt();
+		}
+		else
+		{
+			static unsigned int s_nWarnedSubVersion = 0;
+			if ( s_nWarnedSubVersion != subVersion )
+			{
+				s_nWarnedSubVersion = subVersion;
+				Warning( "Nav file has unknown game custom data (sub-version %u), areas may load incorrectly.\n", subVersion );
+			}
+		}
+
+		if ( !fileBuffer.IsValid() )
+			return NAV_INVALID_FILE;
+	}
+#endif
 
 	return NAV_OK;
 }
@@ -1398,8 +1458,21 @@ NavErrorType CNavMesh::GetNavDataFromFile( CUtlBuffer &outBuffer, bool *pNavData
 	char filename[MAX_PATH] = { 0 };
 	Q_snprintf( filename, sizeof( filename ), FORMAT_NAVFILE, pszMapName );
 
-	if ( !filesystem->ReadFile( filename, "MOD", outBuffer ) )	// this ignores .nav files embedded in the .bsp ...
+	bool bNavFound = filesystem->ReadFile( filename, "MOD", outBuffer );	// this ignores .nav files embedded in the .bsp ...
+#ifdef SRCBOX
+	// Srcbox: maps from mounted games (L4D2 VPKs etc.) keep their .nav beside the .bsp in
+	// that game's content, which is only on the GAME search path, not MOD
+	if ( !bNavFound )
 	{
+		outBuffer.Purge();
+		bNavFound = filesystem->ReadFile( filename, "GAME", outBuffer );
+		if ( bNavFound )
+			DevMsg( "Loaded %s from a mounted game\n", filename );
+	}
+#endif
+	if ( !bNavFound )
+	{
+		outBuffer.Purge();
 		if ( !filesystem->ReadFile( filename, "BSP", outBuffer ) )	// ... and this looks for one if it's the only one around.
 		{
 			// Finally, check for the special embed name for in-BSP nav meshes only
@@ -1524,6 +1597,25 @@ NavErrorType CNavMesh::Load( void )
 
 	LoadCustomDataPreArea( fileBuffer, subVersion );
 
+#ifdef SRCBOX
+	// Srcbox: TerrorNavMesh::LoadCustomDataPreArea, for L4D/L4D2 navs on a plain mesh
+	if ( subVersion >= 8 && subVersion <= 14 && GetSubVersionNumber() == 0 )
+	{
+		char szL4DBuffer[256];
+		if ( subVersion > 11 )
+			fileBuffer.GetString( szL4DBuffer, sizeof( szL4DBuffer ) );		// ZombiePopulation
+
+		unsigned short nFogPlaces = fileBuffer.GetUnsignedShort();
+		for ( int iFog = 0; iFog < nFogPlaces; ++iFog )
+		{
+			unsigned short nLen = fileBuffer.GetUnsignedShort();
+			fileBuffer.SeekGet( CUtlBuffer::SEEK_CURRENT, nLen );
+		}
+
+		DevMsg( "Loading L4D nav mesh (sub-version %u)\n", subVersion );
+	}
+#endif
+
 	// get number of areas
 	unsigned int count = fileBuffer.GetUnsignedInt();
 	unsigned int i;
@@ -1545,8 +1637,20 @@ NavErrorType CNavMesh::Load( void )
 	for( i=0; i<count; ++i )
 	{
 		CNavArea *area = TheNavMesh->CreateArea();
+#ifdef SRCBOX
+		// Srcbox: stop on a misparse instead of building a mesh out of garbage
+		NavErrorType areaResult = area->Load( fileBuffer, version, subVersion );
+		TheNavAreas.AddToTail( area );
+		if ( areaResult != NAV_OK || !fileBuffer.IsValid() )
+		{
+			Warning( "Nav file area %u of %u failed to load (version %u, sub-version %u), discarding nav mesh.\n", i, count, version, subVersion );
+			Reset();
+			return NAV_CORRUPT_DATA;
+		}
+#else
 		area->Load( fileBuffer, version, subVersion );
 		TheNavAreas.AddToTail( area );
+#endif
 
 		area->GetExtent( &areaExtent );
 

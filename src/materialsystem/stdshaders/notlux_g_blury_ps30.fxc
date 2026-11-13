@@ -1,0 +1,49 @@
+//===================== File of the Srcbox Shader Project (Under LUX) =====================//
+//
+//	Initial D.	:	29.10.2026 DMY
+//	Last Change :	29.10.2026 DMY
+//
+//	Recreation of Garry's Mod's g_blury pixel shader ( g_blury_ps20.vcs ).
+//	13 Tap Gaussian along Y. The Step is $size / Back Buffer Width ( Garry's Mod uses the Width
+//	for g_blury too ).
+//
+//=========================================================================================//
+
+//==========================================================================//
+//	Declare Static Combos
+//==========================================================================//
+// NONE
+
+//==========================================================================//
+//	Declare Dynamic Combos
+//==========================================================================//
+// NONE
+
+struct PS_INPUT
+{
+	float2 TexCoord			: TEXCOORD0;
+};
+
+sampler Sampler_BaseTexture	: register(s0);
+
+// $size / Back Buffer Width
+const float g_flBlurSizeV	: register(c0);
+
+// Garry's Mod's 13 Tap Gaussian ( Sigma 2 ), Taps at -6 .. 6 Steps
+static const float g_flWeights[7] = { 0.199471f, 0.176033f, 0.120985f, 0.064759f, 0.026995f, 0.008764f, 0.002216f };
+
+float4 main( PS_INPUT i ) : COLOR
+{
+	const float flStep = g_flBlurSizeV;
+
+	float4 f4Result = tex2D( Sampler_BaseTexture, i.TexCoord ) * g_flWeights[0];
+
+	[unroll]
+	for ( int k = 1; k <= 6; k++ )
+	{
+		f4Result += tex2D( Sampler_BaseTexture, i.TexCoord + float2( 0.0f, flStep * k ) ) * g_flWeights[k];
+		f4Result += tex2D( Sampler_BaseTexture, i.TexCoord - float2( 0.0f, flStep * k ) ) * g_flWeights[k];
+	}
+
+	return f4Result;
+}

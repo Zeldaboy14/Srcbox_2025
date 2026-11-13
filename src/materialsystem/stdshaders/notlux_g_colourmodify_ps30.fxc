@@ -1,0 +1,64 @@
+//===================== File of the Srcbox Shader Project (Under LUX) =====================//
+//
+//	Initial D.	:	29.10.2026 DMY
+//	Last Change :	29.10.2026 DMY
+//
+//	Recreation of Garry's Mod's g_colourmodify pixel shader ( g_colourmodify_ps20.vcs ),
+//	the Color Modify Post Process ( pp_colour_* ).
+//
+//=========================================================================================//
+
+//==========================================================================//
+//	Declare Static Combos
+//==========================================================================//
+// NONE
+
+//==========================================================================//
+//	Declare Dynamic Combos
+//==========================================================================//
+// NONE
+
+struct PS_INPUT
+{
+	float2 TexCoord			: TEXCOORD0;
+};
+
+sampler Sampler_FullScreen	: register(s0);
+
+const float g_flAddR		: register(c0);	// $pp_colour_addr
+const float g_flAddG		: register(c1);	// $pp_colour_addg
+const float g_flAddB		: register(c2);	// $pp_colour_addb
+const float g_flBrightness	: register(c3);	// $pp_colour_brightness
+const float g_flContrast	: register(c4);	// $pp_colour_contrast
+const float g_flColour		: register(c5);	// $pp_colour_colour
+const float g_flMulR		: register(c6);	// $pp_colour_mulr
+const float g_flMulG		: register(c7);	// $pp_colour_mulg
+const float g_flMulB		: register(c8);	// $pp_colour_mulb
+const float g_flInvert		: register(c9);	// $pp_colour_inv
+
+float4 main( PS_INPUT i ) : COLOR
+{
+	float4 f4Texture = tex2D( Sampler_FullScreen, i.TexCoord );
+
+	float R = f4Texture.r + g_flAddR;
+	float G = f4Texture.g + g_flAddG;
+	float B = f4Texture.b + g_flAddB;
+
+	// How much each Channel stands out over the other two, squared ( drives $pp_colour_mul* )
+	float flSatR = max( R - G, 0.0f ) + max( R - B, 0.0f );
+	float flSatG = max( G - R, 0.0f ) + max( G - B, 0.0f );
+	float flSatB = max( B - R, 0.0f ) + max( B - G, 0.0f );
+	float3 f3Mul = float3( flSatR * flSatR * g_flMulR, flSatG * flSatG * g_flMulG, flSatB * flSatB * g_flMulB );
+
+	// $pp_colour_colour: Saturation, lerp from the Grey
+	float flGrey = ( R + G + B ) * ( 1.0f / 3.0f ) * ( 1.0f - g_flColour );
+	float4 f4Result;
+	f4Result.rgb = float3( R, G, B ) * g_flColour + flGrey + f3Mul;
+	f4Result.a = f4Texture.a;
+
+	f4Result.rgb = ( f4Result.rgb + g_flBrightness ) * g_flContrast;
+
+	// $pp_colour_inv: lerp towards 1 - x ( the Alpha too ), only when > 0
+	float4 f4Inverted = f4Result + g_flInvert * ( 1.0f - 2.0f * f4Result );
+	return ( g_flInvert > 0.0f ) ? f4Inverted : f4Result;
+}

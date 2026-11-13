@@ -1,0 +1,45 @@
+//===================== File of the Srcbox Shader Project (Under LUX) =====================//
+//
+//	Initial D.	:	29.10.2026 DMY
+//	Last Change :	29.10.2026 DMY
+//
+//	Recreation of Garry's Mod's g_refract pixel shader ( g_refract_ps20.vcs ).
+//	Offsets $fbtexture by a 5 Tap Average of $normalmap ( 0.001 UV apart ).
+//
+//=========================================================================================//
+
+//==========================================================================//
+//	Declare Static Combos
+//==========================================================================//
+// NONE
+
+//==========================================================================//
+//	Declare Dynamic Combos
+//==========================================================================//
+// NONE
+
+struct PS_INPUT
+{
+	float2 TexCoord			: TEXCOORD0;
+};
+
+sampler Sampler_NormalMap	: register(s0);	// $normalmap
+sampler Sampler_FBTexture	: register(s1);	// $fbtexture
+
+const float g_flRefractAmount	: register(c0);
+
+float4 main( PS_INPUT i ) : COLOR
+{
+	float2 f2UV = i.TexCoord;
+
+	float2 f2Normal = tex2D( Sampler_NormalMap, f2UV ).xy * 2.0f;
+	f2Normal += tex2D( Sampler_NormalMap, f2UV + float2(  0.001f,  0.001f ) ).xy;
+	f2Normal += tex2D( Sampler_NormalMap, f2UV + float2( -0.001f, -0.001f ) ).xy;
+	f2Normal += tex2D( Sampler_NormalMap, f2UV + float2(  0.001f, -0.001f ) ).xy;
+	f2Normal += tex2D( Sampler_NormalMap, f2UV + float2( -0.001f,  0.001f ) ).xy;
+
+	// Average, then centered on 128 / 255
+	float2 f2Offset = f2Normal * ( 1.0f / 6.0f ) - ( 128.0f / 255.0f );
+
+	return tex2D( Sampler_FBTexture, f2UV + f2Offset * ( g_flRefractAmount * 0.25f ) );
+}

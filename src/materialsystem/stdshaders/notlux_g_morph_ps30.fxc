@@ -1,0 +1,37 @@
+//===================== File of the Srcbox Shader Project (Under LUX) =====================//
+//
+//	Initial D.	:	29.10.2026 DMY
+//	Last Change :	29.10.2026 DMY
+//
+//	Recreation of Garry's Mod's g_morph pixel shader ( g_morph_ps20.vcs, an older Garry's Mod ).
+//	Writes a Displacement into RG: Alpha * $pressure * ( $xamt, $yamt ), keeps B and A.
+//
+//=========================================================================================//
+
+//==========================================================================//
+//	Declare Static Combos
+//==========================================================================//
+// NONE
+
+//==========================================================================//
+//	Declare Dynamic Combos
+//==========================================================================//
+// NONE
+
+struct PS_INPUT
+{
+	float2 TexCoord			: TEXCOORD0;
+};
+
+sampler Sampler_Textr	: register(s0);
+
+const float g_flXAmt		: register(c0);
+const float g_flYAmt		: register(c1);
+const float g_flPressure	: register(c2);
+
+float4 main( PS_INPUT i ) : COLOR
+{
+	float4 f4Result = tex2D( Sampler_Textr, i.TexCoord );
+	f4Result.rg = f4Result.a * g_flPressure * float2( g_flXAmt, g_flYAmt );
+	return f4Result;
+}

@@ -12,6 +12,9 @@
 #include "const.h"
 #include "../loadingtippanel.h"
 
+// Srcbox: loading bar style (defined in vloadingprogress.cpp)
+struct LoadingBarStyle_t;
+
 namespace BaseModUI {
 
 class LoadingProgress : public CBaseModFrame
@@ -19,6 +22,9 @@ class LoadingProgress : public CBaseModFrame
 	DECLARE_CLASS_SIMPLE( LoadingProgress, CBaseModFrame );
 
 public:
+	// the full-screen image behind the loading screen
+	static const char *GetBackgroundImageName();
+
 	enum LoadingType
 	{
 		LT_UNDEFINED = 0,
@@ -52,6 +58,11 @@ public:
 
 	bool				IsDrawingProgressBar( void ) { return m_bDrawProgress; }
 
+	// Srcbox: which loading bar this screen uses, per gamemode (s_GamemodeLoadingBars in
+	// vloadingprogress.cpp); gamemodes not listed follow ui_loadingbar_classic.
+	bool				UsesClassicLoadingBar( void ) const;
+	const ::LoadingBarStyle_t *GetLoadingBarStyle( void ) const;
+
 protected:
 	virtual void		OnThink();
 	virtual void		OnCommand(const char *command);
@@ -61,6 +72,14 @@ protected:
 private:
 	void				SetupControlStates( void );
 	void				SetupPoster( void );
+
+	// Srcbox: per-gamemode loading screen
+	static void			GetCurrentGamemode( char *pszOut, int nOutSize );
+	void				SelectGamemodeLayout( const char *pszGamemode );
+	void				CheckGamemodeChanged( void );
+	void				ApplyGamemodeVisuals( void );
+	void				ApplyLoadingBarLayout( void );
+	void				ClearControlPointers( void );
 	void				UpdateWorkingAnim();
 	void				RearrangeNames( const char *pszCharacterOrder, const char **pPlayerNames );
 
@@ -97,6 +116,12 @@ private:
 	int					m_nSpinnerFrame;
 
 	char				m_szGameMode[MAX_PATH];
+
+	// Srcbox: per-gamemode loading screen
+	char				m_szLayoutGamemode[64];		// gamemode the current layout/visuals were built for
+	char				m_szBGTexture[MAX_PATH];	// material drawn as the background
+	int					m_nBGTextureID;
+	float				m_flNextGamemodeCheck;
 
 };
 

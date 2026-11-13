@@ -35,6 +35,11 @@ public:
 	virtual void Touch(CBaseEntity *pOther);
 	virtual void EndTouch(CBaseEntity *pOther);
 
+#ifdef LUA_SDK
+	// GMod's ENT:AcceptInput( inputName, activator, caller, data ); true suppresses the input
+	virtual bool AcceptInput( const char *szInputName, CBaseEntity *pActivator, CBaseEntity *pCaller, variant_t Value, int outputID );
+#endif
+
 	// by default, triggers don't deal with TraceAttack
 	void TraceAttack(CBaseEntity *pAttacker, float flDamage, const Vector &vecDir, trace_t *ptr, int bitsDamageType) {}
 

@@ -206,6 +206,8 @@ IMPLEMENT_CLIENTCLASS_DT(C_BaseAnimating, DT_BaseAnimating, CBaseAnimating)
 #ifdef LUA_SDK
 	// GMod's Entity:SetMaterial set on the server
 	RecvPropString( RECVINFO( m_MaterialOverride ) ),
+	// GMod's Entity:SetSubMaterial set on the server
+	RecvPropArray3( RECVINFO_ARRAY( m_nSubMaterialIndex ), RecvPropInt( RECVINFO( m_nSubMaterialIndex[0] ) ) ),
 #endif
 
 END_RECV_TABLE()
@@ -689,6 +691,7 @@ C_BaseAnimating::C_BaseAnimating() :
 	for ( int iSub = 0; iSub < MAX_SUB_MATERIAL_OVERRIDES; iSub++ )
 	{
 		m_SubMaterialOverrides[iSub][0] = 0;
+		m_nSubMaterialIndex[iSub] = 0;
 	}
 #endif
 	
@@ -3434,6 +3437,23 @@ IMaterial *C_BaseAnimating::GetLuaMaterialOverride()
 
 	return m_MaterialOverrideReference;
 }
+#endif
+
+#ifdef LUA_SDK
+const char *C_BaseAnimating::GetSubMaterialOverrideName( int iIndex )
+{
+	if ( iIndex < 0 || iIndex >= MAX_SUB_MATERIAL_OVERRIDES )
+		return NULL;
+
+	if ( m_SubMaterialOverrides[iIndex][0] )
+		return m_SubMaterialOverrides[iIndex];
+
+	if ( m_nSubMaterialIndex[iIndex] > 0 )
+		return GetMaterialNameFromIndex( m_nSubMaterialIndex[iIndex] - 1 );
+
+	return NULL;
+}
+
 #endif
 
 ConVar classiclighting("cl_hl1_classic_lighting", "1", FCVAR_ARCHIVE);

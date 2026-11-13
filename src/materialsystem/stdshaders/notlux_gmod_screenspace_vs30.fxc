@@ -1,0 +1,60 @@
+//===================== File of the Srcbox Shader Project (Under LUX) =====================//
+//
+//	Initial D.	:	29.10.2026 DMY
+//	Last Change :	29.10.2026 DMY
+//
+//	Vertex Shader for the Garry's Mod Shader Recreations ( game_shader_generic_garrysmod.dll ).
+//	Garry's Mod's g_*_vs20 Shaders are all the same: Position through cModelViewProj, one Texcoord.
+//	g_screenspace_vs20 also passes the Vertex Color, g_sobel_vs20 uses cViewProj instead.
+//
+//=========================================================================================//
+
+//==========================================================================//
+//	Declare Static Combos
+//==========================================================================//
+//  STATIC:  "VERTEXCOLOR"    "0..1"
+//  STATIC:  "VIEWPROJ"       "0..1"
+
+//==========================================================================//
+//	Declare Dynamic Combos
+//==========================================================================//
+// NONE
+
+#include "lux_common_vs_fxc.h"
+
+struct VS_INPUT
+{
+	float4 vPos				: POSITION;
+	float2 vTexCoord0		: TEXCOORD0;
+#if VERTEXCOLOR
+	float4 vColor			: COLOR0;
+#endif
+};
+
+struct VS_OUTPUT
+{
+	float4 ProjPosSetup		: POSITION;
+	float2 TexCoord			: TEXCOORD0;
+#if VERTEXCOLOR
+	float4 VertexColor		: TEXCOORD1;
+#endif
+};
+
+VS_OUTPUT main( const VS_INPUT v )
+{
+	VS_OUTPUT o = ( VS_OUTPUT )0;
+
+#if VIEWPROJ
+	o.ProjPosSetup = FixHPO( mul( float4( v.vPos.xyz, 1.0f ), cViewProj ) );
+#else
+	o.ProjPosSetup = FixHPO( mul( float4( v.vPos.xyz, 1.0f ), cModelViewProj ) );
+#endif
+
+	o.TexCoord = v.vTexCoord0;
+
+#if VERTEXCOLOR
+	o.VertexColor = v.vColor;
+#endif
+
+	return o;
+}

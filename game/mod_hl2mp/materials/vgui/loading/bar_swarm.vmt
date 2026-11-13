@@ -1,0 +1,6 @@
+UnlitGeneric
+{
+	"$basetexture" "vgui/loading/bar_swarm"
+	"$translucent" 1
+	"$ignorez" 1
+}

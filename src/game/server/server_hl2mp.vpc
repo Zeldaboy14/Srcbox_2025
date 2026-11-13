@@ -63,6 +63,11 @@ $Project "Server (HL2MP)"
 				$File	"$SRCDIR\game\shared\terror\weapon_smg_silenced.cpp"
 			}
 			$File	"terror\prop_car_alarm.cpp"
+			$Folder "Director"
+			{
+				$File	"$SRCDIR\game\server\terror\director.cpp"
+				$File	"$SRCDIR\game\server\terror\director.h"
+			}
 		}
 		$Folder "Portal"
 		{

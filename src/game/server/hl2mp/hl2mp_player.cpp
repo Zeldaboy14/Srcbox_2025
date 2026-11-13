@@ -1604,6 +1604,183 @@ void CHL2MP_Player::DeathSound( const CTakeDamageInfo &info )
 	EmitSound( filter, entindex(), ep );
 }
 
+#ifdef SRCBOX
+#include "nav_mesh.h"
+#include "nav_area.h"
+
+//-----------------------------------------------------------------------------
+// Srcbox: L4D/L4D2 maps after the first one in a campaign have no info_player_start
+// or info_survivor_position; survivors start on the nav mesh instead. The first map
+// marks its start with PLAYER_START (SPAWN_MISSION_START) areas, later maps start in
+// the CHECKPOINT areas of the starting saferoom. Build a few spawn points from those.
+//-----------------------------------------------------------------------------
+static CUtlVector< EHANDLE > s_L4DNavSpawns;
+static char s_szL4DNavSpawnMap[ MAX_PATH ] = "";
+static int s_iNextL4DNavSpawn = 0;
+
+ConVar sv_l4d_nav_spawns( "sv_l4d_nav_spawns", "1", FCVAR_GAMEDLL, "Spawn players on L4D nav PLAYER_START/start saferoom areas when a map has no player spawns." );
+
+static bool L4DNavSpawnAreaLess( CNavArea * const *a, CNavArea * const *b )
+{
+	return ( (*a)->GetSizeX() * (*a)->GetSizeY() ) > ( (*b)->GetSizeX() * (*b)->GetSizeY() );
+}
+
+static int L4DNavSpawnAreaCompare( CNavArea * const *a, CNavArea * const *b )
+{
+	if ( L4DNavSpawnAreaLess( a, b ) ) return -1;
+	if ( L4DNavSpawnAreaLess( b, a ) ) return 1;
+	return 0;
+}
+
+// Point inside the starting saferoom: the "checkpoint_exit" door (Valve's naming in every
+// campaign map), else a landmark that isn't this map's outgoing one ("<thismap>_<next>_landmark").
+static bool FindL4DStartReference( Vector &vecRef )
+{
+	CBaseEntity *pDoor = NULL;
+	while ( ( pDoor = gEntList.FindEntityByClassname( pDoor, "prop_door_rotating_checkpoint" ) ) != NULL )
+	{
+		if ( pDoor->NameMatches( "checkpoint_exit" ) )
+		{
+			vecRef = pDoor->WorldSpaceCenter();
+			return true;
+		}
+	}
+
+	char szMapPrefix[ MAX_PATH ];
+	V_FileBase( STRING( gpGlobals->mapname ), szMapPrefix, sizeof( szMapPrefix ) );
+	V_strncat( szMapPrefix, "_", sizeof( szMapPrefix ) );
+
+	CBaseEntity *pLandmark = NULL;
+	while ( ( pLandmark = gEntList.FindEntityByClassname( pLandmark, "info_landmark" ) ) != NULL )
+	{
+		const char *pszName = STRING( pLandmark->GetEntityName() );
+		if ( pszName && *pszName && V_strnicmp( pszName, szMapPrefix, V_strlen( szMapPrefix ) ) )
+		{
+			vecRef = pLandmark->GetAbsOrigin();
+			return true;
+		}
+	}
+
+	return false;
+}
+
+static void BuildL4DNavSpawns( void )
+{
+	s_L4DNavSpawns.RemoveAll();
+	s_iNextL4DNavSpawn = 0;
+
+	CUtlVector< CNavArea * > startAreas;
+	Vector vecRef;
+	bool bHaveRef = false;
+
+	FOR_EACH_VEC( TheNavAreas, it )
+	{
+		if ( TheNavAreas[ it ]->HasL4DSpawnAttributes( CNavArea::L4D_SPAWN_MISSION_START ) )
+			startAreas.AddToTail( TheNavAreas[ it ] );
+	}
+
+	if ( startAreas.Count() == 0 )
+	{
+		// nearest CHECKPOINT area to the start saferoom, then every checkpoint area connected to it
+		bHaveRef = FindL4DStartReference( vecRef );
+
+		CNavArea *pSeed = NULL;
+		float flBestDistSqr = FLT_MAX;
+		FOR_EACH_VEC( TheNavAreas, it )
+		{
+			CNavArea *pArea = TheNavAreas[ it ];
+			if ( !pArea->HasL4DSpawnAttributes( CNavArea::L4D_SPAWN_CHECKPOINT ) )
+				continue;
+
+			float flDistSqr = bHaveRef ? pArea->GetCenter().DistToSqr( vecRef ) : 0.0f;
+			if ( !pSeed || flDistSqr < flBestDistSqr )
+			{
+				pSeed = pArea;
+				flBestDistSqr = flDistSqr;
+			}
+		}
+
+		if ( !pSeed )
+			return;
+
+		startAreas.AddToTail( pSeed );
+		for ( int iOpen = 0; iOpen < startAreas.Count(); ++iOpen )
+		{
+			CNavArea *pArea = startAreas[ iOpen ];
+			for ( int dir = 0; dir < NUM_DIRECTIONS; ++dir )
+			{
+				for ( int i = 0; i < pArea->GetAdjacentCount( (NavDirType)dir ); ++i )
+				{
+					CNavArea *pAdj = pArea->GetAdjacentArea( (NavDirType)dir, i );
+					if ( pAdj && pAdj->HasL4DSpawnAttributes( CNavArea::L4D_SPAWN_CHECKPOINT ) && !startAreas.HasElement( pAdj ) )
+						startAreas.AddToTail( pAdj );
+				}
+			}
+		}
+	}
+
+	// biggest areas first, so survivors don't spawn in corners/doorways
+	startAreas.Sort( L4DNavSpawnAreaCompare );
+
+	const int nMaxSpawns = 8;
+	for ( int i = 0; i < startAreas.Count() && s_L4DNavSpawns.Count() < nMaxSpawns; ++i )
+	{
+		CNavArea *pArea = startAreas[ i ];
+		Vector vecPos = pArea->GetCenter();
+		vecPos.z = pArea->GetZ( vecPos ) + 4.0f;
+
+		QAngle angSpawn( 0, 0, 0 );
+		if ( bHaveRef )
+		{
+			// face the saferoom door
+			Vector vecDir = vecRef - vecPos;
+			vecDir.z = 0;
+			VectorAngles( vecDir, angSpawn );
+		}
+
+		CBaseEntity *pSpawn = CreateEntityByName( "info_target" );
+		if ( !pSpawn )
+			break;
+
+		pSpawn->SetAbsOrigin( vecPos );
+		pSpawn->SetAbsAngles( angSpawn );
+		pSpawn->SetName( AllocPooledString( "srcbox_l4d_navspawn" ) );
+		DispatchSpawn( pSpawn );
+		s_L4DNavSpawns.AddToTail( pSpawn );
+	}
+
+	DevMsg( "L4D nav spawns: %d from %d %s areas\n", s_L4DNavSpawns.Count(), startAreas.Count(),
+		( startAreas.Count() && startAreas[ 0 ]->HasL4DSpawnAttributes( CNavArea::L4D_SPAWN_MISSION_START ) ) ? "PLAYER_START" : "start CHECKPOINT" );
+}
+
+static CBaseEntity *GetL4DNavSpawn( void )
+{
+	if ( !sv_l4d_nav_spawns.GetBool() || !TheNavMesh || !TheNavMesh->IsLoaded() )
+		return NULL;
+
+	// entities from the last map are gone; rebuild once per map
+	bool bStale = V_stricmp( s_szL4DNavSpawnMap, STRING( gpGlobals->mapname ) ) != 0;
+	FOR_EACH_VEC( s_L4DNavSpawns, i )
+	{
+		if ( !s_L4DNavSpawns[ i ].Get() )
+			bStale = true;
+	}
+
+	if ( bStale )
+	{
+		V_strncpy( s_szL4DNavSpawnMap, STRING( gpGlobals->mapname ), sizeof( s_szL4DNavSpawnMap ) );
+		BuildL4DNavSpawns();
+	}
+
+	if ( s_L4DNavSpawns.Count() == 0 )
+		return NULL;
+
+	CBaseEntity *pSpawn = s_L4DNavSpawns[ s_iNextL4DNavSpawn % s_L4DNavSpawns.Count() ].Get();
+	s_iNextL4DNavSpawn++;
+	return pSpawn;
+}
+#endif // SRCBOX
+
 CBaseEntity* CHL2MP_Player::EntSelectSpawnPoint( void )
 {
 #ifdef LUA_SDK
@@ -1704,9 +1881,9 @@ CBaseEntity* CHL2MP_Player::EntSelectSpawnPoint( void )
 	if ( !pSpot  )
 	{
 		pSpot = gEntList.FindEntityByClassname( pSpot, "info_player_start" );
-		pSpot2 = gEntList.FindEntityByClassname( pSpot2, "info_survivor_position" );
-		pSpot3 = gEntList.FindEntityByClassname( pSpot3, "info_survivor_rescue" );
-		pSpot4 = gEntList.FindEntityByClassname( pSpot4, "info_gamemode" );
+		//pSpot2 = gEntList.FindEntityByClassname( pSpot2, "info_survivor_position" );
+		//pSpot3 = gEntList.FindEntityByClassname( pSpot3, "info_survivor_rescue" );
+		//pSpot4 = gEntList.FindEntityByClassname( pSpot4, "info_gamemode" );
 		pSpot5 = gEntList.FindEntityByClassname(pSpot5, "info_player_terrorist");
 		pSpot6 = gEntList.FindEntityByClassname(pSpot6, "info_player_counterterrorist");
 		pSpot7 = gEntList.FindEntityByClassname(pSpot7, "info_player_teamspawn");
@@ -1715,9 +1892,20 @@ CBaseEntity* CHL2MP_Player::EntSelectSpawnPoint( void )
 		if (pSpot)
 			goto ReturnSpot;
 
+#ifdef SRCBOX
+		// L4D maps without info_survivor_position start on the nav mesh, not in rescue closets
+		if ( !pSpot2 )
+		{
+			CBaseEntity *pNavSpawn = GetL4DNavSpawn();
+			if ( pNavSpawn )
+				return pNavSpawn;
+		}
+#endif
+
 		// Srcbox: the first spawn type the map has (the old chain returned pSpot2
 		// even when it was NULL, and NULL when the map had none of these)
-		CBaseEntity *pFallbacks[] = { pSpot2, pSpot3, pSpot4, pSpot5, pSpot6, pSpot7 };
+		//CBaseEntity *pFallbacks[] = { pSpot2, pSpot3, pSpot4, pSpot5, pSpot6, pSpot7 };
+		CBaseEntity *pFallbacks[] = { pSpot5, pSpot6, pSpot7 };
 		for ( int i = 0; i < ARRAYSIZE( pFallbacks ); i++ )
 		{
 			if ( pFallbacks[i] )

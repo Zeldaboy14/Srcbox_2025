@@ -1,0 +1,57 @@
+//===================== File of the Srcbox Shader Project (Under LUX) =====================//
+//
+//	Initial D.	:	29.10.2026 DMY
+//	Last Change :	29.10.2026 DMY
+//
+//	Recreation of Garry's Mod's g_sobel pixel shader ( g_sobel_ps20.vcs / _ps20b.vcs, identical ).
+//	Keeps the Screen where the Sobel Edge Magnitude is below $threshold, black elsewhere.
+//	Fixed 1/640 UV Step, and the ( +X, 0 ) Tap is at ( +X, 0.0014 ), both as in Garry's Mod.
+//
+//=========================================================================================//
+
+//==========================================================================//
+//	Declare Static Combos
+//==========================================================================//
+// NONE
+
+//==========================================================================//
+//	Declare Dynamic Combos
+//==========================================================================//
+// NONE
+
+struct PS_INPUT
+{
+	float2 TexCoord			: TEXCOORD0;
+};
+
+sampler Sampler_Screen	: register(s0);
+
+const float g_flThreshold	: register(c2);
+
+#define SOBEL_STEP ( 1.0f / 640.0f )
+
+float Luma( float2 f2UV )
+{
+	return dot( tex2D( Sampler_Screen, f2UV ).rgb, float3( 0.3f, 0.59f, 0.11f ) );
+}
+
+float4 main( PS_INPUT i ) : COLOR
+{
+	float2 f2UV = i.TexCoord;
+	const float d = SOBEL_STEP;
+
+	float flN	= Luma( f2UV + float2(  0.0f, -d ) );
+	float flNW	= Luma( f2UV + float2(   -d, -d ) );
+	float flNE	= Luma( f2UV + float2(    d, -d ) );
+	float flSW	= Luma( f2UV + float2(   -d,  d ) );
+	float flS	= Luma( f2UV + float2(  0.0f,  d ) );
+	float flSE	= Luma( f2UV + float2(    d,  d ) );
+	float flE	= Luma( f2UV + float2(    d, 0.0014f ) );
+	float flW	= Luma( f2UV + float2(   -d, 0.0f ) );
+
+	float flGy = flNW + 2.0f * flN + flNE - flSW - 2.0f * flS - flSE;
+	float flGx = flNE + flSE + 2.0f * flE - flSW - 2.0f * flW - flNW;
+
+	float flKeep = ( flGx * flGx + flGy * flGy - g_flThreshold >= 0.0f ) ? 0.0f : 1.0f;
+	return tex2D( Sampler_Screen, f2UV ) * flKeep;
+}
