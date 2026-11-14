@@ -539,13 +539,16 @@ src/game/gamepadui/gamepadui_win64_hl2mp.vcxproj.vpc_crc
 src/game/gamepadui/_vpc_/manifest_gamepadui_hl2mp/win64/manifest.txt
 src/lib/public/x64/matsys_controls.lib
 src/gameui_stub/Debugmod_hl2mp/x64/GameUI.dll
-src/lib/public/x64/matsys_controls.lib
 src/gameui_stub/Debugmod_hl2mp/x64/GameUI.lib
+src/gameui_stub/Debugmod_hl2mp/GameUI.dll
+src/gameui_stub/Debugmod_hl2mp/GameUI.lib
+src/lib/public/x64/matsys_controls.lib
 src/lib/public/x64/matsys_controls.lib
 src/lib/public/x64/matsys_controls.lib
 game/mod_hl2mp/lua
 game/mod_hl2mp/lua_cache
 game/Srcbox_OldGameUI.bat
+game/mod_hl2mp/cache
 
 # Shaders
 

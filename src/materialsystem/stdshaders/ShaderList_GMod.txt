@@ -27,5 +27,4 @@ notlux_g_refract_ps30.fxc
 notlux_g_sharpen_ps30.fxc
 notlux_g_sobel_ps30.fxc
 notlux_g_sunbeams_ps30.fxc
-notlux_gmod_screenspace_vs30.fxc
-notlux_gmod_screenspace_ps30.fxc
+notlux_gmodscreenspace_ps30.fxc
