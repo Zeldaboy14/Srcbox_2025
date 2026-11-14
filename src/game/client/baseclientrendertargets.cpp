@@ -34,8 +34,20 @@ static bool FindDX9Device()
 
 	// Dereference the virtual table and access the IsUsingGraphics method
 	byte* pIShaderDevice_IsUsingGraphics = (byte*)(*(void***)pShaderDevice)[5];
-	// Resolve the RIP instruction to get the absolute address
-	byte* ppDirect3DDevice9 = pIShaderDevice_IsUsingGraphics + 8 + *(int32*)(pIShaderDevice_IsUsingGraphics + 3);
+	byte* ppDirect3DDevice9 = NULL;
+#ifdef PLATFORM_64BITS
+	// Resolve the RIP-relative address (8-byte instruction, disp32 at +3)
+	ppDirect3DDevice9 = pIShaderDevice_IsUsingGraphics + 8 + *(int32*)(pIShaderDevice_IsUsingGraphics + 3);
+#else
+	// cmp dword ptr [abs32], 0  (83 3D abs32 00): x86 has no RIP addressing, the address is absolute
+	if ( pIShaderDevice_IsUsingGraphics[0] == 0x83 && pIShaderDevice_IsUsingGraphics[1] == 0x3D )
+		ppDirect3DDevice9 = *(byte**)(pIShaderDevice_IsUsingGraphics + 2);
+#endif
+	if ( !ppDirect3DDevice9 )
+	{
+		Warning( "FindDX9Device: unexpected IShaderDevice::IsUsingGraphics code, can't find the D3D9 device\n" );
+		return false;
+	}
 	g_pDirect3DDevice9 = *(IDirect3DDevice9**)ppDirect3DDevice9;
 
 	return g_pDirect3DDevice9 != NULL;
