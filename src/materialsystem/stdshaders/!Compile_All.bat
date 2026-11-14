@@ -47,7 +47,7 @@ REM The only VS20 Shader at the Moment needed for Screenspace_General
 %BUILD_SHADER% ShaderList_PostProcess_vs20 -game %GAME_DIR% -source %SOURCE_DIR% -force20
 
 REM Non-LUX gmod shaders
-%BUILD_SHADER% ShaderList_GMod -game %GAME_DIR% -source %SOURCE_DIR% -force20
+%BUILD_SHADER% ShaderList_GMod -game %GAME_DIR% -source %SOURCE_DIR% -force30
 
 rem Ask for a .vcs Reload using +lux_vcshotreloads_pulse
 call "%~dp0ShadersCallProcess.bat"
