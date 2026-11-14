@@ -36,5 +36,14 @@ echo.
 call "%SRC%create_physbox.bat"
 echo.
 echo create_physbox.bat finished.
+
+echo.
+echo ========================================
+echo  Running create_physbox.bat
+echo ========================================
+echo.
+call "%SRC%create_physbox_x86.bat"
+echo.
+echo create_physbox_x86.bat finished.
 echo.
 echo All scripts completed.
