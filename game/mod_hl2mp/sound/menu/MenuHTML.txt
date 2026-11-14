@@ -1,0 +1,6 @@
+* mousedown button_7.wav
+
+cncl mouseenter highlite_1.wav
+next mouseenter highlite_1.wav
+back mouseenter highlite_1.wav
+home mouseenter highlite_1.wav

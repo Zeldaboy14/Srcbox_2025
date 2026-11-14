@@ -190,6 +190,11 @@ namespace BaseModUI
 		int	m_iBackgroundImageID;
 		int	m_iFadeToBackgroundImageID;
 		float m_flMovieFadeInTime;
+		// Srcbox: fade from the startup loading screen into the background map (Alien Swarm faded
+		// into its menu movie; there are no movies on x64)
+		float m_flStartupFadeStart;
+		bool m_bStartupFadeDone;
+		int m_nStartupFadeTextureID;
 
 		int m_DelayActivation;
 		int m_ExitingFrameCount;

@@ -5,9 +5,10 @@
 #include <psapi.h>
 #include <util/networkmanager.h>
 
-using Function_ClientState_SetSignonState_t = bool( __fastcall* )( void* pThis, int state, int count );
+// CClientState::SetSignonState (__thiscall on x86, see EP_EDX)
+using Function_ClientState_SetSignonState_t = bool( __fastcall* )( void* pThis EP_EDX, int state, int count );
 
-#ifdef _WIN64
+#ifdef PLATFORM_64BITS
 /*
     ```
     48 89 5C 24 18
@@ -65,6 +66,21 @@ const char* CLIENTSTATE_SETSIGNONSTATE_MASK =
     "xx";
 
 #else
+
+// x86 engine.dll (bin/engine.dll), CClientState::SetSignonState at 0x100B7DF0 in that build:
+//   push ebp; mov ebp,esp; sub esp,128h; push esi; push edi; push [ebp+0Ch]; mov edi,[ebp+8]
+//   mov esi,ecx; push edi; call CBaseClientState::SetSignonState; test al,al; jnz; call CL_Retry
+//   pop edi; xor al,al
+const char* CLIENTSTATE_SETSIGNONSTATE_SIG =
+    "\x55\x8B\xEC\x81\xEC\x28\x01\x00\x00\x56\x57\xFF\x75\x0C\x8B\x7D"
+    "\x08\x8B\xF1\x57\xE8\x00\x00\x00\x00\x84\xC0\x75\x0F\xE8\x00\x00"
+    "\x00\x00\x5F\x32\xC0";
+
+const char* CLIENTSTATE_SETSIGNONSTATE_MASK =
+    "xxxxxxxxxxxxxxxx"
+    "xxxxx????xxxxx??"
+    "??xxx";
+
 #endif
 
 static Function_ClientState_SetSignonState_t OriginalClientStateSetSignOnState = nullptr;
@@ -72,16 +88,18 @@ static Function_ClientState_SetSignonState_t OriginalClientStateSetSignOnState =
 #pragma warning( disable : 4189 )  // Disable warning about unused variable
 
 bool __fastcall DetourClientStateSetSignOnState(
-    void* thisClientState,
+    void* thisClientState EP_EDX,
     int state,
     int count )
 {
-    bool result = OriginalClientStateSetSignOnState( thisClientState, state, count );
+    bool result = OriginalClientStateSetSignOnState( thisClientState EP_EDX_ARG, state, count );
 
-#ifdef _WIN64
+    // CBaseClientState starts with three vtable pointers; the fields below follow them on
+    // both builds (x64: netchannel 0x20, signon state 0x14C; x86: 0x10, 0x130 - checked
+    // against CBaseClientState::SetSignonState in each engine.dll)
     BEGIN_MEMORY_LAYOUT( ClientState, thisClientState );
 
-    SKIP_UNKNOWN_TO( ClientState, 21 );
+    SKIP_UNKNOWN_TO( ClientState, 3 * sizeof( void* ) );
 
     DEFINE_INT( ClientState, socket );
     DEFINE_PTR( ClientState, INetChannel*, netChannel );
@@ -94,9 +112,6 @@ bool __fastcall DetourClientStateSetSignOnState(
     DEFINE_INT( ClientState, signOnState );
 
     END_MEMORY_LAYOUT( ClientState );
-#else
-    //  TODO: x86 version
-#endif
 
     // TODO: This is only for validating we have correctly deduced the memory layout. Remove this later.
     if ( netChannel )

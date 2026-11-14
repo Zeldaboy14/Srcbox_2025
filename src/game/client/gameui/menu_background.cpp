@@ -5,6 +5,7 @@
 //====================================================================================//
 
 #include "cbase.h"
+#include "vgui/IPanel.h"
 #include "menu_background.h"
 #include <cdll_client_int.h>
 #include <ienginevgui.h>
@@ -41,6 +42,32 @@ static float flVolume = NULL;
 //-----------------------------------------------------------------------------
 // Every live background movie panel, so their videos can be released before the video services shut down
 static CUtlVector< CAnimatedBackgroundMovie * > s_BackgroundMovies;
+static CAnimatedBackgroundMovie *s_pMainMenuMovie = NULL;
+
+CAnimatedBackgroundMovie *CAnimatedBackgroundMovie::GetMainMenuMovie()
+{
+	if ( !s_pMainMenuMovie )
+	{
+		// (the constructor parents itself to the GameUI root panel)
+		s_pMainMenuMovie = new CAnimatedBackgroundMovie( NULL, "BackgroundVideo" );
+	}
+	return s_pMainMenuMovie;
+}
+
+void CAnimatedBackgroundMovie::StartVideoIfNeeded()
+{
+	// StartVideo() picks a new random video, so don't restart one that's already playing
+	if ( !m_bPaintVideo || !m_VideoMaterial )
+	{
+		// if no video could be played, don't search the disk again every frame
+		static float s_flLastAttempt = -1000.0f;
+		if ( Plat_FloatTime() - s_flLastAttempt < 5.0f )
+			return;
+		s_flLastAttempt = Plat_FloatTime();
+
+		StartVideo();
+	}
+}
 
 void CAnimatedBackgroundMovie::ReleaseAllVideos()
 {
@@ -73,6 +100,9 @@ CAnimatedBackgroundMovie::CAnimatedBackgroundMovie(vgui::Panel* parent, const ch
 	m_bLoaded = false;
 	bInit = false;
 	m_szVideoFile[0] = 0;
+	m_bPaintVideo = false;		// Srcbox: were never initialised
+	m_DrawLogoText1 = NULL;
+	m_DrawLogoText2 = NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -81,6 +111,8 @@ CAnimatedBackgroundMovie::CAnimatedBackgroundMovie(vgui::Panel* parent, const ch
 CAnimatedBackgroundMovie::~CAnimatedBackgroundMovie()
 {
 	s_BackgroundMovies.FindAndRemove( this );
+	if ( s_pMainMenuMovie == this )
+		s_pMainMenuMovie = NULL;
 	ReleaseVideo();
 	MarkForDeletion();
 
@@ -218,6 +250,72 @@ void CAnimatedBackgroundMovie::GetPanelPos(int& xpos, int& ypos)
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+// Srcbox: startup fade (see menu_background.h)
+//-----------------------------------------------------------------------------
+static float s_flStartupFadeStart = 0.0f;		// 0 = holding the image
+static float s_flStartupFadeFirstDraw = 0.0f;
+static bool s_bStartupFadeDone = false;
+
+void CAnimatedBackgroundMovie::StartStartupFade()
+{
+	if ( !s_bStartupFadeDone && !s_flStartupFadeStart )
+	{
+		// a little after the menu shows up (it needs to be stable)
+		s_flStartupFadeStart = Plat_FloatTime() + TRANSITION_TO_MOVIE_DELAY_TIME;
+	}
+}
+
+float CAnimatedBackgroundMovie::GetStartupFadeAlpha()
+{
+	if ( s_bStartupFadeDone )
+		return 0.0f;
+
+	const float flNow = Plat_FloatTime();
+	if ( !s_flStartupFadeFirstDraw )
+		s_flStartupFadeFirstDraw = flNow;
+
+	// nothing ever started it (no video and no background map): don't hold the image forever
+	if ( !s_flStartupFadeStart && flNow - s_flStartupFadeFirstDraw > 3.0f )
+		StartStartupFade();
+
+	if ( !s_flStartupFadeStart )
+		return 1.0f;
+
+	const float flAlpha = RemapValClamped( flNow, s_flStartupFadeStart, s_flStartupFadeStart + TRANSITION_TO_MOVIE_FADE_TIME, 1.0f, 0.0f );
+	if ( flAlpha <= 0.0f )
+		s_bStartupFadeDone = true;
+	return flAlpha;
+}
+
+void CAnimatedBackgroundMovie::DrawStartupFade( vgui::Panel *pPanel, float flAlpha )
+{
+	static int s_nTextureID = -1;
+	if ( s_nTextureID == -1 )
+	{
+		// the image the engine shows while the game starts
+		s_nTextureID = vgui::surface()->CreateNewTextureID();
+		vgui::surface()->DrawSetTextureFile( s_nTextureID, "console/background01_widescreen", true, false );
+	}
+
+	// cover the whole screen, wherever the panel sits
+	int nAbsX, nAbsY, nScreenWide, nScreenTall;
+	vgui::ipanel()->GetAbsPos( pPanel->GetVPanel(), nAbsX, nAbsY );
+	vgui::surface()->GetScreenSize( nScreenWide, nScreenTall );
+	const int x0 = -nAbsX, y0 = -nAbsY;
+	const int nAlpha = (int)( clamp( flAlpha, 0.0f, 1.0f ) * 255.0f );
+
+	// black, then the 16:9 image centred, as the engine draws it
+	vgui::surface()->DrawSetColor( 0, 0, 0, nAlpha );
+	vgui::surface()->DrawFilledRect( x0, y0, x0 + nScreenWide, y0 + nScreenTall );
+
+	const int nImageWide = (int)( nScreenTall * ( 16.0f / 9.0f ) );
+	const int xImage = x0 + ( nScreenWide - nImageWide ) / 2;
+	vgui::surface()->DrawSetColor( 255, 255, 255, nAlpha );
+	vgui::surface()->DrawSetTexture( s_nTextureID );
+	vgui::surface()->DrawTexturedRect( xImage, y0, xImage + nImageWide, y0 + nScreenTall );
+}
+
 void CAnimatedBackgroundMovie::Paint(void)
 {
 	m_bGamepadUIMode = (IsPC() && (CommandLine()->CheckParm("-gamepadui") != NULL)) ? true : false;
@@ -340,22 +438,12 @@ void CAnimatedBackgroundMovie::Paint(void)
 
 		surface()->DrawTexturedRect(x, y, x + width_at_ratio, y + h);*/
 
-		if (!m_flMovieFadeInTime)
-		{
-			// do the fade a little bit after the movie starts (needs to be stable)
-			// the product overlay will fade out
-			m_flMovieFadeInTime = Plat_FloatTime() + TRANSITION_TO_MOVIE_DELAY_TIME;
-		}
-
-		float flFadeDelta = RemapValClamped(Plat_FloatTime(), m_flMovieFadeInTime, m_flMovieFadeInTime + TRANSITION_TO_MOVIE_FADE_TIME, 1.0f, 0.0f);
-		if (flFadeDelta > 0.0f)
-		{
-			if (!m_pMaterial)
-			{
-				PrepareStartupGraphicNew();
-			}
-			DrawStartupGraphicNew(flFadeDelta);
-		}
+		// Srcbox: fade the engine's startup image out over the movie, once per launch, like Alien
+		// Swarm. (The old code here only loaded its fade image when m_pMaterial - the video's own
+		// material - was NULL, so it drew the video over itself, and its file name was never set.)
+		// the video is on screen: start the fade. CBaseModPanel draws it (it's a popup, so it's in
+		// front of this panel; drawing it here too would stack the two and slow the fade down)
+		StartStartupFade();
 
 		if (engine->IsDrawingLoadingImage())
 			return;
@@ -699,6 +787,58 @@ void CC_MapBackground(const CCommand& args)
 	__disconnect(CCommand{});
 }
 
+#ifndef PLATFORM_64BITS
+//-----------------------------------------------------------------------------
+// x86: convar.h only opens up ConCommandBase::CreateBase/Init/Shutdown and
+// ConCommand's callback on x64. They can't be made public for x86 as well: the
+// prebuilt 32-bit libs (tier2, tier3, appframework, ...) link against their
+// protected names. So instead of renaming the engine's commands in place, they
+// are taken out of the cvar list and replaced by commands of our own.
+//-----------------------------------------------------------------------------
+static ConCommand *s_pEngineDisconnect = NULL;
+
+static void CC_RealDisconnect( const CCommand &args )
+{
+	if ( s_pEngineDisconnect )
+		s_pEngineDisconnect->Dispatch( args );
+}
+
+static void CC_SwappedDisconnect( const CCommand &args )
+{
+	__disconnect( args );
+}
+
+void SwapDisconnectCommand()
+{
+	static bool s_bSwapped = false;
+	if ( s_bSwapped )
+		return;
+
+	ConCommandBase *pDisconnect = g_pCVar->FindCommand( "disconnect" );
+	if ( !pDisconnect || !pDisconnect->IsCommand() || !g_pCVar->FindCommand( "__disconnect" ) )
+		return;
+	s_bSwapped = true;
+
+	// the engine's disconnect lives on as __real_disconnect (__disconnect runs it)
+	s_pEngineDisconnect = static_cast< ConCommand * >( pDisconnect );
+	g_pCVar->UnregisterConCommand( pDisconnect );
+	static ConCommand s_RealDisconnect( "__real_disconnect", CC_RealDisconnect, "" );
+	static ConCommand s_Disconnect( "disconnect", CC_SwappedDisconnect, "Disconnect game from server." );
+
+	// (created after ConVar_Register, so their constructors register them right away)
+	if ( ConCommandBase *pStartupmenu = g_pCVar->FindCommand( "startupmenu" ) )
+	{
+		g_pCVar->UnregisterConCommand( pStartupmenu );
+		static ConCommand s_Startupmenu( "startupmenu", CC_SwappedDisconnect, "Opens initial menu screen and loads the background bsp, but only if no other level is being loaded, and we're not in developer mode." );
+	}
+
+	if ( ConCommandBase *pMapBackground = g_pCVar->FindCommand( "map_background" ) )
+	{
+		g_pCVar->UnregisterConCommand( pMapBackground );
+		static ConCommand s_MapBackground( "map_background", CC_MapBackground, "Plays the background video that would play when you disconnect/goto the main menu. execute this command with no args for command explination\n" );
+	}
+}
+#else
 void SwapDisconnectCommand()
 {
 	//DevMsg("SwapDisconnectCommand\n");
@@ -736,3 +876,4 @@ void SwapDisconnectCommand()
 		map_background->m_fnCommandCallback = CC_MapBackground;
 	}
 }
+#endif // PLATFORM_64BITS

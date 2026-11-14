@@ -1,0 +1,12 @@
+* mousedown button_7.wav
+
+
+back mouseenter highlite_1.wav
+cons mouseenter highlite_1.wav
+terr mouseenter highlite_1.wav
+sett mouseenter highlite_1.wav
+rnum mouseenter highlite_1.wav
+next mouseenter highlite_1.wav
+info mouseenter highlite_1.wav
+
+menu open driver_loop.wav

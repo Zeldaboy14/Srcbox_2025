@@ -592,6 +592,7 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 {
 
 #ifdef SWARM_INTERFACE
+#ifndef PLATFORM_64BITS
 	if (CommandLine()->FindParm("-oldgameui")) {
 		// nothings here. we don't want to load a gameui like this. required for tools and such
 	//} else if (CommandLine()->FindParm("-gamepadui")) {
@@ -602,11 +603,29 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 			DllOverride() {
 				Sys_LoadInterface("filesystem_stdio.dll", FILESYSTEM_INTERFACE_VERSION, nullptr, (void**)&g_pFullFileSystem);
 				const char* pGameDir = CommandLine()->ParmValue("-game", "hl2mp");
+				pGameDir = UTIL_VarArgs("%s/bin", pGameDir);
+				g_pFullFileSystem->AddSearchPath(pGameDir, "EXECUTABLE_PATH", PATH_ADD_TO_HEAD);
+			}
+		} g_DllOverride;
+	}
+#else
+	if (CommandLine()->FindParm("-oldgameui")) {
+		// nothings here. we don't want to load a gameui like this. required for tools and such
+	//} else if (CommandLine()->FindParm("-gamepadui")) {
+		// don't load client for this either. load the newer gamepadui
+	}
+	else {
+		static class DllOverride {
+		public:
+			DllOverride() {
+				Sys_LoadInterface("filesystem_stdio.dll", FILESYSTEM_INTERFACE_VERSION, nullptr, (void**)&g_pFullFileSystem);
+				const char* pGameDir = CommandLine()->ParmValue("-game", "hl2mp");
 				pGameDir = UTIL_VarArgs("%s/bin/x64", pGameDir);
 				g_pFullFileSystem->AddSearchPath(pGameDir, "EXECUTABLE_PATH", PATH_ADD_TO_HEAD);
 			}
 		} g_DllOverride;
 	}
+#endif
 #endif
 
 	ConnectTier1Libraries( &appSystemFactory, 1 );

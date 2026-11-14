@@ -1,0 +1,4 @@
+quit mousedown button_7.wav
+* mouseenter morph.wav
+* mousedown button_7.wav
+menu open menu_loop.wav

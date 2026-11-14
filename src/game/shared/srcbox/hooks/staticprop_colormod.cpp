@@ -32,6 +32,7 @@
 #include "materialsystem/imaterialsystem.h"
 #include "texture_group_names.h"
 #include "studio.h"
+#include "tier1/lzmaDecoder.h"
 
 #include "MinHook.h"
 #undef CreateEvent
@@ -189,6 +190,46 @@ static int GetColorOffset( int nVersion, int nStride )
 	return -1;
 }
 
+// Reads one game lump. Compressed ones (L4D2 / CS:GO / Portal 2 maps) are LZMA with a
+// Source lzma header; their stored size runs to the next game lump's offset, and
+// m_nFileLen is the uncompressed size.
+template < typename GAMELUMP >
+static bool ReadGameLump( SPCMFile_t *pFile, const CUtlVector< GAMELUMP > &lumps, int iLump, unsigned int nGameLumpEnd, CUtlVector< unsigned char > &out )
+{
+	const GAMELUMP &lump = lumps[iLump];
+	const unsigned int nFileSize = pFile->m_nSize;
+	if ( lump.m_nFileOfs <= 0 || lump.m_nFileLen <= 0 )
+		return false;
+
+	if ( !( lump.m_nFlags & SPCM_GAMELUMP_COMPRESSED ) )
+	{
+		if ( (unsigned int)lump.m_nFileOfs + (unsigned int)lump.m_nFileLen > nFileSize )
+			return false;
+		out.SetCount( lump.m_nFileLen );
+		return ReadAt( pFile, lump.m_nFileOfs, out.Base(), lump.m_nFileLen );
+	}
+
+	unsigned int nEnd = MIN( nGameLumpEnd, nFileSize );
+	for ( int i = 0; i < lumps.Count(); i++ )
+	{
+		if ( lumps[i].m_nFileOfs > lump.m_nFileOfs && (unsigned int)lumps[i].m_nFileOfs < nEnd )
+			nEnd = lumps[i].m_nFileOfs;
+	}
+	if ( nEnd <= (unsigned int)lump.m_nFileOfs || nEnd - lump.m_nFileOfs > 64 * 1024 * 1024 )
+		return false;
+
+	CUtlVector< unsigned char > packed;
+	packed.SetCount( nEnd - lump.m_nFileOfs );
+	if ( !ReadAt( pFile, lump.m_nFileOfs, packed.Base(), packed.Count() ) || !CLZMA::IsCompressed( packed.Base() ) )
+		return false;
+
+	const unsigned int nSize = CLZMA::GetActualSize( packed.Base() );
+	if ( !nSize || nSize > 64 * 1024 * 1024 )
+		return false;
+	out.SetCount( nSize );
+	return CLZMA::Uncompress( packed.Base(), out.Base() ) == nSize;
+}
+
 static void LoadPropColors( const char *pszMapFile )
 {
 	ClearPropColors();
@@ -275,57 +316,47 @@ static void LoadPropColors( const char *pszMapFile )
 	gameLumps.SetCount( nGameLumps );
 	ReadAt( hFile, nGameLumpOfs + 4, gameLumps.Base(), nGameLumps * sizeof( GameLump_t ) );
 
-	const GameLump_t *pSprp = NULL;
-	const GameLump_t *pSprc = NULL;
+	int iSprp = -1, iSprc = -1;
 	for ( int i = 0; i < nGameLumps; i++ )
 	{
 		if ( gameLumps[i].m_nId == SPCM_GAMELUMP_SPRP )
-			pSprp = &gameLumps[i];
+			iSprp = i;
 		else if ( gameLumps[i].m_nId == SPCM_GAMELUMP_SPRC )
-			pSprc = &gameLumps[i];
+			iSprc = i;
 	}
 
-	if ( !pSprp || pSprp->m_nFileLen < 12 || pSprp->m_nFileOfs <= 0 ||
-		 (unsigned int)pSprp->m_nFileOfs + (unsigned int)pSprp->m_nFileLen > nFileSize )
+	if ( iSprp < 0 || gameLumps[iSprp].m_nFileLen < 12 )
 	{
 		SPCM_STATUS( "%s: no usable static prop lump", pszMapFile );
 		CloseMap( hFile );
 		return;
 	}
-
-	if ( pSprp->m_nFlags & SPCM_GAMELUMP_COMPRESSED )
-	{
-		DevWarning( "Static prop colors: %s has a compressed static prop lump, colors not loaded\n", pszMapFile );
-		SPCM_STATUS( "%s: static prop lump is compressed, colors not loaded", pszMapFile );
-		CloseMap( hFile );
-		return;
-	}
+	const GameLump_t *pSprp = &gameLumps[iSprp];
+	const unsigned int nGameLumpEnd = (unsigned int)nGameLumpOfs + (unsigned int)nGameLumpLen;
 
 	CUtlVector< unsigned char > lumpData;
-	lumpData.SetCount( pSprp->m_nFileLen );
-	bool bRead = ReadAt( hFile, pSprp->m_nFileOfs, lumpData.Base(), pSprp->m_nFileLen );
+	bool bRead = ReadGameLump( hFile, gameLumps, iSprp, nGameLumpEnd, lumpData );
 
 	// Colors written by Srcbox's vbsp into a separate lump ('sprc'): int count, then
 	// one color32 per prop in static prop lump order. Used when the prop lump itself
 	// has no color (TF2 format).
 	CUtlVector< color32 > separateColors;
-	if ( bRead && pSprc && !( pSprc->m_nFlags & SPCM_GAMELUMP_COMPRESSED ) && pSprc->m_nFileLen >= 4 &&
-		 pSprc->m_nFileOfs > 0 && (unsigned int)pSprc->m_nFileOfs + (unsigned int)pSprc->m_nFileLen <= nFileSize )
+	CUtlVector< unsigned char > sprcData;
+	if ( bRead && iSprc >= 0 && ReadGameLump( hFile, gameLumps, iSprc, nGameLumpEnd, sprcData ) && sprcData.Count() >= 4 )
 	{
 		int nCount = 0;
-		ReadAt( hFile, pSprc->m_nFileOfs, &nCount, sizeof( int ) );
-		if ( nCount > 0 && 4 + nCount * (int)sizeof( color32 ) <= pSprc->m_nFileLen )
+		memcpy( &nCount, sprcData.Base(), sizeof( int ) );
+		if ( nCount > 0 && 4 + nCount * (int)sizeof( color32 ) <= sprcData.Count() )
 		{
 			separateColors.SetCount( nCount );
-			if ( !ReadAt( hFile, pSprc->m_nFileOfs + 4, separateColors.Base(), nCount * sizeof( color32 ) ) )
-				separateColors.Purge();
+			memcpy( separateColors.Base(), sprcData.Base() + 4, nCount * sizeof( color32 ) );
 		}
 	}
 
 	CloseMap( hFile );
 	if ( !bRead )
 	{
-		SPCM_STATUS( "%s: couldn't read the static prop lump", pszMapFile );
+		SPCM_STATUS( "%s: couldn't read the static prop lump%s", pszMapFile, ( pSprp->m_nFlags & SPCM_GAMELUMP_COMPRESSED ) ? " (compressed)" : "" );
 		return;
 	}
 
@@ -556,45 +587,54 @@ static bool GetStaticPropColor( const DrawModelInfo_t &drawInfo, Vector &vecColo
 //-----------------------------------------------------------------------------
 // Detours
 //-----------------------------------------------------------------------------
-typedef void ( __fastcall *DrawStaticPropFn_t )( IStudioRender *pThis, const DrawModelInfo_t &drawInfo, const matrix3x4_t &modelToWorld, int flags );
+// IStudioRender members are __thiscall on x86; __fastcall matches once the unused edx is declared
+#ifdef PLATFORM_64BITS
+#define SPCM_EDX
+#define SPCM_EDX_ARG
+#else
+#define SPCM_EDX		, void *pEdx
+#define SPCM_EDX_ARG	, NULL
+#endif
+
+typedef void ( __fastcall *DrawStaticPropFn_t )( IStudioRender *pThis SPCM_EDX, const DrawModelInfo_t &drawInfo, const matrix3x4_t &modelToWorld, int flags );
 
 static DrawStaticPropFn_t s_pfnOrigDrawModelStaticProp = NULL;
 static DrawStaticPropFn_t s_pfnOrigDrawStaticPropShadows = NULL;
 
 static const Vector s_vecWhite( 1.0f, 1.0f, 1.0f );
 
-static void __fastcall Detour_DrawModelStaticProp( IStudioRender *pThis, const DrawModelInfo_t &drawInfo, const matrix3x4_t &modelToWorld, int flags )
+static void __fastcall Detour_DrawModelStaticProp( IStudioRender *pThis SPCM_EDX, const DrawModelInfo_t &drawInfo, const matrix3x4_t &modelToWorld, int flags )
 {
 	Vector vecColor;
 	if ( !GetStaticPropColor( drawInfo, vecColor ) )
 	{
-		s_pfnOrigDrawModelStaticProp( pThis, drawInfo, modelToWorld, flags );
+		s_pfnOrigDrawModelStaticProp( pThis SPCM_EDX_ARG, drawInfo, modelToWorld, flags );
 		return;
 	}
 
 	pThis->SetColorModulation( vecColor.Base() );
-	s_pfnOrigDrawModelStaticProp( pThis, drawInfo, modelToWorld, flags );
+	s_pfnOrigDrawModelStaticProp( pThis SPCM_EDX_ARG, drawInfo, modelToWorld, flags );
 	// IStudioRender has no getter; the engine draws static props with white modulation
 	pThis->SetColorModulation( s_vecWhite.Base() );
 }
 
-static void __fastcall Detour_DrawStaticPropShadows( IStudioRender *pThis, const DrawModelInfo_t &drawInfo, const matrix3x4_t &modelToWorld, int flags )
+static void __fastcall Detour_DrawStaticPropShadows( IStudioRender *pThis SPCM_EDX, const DrawModelInfo_t &drawInfo, const matrix3x4_t &modelToWorld, int flags )
 {
 	Vector vecColor;
 	if ( !GetStaticPropColor( drawInfo, vecColor ) )
 	{
-		s_pfnOrigDrawStaticPropShadows( pThis, drawInfo, modelToWorld, flags );
+		s_pfnOrigDrawStaticPropShadows( pThis SPCM_EDX_ARG, drawInfo, modelToWorld, flags );
 		return;
 	}
 
 	pThis->SetColorModulation( vecColor.Base() );
-	s_pfnOrigDrawStaticPropShadows( pThis, drawInfo, modelToWorld, flags );
+	s_pfnOrigDrawStaticPropShadows( pThis SPCM_EDX_ARG, drawInfo, modelToWorld, flags );
 	pThis->SetColorModulation( s_vecWhite.Base() );
 }
 
 //-----------------------------------------------------------------------------
 // Finds the vtable slot the compiler uses for a virtual member function, by
-// reading the MSVC x64 vcall thunk that a pointer-to-virtual-member points at.
+// reading the MSVC vcall thunk (x64 or x86) that a pointer-to-virtual-member points at.
 // This keeps the slots in step with istudiorender.h (including MSVC's reversed
 // ordering of overloads) without hard-coding numbers.
 //-----------------------------------------------------------------------------
@@ -608,6 +648,7 @@ static int GetVTableIndex( PMF pmf )
 	for ( int i = 0; i < 4 && p[0] == 0xE9; i++ )
 		p = p + 5 + *reinterpret_cast< const int * >( p + 1 );
 
+#ifdef PLATFORM_64BITS
 	// mov rax, [rcx]
 	if ( p[0] != 0x48 || p[1] != 0x8B || p[2] != 0x01 )
 		return -1;
@@ -622,6 +663,22 @@ static int GetVTableIndex( PMF pmf )
 	if ( p[0] == 0x48 && p[1] == 0x8B && p[2] == 0x40 ) return p[3] / sizeof( void * );
 	if ( p[0] == 0x48 && p[1] == 0x8B && p[2] == 0x80 ) return *reinterpret_cast< const int * >( p + 3 ) / sizeof( void * );
 	if ( p[0] == 0x48 && p[1] == 0x8B && p[2] == 0x00 ) return 0;
+#else
+	// mov eax, [ecx]
+	if ( p[0] != 0x8B || p[1] != 0x01 )
+		return -1;
+	p += 2;
+
+	// jmp dword ptr [eax + disp]
+	if ( p[0] == 0xFF && p[1] == 0x60 ) return p[2] / sizeof( void * );
+	if ( p[0] == 0xFF && p[1] == 0xA0 ) return *reinterpret_cast< const int * >( p + 2 ) / sizeof( void * );
+	if ( p[0] == 0xFF && p[1] == 0x20 ) return 0;
+
+	// /guard:cf thunk: mov eax, dword ptr [eax + disp]; jmp ___guard_dispatch_icall_fptr
+	if ( p[0] == 0x8B && p[1] == 0x40 ) return p[2] / sizeof( void * );
+	if ( p[0] == 0x8B && p[1] == 0x80 ) return *reinterpret_cast< const int * >( p + 2 ) / sizeof( void * );
+	if ( p[0] == 0x8B && p[1] == 0x00 ) return 0;
+#endif
 
 	return -1;
 }
@@ -641,6 +698,7 @@ void StaticPropColorMod_Install( CreateInterfaceFn appSystemFactory )
 	}
 
 	// Checked against the TF2 SDK x64 studiorender.dll: SetColorModulation 27, DrawModelStaticProp 30, DrawStaticPropShadows 32
+	// (the same slots on x86: the vtable layout doesn't depend on pointer size)
 	int nDrawSlot = GetVTableIndex( &IStudioRender::DrawModelStaticProp );
 	int nShadowSlot = GetVTableIndex( &IStudioRender::DrawStaticPropShadows );
 	if ( nDrawSlot < 0 )

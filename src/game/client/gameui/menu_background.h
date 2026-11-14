@@ -41,6 +41,20 @@ public:
 	// Releases the videos of every live background movie panel. Called early in client shutdown,
 	// because these panels are only destroyed after the video services have already shut down.
 	static void ReleaseAllVideos();
+
+	// Srcbox: the fade from the engine's startup image into the menu, once per launch. The image is
+	// held until StartStartupFade() (the menu's video or background map is showing), then faded out.
+	// CBaseModPanel draws it under the menu as well, so there is no black gap before the video's
+	// first frame.
+	// Srcbox: the one menu background video. Created and started by CBaseModPanel as soon as the
+	// GameUI is up (like Alien Swarm's movie), instead of by MainMenu, which only opens after its
+	// delayed activation: the video was seconds late. MainMenu uses this same panel.
+	static CAnimatedBackgroundMovie *GetMainMenuMovie();
+	void StartVideoIfNeeded();
+
+	static void StartStartupFade();
+	static float GetStartupFadeAlpha();
+	static void DrawStartupFade( vgui::Panel *pPanel, float flAlpha );
 	void DoModal();
 
 	MESSAGE_FUNC(OnDisconnectFromGame, "DisconnectedFromGame");

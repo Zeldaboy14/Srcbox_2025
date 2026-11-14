@@ -14,9 +14,7 @@
 #include "../../../gamepadui/gamepadui_button.h"
 #include "../../../gamepadui/gamepadui_image.h"
 #endif
-#ifdef PLATFORM_64BITS
 #include "menu_background.h"
-#endif
 
 namespace BaseModUI {
 

@@ -68,10 +68,9 @@ MainMenu::MainMenu(Panel* parent, const char* panelName) :
 
 	m_iQuickJoinHelpText = MMQJHT_NONE;
 
-#ifdef PLATFORM_64BITS
 	// Main menu panel, which will handle the video background
-	//m_pMainMenuPanel = new CAnimatedBackgroundMovie(this, "BackgroundVideo");
-#endif
+	// Srcbox: the shared one, already started by CBaseModPanel (see menu_background.h)
+	m_pMainMenuPanel = CAnimatedBackgroundMovie::GetMainMenuMovie();
 }
 
 //=============================================================================
@@ -80,12 +79,6 @@ MainMenu::~MainMenu()
 	RemoveFrameListener( this );
 
 #ifdef PLATFORM_64BITS
-	if (m_pMainMenuPanel && m_pMainMenuPanel->IsVisible())
-	{
-		//m_pMainMenuPanel->StopVideo();
-		//m_pMainMenuPanel->SetVisible(false);
-		//ConColorMsg(Color(255, 0, 0, 255), "MainMenu: Stopping video\n");
-	}
 #endif
 }
 
@@ -249,7 +242,6 @@ void MainMenu::OnCommand( const char *command )
 		if ( ui_old_options_menu.GetBool() )
 		{
 			CBaseModPanel::GetSingleton().OpenOptionsDialog( this );
-			//engine->ClientCmd("Options");
 		}
 		else
 		{
@@ -460,12 +452,10 @@ void MainMenu::OnOpen()
 
 	SetFooterState();
 
-#ifdef PLATFORM_64BITS
 	if (m_pMainMenuPanel)
 	{
-		m_pMainMenuPanel->StartVideo();
+		m_pMainMenuPanel->StartVideoIfNeeded();
 	}
-#endif
 }
 
 //=============================================================================

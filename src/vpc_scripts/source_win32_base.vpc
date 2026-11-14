@@ -67,7 +67,10 @@ $Configuration
 		// window since F8 stops on both warnings and errors. The only way to
 		// keep the warning count down is to have warnings-as-errors.
 		// We will not be warning free on 64-bit for a while...
-		$TreatWarningsAsErrors				"Yes (/WX)" [!$ANALYZE && !$WIN64]
+		// Srcbox: off for x86 too. x64 has never had it, and x86 builds failed on warnings
+		// in shared code (Lua, particles, ...) that the x64 builds ignore.
+		//$TreatWarningsAsErrors				"Yes (/WX)" [!$ANALYZE && !$WIN64]
+		$TreatWarningsAsErrors				"No"
 
 		// Disable Using _alloca in a loop
 		$DisableSpecificWarnings			"$BASE;6263" [$ANALYZE]

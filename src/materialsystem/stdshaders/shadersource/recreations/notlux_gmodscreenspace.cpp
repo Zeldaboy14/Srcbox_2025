@@ -19,7 +19,7 @@
 #include "../../cpp_lux_shared.h"
 
 #include "notlux_gmod_screenspace_vs30.inc"
-#include "notlux_gmodscreenspace_ps30.inc"
+#include "notlux_gmod_screenspace_ps30.inc"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -84,11 +84,11 @@ SHADER_DRAW
 		SET_STATIC_VERTEX_SHADER_COMBO(VIEWPROJ, 0);
 		SET_STATIC_VERTEX_SHADER(notlux_gmod_screenspace_vs30);
 
-		DECLARE_STATIC_PIXEL_SHADER(notlux_gmodscreenspace_ps30);
+		DECLARE_STATIC_PIXEL_SHADER(notlux_gmod_screenspace_ps30);
 		SET_STATIC_PIXEL_SHADER_COMBO(TEXTUREALPHA, bTextureAlpha);
 		SET_STATIC_PIXEL_SHADER_COMBO(VERTEXALPHA, bVertexAlpha);
 		SET_STATIC_PIXEL_SHADER_COMBO(BLUR, bBlur);
-		SET_STATIC_PIXEL_SHADER(notlux_gmodscreenspace_ps30);
+		SET_STATIC_PIXEL_SHADER(notlux_gmod_screenspace_ps30);
 	}
 
 	if (IsDynamicState())
@@ -115,8 +115,8 @@ SHADER_DRAW
 		DECLARE_DYNAMIC_VERTEX_SHADER(notlux_gmod_screenspace_vs30);
 		SET_DYNAMIC_VERTEX_SHADER(notlux_gmod_screenspace_vs30);
 
-		DECLARE_DYNAMIC_PIXEL_SHADER(notlux_gmodscreenspace_ps30);
-		SET_DYNAMIC_PIXEL_SHADER(notlux_gmodscreenspace_ps30);
+		DECLARE_DYNAMIC_PIXEL_SHADER(notlux_gmod_screenspace_ps30);
+		SET_DYNAMIC_PIXEL_SHADER(notlux_gmod_screenspace_ps30);
 	}
 	Draw();
 }

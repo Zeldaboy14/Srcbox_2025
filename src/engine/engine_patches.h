@@ -8,12 +8,27 @@
 #include "MinHook.h"
 #undef CreateEvent  // WinBase.h defines this, but it messes with out gameeventmanager->CreateEvent
 
+// Engine member functions are detoured as __fastcall. On x64 that is the only calling
+// convention; on x86 the engine uses __thiscall (this in ecx, the rest on the stack),
+// which __fastcall matches once an unused second register argument (edx) is declared:
+//   void __fastcall Detour( void *pThis EP_EDX, int a );   pfnOriginal( pThis EP_EDX_ARG, a );
+#ifdef PLATFORM_64BITS
+#define EP_EDX
+#define EP_EDX_ARG
+#else
+#define EP_EDX		, void *_edx
+#define EP_EDX_ARG	, nullptr
+#endif
+
 DWORD_PTR GetModuleBaseAddress( HMODULE module );
 DWORD_PTR FindPattern( HMODULE module, const char* pattern, const char* mask );
+
+//void CStudioRenderContext__DrawModelStaticProp();
 
 void ApplyDetoursOnDllStartup();
 void NotifyDetoursOnLevelShutdown();
 void ApplyVTFPatch();
+void ApplyBSPLimitsPatch();
 
 /*
 ** Specific detours
@@ -90,9 +105,9 @@ void ApplyClientStateDetours();
     type* fieldName = ( type* )( _##structName##_base + _##structName##_offset ); \
     _##structName##_offset += sizeof( type );
 
-// Macro for a pointer of a certain type
+// Macro for a pointer of a certain type (pointers are 4-byte aligned on x86)
 #define DEFINE_PTR( structName, type, fieldName )                                 \
-    ALIGN_OFFSET( structName, 8 );                                                \
+    ALIGN_OFFSET( structName, sizeof( void * ) );                                 \
     type fieldName = *( type* )( _##structName##_base + _##structName##_offset ); \
     _##structName##_offset += sizeof( type );
 

@@ -46,7 +46,7 @@ DWORD_PTR FindPattern( HMODULE module, const char *pattern, const char *mask )
 //
 // A 7.5 file has the same header as 7.4. The only format change is that
 // cubemaps no longer store the spheremap face, so they hold 6 faces instead of 7.
-// The TF2 SDK's x64 materialsystem.dll needs three changes in its vtf code:
+// The TF2 SDK's materialsystem.dll (x64 and x86) needs three changes in its vtf code:
 //
 //  1. CVTFTexture::ReadHeader rejects any minor version above 4
 //     ("*** Encountered VTF file with an invalid minor version!").
@@ -74,6 +74,7 @@ struct VTFBytePatch_t
 
 static const VTFBytePatch_t s_VTF75Patches[] =
 {
+#ifdef PLATFORM_64BITS
 	// CVTFTexture::ReadHeader: header size by minor version
 	//   mov eax,[rbp-19h]; cmp eax,4; jne; lea r8d,[rax+3Ch]; jmp read ... cmp eax,1; jbe v70
 	// ->
@@ -105,6 +106,42 @@ static const VTFBytePatch_t s_VTF75Patches[] =
 		"\x8B\x43\x0C\xFF\xC8\x83\xF8\x03\x76\x11\x66\x90",
 		12
 	},
+#else
+	// x86 materialsystem.dll (bin/materialsystem.dll of the same SDK build)
+
+	// CVTFTexture::ReadHeader: header size by minor version
+	//   mov eax,[ebp-78h]; cmp eax,4; jne; mov eax,40h; jmp read; ... cmp eax,1; je v70; test eax,eax; je v70
+	// ->
+	//   mov eax,[ebp-78h]; cmp eax,5; ja bad_version; cmp eax,1; jbe v70; mov eax,40h; jmp read; int3 x28
+	{
+		"ReadHeader minor version",
+		"\x8B\x45\x88\x83\xF8\x04\x75\x07\xB8\x40\x00\x00\x00\xEB\x3E\x83\xF8\x03\x75\x07\xB8\x40\x00\x00\x00\xEB\x32"
+		"\x83\xF8\x02\x75\x07\xB8\x40\x00\x00\x00\xEB\x26\x83\xF8\x01\x74\x1C\x85\xC0\x74\x18",
+		"\x8B\x45\x88\x83\xF8\x05\x77\x28\x83\xF8\x01\x76\x3B\xB8\x40\x00\x00\x00\xEB\x39"
+		"\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xCC",
+		48
+	},
+	// CVTFTexture::LoadImageData: number of cubemap faces stored in the file
+	//   mov eax,[ebp+0Ch]; cmp dword [eax+4],7; jne; cmp dword [eax+8],1; mov ecx,6; cmovl ebx,ecx
+	// ->
+	//   mov eax,[ebp+0Ch]; mov eax,[eax+8]; dec eax; cmp eax,3; jbe skip; mov ebx,6; nop4
+	{
+		"LoadImageData cubemap face count",
+		"\x8B\x45\x0C\x83\x78\x04\x07\x75\x0F\x83\x78\x08\x01\xB9\x06\x00\x00\x00\x0F\x4C\xD9",
+		"\x8B\x45\x0C\x8B\x40\x08\x48\x83\xF8\x03\x76\x0C\xBB\x06\x00\x00\x00\x0F\x1F\x40\x00",
+		21
+	},
+	// CVTFTexture::ImageFileInfo: same check for file offsets
+	//   cmp dword [esi+4],7; jne skip; cmp dword [esi+8],1; jge skip
+	// ->
+	//   mov eax,[esi+8]; dec eax; cmp eax,3; jbe skip; nop3
+	{
+		"ImageFileInfo cubemap face count",
+		"\x83\x7E\x04\x07\x75\x1A\x83\x7E\x08\x01\x7D\x14",
+		"\x8B\x46\x08\x48\x83\xF8\x03\x76\x17\x0F\x1F\x00",
+		12
+	},
+#endif
 };
 
 static BYTE *FindUniqueBytes( HMODULE module, const char *pBytes, int nLength )
@@ -169,8 +206,101 @@ void ApplyVTFPatch()
 	}
 }
 
+//-----------------------------------------------------------------------------
+// Raised map (BSP) limits, like live TF2's 2025 update, as far as this engine.dll
+// allows without rewriting its loaders. Only load-time count checks whose arrays
+// are allocated from the map's own lump sizes are raised:
+//
+//  - brushes  8192 -> 32768 (CollisionBSPData_LoadBrushes, "Map has too many brushes").
+//    cbrush_t is allocated per map; leaf brush lists hold 16-bit indices, so 32768 fits.
+//  - texinfo 12288 -> 32768 (CollisionBSPData_LoadTexinfo, "Map has too many surfaces").
+//    Allocated per map; faces/brush sides store texinfo as a 16-bit signed index.
+//
+// Not raised, because this build stores them in fixed or 16-bit storage:
+//  - brush sides (65536): cbrush_t keeps firstbrushside/numsides as 16-bit values.
+//  - displacements (2048): DispInfo_LoadDisplacements reads them into a fixed
+//    2048-entry array on its stack.
+// Overlays, internal entities/static props and t-junctions have no engine check
+// here; those limits live in vbsp.
+//
+// Each patch checks the original bytes (unique in the module) before writing, so a
+// different engine.dll build is left alone, and applying twice is harmless.
+//-----------------------------------------------------------------------------
+static const VTFBytePatch_t s_BSPLimitPatches[] =
+{
+#ifdef PLATFORM_64BITS
+	// shr rbx,3; cmp ebx,2000h; jle  ->  cmp ebx,8000h
+	{
+		"brushes 8192 -> 32768",
+		"\x48\xC1\xEB\x03\x81\xFB\x00\x20\x00\x00\x7E\x0C",
+		"\x48\xC1\xEB\x03\x81\xFB\x00\x80\x00\x00\x7E\x0C",
+		12
+	},
+	// jmp; cmp ebp,3000h; jle  ->  cmp ebp,8000h
+	{
+		"texinfo 12288 -> 32768",
+		"\xEB\x0F\x81\xFD\x00\x30\x00\x00\x7E\x0C",
+		"\xEB\x0F\x81\xFD\x00\x80\x00\x00\x7E\x0C",
+		10
+	},
+#else
+	// x86 engine.dll: shr ebx,3; cmp ebx,2000h; jle  ->  cmp ebx,8000h
+	{
+		"brushes 8192 -> 32768",
+		"\xC1\xEB\x03\x81\xFB\x00\x20\x00\x00\x7E\x0D",
+		"\xC1\xEB\x03\x81\xFB\x00\x80\x00\x00\x7E\x0D",
+		11
+	},
+	// jmp; cmp ebx,3000h; jle  ->  cmp ebx,8000h
+	{
+		"texinfo 12288 -> 32768",
+		"\xEB\x0D\x81\xFB\x00\x30\x00\x00\x7E\x0D",
+		"\xEB\x0D\x81\xFB\x00\x80\x00\x00\x7E\x0D",
+		10
+	},
+#endif
+};
+
+void ApplyBSPLimitsPatch()
+{
+	static bool s_bApplied = false;
+	if ( s_bApplied )
+		return;
+
+	HMODULE hEngine = GetModuleHandleA( "engine.dll" );
+	if ( !hEngine )
+		return;
+	s_bApplied = true;
+
+	// Each limit is independent; apply whichever ones match this build
+	for ( int i = 0; i < ARRAYSIZE( s_BSPLimitPatches ); i++ )
+	{
+		const VTFBytePatch_t &patch = s_BSPLimitPatches[i];
+		BYTE *pSite = FindUniqueBytes( hEngine, patch.m_pOriginal, patch.m_nLength );
+		if ( !pSite )
+		{
+			// Already patched (client and server both apply it), or a different engine.dll build
+			if ( !FindUniqueBytes( hEngine, patch.m_pReplacement, patch.m_nLength ) )
+				DevWarning( "BSP limits patch: \"%s\" not found in engine.dll, left unchanged\n", patch.m_pszName );
+			continue;
+		}
+
+		DWORD oldProtect;
+		if ( !VirtualProtect( pSite, patch.m_nLength, PAGE_EXECUTE_READWRITE, &oldProtect ) )
+			continue;
+		memcpy( pSite, patch.m_pReplacement, patch.m_nLength );
+		VirtualProtect( pSite, patch.m_nLength, oldProtect, &oldProtect );
+		FlushInstructionCache( GetCurrentProcess(), pSite, patch.m_nLength );
+		DevMsg( "BSP limits patch: %s\n", patch.m_pszName );
+	}
+}
+
 void ApplyDetoursOnDllStartup()
 {
+    // Both DLLs (a dedicated server has no client.dll); a no-op the second time. Before
+    // MinHook, which fails with "already initialized" in the second DLL of a listen server.
+    ApplyBSPLimitsPatch();
+
     if ( MH_Initialize() != MH_OK )
     {
         // DevWarning( "Failed to initialize MinHook.\n" );

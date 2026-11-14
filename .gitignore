@@ -521,6 +521,7 @@ src/lib/public/x64/responserules.lib
 game/mod_hl2mp/downloadlists/peck.lst
 game/mod_hl2mp/maps/graphs/peck.ain
 game/mod_hl2mp/materials/vgui/logos/ui/spray_bullseye.vmt
+game/mod_hl2mp_win32.exe
 game/mod_hl2mp_win64.exe
 game/mod_hl2mp/demoheader.tmp
 game/mod_hl2mp/cfg/config.cfg
@@ -555,3 +556,8 @@ game/mod_episodic/shaders
 game/mod_portal/shaders
 src/materialsystem/stdshaders/include/
 src/materialsystem/stdshaders/shaders/
+# x86 libs built from source
+src/lib/public/mathlib.lib
+src/lib/public/raytrace.lib
+src/lib/public/tier1.lib
+src/lib/public/vgui_controls.lib

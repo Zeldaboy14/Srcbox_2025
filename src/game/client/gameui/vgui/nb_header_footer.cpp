@@ -110,7 +110,8 @@ void CBackgroundMovie::Update()
 		if ( nGameState != m_nLastGameState )
 		{
 			DevMsg( "Attempting to play widescreen video\n" );
-			m_pMaterial->SetLooping(true);
+			if ( m_pMaterial )	// Srcbox: NULL before the first movie is set
+				m_pMaterial->SetLooping(true);
 
 			//SetCurrentMovie( "media/BGFX_01.bik" );
 			SetCurrentMovie("media/mainmenu.webm");

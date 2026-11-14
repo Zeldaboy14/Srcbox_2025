@@ -10,6 +10,7 @@ $Macro SRCDIR		".."
 $Macro OUTBINDIR	"$SRCDIR\..\game"
 
 $Macro OUTBINNAME		"$OUTBINNAME_win64"		[$WIN64]
+$Macro OUTBINNAME		"$OUTBINNAME_win32"		[$WIN32 && !$WIN64] // launcher.dll strips the last "_suffix" to get the mod dir
 $Macro OUTBINNAME       "$OUTBINNAME_osx"		[$OSXALL]
 $Macro OUTBINNAME       "$OUTBINNAME_linux"		[$LINUX32]
 $Macro OUTBINNAME       "$OUTBINNAME_linux64"	[$LINUX64]
@@ -48,6 +49,9 @@ $Configuration
 	$Linker
 	{
 		$SystemLibraries				"SDL2" [$MOD_LAUNCHER && $LINUXALL]
+		// 32-bit Source needs the full 4GB address space (Valve's hl2.exe is built this way);
+		// without it the game runs out of address space and D3D buffer locks fail on map load.
+		$AdditionalOptions				"$BASE /LARGEADDRESSAWARE" [$WIN32 && !$WIN64]
 	}
 }
 

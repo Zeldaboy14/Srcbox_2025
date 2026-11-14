@@ -4,6 +4,8 @@
 //	Project Script for mods to use an an example of how to override shaders
 //-----------------------------------------------------------------------------
 
+$MacroRequired	"PLATSUBDIR"
+
 $Macro OUTBINDIR	"$SRCDIR\..\game\$GAMENAME\bin"
 $Macro SHADERSOURCE "$SRCDIR\materialsystem\stdshaders\shadersource"
 $Macro STDSHADERS	"$SRCDIR\materialsystem\stdshaders"
@@ -15,8 +17,8 @@ $Configuration	"Debug"
 {
 	$General
 	{
-		$OutputDirectory		"Debug_dx9_$GAMENAME"			[$WINDOWS]
-		$IntermediateDirectory	"Debug_dx9_$GAMENAME"			[$WINDOWS]
+		$OutputDirectory		"Debug_dx9_$GAMENAME$PLATSUBDIR"			[$WINDOWS]
+		$IntermediateDirectory	"Debug_dx9_$GAMENAME$PLATSUBDIR"			[$WINDOWS]
 	}
 }
 
@@ -24,8 +26,8 @@ $Configuration	"Release"
 {
 	$General
 	{
-		$OutputDirectory		"Release_dx9_$GAMENAME"		[$WINDOWS]
-		$IntermediateDirectory	"Release_dx9_$GAMENAME"		[$WINDOWS]
+		$OutputDirectory		"Release_dx9_$GAMENAME$PLATSUBDIR"		[$WINDOWS]
+		$IntermediateDirectory	"Release_dx9_$GAMENAME$PLATSUBDIR"		[$WINDOWS]
 	}
 }
 

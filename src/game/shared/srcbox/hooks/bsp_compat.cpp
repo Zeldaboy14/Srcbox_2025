@@ -3629,11 +3629,22 @@ static BOOL WINAPI Hook_FindClose( HANDLE hFind )
 // on the stack; a map with more would overwrite the stack.
 // Not handled natively: the 'thin' brushside byte of ASW/P2/CS:GO maps in VPKs.
 //
-// Signatures and offsets are from the TF2 SDK's x64 engine.dll. Each signature
-// must match exactly once and each patch checks the bytes it replaces, so a
-// different engine build skips what it doesn't recognize instead of corrupting it.
+// Signatures and offsets are from the TF2 SDK's engine.dll, x64 and x86 builds.
+// Each signature must match exactly once and each patch checks the bytes it
+// replaces, so a different engine build skips what it doesn't recognize instead
+// of corrupting it.
 //-----------------------------------------------------------------------------
+#ifdef _WIN32
+
+// Member functions are hooked as __fastcall: on x64 that is the only calling
+// convention; on x86 it matches __thiscall when the (unused) edx is declared.
 #ifdef PLATFORM_64BITS
+#define BC_EDX
+#define BC_EDX_ARG
+#else
+#define BC_EDX		, void *pEdx
+#define BC_EDX_ARG	, NULL
+#endif
 
 // Code patterns: hex bytes, '?' for any byte
 static bool BCParsePattern( const char *pszPattern, unsigned char *pBytes, bool *pWild, int nMax, int &nLen )
@@ -3704,6 +3715,7 @@ static unsigned char *BCFindPattern( HMODULE hModule, const char *pszPattern )
 	return pFound;
 }
 
+#ifdef PLATFORM_64BITS
 #define BCSIG_GAMELUMPVERSION		"44 8B 0D ? ? ? ? 41 83 E9 01 49 63 D1"
 #define BCSIG_UTLBUFFER_GET			"45 85 C0 0F 8E ? ? ? ? 48 89 5C 24 ? 48 89 74 24"
 #define BCSIG_UNSERIALIZE_PROPS		"48 89 54 24 ? 55 56 57 41 56 48 8D AC 24"
@@ -3712,42 +3724,56 @@ static unsigned char *BCFindPattern( HMODULE hModule, const char *pszPattern )
 #define BCSIG_MD5_MAPFILE			"48 89 5C 24 ? 48 89 74 24 ? 48 89 7C 24 ? 55 41 56 41 57 48 8D AC 24 ? ? ? ? 48 81 EC 90 08 00 00"
 #define BCSIG_MAPLOADHELPER_INIT	"48 89 5C 24 ? 57 48 83 EC 30 8B 05"
 #define BCSIG_MAPLOADHELPER_INITMEM	"48 89 5C 24 ? 48 89 6C 24 ? 56 48 83 EC 30 83 7C 24 ? 00"
+#else
+// x86 engine.dll (bin/engine.dll of the same SDK build)
+#define BCSIG_GAMELUMPVERSION		"55 8B EC A1 ? ? ? ? 83 C0 FF 56 78 1E 8B 35 ? ? ? ? 8D 0C 80 8B 55 08 8D 0C 8E 8D 49 00 39 11 74 0D 83 E9 14 83 E8 01 79 F4 33 C0 5E 5D C3 8D 04 80 0F B7 44 86 06"
+#define BCSIG_UTLBUFFER_GET			"55 8B EC 56 57 8B 7D 0C 8B F1 85 FF 7E 22 57 E8"
+#define BCSIG_UNSERIALIZE_PROPS		"55 8B EC 81 EC BC 01 00 00 56 57 68 70 72 70 73 8B F9 E8"
+#define BCSIG_LOAD_WORLDLIGHTS		"55 8B EC 8B 0D ? ? ? ? 53 8B 5D 08 C7 81 A4 00 00 00 00 00 00 00 8B 13"
+#define BCSIG_CRC_MAPFILE			"55 8B EC 81 EC 18 08 00 00 53 56 8B 75 0C 8D 45 FC 57 50 56 E8"
+#define BCSIG_MD5_MAPFILE			"55 8B EC 81 EC 6C 08 00 00 53 56 8B 75 0C 8D 45 FC 57 50 56 E8"
+#define BCSIG_MAPLOADHELPER_INIT	"55 8B EC A1 ? ? ? ? 40 A3 ? ? ? ? 83 F8 01 0F 8F ? ? ? ? 68 0C 04 00 00 6A 00 68"
+#define BCSIG_MAPLOADHELPER_INITMEM	"55 8B EC 83 7D 18 00 0F 85 ? ? ? ? A1 ? ? ? ? 40 A3"
+#endif
 
 // engine.dll's CUtlBuffer (the same layout as tier1's; checked against CUtlBuffer::Get)
+// Offsets: x64 / x86
 struct BCEngineUtlBuffer_t
 {
-	unsigned char	*m_pMemory;			// 0x00
-	int				m_nAllocationCount;	// 0x08
-	int				m_nGrowSize;		// 0x0C
-	int				m_Get;				// 0x10
-	int				m_Put;				// 0x14
-	unsigned char	m_Error;			// 0x18
+	unsigned char	*m_pMemory;			// 0x00 / 0x00
+	int				m_nAllocationCount;	// 0x08 / 0x04
+	int				m_nGrowSize;		// 0x0C / 0x08
+	int				m_Get;				// 0x10 / 0x0C
+	int				m_Put;				// 0x14 / 0x10
+	unsigned char	m_Error;			// 0x18 / 0x14
 	unsigned char	m_Flags;
 	unsigned char	m_Reserved;
 	unsigned char	m_Pad;
-	int				m_nTab;				// 0x1C
-	int				m_nMaxPut;			// 0x20
-	int				m_nOffset;			// 0x24
+	int				m_nTab;				// 0x1C / 0x18
+	int				m_nMaxPut;			// 0x20 / 0x1C
+	int				m_nOffset;			// 0x24 / 0x20
 };
 
-// engine.dll's CMapLoadHelper (checked against its constructor)
+// engine.dll's CMapLoadHelper (checked against its constructor; x64 pads before the
+// first pointer, x86 doesn't). Offsets: x64 / x86
 struct BCEngineMapLoadHelper_t
 {
-	int				m_nLumpSize;		// 0x00
-	int				m_nLumpOffset;		// 0x04
-	int				m_nLumpVersion;		// 0x08
-	int				m_nPad;
-	unsigned char	*m_pRawData;		// 0x10
-	unsigned char	*m_pData;			// 0x18, what LumpBase() returns
-	unsigned char	*m_pUncompressedData;	// 0x20
-	int				m_nLumpID;			// 0x28
+	int				m_nLumpSize;		// 0x00 / 0x00
+	int				m_nLumpOffset;		// 0x04 / 0x04
+	int				m_nLumpVersion;		// 0x08 / 0x08
+	unsigned char	*m_pRawData;		// 0x10 / 0x0C
+	unsigned char	*m_pData;			// 0x18 / 0x10, what LumpBase() returns
+	unsigned char	*m_pUncompressedData;	// 0x20 / 0x14
+	int				m_nLumpID;			// 0x28 / 0x18
 };
 
-typedef int ( *BCGameLumpVersionFn_t )( int nLumpID );
-typedef void ( *BCUtlBufferGetFn_t )( void *pBuffer, void *pMem, int nSize );
-typedef void ( *BCUnserializePropsFn_t )( void *pThis, void *pBuffer );
-typedef void ( *BCLoadWorldlightsFn_t )( void *pLoadHelper, bool bIsHDR );
-typedef void ( *BCMapLoadInitFn_t )( void *pArg1, void *pArg2, void *pArg3, void *pArg4 );
+typedef int ( __cdecl *BCGameLumpVersionFn_t )( int nLumpID );
+typedef void ( __fastcall *BCUtlBufferGetFn_t )( void *pBuffer BC_EDX, void *pMem, int nSize );			// CUtlBuffer::Get
+typedef void ( __fastcall *BCUnserializePropsFn_t )( void *pThis BC_EDX, void *pBuffer );				// CStaticPropMgr::UnserializeModels
+typedef void ( __cdecl *BCLoadWorldlightsFn_t )( void *pLoadHelper, bool bIsHDR );
+// CMapLoadHelper::Init / InitFromMemory: static, and InitFromMemory takes 5 arguments;
+// every argument slot is passed through unchanged
+typedef void ( __cdecl *BCMapLoadInitFn_t )( void *pArg1, void *pArg2, void *pArg3, void *pArg4, void *pArg5, void *pArg6 );
 
 static BCGameLumpVersionFn_t	s_pfnGameLumpVersion = NULL;
 static BCUtlBufferGetFn_t		s_pfnUtlBufferGet = NULL;
@@ -3764,21 +3790,21 @@ static volatile DWORD	s_nPropReaderThread = 0;
 static int				s_nPropStride = 0;
 static bool				s_bPropFlags32 = false;
 
-static void Detour_UtlBufferGet( void *pBuffer, void *pMem, int nSize )
+static void __fastcall Detour_UtlBufferGet( void *pBuffer BC_EDX, void *pMem, int nSize )
 {
 	if ( nSize == BC_STATICPROP_TF2_SIZE && s_nPropReaderThread && s_nPropReaderThread == GetCurrentThreadId() )
 	{
 		unsigned char src[128];
 		memset( src, 0, sizeof( src ) );
-		s_pfnUtlBufferGet( pBuffer, src, s_nPropStride );
+		s_pfnUtlBufferGet( pBuffer BC_EDX_ARG, src, s_nPropStride );
 		ConvertStaticProp( src, s_bPropFlags32, (unsigned char *)pMem );
 		return;
 	}
-	s_pfnUtlBufferGet( pBuffer, pMem, nSize );
+	s_pfnUtlBufferGet( pBuffer BC_EDX_ARG, pMem, nSize );
 }
 
 // Reads the prop count and the prop structs; the buffer is at the count
-static void Detour_UnserializeProps( void *pThis, void *pBuffer )
+static void __fastcall Detour_UnserializeProps( void *pThis BC_EDX, void *pBuffer )
 {
 	const BCEngineUtlBuffer_t *pBuf = (const BCEngineUtlBuffer_t *)pBuffer;
 	const int nVersion = s_pfnGameLumpVersion( BC_GAMELUMP_SPRP );
@@ -3809,11 +3835,11 @@ static void Detour_UnserializeProps( void *pThis, void *pBuffer )
 		}
 	}
 
-	s_pfnUnserializeProps( pThis, pBuffer );
+	s_pfnUnserializeProps( pThis BC_EDX_ARG, pBuffer );
 	s_nPropReaderThread = 0;
 }
 
-static void Detour_LoadWorldlights( void *pLoadHelper, bool bIsHDR )
+static void __cdecl Detour_LoadWorldlights( void *pLoadHelper, bool bIsHDR )
 {
 	BCEngineMapLoadHelper_t *pHelper = (BCEngineMapLoadHelper_t *)pLoadHelper;
 	if ( pHelper->m_nLumpVersion == 1 && pHelper->m_pData && pHelper->m_nLumpSize > 0 &&
@@ -3869,15 +3895,16 @@ static void FixEngineMapHeader()
 	DevMsg( "BSP: version 21 map header read natively%s\n", bL4D2Order ? " (L4D2 lump order)" : "" );
 }
 
-static void Detour_MapLoadInit( void *pArg1, void *pArg2, void *pArg3, void *pArg4 )
+static void __cdecl Detour_MapLoadInit( void *pArg1, void *pArg2, void *pArg3, void *pArg4, void *pArg5, void *pArg6 )
 {
-	s_pfnMapLoadInit( pArg1, pArg2, pArg3, pArg4 );
+	s_pfnMapLoadInit( pArg1, pArg2, pArg3, pArg4, pArg5, pArg6 );
 	FixEngineMapHeader();
 }
 
-static void Detour_MapLoadInitFromMemory( void *pArg1, void *pArg2, void *pArg3, void *pArg4 )
+// (this used to pass on 4 arguments; InitFromMemory's 5th was then left to chance)
+static void __cdecl Detour_MapLoadInitFromMemory( void *pArg1, void *pArg2, void *pArg3, void *pArg4, void *pArg5, void *pArg6 )
 {
-	s_pfnMapLoadInitFromMemory( pArg1, pArg2, pArg3, pArg4 );
+	s_pfnMapLoadInitFromMemory( pArg1, pArg2, pArg3, pArg4, pArg5, pArg6 );
 	FixEngineMapHeader();
 }
 
@@ -3894,11 +3921,21 @@ struct BCEnginePatch_t
 
 static BCEnginePatch_t s_EnginePatches[] =
 {
+#ifdef PLATFORM_64BITS
 	{ "CStaticPropMgr: lump versions 7-11",		NULL, 0xCF,  "\x83\xF9\x03\x74\x28", "\x83\xF9\x05\x78\x28", 5 },	// cmp ecx,3 / je  ->  cmp ecx,5 / js
 	{ "CRC_MapFile: version 21",				NULL, 0xBC,  "\x83\xF8\x01", "\x83\xF8\x02", 3 },	// cmp eax,1 -> 2 (version - 19)
 	{ "MD5_MapFile: version 21",				NULL, 0xF6,  "\x83\xF8\x01", "\x83\xF8\x02", 3 },
 	{ "CMapLoadHelper::Init: version 21",		NULL, 0x162, "\x83\xF8\x01", "\x83\xF8\x02", 3 },
 	{ "CMapLoadHelper::InitFromMemory: version 21", NULL, 0x17D, "\x83\xF8\x01", "\x83\xF8\x02", 3 },
+#else
+	// x86: the prop reader is a jump table on (version - 4); cmp eax,6 / ja  ->  cmp eax,7 / ja,
+	// with table entry 7 added by ApplyPropJumpTablePatch
+	{ "CStaticPropMgr: lump versions 7-11",		NULL, 0x73,  "\x83\xF8\x06\x0F\x87", "\x83\xF8\x07\x0F\x87", 5 },
+	{ "CRC_MapFile: version 21",				NULL, 0x94,  "\x83\xF8\x01", "\x83\xF8\x02", 3 },	// cmp eax,1 -> 2 (version - 19)
+	{ "MD5_MapFile: version 21",				NULL, 0xAE,  "\x83\xF8\x01", "\x83\xF8\x02", 3 },
+	{ "CMapLoadHelper::Init: version 21",		NULL, 0x11A, "\x83\xF8\x01", "\x83\xF8\x02", 3 },
+	{ "CMapLoadHelper::InitFromMemory: version 21", NULL, 0xDA,  "\x83\xF8\x01", "\x83\xF8\x02", 3 },
+#endif
 };
 enum { BCPATCH_PROPS, BCPATCH_CRC, BCPATCH_MD5, BCPATCH_INIT, BCPATCH_INITMEM };
 
@@ -3938,6 +3975,67 @@ static void RevertEnginePatch( BCEnginePatch_t &patch )
 		FlushInstructionCache( GetCurrentProcess(), pAddress, patch.m_nLen );
 	}
 }
+
+#ifndef PLATFORM_64BITS
+//-----------------------------------------------------------------------------
+// x86 CStaticPropMgr::UnserializeModels picks the prop reader with a jump table
+// on (version - 4): versions 7 and 10 use the 72-byte read, 8 and 9 zero the
+// prop, 11 is past the table. Point 8 and 9 at the 72-byte read, and give 11
+// an entry in the int3 padding right after the table (the patched cmp lets
+// index 7 through). x64 does the same with a single cmp (see s_EnginePatches).
+//-----------------------------------------------------------------------------
+#define BC_PROPS_JUMPTABLE_JMP	0x7C	// jmp dword ptr [eax*4 + table]
+
+static DWORD *s_pPropJumpTable = NULL;
+static DWORD s_PropJumpTableSaved[8];
+
+static bool ApplyPropJumpTablePatch( unsigned char *pProps )
+{
+	if ( !pProps )
+		return false;
+
+	const unsigned char *pJmp = pProps + BC_PROPS_JUMPTABLE_JMP;
+	if ( pJmp[0] != 0xFF || pJmp[1] != 0x24 || pJmp[2] != 0x85 )
+	{
+		Warning( "BSP: CStaticPropMgr::UnserializeModels: unexpected code, not patched\n" );
+		return false;
+	}
+
+	DWORD *pTable = *(DWORD * const *)( pJmp + 3 );
+	// 7 and 10 share the 72-byte read; the slot after the table is padding
+	if ( pTable[3] != pTable[6] || pTable[7] != 0xCCCCCCCC )
+	{
+		Warning( "BSP: CStaticPropMgr::UnserializeModels: unexpected jump table, not patched\n" );
+		return false;
+	}
+
+	DWORD nProtect;
+	if ( !VirtualProtect( pTable, sizeof( s_PropJumpTableSaved ), PAGE_EXECUTE_READWRITE, &nProtect ) )
+		return false;
+	memcpy( s_PropJumpTableSaved, pTable, sizeof( s_PropJumpTableSaved ) );
+	pTable[4] = pTable[5] = pTable[7] = pTable[3];
+	VirtualProtect( pTable, sizeof( s_PropJumpTableSaved ), nProtect, &nProtect );
+	FlushInstructionCache( GetCurrentProcess(), pTable, sizeof( s_PropJumpTableSaved ) );
+	s_pPropJumpTable = pTable;
+	return true;
+}
+
+static void RevertPropJumpTablePatch()
+{
+	DWORD *pTable = s_pPropJumpTable;
+	s_pPropJumpTable = NULL;
+	if ( !pTable )
+		return;
+
+	DWORD nProtect;
+	if ( VirtualProtect( pTable, sizeof( s_PropJumpTableSaved ), PAGE_EXECUTE_READWRITE, &nProtect ) )
+	{
+		memcpy( pTable, s_PropJumpTableSaved, sizeof( s_PropJumpTableSaved ) );
+		VirtualProtect( pTable, sizeof( s_PropJumpTableSaved ), nProtect, &nProtect );
+		FlushInstructionCache( GetCurrentProcess(), pTable, sizeof( s_PropJumpTableSaved ) );
+	}
+}
+#endif
 
 static void *s_EngineHookTargets[8];
 static int s_nEngineHookTargets = 0;
@@ -3993,17 +4091,35 @@ static bool InstallEngineSupport()
 	else if ( CreateEngineHook( pGet, (void *)&Detour_UtlBufferGet, (void **)&s_pfnUtlBufferGet, "CUtlBuffer::Get" ) )
 	{
 		if ( CreateEngineHook( pProps, (void *)&Detour_UnserializeProps, (void **)&s_pfnUnserializeProps, "CStaticPropMgr::UnserializeModels" ) )
+		{
+#ifdef PLATFORM_64BITS
 			bProps = ApplyEnginePatch( s_EnginePatches[BCPATCH_PROPS] );
+#else
+			bProps = ApplyPropJumpTablePatch( pProps );
+			if ( bProps && !ApplyEnginePatch( s_EnginePatches[BCPATCH_PROPS] ) )
+			{
+				RevertPropJumpTablePatch();
+				bProps = false;
+			}
+#endif
+		}
 	}
 
 	const bool bLights = CreateEngineHook( pLights, (void *)&Detour_LoadWorldlights, (void **)&s_pfnLoadWorldlights, "Mod_LoadWorldlights" );
 
 	// version 21: only with the header fix, or an L4D2 lump table would be read as it is
 	bool bV21 = false;
-	if ( pInit && pInitMem && pInit[0x2C] == 0x48 && pInit[0x2D] == 0x8D && pInit[0x2E] == 0x0D )
-	{
-		// lea rcx, s_MapHeader (the memset at the top of CMapLoadHelper::Init)
+#ifdef PLATFORM_64BITS
+	// lea rcx, s_MapHeader (the memset at the top of CMapLoadHelper::Init)
+	if ( pInit && pInit[0x2C] == 0x48 && pInit[0x2D] == 0x8D && pInit[0x2E] == 0x0D )
 		s_pEngineMapHeader = (int *)( pInit + 0x2C + 7 + *(const int *)( pInit + 0x2F ) );
+#else
+	// push offset s_MapHeader (the memset at the top of CMapLoadHelper::Init)
+	if ( pInit && pInit[0x1E] == 0x68 )
+		s_pEngineMapHeader = *(int * const *)( pInit + 0x1F );
+#endif
+	if ( pInit && pInitMem && s_pEngineMapHeader )
+	{
 		if ( CreateEngineHook( pInit, (void *)&Detour_MapLoadInit, (void **)&s_pfnMapLoadInit, "CMapLoadHelper::Init" ) &&
 			 CreateEngineHook( pInitMem, (void *)&Detour_MapLoadInitFromMemory, (void **)&s_pfnMapLoadInitFromMemory, "CMapLoadHelper::InitFromMemory" ) )
 		{
@@ -4028,6 +4144,9 @@ static void RemoveEngineSupport()
 {
 	for ( int i = 0; i < ARRAYSIZE( s_EnginePatches ); i++ )
 		RevertEnginePatch( s_EnginePatches[i] );
+#ifndef PLATFORM_64BITS
+	RevertPropJumpTablePatch();
+#endif
 
 	for ( int i = 0; i < s_nEngineHookTargets; i++ )
 	{
@@ -4043,7 +4162,7 @@ static void RemoveEngineSupport()
 static bool InstallEngineSupport() { return false; }
 static void RemoveEngineSupport() {}
 
-#endif // PLATFORM_64BITS
+#endif // _WIN32
 
 //-----------------------------------------------------------------------------
 // Install / shutdown. client.dll and server.dll both call these; the first to

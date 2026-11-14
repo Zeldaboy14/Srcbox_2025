@@ -7,6 +7,10 @@
 #include <vgui/VGUI.h>
 #include <vgui_controls/EditablePanel.h>
 
+#ifdef PLATFORM_64BITS
+#include "menu_background.h"
+#endif
+
 
 // == MANAGED_CLASS_DECLARATIONS_START: Do not edit by hand ==
 class vgui::Label;
@@ -47,6 +51,11 @@ public:
 	float MaxU() { if (m_flMaxU == 0) return 1.0f; return m_flMaxU; }
 	float MaxV() { if (m_flMaxV == 0) return 1.0f; return m_flMaxV; }
 	float AspectRatio() { return m_flAspectRatio; }
+
+#ifdef PLATFORM_64BITS
+	class CAnimatedBackgroundMovie* m_pMainMenuPanel;
+#endif
+
 private:
 	float m_flMaxU, m_flMaxV, m_flAspectRatio;
 	IVideoMaterial* m_pMaterial;

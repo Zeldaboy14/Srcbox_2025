@@ -6,15 +6,16 @@
 #include <psapi.h>
 #include "util/networkmanager.h"
 
+// CBaseClient::Connect (__thiscall on x86, see EP_EDX)
 typedef void( __fastcall *Function_BaseClient_Connect_t )(
-    void *thisClient,
+    void *thisClient EP_EDX,
     const char *playerName,
     int userID,
     INetChannel *netChannel,
     bool isFakePlayer,
     int challenge );
 
-#ifdef _WIN64
+#ifdef PLATFORM_64BITS
 
 /*
     To find the CBaseClient::Connect pattern, we can use the fact that the first
@@ -96,17 +97,21 @@ const char *CLIENT_CONNECT_MASK =
 
 #else
 
-// TODO: Not yet tested for x86
+// x86 engine.dll (bin/engine.dll), CBaseClient::Connect at 0x10080F80 in that build:
+//   push ebp; mov ebp,esp; push ebx; push esi; push edi
+//   push offset "CBaseClient::Connect"; mov esi,ecx; call [COM_TimestampedLog] ...
+// (the earlier x86 mask was one byte short after the first wildcard, so it never matched)
 const char *CLIENT_CONNECT_SIG =
-    "\x55\x8B\xEC\x53\x56\x57\x68\x00\x00\x00\x00\x8B\xF1\xFF\x15"
-    "\x00\x00\x00\x00\x83\xC4\x04\xE8\x00\x00\x00\x00\x6A\x0E\x8B"
-    "\xC8\x8B\x10\xFF\x52\x6C\x8B\x06\x8B\xCE\xFF\x50\x68\x6A\x20"
-    "\xE8\x00\x00\x00\x00\x83\xC4\x04\x85\xC0\x74\x0E\x68\x00\x00"
-    "\x00\x00\x8B\xC8\xE8\x00\x00\x00\x00\xEB\x02";
+    "\x55\x8B\xEC\x53\x56\x57\x68\x00\x00\x00\x00\x8B\xF1\xFF\x15\x00"
+    "\x00\x00\x00\x83\xC4\x04\xE8\x00\x00\x00\x00\x6A\x0E\x8B\xC8\x8B"
+    "\x10\xFF\x52\x6C\x8B\x06\x8B\xCE\xFF\x50\x68\x6A\x20\xE8\x00\x00"
+    "\x00\x00\x83\xC4\x04\x85\xC0\x74\x0E\x68\x00\x00\x00\x00\x8B\xC8"
+    "\xE8\x00\x00\x00\x00\xEB\x02";
 
 const char *CLIENT_CONNECT_MASK =
-    "xxxxxxx????xxx????xxx????xxxxxxx"
-    "xxxxxxxxxx????xxxxxxx????xx";
+    "xxxxxxx????xxxx????xxxx????xxxxx"
+    "xxxxxxxxxxxxxx????xxxxxxxx????xx"
+    "x????xx";
 
 #endif
 
@@ -127,7 +132,7 @@ static int s_OffsetConVarsChanged;
 #pragma warning( disable : 4189 )  // Disable warning about unused variable
 
 void __fastcall DetourClientConnect(
-    void *thisClient,
+    void *thisClient EP_EDX,
     const char *playerName,
     int userID,
     INetChannel *pNetChannel,
@@ -146,9 +151,9 @@ void __fastcall DetourClientConnect(
         DevWarning( "Detour: Fake player connecting with name %s (#%i)\n", playerName, userID );
     }
 
-    OriginalClientConnect( thisClient, playerName, userID, pNetChannel, bFakePlayer, retryChallenge );
+    OriginalClientConnect( thisClient EP_EDX_ARG, playerName, userID, pNetChannel, bFakePlayer, retryChallenge );
 
-#ifdef _WIN64
+#ifdef PLATFORM_64BITS
     BEGIN_MEMORY_LAYOUT( Client, thisClient );
     SKIP_UNKNOWN_TO( Client, 16 );
 
@@ -182,14 +187,15 @@ void __fastcall DetourClientConnect(
     //// KeyValues *conVars = ( KeyValues * )( ( uintptr_t )thisClient + 0x84 );
     //// Offset of m_pServer from CBaseClient
     // void *serverObject = *( void ** )( ( uintptr_t )thisClient + 0x8C );
-    //  TODO: Test this cleaned up version of the above on x86:
+    // x86 layout, relative to the IClient 'this' the engine passes (checked against
+    // CBaseClient::Connect in bin/engine.dll: m_UserID 0x10, m_ConVars 0x84, m_Server 0x8C)
     BEGIN_MEMORY_LAYOUT( Client, thisClient );
     SKIP_UNKNOWN_TO( Client, 0x0C );  // Skip to entityIndex at 0x0C
     DEFINE_INT( Client, entityIndex );
     DEFINE_INT( Client, validateUserID );                           // At 0x10
     DEFINE_STRING( Client, validateName, MAX_PLAYER_NAME_LENGTH );  // At 0x14
 
-    SKIP_UNKNOWN_TO( Client, 0x5C );  // Skip to CSteamID at 0x5C
+    SKIP_UNKNOWN_TO( Client, 0x58 );  // CSteamID at 0x58 (after the 33-byte GUID, 8-byte aligned)
     DEFINE_TYPE( Client, CSteamID, validateSteamId );
 
     SKIP_UNKNOWN_TO( Client, 0x84 );  // Skip to conVars at 0x84

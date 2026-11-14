@@ -1550,7 +1550,19 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 	//else if (CommandLine()->FindParm("-gamepadui")) {
 		// don't load client for this either. load the newer gamepadui
 	} else {
-		/*static class DllOverride {
+#ifndef PLATFORN_64BITS
+		static class DllOverride {
+		public:
+			DllOverride() {
+				Sys_LoadInterface("filesystem_stdio.dll", FILESYSTEM_INTERFACE_VERSION, nullptr, (void**)&g_pFullFileSystem);
+				const char* pGameDir = CommandLine()->ParmValue("-game", "hl2mp");
+				pGameDir = VarArgs("%s/bin", pGameDir);
+				g_pFullFileSystem->AddSearchPath(pGameDir, "EXECUTABLE_PATH", PATH_ADD_TO_HEAD);
+			}
+		} g_DllOverride;
+	}
+#else
+		static class DllOverride {
 		public:
 			DllOverride() {
 				Sys_LoadInterface("filesystem_stdio.dll", FILESYSTEM_INTERFACE_VERSION, nullptr, (void**)&g_pFullFileSystem);
@@ -1558,8 +1570,9 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 				pGameDir = VarArgs("%s/bin/x64", pGameDir);
 				g_pFullFileSystem->AddSearchPath(pGameDir, "EXECUTABLE_PATH", PATH_ADD_TO_HEAD);
 			}
-		} g_DllOverride;*/
-	}
+		} g_DllOverride;
+}
+#endif
 #endif
 
 #ifdef SIXENSE

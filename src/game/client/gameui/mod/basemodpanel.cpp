@@ -31,6 +31,7 @@
 #include "vkeyboard.h"
 #include "VVoteOptions.h"
 #include "VLoadingProgress.h"
+#include "../menu_background.h"
 #include "VMainMenu.h"
 #include "VMultiplayer.h"
 #include "VOptions.h"
@@ -141,6 +142,9 @@ CBaseModPanel::CBaseModPanel(): BaseClass(0, "CBaseModPanel"),
 	m_nProductImageWide = 0;
 	m_nProductImageTall = 0;
 	m_flMovieFadeInTime = 0.0f;
+	m_flStartupFadeStart = 0.0f;
+	m_bStartupFadeDone = false;
+	m_nStartupFadeTextureID = -1;
 	m_pBackgroundMaterial = NULL;
 	m_pBackgroundTexture = NULL;
 }
@@ -794,10 +798,11 @@ void CBaseModPanel::RunFrame()
 // any classic VGUI2 dialog (options dialog, server browser, mod panels built on vgui::Frame) that is
 // open. HL2's GameUI menu never competed with its dialogs like that. When that happens, put the classic
 // dialogs back on top, in the order they were in.
-// While a confirmation popup (quit, disconnect, ...) is up, the classic dialogs are hidden instead, and
-// shown again (in front of the menu) once it is gone.
+// While a confirmation popup (quit, disconnect, ...) or any other L4D-styled panel (Video, Keyboard, ...)
+// is up, the classic dialogs are hidden behind it instead, and shown again (in front of the menu) once it
+// is gone.
 //=============================================================================
-static ConVar ui_legacy_dialogs_on_top( "ui_legacy_dialogs_on_top", "1", FCVAR_NONE, "Keep classic VGUI2 dialogs above the main/pause menu frames, and hide them while a confirmation is shown." );
+static ConVar ui_legacy_dialogs_on_top( "ui_legacy_dialogs_on_top", "1", FCVAR_NONE, "Keep classic VGUI2 dialogs above the main/pause menu frames, and hide them while an L4D-styled panel or confirmation is shown." );
 
 void CBaseModPanel::KeepLegacyDialogsOnTop()
 {
@@ -811,6 +816,29 @@ void CBaseModPanel::KeepLegacyDialogsOnTop()
 	// panel, so the confirmation has to be looked up as one of our windows rather than in the popup list
 	CBaseModFrame *pConfirmation = GetWindow( WT_GENERICCONFIRMATION );
 	bool bConfirmationVisible = ( pConfirmation && pConfirmation->IsVisible() );
+
+	// Any L4D/Swarm-styled panel opened over the menu (Video, Keyboard, Audio, a confirmation...)
+	// and the loading screen take priority too: the classic dialogs are hidden behind them and come
+	// back once they are gone (after a load the GameUI is hidden anyway, so they are simply there
+	// again the next time the menu is opened). The main/pause menus (and their flyouts) don't count.
+	if ( m_LevelLoading )
+	{
+		bConfirmationVisible = true;
+	}
+
+	for ( int wt = WT_NONE + 1; wt < WT_WINDOW_COUNT && !bConfirmationVisible; wt++ )
+	{
+		switch ( wt )
+		{
+		case WT_MAINMENU:
+		case WT_INGAMEMAINMENU:
+			continue;
+		}
+
+		CBaseModFrame *pFrame = m_Frames[ wt ].Get();
+		if ( pFrame && pFrame->IsVisible() )
+			bConfirmationVisible = true;
+	}
 	CUtlVector< vgui::VPANEL > legacyDialogs;
 
 	// Popups are drawn in list order, so a higher index is further in front
@@ -1311,7 +1339,32 @@ void CBaseModPanel::DrawCopyStats()
 //=============================================================================
 void CBaseModPanel::PaintBackground()
 {
-#ifndef PLATFORM_64BITS
+	// Srcbox: the fade from the engine's startup image into the menu (CAnimatedBackgroundMovie).
+	// Drawn here too, under the menu, so the screen isn't black before the menu video's first frame;
+	// with a background map instead of a video, this is where it starts and is drawn.
+	if ( !m_LevelLoading && !GameUI().IsInLevel() )
+	{
+		if ( GameUI().IsInBackgroundLevel() )
+		{
+			CAnimatedBackgroundMovie::StartStartupFade();
+		}
+		else if ( !engine->IsConnected() )
+		{
+			// start the menu video now, not when MainMenu finally opens
+			CAnimatedBackgroundMovie::GetMainMenuMovie()->StartVideoIfNeeded();
+		}
+
+		const float flStartupFade = CAnimatedBackgroundMovie::GetStartupFadeAlpha();
+		if ( flStartupFade > 0.0f )
+		{
+			CAnimatedBackgroundMovie::DrawStartupFade( this, flStartupFade );
+		}
+	}
+
+	// Srcbox: Swarm's BackgroundMovie() path. It was left on for x86 only, but that
+	// BackgroundMovie() is now x64-only too (nb_header_footer.h), so it couldn't build;
+	// x86 uses the same menu video as x64 (CAnimatedBackgroundMovie) instead.
+#if 0
 	if ( !m_LevelLoading &&
 		!GameUI().IsInLevel() &&
 		!GameUI().IsInBackgroundLevel() )
