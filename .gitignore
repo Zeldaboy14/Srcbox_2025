@@ -519,16 +519,26 @@ src/lib/public/linux64/tier1.a
 src/lib/public/linux64/vgui_controls.a
 src/lib/public/x64/responserules.lib
 game/mod_hl2mp/downloadlists/peck.lst
+game/physbox/downloadlists/peck.lst
 game/mod_hl2mp/maps/graphs/peck.ain
+game/physbox/maps/graphs/peck.ain
 game/mod_hl2mp/materials/vgui/logos/ui/spray_bullseye.vmt
+game/physbox/materials/vgui/logos/ui/spray_bullseye.vmt
 game/mod_hl2mp_win32.exe
 game/mod_hl2mp_win64.exe
+game/physbox_win32.exe
+game/physbox_win64.exe
 game/mod_hl2mp/demoheader.tmp
+game/physbox/demoheader.tmp
 game/mod_hl2mp/cfg/config.cfg
+game/physbox/cfg/config.cfg
 /game/mod_hl2mp/downloadlists
+/game/physbox/downloadlists
 game/mod_hl2mp/sound/sound.cache
+game/physbox/sound/sound.cache
 *.cache
 /game/mod_hl2mp/maps/graphs
+/game/physbox/maps/graphs
 /src/gameui_stub/Releasemod_hl2mp
 src/game/gamepadui/gamepadui_hl2.vpc.vpc_cache
 src/fgdlib/_vpc_/manifest_fgdlib/win64/manifest.txt
@@ -545,14 +555,16 @@ src/gameui_stub/Debugmod_hl2mp/GameUI.lib
 src/lib/public/x64/matsys_controls.lib
 src/lib/public/x64/matsys_controls.lib
 src/lib/public/x64/matsys_controls.lib
-game/mod_hl2mp/lua
-game/mod_hl2mp/lua_cache
+game/physbox/lua
+game/physbox/lua_cache
 game/Srcbox_OldGameUI.bat
 game/mod_hl2mp/cache
+game/physbox/cache
 
 # Shaders
 
 game/mod_hl2mp/shaders
+game/physbox/shaders
 game/mod_tf/shaders
 game/mod_hl2/shaders
 game/mod_episodic/shaders

@@ -1,0 +1,22 @@
+$Macro OUTBINNAME "physbox"
+
+$Conditional "MOD_LAUNCHER" "1"
+
+$Include "launcher_main.vpc"
+
+$Configuration
+{
+	$Compiler
+	{
+		$PreprocessorDefinitions	"$BASE;MOD_APPID=243750" // Replace with your appid if you ship on Steam.
+	}
+}
+
+$Project "Launcher Main (Physbox)"
+{
+    $Folder "Resource Files" [$WINDOWS]
+    {
+        $File   "launcher_main_physbox.rc"
+        $File   "res\physbox.ico"
+    }
+}

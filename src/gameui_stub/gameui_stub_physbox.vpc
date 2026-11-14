@@ -1,0 +1,30 @@
+//-----------------------------------------------------------------------------
+//	GAMEUI_STUB_HL2MP.VPC
+//
+//	Project Script
+//-----------------------------------------------------------------------------
+$Macro SRCDIR		".."
+$Macro GAMENAME 	"physbox" [!$SOURCESDK]
+$Macro GAMENAME 	"physbox" [$SOURCESDK]
+
+$Macro OUTBINNAME	"GameUI"
+$Macro OUTBINDIR	"$SRCDIR\..\game\$GAMENAME\bin"
+
+$Include "$SRCDIR\vpc_scripts\source_dll_base.vpc"
+
+
+$Configuration
+{
+
+	$Compiler
+	{
+		$AdditionalIncludeDirectories	"$BASE;.\;$SRCDIR\common\GameUI;$SRCDIR\public"
+		$PreprocessorDefinitions		"$BASE;"
+	}
+
+}
+
+$Project "GameUI Stub [Physbox]"
+{
+	$File "gameui_stub.cpp"
+}

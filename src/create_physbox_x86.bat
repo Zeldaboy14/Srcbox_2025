@@ -1,6 +1,6 @@
 @echo off
 
-devtools\bin\vpc.exe /win32 /hl2mp /define:SOURCESDK +game /mksln PHYSBOX_x86.sln msbuild /m /p:Configuration=Release
+devtools\bin\vpc.exe /win32 /physbox /define:SOURCESDK +game /mksln PHYSBOX_x86.sln msbuild /m /p:Configuration=Release
 
 if errorlevel 1 (
     echo.

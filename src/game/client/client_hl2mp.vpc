@@ -10,27 +10,12 @@ $Macro GAMENAME 	"mod_hl2mp" [$SOURCESDK]
 
 $Include "$SRCDIR\game\client\client_base.vpc"
 
-//-----------------------------------------
-// Alien Swarms GameUI for Half-Life 2: Deathmatch
-//-----------------------------------------
-$Include "$SRCDIR\game\client\client_gameui_hl2mp.vpc"
-
-//-----------------------------------------
-// Engine Patchs (Experiment)
-//-----------------------------------------
-$Include "$SRCDIR\engine\engine_patches_client.vpc"
-
-//-----------------------------------------
-// LUA 5.4 from EXPERIMENT. Compatible with Garry's Mod
-//-----------------------------------------
-$Include "$SRCDIR\game\client\client_lua.vpc"
-
 $Configuration
 {
 	$Compiler
 	{
-		$AdditionalIncludeDirectories		"$BASE;hl2mp\ui,.\hl2mp,$SRCDIR\game\shared\hl2mp,.\hl2,.\hl2\elements,$SRCDIR\game\shared\hl2;$SRCDIR\game\shared\srcbox;$SRCDIR\thirdparty\mem;$SRCDIR\thirdparty\lighthook"
-		$PreprocessorDefinitions			"$BASE;HL2MP;HL2_CLIENT_DLL;HL2_EPISODIC;NEXT_BOT;ASW_PROJECTED_TEXTURES;GAMEUI_EMBEDDED;GAMEUI_EXPORTS;MAPBASE;DYNAMIC_RTT_SHADOWS;EXPERIMENT;LUA_SDK"
+		$AdditionalIncludeDirectories		"$BASE;hl2mp\ui,.\hl2mp,$SRCDIR\game\shared\hl2mp,.\hl2,.\hl2\elements,$SRCDIR\game\shared\hl2"
+		$PreprocessorDefinitions			"$BASE;HL2MP;HL2_CLIENT_DLL;NEXT_BOT"
 	}
 }
 
@@ -44,58 +29,16 @@ $Project "Client (HL2MP)"
 		$File	"c_team_objectiveresource.h"
 		$File	"c_team_train_watcher.cpp"
 		$File	"c_team_train_watcher.h"
-		$File	"estranged_system_caps.cpp"
-		$File	"estrangedclientrendertargets.cpp"
 		$File	"hud_voicestatus.cpp"
-		$File	"c_baselesson.cpp"
-		$File	"c_gameinstructor.cpp"
-		$File	"hud_locator_target.cpp"
 		$File	"$SRCDIR\game\shared\predicted_viewmodel.cpp"
 		$File	"$SRCDIR\game\shared\predicted_viewmodel.h"
 		$File	"$SRCDIR\game\shared\teamplay_round_timer.cpp"
 		$File	"$SRCDIR\game\shared\teamplay_round_timer.h"
-		$File	"c_env_cascade_light.cpp"
-		$File	"C_Env_Cascade_Light.h"
-		$File	"worldlight.cpp"
-		$File	"worldlight.h"
 
 		$Folder	"NextBot"
 		{
 			$File	"NextBot\C_NextBot.cpp"
 			$File	"NextBot\C_NextBot.h"
-		}
-		$Folder "Gmod"
-		{
-			$File	"$SRCDIR\game\shared\gmod\env_skypaint.cpp"
-		}
-		$Folder "Srcbox"
-		{
-			$File	"$SRCDIR\game\shared\srcbox\srcbox_gamerules.cpp"
-			$File	"$SRCDIR\game\shared\srcbox\hooks\staticprop_colormod.cpp"
-			$File	"$SRCDIR\game\shared\srcbox\hooks\staticprop_colormod.h"
-			$File	"$SRCDIR\game\shared\srcbox\hooks\bsp_compat.cpp"
-			$File	"$SRCDIR\game\shared\srcbox\hooks\bsp_compat.h"
-			$File	"$SRCDIR\game\shared\srcbox\hooks\gma_mount.cpp"
-			$File	"$SRCDIR\game\shared\srcbox\hooks\gma_mount.h"
-		}
-		$Folder "Portal"
-		{
-			$File	"$SRCDIR\game\shared\portal\weapon_portalgun.cpp"
-			$File	"$SRCDIR\game\shared\hl2mp\hl2mp_portal_shared.cpp"
-			$File	"$SRCDIR\game\client\portal\c_prop_portal.cpp"
-		}
-		$Folder "Terror"
-		{
-			$Folder "Effects"
-			{
-				$File "terror/Effects/ProxyPlayerTeam.cpp"
-			}
-			$Folder "Weapons"
-			{
-				$File	"$SRCDIR\game\shared\terror\weapon_pistol_terror.cpp"
-				$File	"$SRCDIR\game\shared\terror\crowbar.cpp"
-				$File	"$SRCDIR\game\shared\terror\weapon_smg_silenced.cpp"
-			}
 		}
 
 		$Folder	"HL2 DLL"
@@ -129,7 +72,6 @@ $Project "Client (HL2MP)"
 			$File	"hl2\c_plasma_beam_node.cpp"
 			$File	"hl2\c_prop_combine_ball.cpp"
 			$File	"hl2\c_prop_combine_ball.h"
-			$File	"episodic\c_prop_scalable.cpp"
 			$File	"hl2\c_rotorwash.cpp"
 			$File	"hl2\c_script_intro.cpp"
 			$File	"$SRCDIR\game\shared\script_intro_shared.cpp"
@@ -141,24 +83,17 @@ $Project "Client (HL2MP)"
 			$File	"hl2\c_vehicle_cannon.cpp"
 			$File	"hl2\c_vehicle_crane.cpp"
 			$File	"hl2\c_vehicle_crane.h"
-			$File	"episodic\c_vehicle_jeep_episodic.cpp"
 			$File	"hl2\c_vehicle_prisoner_pod.cpp"
-			$File	"episodic\c_vort_charge_token.cpp"
 			$File	"hl2\c_weapon__stubs_hl2.cpp"
 			$File	"hl2\c_weapon_crossbow.cpp"
 			$File	"$SRCDIR\game\shared\hl2\citadel_effects_shared.h"
 			$File	"$SRCDIR\game\shared\hl2\env_headcrabcanister_shared.cpp"
 			$File	"$SRCDIR\game\shared\hl2\env_headcrabcanister_shared.h"
-			$File	"episodic\c_npc_advisor.cpp"
-			$File	"episodic\episodic_screenspaceeffects.cpp"
-			$File	"episodic\episodic_screenspaceeffects.h"
-			$File	"episodic\flesh_internal_material_proxy.cpp"
 			$File	"hl2\fx_antlion.cpp"
 			$File	"hl2\fx_bugbait.cpp"
 			$File	"hl2\fx_hl2_impacts.cpp"
 			$File	"hl2\fx_hl2_tracers.cpp"
 			$File	"hl2\hl2_clientmode.cpp"
-			$File	"$SRCDIR\game\shared\hl2\survival_gamerules.cpp"
 			$File	"$SRCDIR\game\shared\hl2\hl2_gamerules.cpp"
 			$File	"$SRCDIR\game\shared\hl2\hl2_gamerules.h"
 			$File	"$SRCDIR\game\shared\hl2\hl2_shareddefs.h"
@@ -168,6 +103,7 @@ $Project "Client (HL2MP)"
 			$File	"hl2\hl_in_main.cpp"
 			$File	"hl2\hl_prediction.cpp"
 			$File	"hl2\hud_ammo.cpp"
+			$File	"hl2\hud_autoaim.cpp"
 			$File	"hl2\hud_battery.cpp"
 			$File	"hl2\hud_blood.cpp"
 			$File	"hl2\hud_credits.cpp"
@@ -176,8 +112,6 @@ $Project "Client (HL2MP)"
 			$File	"hl2\hud_health.cpp"
 			$File	"hl2\hud_poisondamageindicator.cpp"
 			$File	"hl2\hud_quickinfo.cpp"
-			$File	"hl2\hud_radar.cpp"
-			$File	"hl2\hud_radar.h"
 			$File	"hud_squadstatus.cpp"
 			$File	"hl2\hud_suitpower.cpp"
 			$File	"hl2\hud_suitpower.h"
@@ -185,8 +119,6 @@ $Project "Client (HL2MP)"
 			$File	"hl2\hud_zoom.cpp"
 			$File	"hl2\shieldproxy.cpp"
 			$File	"hl2\vgui_rootpanel_hl2.cpp"
-			$File	"hl2\c_weapon_gravitygun.cpp"
-			$File	"$SRCDIR\game\shared\handviewmodel_shared.cpp"
 		}
 
 		$Folder	"HL2MP"
@@ -202,9 +134,6 @@ $Project "Client (HL2MP)"
 			$File	"$SRCDIR\game\shared\hl2mp\hl2mp_player_shared.h"
 			$File	"$SRCDIR\game\shared\hl2mp\hl2mp_weapon_parse.cpp"
 			$File	"$SRCDIR\game\shared\hl2mp\hl2mp_weapon_parse.h"
-			
-			$File	"$SRCDIR\game\client\hl2mp\hl2mp_rendertargets.cpp"
-			$File	"$SRCDIR\game\client\hl2mp\hl2mp_rendertargets.h"
 
 			$Folder	"Weapons"
 			{
@@ -223,8 +152,6 @@ $Project "Client (HL2MP)"
 				$File	"$SRCDIR\game\shared\hl2mp\weapon_hl2mpbasehlmpcombatweapon.h"
 				$File	"$SRCDIR\game\shared\hl2mp\weapon_physcannon.cpp"
 				$File	"$SRCDIR\game\shared\hl2mp\weapon_physcannon.h"
-				$File	"$SRCDIR\game\shared\hl2mp\weapon_physgun.cpp"
-				$File	"$SRCDIR\game\shared\hl2mp\weapon_physgun.h"
 				$File	"$SRCDIR\game\shared\hl2mp\weapon_pistol.cpp"
 				$File	"$SRCDIR\game\shared\hl2mp\weapon_rpg.cpp"
 				$File	"$SRCDIR\game\shared\hl2mp\weapon_rpg.h"
@@ -250,14 +177,5 @@ $Project "Client (HL2MP)"
 				$File	"hl2mp\hud_deathnotice.cpp"
 			}
 		}
-		
-		$Folder	"VGUI2 Panels"
-		{
-            $File "$SRCDIR\game\client\vgui2_panels\vgui_singleplayer.cpp"
-            $File "$SRCDIR\game\client\vgui2_panels\vgui_newgame.cpp"
-            $File "$SRCDIR\game\client\vgui2_panels\vgui_savenquit.cpp"
-            $File "$SRCDIR\game\client\vgui2_panels\overrides\OverrideInterface.cpp"
-            $File "$SRCDIR\game\client\vgui2_panels\overrides\OverrideUI_RootPanel.cpp"
-        }
 	}
 }

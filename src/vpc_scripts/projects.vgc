@@ -20,6 +20,7 @@ $Project "client"
 	"game\client\client_hl2.vpc"		[$HL2]
 	"game\client\client_episodic.vpc"	[$EPISODIC]
 	"game\client\client_portal.vpc"		[$PORTAL]
+	"game\client\client_physbox.vpc"	[$PHYSBOX]
 }
 
 $Project "fgdlib"
@@ -29,7 +30,7 @@ $Project "fgdlib"
 
 $Project "game_shader_generic_garrysmod"
 {
-	"materialsystem\stdshaders\game_shader_generic_garrysmod_hl2mp.vpc" [$HL2MP]
+	"materialsystem\stdshaders\game_shader_generic_garrysmod_physbox.vpc" [$PHYSBOX]
 }
 
 $Project "game_shader_generic_example"
@@ -39,6 +40,7 @@ $Project "game_shader_generic_example"
 	"materialsystem\stdshaders\game_shader_generic_example_hl2.vpc" [$HL2]
 	"materialsystem\stdshaders\game_shader_generic_example_episodic.vpc" [$EPISODIC]
 	"materialsystem\stdshaders\game_shader_generic_example_portal.vpc" [$PORTAL]
+	"materialsystem\stdshaders\game_shader_generic_example_physbox.vpc" [$PHYSBOX]
 }
 
 // Use this project if you want to override all std shaders with your own.
@@ -51,6 +53,7 @@ $Project "game_shader_generic_std"
 	"materialsystem\stdshaders\game_shader_generic_std_hl2.vpc" [$HL2MP]
 	"materialsystem\stdshaders\game_shader_generic_std_episodic.vpc" [$EPISODIC]
 	"materialsystem\stdshaders\game_shader_generic_std_portal.vpc" [$PORTAL]
+	"materialsystem\stdshaders\game_shader_generic_std_physbox.vpc" [$PHYSBOX]
 }
 
 $Project "gamepadui"
@@ -58,6 +61,7 @@ $Project "gamepadui"
 	"game\gamepadui\gamepadui_hl2mp.vpc" [$HL2MP]
 	"game\gamepadui\gamepadui_hl2.vpc" [$HL2]
 	"game\gamepadui\gamepadui_episodic.vpc" [$EPISODIC]
+	"game\gamepadui\gamepadui_physbox.vpc" [$PHYSBOX]
 }
 
 $Project "gameui_stub"
@@ -66,6 +70,7 @@ $Project "gameui_stub"
 	"gameui_stub\gameui_stub_hl2.vpc" [$HL2]
 	"gameui_stub\gameui_stub_episodic.vpc" [$EPISODIC]
 	"gameui_stub\gameui_stub_tf.vpc" [$TF]
+	"gameui_stub\gameui_stub_physbox.vpc" [$PHYSBOX]
 }
 
 $Project "glview"
@@ -88,8 +93,9 @@ $Project "server"
 	"game\server\server_tf.vpc"			[$TF]
 	"game\server\server_hl2mp.vpc"		[$HL2MP]
 	"game\server\server_hl2.vpc"		[$HL2]
-	"game\server\server_episodic.vpc"		[$EPISODIC]
+	"game\server\server_episodic.vpc"	[$EPISODIC]
 	"game\server\server_portal.vpc"		[$PORTAL]
+	"game\server\server_physbox.vpc"	[$PHYSBOX]
 }
 
 $Project "launcher_main"
@@ -99,6 +105,7 @@ $Project "launcher_main"
 	"launcher_main\launcher_main_mod_episodic.vpc" [$EPISODIC]
 	"launcher_main\launcher_main_mod_tf.vpc" [$TF]
 	"launcher_main\launcher_main_mod_portal.vpc" [$PORTAL]
+	"launcher_main\launcher_main_physbox.vpc" [$PHYSBOX]
 }
 
 $Project "mathlib"

@@ -3,12 +3,12 @@
 rem sourcedir = Where to compile Shaders to ( shaders\ )
 rem targetdir = Where to copy compiled Shaders to ( game\..\shaders\ )
 set sourcedir="shaders"
-set targetdir="..\..\..\game\mod_hl2mp\shaders"
+set targetdir="..\..\..\game\physbox\shaders"
 
 rem SOURCE_DIR = Source Code Root ( src\ )
 rem GAME_DIR = Mod Folder with GameInfo.txt
 set SOURCE_DIR="..\..\"
-set GAME_DIR="..\..\..\game\mod_hl2mp"
+set GAME_DIR="..\..\..\game\physbox"
 
 rem Process Names we will try to call to ask for Shader reloads
 rem Will check in Order
@@ -22,3 +22,4 @@ rem Mod Projects using LUX
 set PROCESS_LIST=%PROCESS_LIST% tf2classic_win64.exe
 set PROCESS_LIST=%PROCESS_LIST% fc_tfsdk_win64.exe
 set PROCESS_LIST=%PROCESS_LIST% mod_hl2mp_win64.exe
+set PROCESS_LIST=%PROCESS_LIST% physbox.exe

@@ -1,6 +1,6 @@
 @echo off
 
-devtools\bin\vpc.exe /hl2mp /define:SOURCESDK +game /mksln PHYSBOX.sln
+devtools\bin\vpc.exe /physbox /define:SOURCESDK +game /mksln PHYSBOX.sln
 
 if errorlevel 1 (
     echo.

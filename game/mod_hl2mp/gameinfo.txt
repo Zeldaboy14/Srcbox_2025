@@ -1,15 +1,13 @@
 "GameInfo"
 {
-	game 		"Srcbox"
-	title 		"HALF-LIFE'"
-	title2		""
+	game	"My First HL2MP Mod"
+	title	"HALF+LIFE'"
+	title2	"deathmatch"
 	type multiplayer_only
 	nomodels 0
 	nohimodel 1
 	nocrosshair 1
-	supportsvr	0
-	gamelogo	0
-	
+	supportsvr	1
 	hidden_maps
 	{
 		"test_speakers"		1

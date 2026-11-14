@@ -8,7 +8,7 @@
 
 $Macro SRCDIR		"..\.."
 $Macro OUTBINNAME	"game_shader_generic_garrysmod"
-$Macro GAMENAME		"mod_hl2mp"
+$Macro GAMENAME		"physbox"
 
 $Macro OUTBINDIR	"$SRCDIR\..\game\$GAMENAME\bin"
 $Macro SHADERSOURCE "$SRCDIR\materialsystem\stdshaders\shadersource"
@@ -51,7 +51,7 @@ $Configuration
 	}
 }
 
-$Project "Game Shaders (Garry's Mod - HL2MP)"
+$Project "Game Shaders (Garry's Mod - Physbox)"
 {
 	$Folder	"Source Files"
 	{

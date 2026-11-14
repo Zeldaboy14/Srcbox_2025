@@ -21,6 +21,7 @@ $Games
 	"PORTAL"
 	"SDK"
 	"TF"
+	"PHYSBOX"
 }
 
 $Include "vpc_scripts\projects.vgc"

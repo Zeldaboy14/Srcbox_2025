@@ -7,7 +7,7 @@
 $IgnoreRedundancyWarning	"ON"
 
 $macro SRCDIR		".."
-$Macro GAMENAME     "mod_hl2mp"
+$Macro GAMENAME     "physbox"
 
 $Macro OUTBINDIR	"$SRCDIR\..\game\$GAMENAME\bin"
 $Macro OUTBINNAME	"luasocket"
@@ -26,8 +26,8 @@ $Configuration	"Debug"
 {
     $General
     {
-        $OutputDirectory			".\Debug_$GAMENAME"			[$WINDOWS]
-        $IntermediateDirectory		".\Debug_$GAMENAME"			[$WINDOWS]
+        $OutputDirectory			".\Debug_$GAMENAME$PLATSUBDIR"			[$WINDOWS]
+        $IntermediateDirectory		".\Debug_$GAMENAME$PLATSUBDIR"			[$WINDOWS]
 
         $OutputDirectory			".\Debug_$GAMENAME_360"		[$X360]
         $IntermediateDirectory		".\Debug_$GAMENAME_360"		[$X360]
@@ -43,8 +43,8 @@ $Configuration	"Release"
 {
     $General
     {
-        $OutputDirectory			".\Release_$GAMENAME"		[$WINDOWS]
-        $IntermediateDirectory		".\Release_$GAMENAME"		[$WINDOWS]
+        $OutputDirectory			".\Release_$GAMENAME$PLATSUBDIR"		[$WINDOWS]
+        $IntermediateDirectory		".\Release_$GAMENAME$PLATSUBDIR"		[$WINDOWS]
 
         $OutputDirectory			".\Release_$GAMENAME_360"	[$X360]
         $IntermediateDirectory		".\Release_$GAMENAME_360"	[$X360]
