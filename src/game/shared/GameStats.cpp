@@ -1246,7 +1246,6 @@ void CBaseGameStats_Driver::ResetData()
 	
 	// Capture memory stats as well.
 	MemoryInformation memInfo;
-#ifdef PLATFORM_64BITS
 	if ( GetMemoryInformation( &memInfo ) )
 	{
 		pKV->SetInt( "PhysicalRamMbTotal",     memInfo.m_nPhysicalRamMbTotal );
@@ -1254,7 +1253,6 @@ void CBaseGameStats_Driver::ResetData()
 		pKV->SetInt( "VirtualRamMbTotal",      memInfo.m_nVirtualRamMbTotal );
 		pKV->SetInt( "VirtualRamMbAvailable",  memInfo.m_nVirtualRamMbAvailable );
 	}
-#endif
 			
 	MaterialAdapterInfo_t gpu;
 	materials->GetDisplayAdapterInfo( materials->GetCurrentAdapter(), gpu );

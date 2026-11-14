@@ -1605,9 +1605,7 @@ void C_BaseAnimating::BuildTransformations( CStudioHdr *hdr, Vector *pos, Quater
 				}
 
 				// do jiggle physics
-#ifdef PLATFORM_64BITS
 				m_pJiggleBones->BuildJiggleTransformations( i, gpGlobals->realtime, jiggleInfo, goalMX, GetBoneForWrite( i ), this->ShouldFlipViewModel() );
-#endif
 
 			}
 			else if (hdr->boneParent(i) == -1) 
