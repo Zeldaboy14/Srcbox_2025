@@ -861,6 +861,9 @@ static void createsearcherstable (lua_State *L) {
     lua_pushcclosure(L, searchers[i], 1);
     lua_rawseti(L, -2, i+1);
   }
+  // Srcbox; Lua 5.1 compatibility: 5.1 called the searchers package.loaders
+  lua_pushvalue(L, -1);
+  lua_setfield(L, -3, "loaders");
   lua_setfield(L, -2, "searchers");  /* put it in field 'searchers' */
 }
 

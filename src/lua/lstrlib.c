@@ -1836,6 +1836,7 @@ static const luaL_Reg strlib[] = {
   {"find", str_find},
   {"format", str_format},
   {"gmatch", gmatch},
+  {"gfind", gmatch},		// Srcbox; Lua 5.1 compatibility: string.gfind
   {"gsub", str_gsub},
   {"len", str_len},
   {"lower", str_lower},

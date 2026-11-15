@@ -21,6 +21,11 @@
 #include "lauxlib.h"
 #include "lualib.h"
 
+// Srcbox; Lua 5.1 compatibility: math.pow, math.ldexp, math.frexp, math.log10, cosh/sinh/tanh
+#ifndef LUA_COMPAT_MATHLIB
+#define LUA_COMPAT_MATHLIB
+#endif
+
 
 #undef PI
 #define PI	(l_mathop(3.141592653589793238462643383279502884))
@@ -714,6 +719,7 @@ static const luaL_Reg mathlib[] = {
   {"tointeger", math_toint},
   {"floor", math_floor},
   {"fmod",   math_fmod},
+  {"mod",   math_fmod},		// Srcbox; Lua 5.1 compatibility: math.mod
   {"ult",   math_ult},
   {"log",   math_log},
   {"max",   math_max},

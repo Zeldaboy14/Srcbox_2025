@@ -503,7 +503,110 @@ static int luaB_tostring (lua_State *L) {
 }
 
 
+// Srcbox; Lua 5.1 compatibility (GMod 9/10 scripts): unpack, loadstring, getfenv, setfenv, gcinfo
+
+static int luaB_unpack51 (lua_State *L) {
+  lua_Unsigned n;
+  lua_Integer i = luaL_optinteger(L, 2, 1);
+  lua_Integer e = luaL_opt(L, luaL_checkinteger, 3, luaL_len(L, 1));
+  if (i > e) return 0;  /* empty range */
+  n = (lua_Unsigned)e - i;  /* number of elements minus 1 (avoid overflows) */
+  if (l_unlikely(n >= (unsigned int)INT_MAX  ||
+                 !lua_checkstack(L, (int)(++n))))
+    return luaL_error(L, "too many results to unpack");
+  for (; i < e; i++)  /* push arg[i..e - 1] (to avoid overflows) */
+    lua_geti(L, 1, i);
+  lua_geti(L, 1, e);  /* push last element */
+  return (int)n;
+}
+
+/* loadstring(s [, chunkname]): load() without the mode/env arguments */
+static int luaB_loadstring51 (lua_State *L) {
+  luaL_checkstring(L, 1);
+  lua_settop(L, 2);
+  return luaB_load(L);
+}
+
+/* Pushes the function argument 1 names (a function, or a stack level; 1 is the caller).
+   Returns 0 for level 0 (the thread's environment), pushing nothing. */
+static int getfunc51 (lua_State *L, int opt) {
+  lua_Debug ar;
+  int level;
+  if (lua_isfunction(L, 1)) {
+    lua_pushvalue(L, 1);
+    return 1;
+  }
+  level = (int)(opt ? luaL_optinteger(L, 1, 1) : luaL_checkinteger(L, 1));
+  luaL_argcheck(L, level >= 0, 1, "level must be non-negative");
+  if (level == 0)
+    return 0;
+  if (lua_getstack(L, level, &ar) == 0)
+    luaL_argerror(L, 1, "invalid level");
+  lua_getinfo(L, "f", &ar);
+  return 1;
+}
+
+/* Index of the _ENV upvalue of the Lua function at 'f', or 0 if it has none */
+static int findenv51 (lua_State *L, int f) {
+  const char *name;
+  int i;
+  if (lua_iscfunction(L, f))
+    return 0;
+  for (i = 1; (name = lua_getupvalue(L, f, i)) != NULL; i++) {
+    lua_pop(L, 1);
+    if (strcmp(name, "_ENV") == 0)
+      return i;
+  }
+  return 0;
+}
+
+static int luaB_getfenv51 (lua_State *L) {
+  int up;
+  if (!getfunc51(L, 1)) {
+    lua_pushglobaltable(L);
+    return 1;
+  }
+  up = findenv51(L, lua_gettop(L));
+  if (up == 0)
+    lua_pushglobaltable(L);  /* doesn't use globals: report the global table, like 5.1's default */
+  else
+    lua_getupvalue(L, -1, up);
+  return 1;
+}
+
+static int luaB_setfenv51 (lua_State *L) {
+  int f, up;
+  luaL_checktype(L, 2, LUA_TTABLE);
+  if (!getfunc51(L, 0))
+    return luaL_error(L, "setfenv: changing a thread's environment (level 0) isn't supported");
+  f = lua_gettop(L);
+  up = findenv51(L, f);
+  if (up != 0) {
+    /* Give the function its own _ENV (an empty chunk's upvalue set to the table), so other
+       closures that shared the old one keep theirs, as functions had separate envs in 5.1 */
+    if (luaL_loadstring(L, "") != LUA_OK)
+      return lua_error(L);
+    lua_pushvalue(L, 2);
+    lua_setupvalue(L, -2, 1);
+    lua_upvaluejoin(L, f, up, lua_gettop(L), 1);
+    lua_pop(L, 1);
+  }
+  lua_pushvalue(L, f);
+  return 1;
+}
+
+static int luaB_gcinfo51 (lua_State *L) {
+  lua_pushinteger(L, lua_gc(L, LUA_GCCOUNT, 0));
+  return 1;
+}
+
+
 static const luaL_Reg base_funcs[] = {
+  {"unpack", luaB_unpack51},		/* Srcbox; Lua 5.1 compatibility */
+  {"loadstring", luaB_loadstring51},
+  {"getfenv", luaB_getfenv51},
+  {"setfenv", luaB_setfenv51},
+  {"gcinfo", luaB_gcinfo51},
   {"assert", luaB_assert},
   {"collectgarbage", luaB_collectgarbage},
   {"dofile", luaB_dofile},

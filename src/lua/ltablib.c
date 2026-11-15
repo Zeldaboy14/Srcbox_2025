@@ -411,7 +411,68 @@ static int sort (lua_State *L) {
 /* }====================================================== */
 
 
+// Srcbox; Lua 5.1 compatibility: table.getn, table.maxn, table.foreach, table.foreachi
+
+static int tgetn51 (lua_State *L) {
+  lua_pushinteger(L, aux_getn(L, 1, TAB_R));
+  return 1;
+}
+
+static int tmaxn51 (lua_State *L) {
+  lua_Number max = 0;
+  luaL_checktype(L, 1, LUA_TTABLE);
+  lua_pushnil(L);
+  while (lua_next(L, 1)) {
+    lua_pop(L, 1);  /* remove value */
+    if (lua_type(L, -1) == LUA_TNUMBER) {
+      lua_Number v = lua_tonumber(L, -1);
+      if (v > max) max = v;
+    }
+  }
+  if (max == (lua_Number)(lua_Integer)max)
+    lua_pushinteger(L, (lua_Integer)max);
+  else
+    lua_pushnumber(L, max);
+  return 1;
+}
+
+static int tforeachi51 (lua_State *L) {
+  lua_Integer i, n = aux_getn(L, 1, TAB_R);
+  luaL_checktype(L, 2, LUA_TFUNCTION);
+  for (i = 1; i <= n; i++) {
+    lua_pushvalue(L, 2);
+    lua_pushinteger(L, i);
+    lua_geti(L, 1, i);
+    lua_call(L, 2, 1);
+    if (!lua_isnil(L, -1))
+      return 1;
+    lua_pop(L, 1);
+  }
+  return 0;
+}
+
+static int tforeach51 (lua_State *L) {
+  luaL_checktype(L, 1, LUA_TTABLE);
+  luaL_checktype(L, 2, LUA_TFUNCTION);
+  lua_pushnil(L);
+  while (lua_next(L, 1)) {
+    lua_pushvalue(L, 2);
+    lua_pushvalue(L, -3);  /* key */
+    lua_pushvalue(L, -3);  /* value */
+    lua_call(L, 2, 1);
+    if (!lua_isnil(L, -1))
+      return 1;
+    lua_pop(L, 2);  /* remove value and result */
+  }
+  return 0;
+}
+
+
 static const luaL_Reg tab_funcs[] = {
+  {"getn", tgetn51},		/* Srcbox; Lua 5.1 compatibility */
+  {"maxn", tmaxn51},
+  {"foreach", tforeach51},
+  {"foreachi", tforeachi51},
   {"concat", tconcat},
   {"insert", tinsert},
   {"pack", tpack},
