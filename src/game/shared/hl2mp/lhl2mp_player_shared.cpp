@@ -168,6 +168,37 @@ LUA_BINDING_BEGIN( CExperimentPlayer, SetMaxArmor, "class", "Set the armor for t
     return 0;
 }
 LUA_BINDING_END()
+
+// Srcbox: HL2MP's own team join (the "jointeam" command). Leaving spectator this way also
+// stops observer mode and moves the player to STATE_ACTIVE; a bare ChangeTeam leaves them
+// stuck in HL2MP's observer state. In deathmatch HL2MP turns any playing team into team 0.
+LUA_BINDING_BEGIN( CExperimentPlayer, JoinTeam, "class", "Join a team the way the jointeam command does.", "server" )
+{
+    CHL2MP_Player *player = LUA_BINDING_ARGUMENT( luaL_checkexperimentplayer, 1, "entity" );
+    lua_pushboolean( L, player->HandleCommand_JoinTeam( LUA_BINDING_ARGUMENT( luaL_checkinteger, 2, "team" ) ) );
+    return 1;
+}
+LUA_BINDING_END( "boolean", "False if the team was invalid or spectating isn't allowed." )
+
+// Srcbox: HL2MP's StartObserverMode only works when the player asked to spectate; this starts it anyway
+LUA_BINDING_BEGIN( CExperimentPlayer, ForceStartObserverMode, "class", "Start observer mode even if the player didn't ask to spectate.", "server" )
+{
+    CHL2MP_Player *player = LUA_BINDING_ARGUMENT( luaL_checkexperimentplayer, 1, "entity" );
+    lua_pushboolean( L, player->ForceStartObserverMode( LUA_BINDING_ARGUMENT( luaL_checkinteger, 2, "mode" ) ) );
+    return 1;
+}
+LUA_BINDING_END( "boolean", "Whether observer mode was started." )
+
+// Srcbox: show or hide a viewport panel ("specgui", "scores", "info", ...) on the player's screen
+LUA_BINDING_BEGIN( CExperimentPlayer, ShowViewPortPanel, "class", "Show or hide a viewport panel (specgui, specmenu, overview, scores, info, ...) for this player.", "server" )
+{
+    CHL2MP_Player *player = LUA_BINDING_ARGUMENT( luaL_checkexperimentplayer, 1, "entity" );
+    const char *name = LUA_BINDING_ARGUMENT( luaL_checkstring, 2, "name" );
+    bool show = lua_isnoneornil( L, 3 ) ? true : lua_toboolean( L, 3 ) != 0;
+    player->ShowViewPortPanel( name, show );
+    return 0;
+}
+LUA_BINDING_END()
 #endif
 
 // Experiment; We only let CBasePlayer determine equality, which should be fine since they're pointers to the same entity. Disabled:

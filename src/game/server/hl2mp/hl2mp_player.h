@@ -152,6 +152,12 @@ public:
 
 
 	virtual bool StartObserverMode( int mode );
+#ifdef LUA_SDK
+	// Srcbox: StartObserverMode refuses unless the player asked to spectate (m_bEnterObserver).
+	// Lua gamemodes need to put a living player into observer mode themselves (GMod 9's
+	// melonracer chase-cams the player's melon).
+	bool ForceStartObserverMode( int mode ) { m_bEnterObserver = true; return StartObserverMode( mode ); }
+#endif
 	virtual void StopObserverMode( void );
 
 

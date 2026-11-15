@@ -8,6 +8,7 @@
 #include <vgui_controls/ListPanel.h>
 #include <vgui_controls/ComboBox.h>
 #include <vgui/ISurface.h>
+#include <vgui/ILocalize.h>
 #include <filesystem.h>
 #include <KeyValues.h>
 #include "ienginevgui.h"
@@ -82,6 +83,7 @@ private:
 	void PopulateBrowseAll();
 	void PopulateGameTab();
 	void PlaySelectedMap(); // Function to handle playing the selected map
+	void PopulateGamemodes(); // Fill m_pGamemode from the gamemodes/ folders
 	void CreateGameIcon(const char* mapName, const char* imagePath, const char* command);
 };
 
@@ -147,16 +149,10 @@ CMyPanel::CMyPanel(vgui::VPANEL parent)
 
 	PopulateBrowseAll();
 
-	m_pGamemode = new ComboBox(this, "Gamemode", 5, false);
+	m_pGamemode = new ComboBox(this, "Gamemode", 8, false);
 	m_pGamemode->SetBounds(125, 938, 171, 24);
 	m_pGamemode->SetVisible(true);
-	m_pGamemode->ActivateItem(0);
-
-	if (m_pGamemode)
-	{
-		m_pGamemode->AddItem("Sandbox", new KeyValues("Gamemodes", "sandbox", "sandbox"));
-		m_pGamemode->AddItem("Half-Life 2", new KeyValues("Gamemodes", "hl2", "hl2"));
-	}
+	PopulateGamemodes();
 
 	m_pPlayButton = new Button(this, "PlayButton", "Start Game");
 	m_pPlayButton->SetCommand("play_selected_map");
@@ -293,6 +289,61 @@ void CMyPanel::PopulateGameTab()
 
 
 
+//-----------------------------------------------------------------------------
+// Purpose: List the Lua gamemodes (every folder in gamemodes/, the same list the
+//			multiplayer create-game page uses) and select the current "gamemode".
+//			Display name: #Srcbox_Gamemode_<name> if localized, else "title" from a
+//			GMod-style gamemodes/<name>/<name>.txt, else the folder name. A .txt with
+//			"menusystem" "0" hides the gamemode, like GMod.
+//-----------------------------------------------------------------------------
+void CMyPanel::PopulateGamemodes()
+{
+	m_pGamemode->RemoveAll();
+
+	ConVarRef gamemodeVar( "gamemode", true );
+	const char *pszCurrent = gamemodeVar.IsValid() ? gamemodeVar.GetString() : "";
+	int iSelect = -1;
+
+	FileFindHandle_t findHandle = FILESYSTEM_INVALID_FIND_HANDLE;
+	for ( const char *pszName = g_pFullFileSystem->FindFirst( "gamemodes/*", &findHandle ); pszName; pszName = g_pFullFileSystem->FindNext( findHandle ) )
+	{
+		if ( pszName[0] == '.' || !g_pFullFileSystem->FindIsDirectory( findHandle ) )
+			continue;
+
+		char szTitle[128];
+		V_strncpy( szTitle, pszName, sizeof( szTitle ) );
+
+		char szInfo[MAX_PATH];
+		V_snprintf( szInfo, sizeof( szInfo ), "gamemodes/%s/%s.txt", pszName, pszName );
+		KeyValues *pInfo = new KeyValues( pszName );
+		if ( pInfo->LoadFromFile( g_pFullFileSystem, szInfo, "GAME" ) )
+		{
+			if ( !pInfo->GetBool( "menusystem", true ) )
+			{
+				pInfo->deleteThis();
+				continue;
+			}
+			V_strncpy( szTitle, pInfo->GetString( "title", pszName ), sizeof( szTitle ) );
+		}
+		pInfo->deleteThis();
+
+		KeyValues *pData = new KeyValues( "Gamemode", "name", pszName );
+
+		char szToken[128];
+		V_snprintf( szToken, sizeof( szToken ), "#Srcbox_Gamemode_%s", pszName );
+		const wchar_t *pwszLocalized = g_pVGuiLocalize->Find( szToken );
+		int iItem = pwszLocalized ? m_pGamemode->AddItem( pwszLocalized, pData ) : m_pGamemode->AddItem( szTitle, pData );
+		pData->deleteThis(); // AddItem keeps its own copy
+
+		if ( !Q_stricmp( pszName, pszCurrent ) )
+			iSelect = iItem;
+	}
+	g_pFullFileSystem->FindClose( findHandle );
+
+	if ( m_pGamemode->GetItemCount() > 0 )
+		m_pGamemode->ActivateItem( iSelect >= 0 ? iSelect : m_pGamemode->GetItemIDFromRow( 0 ) );
+}
+
 void CMyPanel::PlaySelectedMap()
 {
 	int selectedItemID = m_pBrowseAllList->GetSelectedItem(0);
@@ -305,34 +356,27 @@ void CMyPanel::PlaySelectedMap()
 	KeyValues* kv = m_pBrowseAllList->GetItem(selectedItemID);
 	const char* mapName = kv->GetString("MapName");
 
-	char command[256];
-	Q_snprintf(command, sizeof(command), "map %s\n", mapName);
+	// Set the gamemode first, in the same command buffer, so it's in effect when the map loads
+	// (it's replicated, and the loading screen picks its style from it too)
+	char gamemodeCmd[160] = "";
+	KeyValues* pMode = m_pGamemode->GetActiveItemUserData();
+	const char* pszMode = pMode ? pMode->GetString("name", "") : "";
+	if (pszMode[0])
+		Q_snprintf(gamemodeCmd, sizeof(gamemodeCmd), "gamemode \"%s\"\n", pszMode);
 
-	engine->ClientCmd(command);
+	char command[512];
+	Q_snprintf(command, sizeof(command), "%smap %s\n", gamemodeCmd, mapName);
+
+	engine->ClientCmd_Unrestricted(command);
 }
 
 void CMyPanel::OnCommand(const char* pcCommand)
 {
 	BaseClass::OnCommand(pcCommand);
 
-	int activeItem = m_pGamemode->GetActiveItem();
-
-	KeyValues* kv = m_pGamemode->GetItemUserData(activeItem);
-	const char* mode = kv ? kv->GetString("mode", "") : "";
-
 	if (FStrEq(pcCommand, "play_selected_map"))
 	{
-		//if (m_pGamemode == "Sandbox")
-		if (!Q_stricmp(mode, "Sandbox"))
-		{
-			//gamemode.SetValue("hl2sb");
-		}
-		else if (!Q_stricmp(mode, "Half-Life 2"))
-		{
-			//gamemode.SetValue("hl2_campaign");
-		};
 		PlaySelectedMap();
-		//IsTeamplay() == true;
 	}
 }
 

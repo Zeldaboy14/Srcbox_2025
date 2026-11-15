@@ -1,0 +1,9 @@
+"UnlitGeneric"
+{
+	"$basetexture"		"gmod\melonracer\melon"
+	//"$ignorez"		1
+	"$vertexcolor" 1
+	"$vertexalpha" 1
+	"$nolod" "1"
+	"$nocull" "1"
+}

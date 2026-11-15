@@ -21,6 +21,8 @@
 #include "SoundEmitterSystem/isoundemittersystembase.h"
 
 #include "physics_saverestore.h"
+#include "bspfile.h"
+#include "tier1/utlbuffer.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -560,15 +562,90 @@ void PhysParseSurfaceData( IPhysicsSurfaceProps *pProps, IFileSystem *pFileSyste
 	manifest->deleteThis();
 }
 
-void PhysCreateVirtualTerrain( CBaseEntity *pWorld, const objectparams_t &defaultParams )
+// Srcbox: old maps (BSP v19 vbsp, e.g. GMod 9's) stored displacement physics as MOPP meshes,
+// which this vphysics can't load, so they get virtual terrain instead (see the "mopp" note in
+// PhysCreateWorld_Shared). Virtual terrain blocks from both sides, but the old meshes only
+// blocked from the front: a wall displacement whose back faces the play area became an
+// invisible ridge (gm_melonrace: the rock wall where the concrete strip starts). On those maps,
+// wall displacements get no collision.
+static ConVar phys_old_map_skip_wall_displacements( "phys_old_map_skip_wall_displacements", "1", 0, "On maps whose displacement physics is in the old MOPP format, don't build collision for wall displacements (the original engine only blocked them from the front). Takes effect on the next map load." );
+
+// Marks each displacement whose surface is a wall (base face normal mostly horizontal)
+static void FindWallDisplacements( CUtlVector<bool> &isWall )
+{
+	char mapPath[MAX_PATH];
+#ifdef CLIENT_DLL
+	Q_strncpy( mapPath, engine->GetLevelName(), sizeof( mapPath ) );
+#else
+	Q_snprintf( mapPath, sizeof( mapPath ), "maps/%s.bsp", STRING( gpGlobals->mapname ) );
+#endif
+
+	FileHandle_t file = filesystem->Open( mapPath, "rb", "GAME" );
+	if ( !file )
+		return;
+
+	dheader_t header;
+	if ( filesystem->Read( &header, sizeof( header ), file ) == sizeof( header ) && header.ident == IDBSPHEADER )
+	{
+		// read with fixed record sizes; these didn't change between BSP v19 and v21
+		const int DISPINFO_SIZE = 176, DISPINFO_FACE = 36, FACE_SIZE = 56, PLANE_SIZE = 20;
+		const lump_t &dispLump = header.lumps[LUMP_DISPINFO];
+		const lump_t &faceLump = header.lumps[LUMP_FACES];
+		const lump_t &planeLump = header.lumps[LUMP_PLANES];
+
+		CUtlBuffer disp, faces, planes;
+		bool ok = true;
+		const lump_t *lumps[3] = { &dispLump, &faceLump, &planeLump };
+		CUtlBuffer *buffers[3] = { &disp, &faces, &planes };
+		for ( int l = 0; l < 3 && ok; l++ )
+		{
+			buffers[l]->EnsureCapacity( lumps[l]->filelen );
+			filesystem->Seek( file, lumps[l]->fileofs, FILESYSTEM_SEEK_HEAD );
+			ok = filesystem->Read( buffers[l]->Base(), lumps[l]->filelen, file ) == lumps[l]->filelen;
+		}
+
+		if ( ok )
+		{
+			int count = dispLump.filelen / DISPINFO_SIZE;
+			isWall.SetCount( count );
+			for ( int i = 0; i < count; i++ )
+			{
+				isWall[i] = false;
+				unsigned short face = *(unsigned short *)( (byte *)disp.Base() + i * DISPINFO_SIZE + DISPINFO_FACE );
+				if ( ( face + 1 ) * FACE_SIZE > faceLump.filelen )
+					continue;
+				unsigned short plane = *(unsigned short *)( (byte *)faces.Base() + face * FACE_SIZE );
+				if ( ( plane + 1 ) * PLANE_SIZE > planeLump.filelen )
+					continue;
+				const float *normal = (const float *)( (byte *)planes.Base() + plane * PLANE_SIZE );
+				isWall[i] = fabs( normal[2] ) < 0.5f;
+			}
+		}
+	}
+
+	filesystem->Close( file );
+}
+
+void PhysCreateVirtualTerrain( CBaseEntity *pWorld, const objectparams_t &defaultParams, bool bOldMoppMap )
 {
 	if ( !physenv )
 		return;
+
+	CUtlVector<bool> isWall;
+	if ( bOldMoppMap && phys_old_map_skip_wall_displacements.GetBool() )
+	{
+		FindWallDisplacements( isWall );
+	}
 
 	char nameBuf[1024];
 	for ( int i = 0; i < MAX_MAP_DISPINFO; i++ )
 	{
 		CPhysCollide *pCollide = modelinfo->GetCollideForVirtualTerrain( i );
+		if ( pCollide && i < isWall.Count() && isWall[i] )
+		{
+			DevMsg( "Old map: no collision for wall displacement %d\n", i );
+			continue;
+		}
 		if ( pCollide )
 		{
 			solid_t solid;
@@ -610,6 +687,7 @@ IPhysicsObject *PhysCreateWorld_Shared( CBaseEntity *pWorld, vcollide_t *pWorldC
 	IVPhysicsKeyParser *pParse = physcollision->VPhysicsKeyParserCreate( pWorldCollide->pKeyValues );
 
 	bool bCreateVirtualTerrain = false;
+	bool bOldMoppMap = false;	// Srcbox: see PhysCreateVirtualTerrain
 	while ( !pParse->Finished() )
 	{
 		const char *pBlock = pParse->GetCurrentBlockName();
@@ -631,6 +709,7 @@ IPhysicsObject *PhysCreateWorld_Shared( CBaseEntity *pWorld, vcollide_t *pWorldC
 			{
 				// this implies that the collision model is a mopp and the physics DLL doesn't support that.
 				bCreateVirtualTerrain = true;
+				bOldMoppMap = true;
 				continue;
 			}
 			// create this as part of the world
@@ -694,7 +773,7 @@ IPhysicsObject *PhysCreateWorld_Shared( CBaseEntity *pWorld, vcollide_t *pWorldC
 
 	if ( bCreateVirtualTerrain && physcollision->SupportsVirtualMesh() )
 	{
-		PhysCreateVirtualTerrain( pWorld, defaultParams );
+		PhysCreateVirtualTerrain( pWorld, defaultParams, bOldMoppMap );
 	}
 	return pWorldPhysics;
 }
