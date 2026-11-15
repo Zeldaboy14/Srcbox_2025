@@ -39,7 +39,7 @@ echo create_physbox.bat finished.
 
 echo.
 echo ========================================
-echo  Running create_physbox.bat
+echo  Running create_physbox_x86.bat
 echo ========================================
 echo.
 call "%SRC%create_physbox_x86.bat"
