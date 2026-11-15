@@ -3199,9 +3199,6 @@ void CAI_ChangeHintGroup::InputActivate( inputdata_t &inputdata )
 	}
 }
 
-
-
-
 #define SF_CAMERA_PLAYER_POSITION		1
 #define SF_CAMERA_PLAYER_TARGET			2
 #define SF_CAMERA_PLAYER_TAKECONTROL	4
@@ -4063,6 +4060,8 @@ bool CAttachmentFollower::Start( CBaseEntity *pEntity, const char *pszAttachment
 	m_hParent = pAnimating;
 	m_iAttachment = iAttachment;
 	m_bActive = true;
+	m_bHolding = false;
+	m_iLastSequence = -1;
 	return Update( pEntity );
 }
 
@@ -4078,6 +4077,20 @@ bool CAttachmentFollower::Update( CBaseEntity *pEntity )
 	// prop_dynamic only advances its animation every 0.1s; bring it up to now so the camera
 	// moves every tick instead of in steps
 	pAnimating->StudioFrameAdvance();
+
+	// A one-shot animation that had (all but) finished was replaced by another: the rig went
+	// back to its default animation. c11m1: the C130's airport_intro_flyby is 14.58s, the
+	// cameras' StartMovement comes at 14.6s, and in between the plane went back to
+	// airport_intro_preidle up in the sky, so the camera jumped there and swung back to the
+	// survivors through the sky and walls. Hold the shot's last frame, like L4D.
+	int iSequence = pAnimating->GetSequence();
+	if ( !m_bHolding && m_iLastSequence >= 0 && iSequence != m_iLastSequence && !m_bLastLooping && m_flLastCycle > 0.9f )
+		m_bHolding = true;
+	m_iLastSequence = iSequence;
+	m_flLastCycle = pAnimating->GetCycle();
+	m_bLastLooping = pAnimating->SequenceLoops();
+	if ( m_bHolding )
+		return true;
 
 	matrix3x4_t matAttachment, matWorld;
 	if ( !pAnimating->GetAttachment( m_iAttachment, matAttachment ) )
@@ -4226,28 +4239,10 @@ void CSurvivorCamera::FollowTarget(void)
 		return;
 	}
 
-	QAngle ang = m_hPlayer->GetLocalAngles() - GetLocalAngles();
-
-	// We could use AngleNormalize() for these, but fmodf isn't called
-	if (ang.x < -180)
-		ang.x += 360;
-	if (ang.x > 180)
-		ang.x -= 360;
-
-	if (ang.y < -180)
-		ang.y += 360;
-	if (ang.y > 180)
-		ang.y -= 360;
-
-	if (ang.z < -180)
-		ang.z += 360;
-	if (ang.z > 180)
-		ang.z -= 360;
-
-	float speed = 40.0 * gpGlobals->frametime;
-	ang *= speed;
-
-	SetLocalAngularVelocity(ang);
+	// (This used to steer with an angular velocity, each Euler angle chasing the player's body
+	// angles on its own: the camera rolled and swung oddly on the way back, aimed at the body's
+	// level pitch, then snapped to the eyes when control came back.)
+	// keep following the eyes once there, until the map disables the camera
 	SetNextThink(gpGlobals->curtime);
 	Move();
 }
@@ -4266,7 +4261,10 @@ void CSurvivorCamera::StartMovement(void)
 
 	SetParent(NULL);
 	SetMoveType(MOVETYPE_NOCLIP);
+	SetAbsVelocity(vec3_origin);
+	SetLocalAngularVelocity(vec3_angle);
 	m_vStartPos = GetAbsOrigin();
+	m_angStartAngles = GetAbsAngles();
 	m_bMovementStarted = true;
 	SetThink(&CSurvivorCamera::FollowTarget);
 	m_flInterpStartTime = gpGlobals->curtime;
@@ -4354,22 +4352,32 @@ void CSurvivorCamera::AttachmentFollowThink(void)
 
 void CSurvivorCamera::Move()
 {
+	// Back into the player's eyes over a second: position and angles on the same eased curve,
+	// the angles through quaternions so they take the short way round with no stray roll
+	// (like point_viewcontrol_multiplayer's StartMovement)
+	CBasePlayer *pPlayer = ToBasePlayer(m_hPlayer.Get());
 	Vector vEndPos = m_hPlayer->EyePosition();
+	QAngle angEnd = pPlayer ? pPlayer->EyeAngles() : m_hPlayer->GetAbsAngles();
 
 	float interp = gpGlobals->curtime - m_flInterpStartTime;
 	if (interp < 1.0)
 	{
-		float interpResult = Bias(interp, 0.15);
-		float distance = (float)1.0 / gpGlobals->frametime;
+		float flFrac = SimpleSpline(interp);
 
-		Vector desiredVel = (interpResult * (vEndPos - m_vStartPos) + m_vStartPos - GetAbsOrigin()) * distance;
+		SetAbsOrigin(Lerp(flFrac, m_vStartPos, vEndPos));
 
-		SetAbsVelocity(desiredVel);
+		Quaternion qStart, qEnd, qNow;
+		AngleQuaternion(m_angStartAngles, qStart);
+		AngleQuaternion(angEnd, qEnd);
+		QuaternionSlerp(qStart, qEnd, flFrac, qNow);
+		QAngle angNow;
+		QuaternionAngles(qNow, angNow);
+		SetAbsAngles(angNow);
 	}
 	else
 	{
 		UTIL_SetOrigin(this, vEndPos);
-		SetAbsAngles(m_hPlayer->GetLocalAngles());
+		SetAbsAngles(angEnd);
 		SetAbsVelocity(vec3_origin);
 
 		if (m_bDisableOnMoveEnd)

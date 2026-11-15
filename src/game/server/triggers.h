@@ -336,7 +336,7 @@ bool IsTakingTriggerHurtDamageAtPoint( const Vector &vecPoint );
 class CAttachmentFollower
 {
 public:
-	CAttachmentFollower() : m_iAttachment( 0 ), m_bActive( false ) { SetIdentityMatrix( m_matOffset ); }
+	CAttachmentFollower() : m_iAttachment( 0 ), m_bActive( false ), m_iLastSequence( -1 ), m_flLastCycle( 0 ), m_bLastLooping( true ), m_bHolding( false ) { SetIdentityMatrix( m_matOffset ); }
 
 	// Like CBaseEntity::SetParentAttachment, on pEntity's current move parent
 	bool Start( CBaseEntity *pEntity, const char *pszAttachment, bool bMaintainOffset );
@@ -349,6 +349,14 @@ public:
 	int				m_iAttachment;
 	matrix3x4_t		m_matOffset;	// entity in attachment space
 	bool			m_bActive;
+
+	// The parent's animation last tick. When a one-shot animation (the intro rig's flyby)
+	// finishes, prop_dynamic goes back to its default animation and the attachment jumps
+	// back to where that idles; the follower holds the shot's last frame instead.
+	int				m_iLastSequence;
+	float			m_flLastCycle;
+	bool			m_bLastLooping;
+	bool			m_bHolding;
 };
 
 class CSurvivorCamera : public CBaseEntity
@@ -397,6 +405,7 @@ private:
 	bool m_bMovementStarted;
 
 	Vector m_vStartPos;
+	QAngle m_angStartAngles;	// where StartMovement began, for the slerp back to the player's eyes
 	float m_flInterpStartTime;
 
 };

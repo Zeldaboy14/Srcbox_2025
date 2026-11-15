@@ -39,6 +39,7 @@
 #include "view_shared.h"
 #include "view.h"
 #include "sprite.h"
+#include "beamdraw.h"
 #include "iviewrender.h"
 #include "ragdoll.h"
 #else
@@ -52,12 +53,54 @@
 
 ConVar physcannon_rotate("physcannon_rotate", "1");
 
+// GMod 10's hold controller settings (same names and defaults as its server.dll), read every
+// physics tick. Replicated so the client's predicted hold matches the server's.
+ConVar physgun_maxAngular( "physgun_maxAngular", "5000", FCVAR_REPLICATED );
+ConVar physgun_maxAngularDamping( "physgun_maxAngularDamping", "10000", FCVAR_REPLICATED );
+ConVar physgun_maxSpeed( "physgun_maxSpeed", "5000", FCVAR_REPLICATED );
+ConVar physgun_maxSpeedDamping( "physgun_maxSpeedDamping", "10000", FCVAR_REPLICATED );
+ConVar physgun_DampingFactor( "physgun_DampingFactor", "0.8", FCVAR_REPLICATED );
+ConVar physgun_teleportDistance( "physgun_teleportDistance", "0", FCVAR_REPLICATED );
+ConVar physgun_timeToArrive( "physgun_timeToArrive", "0.05", FCVAR_REPLICATED );
+ConVar physgun_timeToArriveRagdoll( "physgun_timeToArriveRagdoll", "0.1", FCVAR_REPLICATED );
+
+// GMod 10 makes held props (not ragdolls or the jeep) this heavy, so nothing they hit slows them
+#define PHYSGUN_HELD_MASS	1e11f
+
+// GMod 10's snapping and key rotation (same names and defaults as its server.dll)
+ConVar gm_snaptogrid( "gm_snaptogrid", "0", FCVAR_REPLICATED | FCVAR_ARCHIVE, "Held objects move in steps of gm_gridsize" );
+ConVar gm_gridsize( "gm_gridsize", "32", FCVAR_REPLICATED | FCVAR_ARCHIVE, "Grid size for gm_snaptogrid" );
+ConVar gm_snapdegrees( "gm_snapdegrees", "45", FCVAR_REPLICATED | FCVAR_ARCHIVE, "Holding Sprint while rotating (Use) snaps the held object's angles to this many degrees" );
+ConVar phys_spinspeed( "phys_spinspeed", "200", FCVAR_REPLICATED | FCVAR_ARCHIVE, "Degrees per second Left/Right turn a held object while rotating (Use)" );
+
+// GMod 10's SnapToGrid: round each axis to the nearest multiple of the grid size
+static Vector PhysgunSnapToGrid( const Vector &v, float flGrid )
+{
+	if ( flGrid <= 0 )
+		return v;
+	return Vector( RoundFloatToInt( v.x / flGrid ) * flGrid,
+				   RoundFloatToInt( v.y / flGrid ) * flGrid,
+				   RoundFloatToInt( v.z / flGrid ) * flGrid );
+}
+
+// True for vehicles (their physics is a body plus wheels, so more than one object, but they
+// aren't ragdolls)
+static bool PhysgunIsVehicle( CBaseEntity *pEntity )
+{
+#ifdef CLIENT_DLL
+	return pEntity->GetClientVehicle() != NULL || FClassnameIs( pEntity, "prop_vehicle_jeep" );
+#else
+	return pEntity->GetServerVehicle() != NULL || FClassnameIs( pEntity, "prop_vehicle_jeep" );
+#endif
+}
+
 static int g_physgunBeam1;
 static int g_physgunBeam;
 static int g_physgunGlow;
 #define PHYSGUN_BEAM_SPRITE				"sprites/physbeam.vmt"
 #define PHYSGUN_BEAM_SPRITE_ACTIVE		"sprites/physbeama.vmt"
 #define PHYSGUN_BEAM_GLOW				"sprites/physg_glow1.vmt"
+#define PHYSGUN_CORE_GLOW				"sprites/physg_glow2.vmt"	// GMod 10's core light (C_PhysBeam binds physg_glow2 for it)
 
 #define	PHYSGUN_SKIN	1
 
@@ -69,13 +112,14 @@ class CWeaponGravityGun;
 #ifdef CLIENT_DLL
 #define PHYSGUN_GLOW_SPRITE "sprites/glow04_noz"
 #define PHYSGUN_ENDCAP_SPRITE "sprites/orangeflare1"
-#define PHYSGUN_CENTER_GLOW "sprites/orangecore1"
+#define PHYSGUN_CENTER_GLOW "sprites/physg_glow1"
 #define PHYSGUN_BLAST_SPRITE "sprites/orangecore2"
 
 CLIENTEFFECT_REGISTER_BEGIN( PrecacheEffectGravityGun )
 CLIENTEFFECT_MATERIAL( PHYSGUN_BEAM_SPRITE )
 CLIENTEFFECT_MATERIAL( PHYSGUN_BEAM_SPRITE_ACTIVE )
 CLIENTEFFECT_MATERIAL( PHYSGUN_BEAM_GLOW )
+CLIENTEFFECT_MATERIAL( PHYSGUN_CORE_GLOW )
 CLIENTEFFECT_MATERIAL(PHYSGUN_GLOW_SPRITE)
 CLIENTEFFECT_MATERIAL(PHYSGUN_ENDCAP_SPRITE)
 CLIENTEFFECT_MATERIAL(PHYSGUN_CENTER_GLOW)
@@ -88,12 +132,18 @@ CLIENTEFFECT_REGISTER_END()
 //IPhysicsObject *GetPhysObjFromPhysicsBone( CBaseEntity *pEntity, short physicsbone )
 IPhysicsObject *GetPhysObjFromPhysicsBone( CBaseEntity *pEntity, short physicsbone )
 {
+	if ( !pEntity )
+		return NULL;
+
 	if( pEntity->IsNPC() )
 	{
 		return pEntity->VPhysicsGetObject();
 	}
 
-	CBaseAnimating *pModel = static_cast< CBaseAnimating * >( pEntity );
+	// Only models can be ragdolls. This was a static_cast, which on a brush entity (the glass
+	// in gm_greenhouse is a func_lod) read m_pRagdoll from memory past the end of the object
+	// and crashed; brush entities just use their one physics object.
+	CBaseAnimating *pModel = pEntity->GetBaseAnimating();
 	if (pModel != NULL)
 	{
 
@@ -171,9 +221,14 @@ public:
 		m_targetPosition = target;
 		m_shadow.targetPosition = target;
 		m_shadow.targetRotation = targetOrientation;
+
+		// GMod 10: with gm_snaptogrid, the held object's origin moves in gm_gridsize steps
+		// (only the physics target; m_targetPosition stays where the beam aims)
+		if ( gm_snaptogrid.GetBool() )
+			m_shadow.targetPosition = PhysgunSnapToGrid( target, gm_gridsize.GetFloat() );
 		CBaseEntity *pEntity;
 
-		m_timeToArrive = gpGlobals->frametime;
+		// (GMod 10 keeps the time to arrive set on grab; it isn't reset on each update)
 
 		CBaseEntity *pAttached = m_attachedEntity;
 		if ( pAttached )
@@ -214,6 +269,7 @@ public:
 	EHANDLE			m_attachedEntity;
 	short			m_attachedPhysicsBone;
 	QAngle			m_targetRotation;
+	bool			m_bJeep;			// GMod 10 eases the jeep's rotation in as it lines up (see Simulate)
 	float			m_timeToArrive;
 	float			m_timeToArrive_Shadow;
 
@@ -292,8 +348,9 @@ CGravControllerPoint::CGravControllerPoint( void )
 	m_localPosition = vec3_origin;
 	m_targetRotation = vec3_angle;
 	m_timeToArrive = 0;
+	m_bJeep = false;
 	m_saveDamping = 0;
-	m_saveMass = 0;
+	m_saveMass = -1.0f;
 
 //#ifdef ARGG
 	// adnan
@@ -333,11 +390,27 @@ void CGravControllerPoint::AttachEntity( CBasePlayer *pPlayer, CBaseEntity *pEnt
 	m_attachedPhysicsBone = physicsbone;	// the ragdoll bone that was hit (was never stored, so bone 0 got used)
 	pPhys->WorldToLocal( &m_localPosition, vGrabPosition );
 	m_worldPosition = vGrabPosition;
-	pPhys->GetDamping( NULL, &m_saveDamping );
-	float damping = 2;
-	pPhys->SetDamping( NULL, &damping );
-	m_saveMass = pPhys->GetMass();			// before changing it, so the drop restores the real mass
-	pPhys->SetMass( 50000 );
+	// GMod 10: leave damping alone (props keep spinning and swinging freely), make props
+	// effectively immovable by collisions, and give ragdolls a slower time to arrive. Ragdolls
+	// and the jeep keep their mass; m_saveMass < 0 means nothing to restore.
+	IPhysicsObject *pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
+	bool bRagdoll = pEntity->VPhysicsGetObjectList( pList, ARRAYSIZE( pList ) ) > 1 && !PhysgunIsVehicle( pEntity );
+	m_bJeep = FClassnameIs( pEntity, "prop_vehicle_jeep" );
+
+	// GMod 10 makes sure the object can move and turns on touch callbacks for it while held
+	pPhys->EnableMotion( true );
+	pPhys->SetCallbackFlags( pPhys->GetCallbackFlags() | CALLBACK_GLOBAL_TOUCH );
+	m_timeToArrive = bRagdoll ? physgun_timeToArriveRagdoll.GetFloat() : physgun_timeToArrive.GetFloat();
+
+	m_saveMass = -1.0f;
+	if ( !bRagdoll && !FClassnameIs( pEntity, "prop_vehicle_jeep" ) )
+	{
+		m_saveMass = pPhys->GetMass();			// before changing it, so the drop restores the real mass
+		if ( m_saveMass < PHYSGUN_HELD_MASS )
+			pPhys->SetMass( PHYSGUN_HELD_MASS );
+		else
+			m_saveMass = -1.0f;
+	}
 	m_controller = physenv->CreateMotionController( this );
 	m_controller->AttachObject( pPhys, true );
 	m_controller->SetPriority(IPhysicsMotionController::HIGH_PRIORITY);
@@ -367,8 +440,8 @@ void CGravControllerPoint::DetachEntity( void )
 		{
 			// on the odd chance that it's gone to sleep while under anti-gravity
 			pPhys->Wake();
-			pPhys->SetDamping( NULL, &m_saveDamping );
-			pPhys->SetMass( m_saveMass );
+			if ( m_saveMass >= 0 )
+				pPhys->SetMass( m_saveMass );
 		}
 	}
 	m_attachedEntity = NULL;
@@ -394,12 +467,34 @@ void AxisAngleQAngle( const Vector &axis, float angle, QAngle &outAngles )
 
 IMotionEvent::simresult_e CGravControllerPoint::Simulate( IPhysicsMotionController *pController, IPhysicsObject *pObject, float deltaTime, Vector &linear, AngularImpulse &angular )
 {
+	// GMod 10: the limits come from the convars every tick, and the time to arrive stays what it
+	// was set to on grab (the return value isn't kept)
 	hlshadowcontrol_params_t shadowParams = m_shadow;
-#ifndef CLIENT_DLL
-	m_timeToArrive = pObject->ComputeShadowControl( shadowParams, m_timeToArrive, deltaTime );
-#else
-	m_timeToArrive = pObject->ComputeShadowControl( shadowParams, (TICK_INTERVAL*2), deltaTime );
-#endif
+	shadowParams.maxAngular = physgun_maxAngular.GetFloat();
+	shadowParams.maxDampAngular = physgun_maxAngularDamping.GetFloat();
+	shadowParams.maxSpeed = physgun_maxSpeed.GetFloat();
+	shadowParams.maxDampSpeed = physgun_maxSpeedDamping.GetFloat();
+	shadowParams.dampFactor = physgun_DampingFactor.GetFloat();
+	shadowParams.teleportDistance = physgun_teleportDistance.GetFloat();
+
+	// GMod 10 does this every tick: the held object stays unfrozen and awake
+	pObject->EnableMotion( true );
+	pObject->Wake();
+
+	// GMod 10, the jeep only: scale the turning speed by how far it still has to turn
+	// (1 - the dot product of its forward and the target's), so it eases into the target
+	// orientation instead of overshooting and spinning
+	if ( m_bJeep )
+	{
+		QAngle angCurrent;
+		pObject->GetPosition( NULL, &angCurrent );
+		Vector vecTargetForward, vecCurrentForward;
+		AngleVectors( shadowParams.targetRotation, &vecTargetForward );
+		AngleVectors( angCurrent, &vecCurrentForward );
+		shadowParams.maxAngular *= ( 1.0f - DotProduct( vecTargetForward, vecCurrentForward ) );
+	}
+
+	pObject->ComputeShadowControl( shadowParams, m_timeToArrive, deltaTime );
 	
 	linear.Init();
 	angular.Init();
@@ -497,6 +592,7 @@ public:
 	}
 
 	void DrawEffects();
+	void DrawCoreGlow( C_BasePlayer *pOwner );
 	int	 DrawModel( int flags );
 	void ViewModelDrawn( C_BaseViewModel* pBaseViewModel );
 	bool IsTransparent( void );
@@ -598,6 +694,7 @@ private:
 	Vector		m_originalObjectPosition;
 	CNetworkVector	( m_targetPosition );
 	CNetworkVector	( m_worldPosition );
+	CNetworkVar( int, m_nHeldModelBone );	// ragdolls: the model bone of the held physics bone (m_worldPosition is local to it), else -1
 	CNetworkVar( int, m_nGrabCount );	// +1 on every grab, so the client can tell when the server's grab data is for this grab
 
 #ifdef CLIENT_DLL
@@ -647,6 +744,7 @@ BEGIN_NETWORK_TABLE( CWeaponGravityGun, DT_WeaponGravityGun )
 	RecvPropInt( RECVINFO( m_physicsBone ) ),
 	RecvPropVector( RECVINFO( m_targetPosition ) ),
 	RecvPropVector( RECVINFO( m_worldPosition ) ),
+	RecvPropInt( RECVINFO( m_nHeldModelBone ) ),
 	RecvPropInt( RECVINFO( m_nGrabCount ) ),
 	RecvPropInt( RECVINFO(m_active) ),
 //#ifdef ARGG
@@ -661,6 +759,7 @@ BEGIN_NETWORK_TABLE( CWeaponGravityGun, DT_WeaponGravityGun )
 	SendPropInt( SENDINFO( m_physicsBone ) ),
 	SendPropVector(SENDINFO( m_targetPosition ), -1, SPROP_COORD),
 	SendPropVector(SENDINFO( m_worldPosition ), -1, SPROP_COORD),
+	SendPropInt( SENDINFO( m_nHeldModelBone ), 10 ),
 	SendPropInt( SENDINFO( m_nGrabCount ), 8, SPROP_UNSIGNED ),
 	SendPropInt( SENDINFO(m_active), 1, SPROP_UNSIGNED ),
 //#ifdef ARGG
@@ -748,6 +847,7 @@ CWeaponGravityGun::CWeaponGravityGun()
 	m_lastYaw = 0;
 	m_soundState = 0;
 	m_physicsBone = 0;
+	m_nHeldModelBone = -1;
 	m_flRotateX = 0;
 	m_flRotateY = 0;
 	m_bWasRotating = false;
@@ -790,10 +890,21 @@ bool CGravControllerPoint::UpdateObject( CBasePlayer *pPlayer, CBaseEntity *pEnt
 	//Pickup_GetRotatedCarryAngles( pEntity, pPlayer, pPlayer->EntityToWorldTransform(), angles );
 	// added the ... && (mousedx | mousedy) so we dont have to calculate if no mouse movement
 	// UPDATE: m_vecRotatedCarryAngles has become a temp variable... can be cleaned up by using actual temp vars
+	// GMod 10: while rotating (Use), Left/Right turn the object at phys_spinspeed degrees a
+	// second about the vertical, the same way moving the mouse sideways does
+	float flKeyYaw = 0;
+	if ( m_bHasRotatedCarryAngles )
+	{
+		if ( pPlayer->m_nButtons & IN_MOVELEFT )
+			flKeyYaw += phys_spinspeed.GetFloat() * gpGlobals->frametime;
+		if ( pPlayer->m_nButtons & IN_MOVERIGHT )
+			flKeyYaw -= phys_spinspeed.GetFloat() * gpGlobals->frametime;
+	}
+
 #ifdef CLIENT_DLL
-	if( m_bHasRotatedCarryAngles && (pPlayer->m_pCurrentCommand->mousedx || pPlayer->m_pCurrentCommand->mousedy) )
+	if( m_bHasRotatedCarryAngles && (pPlayer->m_pCurrentCommand->mousedx || pPlayer->m_pCurrentCommand->mousedy || flKeyYaw != 0) )
 #else
-	if( m_bHasRotatedCarryAngles && (pPlayer->GetCurrentCommand()->mousedx || pPlayer->GetCurrentCommand()->mousedy) )
+	if( m_bHasRotatedCarryAngles && (pPlayer->GetCurrentCommand()->mousedx || pPlayer->GetCurrentCommand()->mousedy || flKeyYaw != 0) )
 #endif
 	{
 		// method II: relative orientation
@@ -810,6 +921,7 @@ bool CGravControllerPoint::UpdateObject( CBasePlayer *pPlayer, CBaseEntity *pEnt
 		m_vecRotatedCarryAngles[YAW] = pPlayer->GetCurrentCommand()->mousedx * -0.4;
 		m_vecRotatedCarryAngles[PITCH] = pPlayer->GetCurrentCommand()->mousedy * 0.4;
 #endif
+		m_vecRotatedCarryAngles[YAW] += flKeyYaw;
 		m_vecRotatedCarryAngles[ROLL] = 0;
 		MatrixFromAngles( m_vecRotatedCarryAngles, vDeltaRotation );
 
@@ -824,7 +936,26 @@ bool CGravControllerPoint::UpdateObject( CBasePlayer *pPlayer, CBaseEntity *pEnt
 	// stale here, the world origin after a previous drop, and the object got
 	// pulled to it on frames EffectUpdate didn't run). m_targetRotation is kept
 	// relative to the player's yaw; the shadow controller wants world angles.
-	SetTargetPosition( m_targetPosition, TransformAnglesFromPlayerSpace( m_targetRotation, pPlayer ) );
+	QAngle angTarget = TransformAnglesFromPlayerSpace( m_targetRotation, pPlayer );
+
+	// GMod 10: Sprint + Use snaps the object's angles to gm_snapdegrees while held, and
+	// letting go of Use with Sprint still down keeps the snapped angles
+	float flSnap = gm_snapdegrees.GetFloat();
+	if ( flSnap > 0 && ( pPlayer->m_nButtons & IN_SPEED ) )
+	{
+		bool bSnapping = ( pPlayer->m_nButtons & IN_USE ) != 0;
+		bool bCommit = ( pPlayer->m_afButtonReleased & IN_USE ) != 0;
+		if ( bSnapping || bCommit )
+		{
+			for ( int i = 0; i < 3; i++ )
+				angTarget[i] = RoundFloatToInt( angTarget[i] / flSnap ) * flSnap;
+
+			if ( bCommit )
+				m_targetRotation = TransformAnglesToPlayerSpace( angTarget, pPlayer );
+		}
+	}
+
+	SetTargetPosition( m_targetPosition, angTarget );
 
 	return true;
 }
@@ -1009,7 +1140,7 @@ void CWeaponGravityGun::EffectUpdate( void )
 #endif
 			if (pOwner->m_nButtons & IN_FORWARD)
 			{
-				m_distance = Approach( 1024, m_distance, gpGlobals->frametime * 100 );
+				m_distance = Approach( 2048, m_distance, gpGlobals->frametime * 100 );	// GMod 10: up to 2048
 			}
 			if ( pOwner->m_nButtons & IN_BACK )
 			{
@@ -1298,6 +1429,7 @@ void CWeaponGravityGun::DetachObject( void )
 		m_gravCallback.DetachEntity();
 		m_hObject = NULL;
 		m_physicsBone = 0;
+	m_nHeldModelBone = -1;
 	}
 }
 
@@ -1331,12 +1463,29 @@ void CWeaponGravityGun::AttachObject(CBaseEntity * pObject, IPhysicsObject * pPh
 	{
 		if (gmod_physgun_lock == true){
 			pPhysics->EnableMotion(true);
+
+			// a frozen vehicle has all its objects frozen (see SecondaryAttack); unfreeze the
+			// wheels too, or they fight the body being carried
+			if ( PhysgunIsVehicle( pObject ) )
+			{
+				IPhysicsObject *pVehicleList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
+				int vehicleCount = pObject->VPhysicsGetObjectList( pVehicleList, ARRAYSIZE( pVehicleList ) );
+				for ( int i = 0; i < vehicleCount; i++ )
+					pVehicleList[i]->EnableMotion( true );
+			}
 		}
 		m_distance = distance;
 		m_physicsBone = physicsbone;	// every later lookup uses this; it was left at 0 (the root bone)
 #ifndef CLIENT_DLL
 		m_nGrabCount = ( m_nGrabCount + 1 ) & 0xFF;
 		m_targetPosition = end;			// the held point, right away (was last grab's until the next update)
+
+		// ragdolls: tell the client which model bone the held point is on, so it can draw the
+		// beam end on the bone as it's drawn (like GMod 10's m_iPhysBone)
+		m_nHeldModelBone = -1;
+		CRagdollProp *pRagdollProp = dynamic_cast< CRagdollProp * >( pObject );
+		if ( pRagdollProp && physicsbone >= 0 && physicsbone < pRagdollProp->GetRagdoll()->listCount )
+			m_nHeldModelBone = pRagdollProp->GetRagdoll()->boneIndex[physicsbone];
 #endif
 
 		Vector worldPosition;
@@ -1367,6 +1516,7 @@ void CWeaponGravityGun::AttachObject(CBaseEntity * pObject, IPhysicsObject * pPh
 	{
 		m_hObject = NULL;
 		m_physicsBone = 0;
+	m_nHeldModelBone = -1;
 	}*/
 }
 
@@ -1406,6 +1556,18 @@ void CWeaponGravityGun::SecondaryAttack( void )
 			IPhysicsObject* phys = GetPhysObjFromPhysicsBone( m_hObject, m_physicsBone );
 			if (phys) {
 				phys->EnableMotion(false);
+
+				// GMod 10 (base gamemode OnPhysgunFreeze): "With the jeep we need to pause all
+				// of its physics objects to stop it spazzing out and killing the server" - the
+				// wheels kept simulating against the frozen body
+				if ( PhysgunIsVehicle( m_hObject ) )
+				{
+					IPhysicsObject *pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
+					int count = m_hObject->VPhysicsGetObjectList( pList, ARRAYSIZE( pList ) );
+					for ( int i = 0; i < count; i++ )
+						pList[i]->EnableMotion( false );
+				}
+
 				m_bBlockPrimary = true;
 			}
 		}
@@ -1432,23 +1594,125 @@ void CWeaponGravityGun::SecondaryAttack( void )
 //-----------------------------------------------------------------------------
 // Purpose: Render the beams and sprites for the physgun (both view and world models)
 //-----------------------------------------------------------------------------
+extern void FormatViewModelAttachment( Vector &vOrigin, bool bInverse );
+
+//-----------------------------------------------------------------------------
+// Purpose: The light in the physgun's core, as GMod 10 drew it (C_PhysBeam::DrawModel in its
+//			client.dll), at the gun's first attachment ("core" on the world model, "muzzle"
+//			on the view model):
+//			- beam off: two sprites pulsing between 40 and 56 units, 5 units apart along the
+//			  attachment's forward axis
+//			- beam on: sprites of a random 16-64 units every frame (the fast flicker), 2 units
+//			  apart; 2 of them, or 7 while holding something
+//-----------------------------------------------------------------------------
+void CWeaponGravityGun::DrawCoreGlow( C_BasePlayer *pOwner )
+{
+	// First person: the view model; third person: this weapon's world model
+	C_BaseAnimating *pModel = pOwner->GetRenderedWeaponModel();
+	if ( !pModel )
+		return;
+
+	// GMod 10 used attachment 1: "core" on the world model (w_physics), "muzzle" on the
+	// view model (c_superphyscannon has no "core")
+	int iAttachment = pModel->LookupAttachment( "core" );
+	if ( iAttachment <= 0 )
+		iAttachment = 1;
+
+	Vector vecCore;
+	QAngle angCore;
+	if ( !pModel->GetAttachment( iAttachment, vecCore, angCore ) )
+		return;
+
+	// In first person this is drawn with the view model, in its view (view model FOV and depth
+	// range), so it's hidden behind the gun's parts like the rest of the model. View model
+	// attachments come moved to line up with the world view; move it back.
+	if ( !pOwner->ShouldDrawThisPlayer() )
+		::FormatViewModelAttachment( vecCore, true );	// the global one, not C_BaseAnimating's
+
+	Vector vecForward;
+	AngleVectors( angCore, &vecForward );
+
+	CMatRenderContextPtr pRenderContext( materials );
+	pRenderContext->Bind( materials->FindMaterial( PHYSGUN_CORE_GLOW, TEXTURE_GROUP_CLIENT_EFFECTS ) );
+
+	int nSprites = 2;
+	float flSpacing = 5.0f;
+	if ( m_active )
+	{
+		nSprites = m_hObject.Get() ? 7 : 2;
+		flSpacing = 2.0f;
+	}
+
+	Vector vecPos = vecCore;
+	for ( int i = 0; i < nSprites; i++ )
+	{
+		color32 clr;
+		clr.r = clr.g = random->RandomInt( 120, 130 );
+		clr.b = random->RandomInt( 200, 255 );
+		clr.a = 255;
+
+		float flSize;
+		if ( m_active )
+			flSize = random->RandomFloat( 16.0f, 64.0f );
+		else
+			flSize = 48.0f + 8.0f * sin( ( gpGlobals->curtime + i * 3.0f ) * 5.0f );
+
+		DrawSprite( vecPos, flSize, flSize, clr );
+
+		vecPos += vecForward * flSpacing;
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: GMod 10's version of DrawBeamQuadratic (beamdraw.cpp): the same 16-segment curve
+//			with black ends, but the texture repeats along the beam (every 50 units, measured
+//			start to end) instead of being stretched once over its length.
+//-----------------------------------------------------------------------------
+static void DrawBeamQuadraticGMod10( const Vector &start, const Vector &control, const Vector &end, float width, const Vector &color, float scrollOffset )
+{
+	const int subdivisions = 16;
+	float flLength = start.DistTo( end );
+
+	CMatRenderContextPtr pRenderContext( materials );
+	CBeamSegDraw beamDraw;
+	beamDraw.Start( pRenderContext, subdivisions + 1, NULL );
+
+	BeamSeg_t seg;
+	seg.m_flAlpha = 1.0f;
+	seg.m_flWidth = width;
+
+	float t = 0;
+	float u = fmod( scrollOffset, 1.0f );
+	float dt = 1.0f / ( float )subdivisions;
+	for ( int i = 0; i <= subdivisions; i++, t += dt )
+	{
+		float omt = 1 - t;
+		seg.m_vPos = ( omt * omt ) * start + ( 2 * t * omt ) * control + ( t * t ) * end;
+		seg.m_flTexCoord = u - t * flLength * 0.02f;
+		seg.m_vColor = ( i == 0 || i == subdivisions ) ? vec3_origin : color;
+		beamDraw.NextSeg( &seg );
+	}
+
+	beamDraw.End();
+}
+
 void CWeaponGravityGun::DrawEffects()
 {
-		if (!m_active)
-			return;
-
 		// Render our effects
 		C_BasePlayer *pOwner = ToBasePlayer( GetOwner() );
 
 		if ( !pOwner )
 			return;
 
+		DrawCoreGlow( pOwner );
+
+		if (!m_active)
+			return;
+
 		Vector points[3];
 		QAngle tmpAngle;
 
 		C_BaseEntity *pObject = m_hObject;
-		//if ( pObject == NULL )
-		//	return;
 
 		Vector attachPos;
 		QAngle attachAng;
@@ -1491,39 +1755,38 @@ void CWeaponGravityGun::DrawEffects()
 			pOwner->EyeVectors( &vecAim, NULL, NULL );
 			points[2] = pOwner->Weapon_ShootPosition() + vecAim * m_flPredictedDistance;
 		}
-		else if ( !pObject->VPhysicsGetObject() )
+		else if ( m_nHeldModelBone >= 0 && pObject->GetBaseAnimating() )
 		{
-			// no client physics for it (server ragdolls): the server sends the
-			// held point; m_worldPosition is local to the held bone, not the entity
+			// a ragdoll: m_worldPosition is local to the held bone; use that bone as it's
+			// drawn now
+			matrix3x4_t boneToWorld;
+			pObject->GetBaseAnimating()->GetBoneTransform( m_nHeldModelBone, boneToWorld );
+			VectorTransform( m_worldPosition, boneToWorld, points[2] );
+		}
+		else if ( m_physicsBone > 0 )
+		{
+			// another multi-part object we can't follow on the client: the server's held point
 			points[2] = m_targetPosition;
 		}
 		else
 		{
+			// like GMod 10: the held point on the object as it's drawn now, every frame (the
+			// server's networked point lags the drawn object by the interpolation delay)
 			pObject->EntityToWorldSpace(m_worldPosition, &points[2]);
 		}
 
-		Vector forward, right, up;
-		QAngle playerAngles = pOwner->EyeAngles();
-		AngleVectors( playerAngles, &forward, &right, &up );
+		// GMod 10's control point: straight at the end point when not holding anything,
+		// otherwise 0.6 of the beam's length out along the aim from the eye
+		Vector forward;
+		pOwner->EyeVectors( &forward, NULL, NULL );
 		if (pObject == NULL)
 		{
-			Vector vecDir = points[2] - points[0];
-			VectorNormalize(vecDir);
-			points[1] = points[0] + 0.5f * (vecDir * points[2].DistTo(points[0]));
+			points[1] = points[2];
 		}
 		else
 		{
-			Vector vecSrc = pOwner->Weapon_ShootPosition();
-			points[1] = vecSrc + 0.5f * (forward * points[2].DistTo(points[0]));
+			points[1] = pOwner->EyePosition() + forward * ( points[2].DistTo( points[0] ) * 0.6f );
 		}
-
-		//IMaterial *pMat = materials->FindMaterial( "sprites/physbeam1", TEXTURE_GROUP_CLIENT_EFFECTS );
-		//Gmod 10 uses this specifically. HL2:SB had some vmt pointing elsewhere. It was stupid. Lets just use stock HL2 assets!
-		IMaterial *pMat = materials->FindMaterial( PHYSGUN_BEAM_SPRITE, TEXTURE_GROUP_CLIENT_EFFECTS );
-		if ( pObject )
-			pMat = materials->FindMaterial( PHYSGUN_BEAM_SPRITE_ACTIVE, TEXTURE_GROUP_CLIENT_EFFECTS );
-		Vector color;
-		color.Init(1,1,1);
 
 		// Now draw it.
 		CViewSetup beamView = *view->GetPlayerViewSetup();
@@ -1531,43 +1794,37 @@ void CWeaponGravityGun::DrawEffects()
 		Frustum dummyFrustum;
 		render->Push3DView( beamView, 0, NULL, dummyFrustum );
 
-		float scrollOffset = gpGlobals->curtime * 2 - (int)gpGlobals->curtime * 2;
 		CMatRenderContextPtr pRenderContext( materials );
-		pRenderContext->Bind( pMat );
 	#if 1
 		// HACK HACK:  Munge the depth range to prevent view model from poking into walls, etc.
 		// Force clipped down range
 		pRenderContext->DepthRange( 0.1f, 0.2f );
 	#endif
-		DrawBeamQuadratic( points[0], points[1], points[2], pObject ? 13/3.0f : 13/3.0f, color, scrollOffset );
-		DrawBeamQuadratic( points[0], points[1], points[2], pObject ? 13/3.0f : 13/3.0f, color, -scrollOffset );
 
-		//Draw the beams endpoint!!!!
+		// The beam, as GMod 10 drew it (C_PhysBeam): physbeam when empty, scrolling backwards
+		// slowly; physbeama when holding, scrolling forwards fast. Three layers: width 2 at
+		// that speed, a random 2-5 at 1.1x and a random 2-6 at -0.9x.
+		pRenderContext->Bind( materials->FindMaterial( pObject ? PHYSGUN_BEAM_SPRITE_ACTIVE : PHYSGUN_BEAM_SPRITE, TEXTURE_GROUP_CLIENT_EFFECTS ) );
 
-		//IMaterial *pMaterial = materials->FindMaterial( "sprites/physglow", TEXTURE_GROUP_CLIENT_EFFECTS );
-		// Another change from HL2:SB to Gmod 10. Additives are better then a full blue ball!
-		// Gmod 10 also seems to have a physg_glow2. Seems to be for the beam end effect (and for mimicing the orb from the physcannon)
-		IMaterial *pMaterial = materials->FindMaterial( PHYSGUN_BEAM_GLOW, TEXTURE_GROUP_CLIENT_EFFECTS );
+		Vector color( 1, 1, 1 );
+		float flScroll = ( pObject ? 10.0f : -2.0f ) * gpGlobals->curtime;
+		DrawBeamQuadraticGMod10( points[0], points[1], points[2], 2.0f, color, flScroll );
+		DrawBeamQuadraticGMod10( points[0], points[1], points[2], random->RandomFloat( 2.0f, 5.0f ), color, flScroll * 1.1f );
+		DrawBeamQuadraticGMod10( points[0], points[1], points[2], random->RandomFloat( 2.0f, 6.0f ), color, flScroll * -0.9f );
 
-		color32 clr={128,128,240,255};
-		/*if (pObject)
+		// The sparkle at the end: 2 sprites, or 7 while holding something
+		pRenderContext->Bind( materials->FindMaterial( PHYSGUN_BEAM_GLOW, TEXTURE_GROUP_CLIENT_EFFECTS ) );
+
+		int nSparkles = pObject ? 7 : 2;
+		for ( int i = 0; i < nSparkles; i++ )
 		{
-			clr.r = 186;
-			clr.g = 253;
-			clr.b = 247;
+			color32 clr;
+			clr.r = clr.g = random->RandomInt( 100, 150 );
+			clr.b = random->RandomInt( 200, 255 );
 			clr.a = 255;
-		}*/
 
-		// Guessed Gmod 10 factor
-		// PObject ? holding object then not holding anything
-		float scale = random->RandomFloat( 1, 4.5 ) * ( pObject ? 6 : 4 );
-
-		// Draw the sprite
-		pRenderContext->Bind( pMaterial );
-		//pRenderContext->Bind( pMaterial2 );
-		for ( int i = 0; i < 3; i++ )
-		{
-			DrawSprite( points[2], scale, scale, clr );
+			float flSize = random->RandomFloat( 1.0f, 16.0f );
+			DrawSprite( points[2], flSize, flSize, clr );
 		}
 	#if 1
 		pRenderContext->DepthRange( 0.0f, 1.0f );

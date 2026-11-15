@@ -5305,6 +5305,18 @@ for name, default in pairs({
 	end
 end
 
+--[[
+	GMod commands that addons run whatever the gamemode (portal manager, SligWolf, VJ Base run
+	spawnmenu_reload, which only sandbox's client spawn menu defines). A command the client
+	doesn't have is sent on to the server, and running one the other side doesn't have gives
+	"Error, bad server command". Give them a callback that does nothing on both sides (a
+	command without one prints "Unknown command"); a gamemode that defines one with
+	concommand.Add later replaces it.
+--]]
+for _, name in ipairs({ "spawnmenu_reload" }) do
+	ConsoleCommands.Add(name, function() end)
+end
+
 -- GMod spells the bodygroup functions "Bodygroup"; ours are "BodyGroup".
 do
 	local aliases = {
