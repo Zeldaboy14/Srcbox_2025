@@ -134,13 +134,18 @@ CWeaponCrowbarTerror::CWeaponCrowbarTerror( void )
 //-----------------------------------------------------------------------------
 void CWeaponCrowbarTerror::SecondaryAttack(void)
 {
-	Swing(true);
-
-	m_flNextSecondaryAttack = gpGlobals->curtime + GetViewModelSequenceDuration();
+	// Srcbox: swing once. This used to call Swing() itself and again through BaseClass::SecondaryAttack(),
+	// so the swing traced/damaged twice and its animation was sent up to three times. Swing() also times
+	// the next swing from the weapon entity's sequence; when the miss animation (ACT_VM_MISSCENTER2) isn't
+	// in the view model nothing is sent, so that duration was whatever played last (the idle), and further
+	// swings were held back until the weapon idled. Time everything from the view model's swing instead.
+	Swing( true );
 
 	//SendWeaponAnim(ACT_VM_HITCENTER2);
 
-	BaseClass::SecondaryAttack();
+	float flSwingTime = GetViewModelSequenceDuration();
+	m_flNextSecondaryAttack = gpGlobals->curtime + flSwingTime;
+	SetWeaponIdleTime( gpGlobals->curtime + flSwingTime );
 }
 
 //-----------------------------------------------------------------------------

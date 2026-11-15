@@ -237,13 +237,21 @@ void CSMG_Silenced::PrimaryAttack( void )
 //-----------------------------------------------------------------------------
 void CSMG_Silenced::SecondaryAttack( void )
 {
-	Swing(true);
+	// Srcbox: swing once. This used to call Swing() itself and again through BaseClass::SecondaryAttack(),
+	// so the shove traced/damaged twice and its animation was sent up to three times. Swing() also times
+	// the next shove from the weapon entity's sequence; when the miss animation (ACT_VM_MISSCENTER2) isn't
+	// in the view model nothing is sent, so that duration was whatever played last (the idle), and further
+	// shoves were held back until the weapon idled. Time everything from the view model's shove instead.
+	Swing( true );
 
-	m_flNextSecondaryAttack = gpGlobals->curtime + GetViewModelSequenceDuration();
+	SendWeaponAnim( ACT_VM_HITCENTER );
 
-	SendWeaponAnim(ACT_VM_HITCENTER);
+	float flShoveTime = GetViewModelSequenceDuration();
+	m_flNextSecondaryAttack = gpGlobals->curtime + flShoveTime;
+	SetWeaponIdleTime( gpGlobals->curtime + flShoveTime );
 
-	BaseClass::SecondaryAttack();
+	// Swing() set the next shot; keep ItemPostFrame's click-refire from cutting the shove short
+	m_flSoonestPrimaryAttack = m_flNextPrimaryAttack;
 }
 
 //-----------------------------------------------------------------------------

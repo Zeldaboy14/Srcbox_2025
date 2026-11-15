@@ -147,7 +147,7 @@ static const char *s_PreserveEnts[] =
 	"soundent",
 	"trigger_soundscape",
 	"viewmodel",
-#if 0
+#if OLD_HAND_VIEWMODELS
 	"hand_viewmodel",
 #endif
 	"predicted_viewmodel",
@@ -1302,13 +1302,35 @@ const char *CHL2MPRules::GetGameDescription( void )
 	if ( IsTeamplay() )
 		return "Team Deathmatch";
 #else
-	LUA_CALL_HOOK_BEGIN("GetGameDescription");
-	LUA_CALL_HOOK_END(0, 1);
+	// Srcbox: copy the hook's string before it leaves the Lua stack. LUA_RETURN_STRING handed
+	// back Lua's own pointer after popping it, so the engine (server browser info, game
+	// description) could read a string Lua had already garbage-collected.
+	static char s_szGameDescription[128];
+	if ( L )	// the engine can ask before Lua is up
+	{
+		int iTop = lua_gettop( L );
 
-	LUA_RETURN_STRING();
+		LUA_CALL_HOOK_BEGIN("GetGameDescription");
+		LUA_CALL_HOOK_END(0, 1);
+
+		if ( lua_gettop( L ) > iTop )
+		{
+			bool bHasDescription = ( lua_type( L, -1 ) == LUA_TSTRING );
+			if ( bHasDescription )
+				Q_strncpy( s_szGameDescription, lua_tostring( L, -1 ), sizeof( s_szGameDescription ) );
+			lua_settop( L, iTop );
+
+			if ( bHasDescription )
+				return s_szGameDescription;
+		}
+	}
 
 	//return "Deathmatch";
 #endif
+
+	// Srcbox: also the fallback when the hook returns nothing (with SRCBOX defined this
+	// function used to end without returning anything)
+	return "Deathmatch";
 
 #if !defined( SRCBOX )
 	return "Deathmatch"; 

@@ -233,7 +233,7 @@ void CHL2MP_Player::Precache( void )
 	PrecacheScriptSound("Player.FlashlightOff");
 
 	PrecacheModel ( "sprites/glow01.vmt" );
-#if 0
+#if OLD_HAND_VIEWMODELS
 	PrecacheModel(HANDVIEWMODEL);
 #endif
 
@@ -455,8 +455,8 @@ void CHL2MP_Player::Spawn(void)
 
 	SetNumAnimOverlays( 3 );
 	ResetAnimation();
-#if 0
-	GetViewModel(1)->SetModel(HANDVIEWMODEL); // set the viewmodels for the hands
+#if OLD_HAND_VIEWMODELS
+	SetupHandsViewModel();
 #endif
 
 	m_nRenderFX = kRenderNormal;
@@ -1781,6 +1781,66 @@ static CBaseEntity *GetL4DNavSpawn( void )
 }
 #endif // SRCBOX
 
+#if OLD_HAND_VIEWMODELS
+//-----------------------------------------------------------------------------
+// Purpose: Srcbox: sets the hands view model ( view model 1 ) when the player spawns.
+//
+// The gamemode chooses it with the PlayerHandsModel hook:
+//
+//		function GM:PlayerHandsModel( ply )
+//			return "models/weapons/c_arms_citizen.mdl"	-- these hands
+//			return ""									-- no hands ( e.g. GMod-style c_arms )
+//			return nil									-- the default arms ( HANDVIEWMODEL )
+//		end
+//
+// Gamemodes inherit it like any other hook, so a base gamemode can set it for all the
+// gamemodes deriving from it, and a gamemode can decide per player ( team, class, model ).
+// ( This used to compare GetGameDescription() with "gmod_minimal", but that returns the
+// gamemode's display name, never the folder name, so the hands were always set. )
+//-----------------------------------------------------------------------------
+void CHL2MP_Player::SetupHandsViewModel( void )
+{
+	CBaseViewModel *pHands = GetViewModel( 1 );
+	if ( !pHands )
+		return;
+
+	char szModel[MAX_PATH];
+	Q_strncpy( szModel, HANDVIEWMODEL, sizeof( szModel ) );
+
+#ifdef LUA_SDK
+	int iTop = lua_gettop( L );
+	LUA_CALL_HOOK_BEGIN( "PlayerHandsModel" );
+	CHL2MP_Player::PushLuaInstanceSafe( L, this );
+	LUA_CALL_HOOK_END( 1, 1 );
+
+	if ( lua_gettop( L ) > iTop )
+	{
+		// copy it before popping: the string belongs to Lua
+		if ( lua_type( L, -1 ) == LUA_TSTRING )
+			Q_strncpy( szModel, lua_tostring( L, -1 ), sizeof( szModel ) );
+		lua_settop( L, iTop );
+	}
+#endif
+
+	if ( !szModel[0] )
+	{
+		pHands->SetModel( "" );	// no hands, like PlayerDeathThink does
+		return;
+	}
+
+	// A gamemode's own hands may not have been precached with the map
+	if ( modelinfo->GetModelIndex( szModel ) < 0 )
+	{
+		bool bAllowPrecache = CBaseEntity::IsPrecacheAllowed();
+		CBaseEntity::SetAllowPrecache( true );
+		PrecacheModel( szModel );
+		CBaseEntity::SetAllowPrecache( bAllowPrecache );
+	}
+
+	pHands->SetModel( szModel );
+}
+#endif
+
 CBaseEntity* CHL2MP_Player::EntSelectSpawnPoint( void )
 {
 #ifdef LUA_SDK
@@ -1806,7 +1866,7 @@ CBaseEntity* CHL2MP_Player::EntSelectSpawnPoint( void )
 
 	CBaseEntity *pSpot = NULL;
 	CBaseEntity *pSpot2 = NULL;
-	CBaseEntity *pSpot3 = NULL;
+	//CBaseEntity *pSpot3 = NULL;
 	CBaseEntity *pSpot4 = NULL;
 	CBaseEntity *pSpot5 = NULL;
 	CBaseEntity *pSpot6 = NULL;
@@ -1904,7 +1964,6 @@ CBaseEntity* CHL2MP_Player::EntSelectSpawnPoint( void )
 
 		// Srcbox: the first spawn type the map has (the old chain returned pSpot2
 		// even when it was NULL, and NULL when the map had none of these)
-		//CBaseEntity *pFallbacks[] = { pSpot2, pSpot3, pSpot4, pSpot5, pSpot6, pSpot7 };
 		CBaseEntity *pFallbacks[] = { pSpot5, pSpot6, pSpot7 };
 		for ( int i = 0; i < ARRAYSIZE( pFallbacks ); i++ )
 		{

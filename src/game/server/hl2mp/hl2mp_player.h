@@ -112,6 +112,9 @@ public:
 	void CreateRagdollEntity( void );
 	void GiveAllItems( void );
 	void GiveDefaultItems( void );
+#if OLD_HAND_VIEWMODELS
+	void SetupHandsViewModel( void );	// Srcbox: the hands view model, chosen by the gamemode
+#endif
 
 	void NoteWeaponFired( void );
 

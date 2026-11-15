@@ -1056,8 +1056,14 @@ void CBaseCombatWeapon::SetActivity( Activity act, float duration )
 #endif*/
 
 //Adrian: Oh man...
-	if (GetOwner()->IsPlayer())
-		SetModel(GetWorldModel());
+	// Srcbox: like Experiment, only the server swaps the model (the client changing its own model
+	// index mid-prediction resets the weapon's animation state), and only for a player owner;
+	// GetOwner() can be NULL (a dropped or not-yet-equipped weapon), which crashed here.
+#ifndef CLIENT_DLL
+	const bool bSwapModel = GetOwner() && GetOwner()->IsPlayer();
+	if ( bSwapModel )
+		SetModel( GetWorldModel() );
+#endif
 
 	int sequence = SelectWeightedSequence(act);
 
@@ -1066,8 +1072,10 @@ void CBaseCombatWeapon::SetActivity( Activity act, float duration )
 		sequence = SelectWeightedSequence(ACT_VM_IDLE);
 
 	//Adrian: Oh man again...
-	if (GetOwner()->IsPlayer())
-		SetModel(GetViewModel());
+#ifndef CLIENT_DLL
+	if ( bSwapModel )
+		SetModel( GetViewModel() );
+#endif
 
 	if ( sequence != ACTIVITY_NOT_AVAILABLE )
 	{
