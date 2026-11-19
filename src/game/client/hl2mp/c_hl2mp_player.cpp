@@ -46,10 +46,18 @@ ConVar sv_infinite_aux_power( "sv_infinite_aux_power", "1", FCVAR_CHEAT | FCVAR_
 
 LINK_ENTITY_TO_CLASS( player, C_HL2MP_Player );
 
+// Srcbox: the origin arrives as one vector ( see SRCBOX_PLAYER_FULL_ORIGIN in hl2mp_player.cpp,
+// which this must match ): with maxplayers 1 the separate Z never arrived after spawning.
+#define SRCBOX_PLAYER_FULL_ORIGIN
+
 // specific to the local player
 BEGIN_RECV_TABLE_NOBASE( C_HL2MP_Player, DT_HL2MPLocalPlayerExclusive )
+#ifdef SRCBOX_PLAYER_FULL_ORIGIN
+    RecvPropVector( RECVINFO_NAME( m_vecNetworkOrigin, m_vecOrigin ) ),
+#else
 RecvPropVectorXY( RECVINFO_NAME( m_vecNetworkOrigin, m_vecOrigin ) ),
     RecvPropFloat( RECVINFO_NAME( m_vecNetworkOrigin[2], m_vecOrigin[2] ) ),
+#endif
 
     RecvPropFloat( RECVINFO( m_angEyeAngles[0] ) ),
 #ifndef LUA_SDK
@@ -59,8 +67,12 @@ RecvPropVectorXY( RECVINFO_NAME( m_vecNetworkOrigin, m_vecOrigin ) ),
 
     // all players except the local player
     BEGIN_RECV_TABLE_NOBASE( C_HL2MP_Player, DT_HL2MPNonLocalPlayerExclusive )
+#ifdef SRCBOX_PLAYER_FULL_ORIGIN
+        RecvPropVector( RECVINFO_NAME( m_vecNetworkOrigin, m_vecOrigin ) ),
+#else
         RecvPropVectorXY( RECVINFO_NAME( m_vecNetworkOrigin, m_vecOrigin ) ),
     RecvPropFloat( RECVINFO_NAME( m_vecNetworkOrigin[2], m_vecOrigin[2] ) ),
+#endif
 
     RecvPropFloat( RECVINFO( m_angEyeAngles[0] ) ),
     RecvPropFloat( RECVINFO( m_angEyeAngles[1] ) ),
