@@ -1,6 +1,7 @@
 #include "cbase.h"
 #include "luamanager.h"
 #include "luasrclib.h"
+#include "srcbox/srcbox_bonemanip.h"
 #include "mathlib/lvector.h"
 #ifdef LUA_SDK
 #include "mathlib/lvmatrix.h"
@@ -1378,6 +1379,174 @@ LUA_BINDING_END()
 //    return 1;
 //}
 // LUA_BINDING_END( "string", "The string representation of the entity" )
+
+//-----------------------------------------------------------------------------
+// Srcbox: GMod's bone hierarchy / physics bone / bone manipulation API
+// ( Ragdoll Mover, bone_manipulate, etc. ). See srcbox/srcbox_bonemanip.cpp.
+//-----------------------------------------------------------------------------
+static const mstudiobone_t *LuaGetBone( CBaseAnimating *pAnimating, int iBone )
+{
+    CStudioHdr *pHdr = pAnimating ? pAnimating->GetModelPtr() : NULL;
+    if ( !pHdr || iBone < 0 || iBone >= pHdr->numbones() )
+        return NULL;
+    return pHdr->pBone( iBone );
+}
+
+LUA_BINDING_BEGIN( CBaseAnimating, GetBoneName, "class", "Get the name of a bone." )
+{
+    lua_CBaseAnimating *pAnimating = LUA_BINDING_ARGUMENT( luaL_checkanimating, 1, "entity" );
+    int iBone = LUA_BINDING_ARGUMENT( luaL_checknumber, 2, "bone" );
+    const mstudiobone_t *pBone = LuaGetBone( pAnimating, iBone );
+    lua_pushstring( L, pBone ? pBone->pszName() : "__INVALIDBONE__" );
+    return 1;
+}
+LUA_BINDING_END( "string", "The bone's name, or \"__INVALIDBONE__\"." )
+
+LUA_BINDING_BEGIN( CBaseAnimating, GetBoneParent, "class", "Get the parent bone of a bone." )
+{
+    lua_CBaseAnimating *pAnimating = LUA_BINDING_ARGUMENT( luaL_checkanimating, 1, "entity" );
+    int iBone = LUA_BINDING_ARGUMENT( luaL_checknumber, 2, "bone" );
+    const mstudiobone_t *pBone = LuaGetBone( pAnimating, iBone );
+    lua_pushinteger( L, pBone ? pBone->parent : -1 );
+    return 1;
+}
+LUA_BINDING_END( "integer", "The parent bone, or -1." )
+
+LUA_BINDING_BEGIN( CBaseAnimating, GetChildBones, "class", "Get the bones whose parent is this bone." )
+{
+    lua_CBaseAnimating *pAnimating = LUA_BINDING_ARGUMENT( luaL_checkanimating, 1, "entity" );
+    int iBone = LUA_BINDING_ARGUMENT( luaL_checknumber, 2, "bone" );
+
+    lua_newtable( L );
+    CStudioHdr *pHdr = pAnimating->GetModelPtr();
+    if ( pHdr )
+    {
+        int n = 1;
+        for ( int i = 0; i < pHdr->numbones(); i++ )
+        {
+            if ( pHdr->pBone( i )->parent == iBone && i != iBone )
+            {
+                lua_pushinteger( L, i );
+                lua_rawseti( L, -2, n++ );
+            }
+        }
+    }
+    return 1;
+}
+LUA_BINDING_END( "table", "The child bones." )
+
+LUA_BINDING_BEGIN( CBaseAnimating, BoneHasFlag, "class", "Whether a bone has a BONE_ flag." )
+{
+    lua_CBaseAnimating *pAnimating = LUA_BINDING_ARGUMENT( luaL_checkanimating, 1, "entity" );
+    int iBone = LUA_BINDING_ARGUMENT( luaL_checknumber, 2, "bone" );
+    int iFlag = LUA_BINDING_ARGUMENT( luaL_checknumber, 3, "flag" );
+    const mstudiobone_t *pBone = LuaGetBone( pAnimating, iBone );
+    lua_pushboolean( L, pBone && ( pBone->flags & iFlag ) != 0 );
+    return 1;
+}
+LUA_BINDING_END( "boolean", "True when the bone has the flag." )
+
+LUA_BINDING_BEGIN( CBaseAnimating, TranslatePhysBoneToBone, "class", "Get the bone of a physics bone ( ragdoll solid )." )
+{
+    lua_CBaseAnimating *pAnimating = LUA_BINDING_ARGUMENT( luaL_checkanimating, 1, "entity" );
+    int iPhysBone = LUA_BINDING_ARGUMENT( luaL_checknumber, 2, "physBone" );
+    lua_pushinteger( L, SrcboxPhysBoneToBone( pAnimating, iPhysBone ) );
+    return 1;
+}
+LUA_BINDING_END( "integer", "The bone, or -1." )
+
+LUA_BINDING_BEGIN( CBaseAnimating, TranslateBoneToPhysBone, "class", "Get the physics bone a bone belongs to." )
+{
+    lua_CBaseAnimating *pAnimating = LUA_BINDING_ARGUMENT( luaL_checkanimating, 1, "entity" );
+    int iBone = LUA_BINDING_ARGUMENT( luaL_checknumber, 2, "bone" );
+    lua_pushinteger( L, SrcboxBoneToPhysBone( pAnimating, iBone ) );
+    return 1;
+}
+LUA_BINDING_END( "integer", "The physics bone, or -1." )
+
+LUA_BINDING_BEGIN( CBaseAnimating, ManipulateBonePosition, "class", "Offset a bone, in its own frame." )
+{
+    lua_CBaseAnimating *pAnimating = LUA_BINDING_ARGUMENT( luaL_checkanimating, 1, "entity" );
+    int iBone = LUA_BINDING_ARGUMENT( luaL_checknumber, 2, "bone" );
+    Vector vecPos = LUA_BINDING_ARGUMENT( luaL_checkvector, 3, "position" );
+    SrcboxBoneManip_SetPosition( pAnimating, iBone, vecPos );
+    return 0;
+}
+LUA_BINDING_END()
+
+LUA_BINDING_BEGIN( CBaseAnimating, ManipulateBoneAngles, "class", "Rotate a bone, in its own frame." )
+{
+    lua_CBaseAnimating *pAnimating = LUA_BINDING_ARGUMENT( luaL_checkanimating, 1, "entity" );
+    int iBone = LUA_BINDING_ARGUMENT( luaL_checknumber, 2, "bone" );
+    QAngle ang = LUA_BINDING_ARGUMENT( luaL_checkangle, 3, "angles" );
+    SrcboxBoneManip_SetAngles( pAnimating, iBone, ang );
+    return 0;
+}
+LUA_BINDING_END()
+
+LUA_BINDING_BEGIN( CBaseAnimating, ManipulateBoneScale, "class", "Scale a bone ( not its children )." )
+{
+    lua_CBaseAnimating *pAnimating = LUA_BINDING_ARGUMENT( luaL_checkanimating, 1, "entity" );
+    int iBone = LUA_BINDING_ARGUMENT( luaL_checknumber, 2, "bone" );
+    Vector vecScale = LUA_BINDING_ARGUMENT( luaL_checkvector, 3, "scale" );
+    SrcboxBoneManip_SetScale( pAnimating, iBone, vecScale );
+    return 0;
+}
+LUA_BINDING_END()
+
+LUA_BINDING_BEGIN( CBaseAnimating, ManipulateBoneJiggle, "class", "( not supported: accepted and ignored )" )
+{
+    return 0;
+}
+LUA_BINDING_END()
+
+LUA_BINDING_BEGIN( CBaseAnimating, GetManipulateBonePosition, "class", "Get a bone's position offset." )
+{
+    lua_CBaseAnimating *pAnimating = LUA_BINDING_ARGUMENT( luaL_checkanimating, 1, "entity" );
+    int iBone = LUA_BINDING_ARGUMENT( luaL_checknumber, 2, "bone" );
+    const SrcboxBoneManipData_t *pData = SrcboxBoneManip_Get( pAnimating );
+    Vector vecPos = ( pData && iBone >= 0 && iBone < MAXSTUDIOBONES ) ? pData->m_Pos[iBone] : vec3_origin;
+    lua_pushvector( L, vecPos );
+    return 1;
+}
+LUA_BINDING_END( "Vector", "The offset." )
+
+LUA_BINDING_BEGIN( CBaseAnimating, GetManipulateBoneAngles, "class", "Get a bone's rotation." )
+{
+    lua_CBaseAnimating *pAnimating = LUA_BINDING_ARGUMENT( luaL_checkanimating, 1, "entity" );
+    int iBone = LUA_BINDING_ARGUMENT( luaL_checknumber, 2, "bone" );
+    const SrcboxBoneManipData_t *pData = SrcboxBoneManip_Get( pAnimating );
+    QAngle ang = ( pData && iBone >= 0 && iBone < MAXSTUDIOBONES ) ? pData->m_Ang[iBone] : vec3_angle;
+    lua_pushangle( L, ang );
+    return 1;
+}
+LUA_BINDING_END( "Angle", "The rotation." )
+
+LUA_BINDING_BEGIN( CBaseAnimating, GetManipulateBoneScale, "class", "Get a bone's scale." )
+{
+    lua_CBaseAnimating *pAnimating = LUA_BINDING_ARGUMENT( luaL_checkanimating, 1, "entity" );
+    int iBone = LUA_BINDING_ARGUMENT( luaL_checknumber, 2, "bone" );
+    const SrcboxBoneManipData_t *pData = SrcboxBoneManip_Get( pAnimating );
+    Vector vecScale = ( pData && iBone >= 0 && iBone < MAXSTUDIOBONES ) ? pData->m_Scale[iBone] : Vector( 1, 1, 1 );
+    lua_pushvector( L, vecScale );
+    return 1;
+}
+LUA_BINDING_END( "Vector", "The scale." )
+
+LUA_BINDING_BEGIN( CBaseAnimating, GetManipulateBoneJiggle, "class", "( not supported: always 0 )" )
+{
+    lua_pushinteger( L, 0 );
+    return 1;
+}
+LUA_BINDING_END( "integer", "0" )
+
+LUA_BINDING_BEGIN( CBaseAnimating, HasBoneManipulations, "class", "Whether any bone is manipulated." )
+{
+    lua_CBaseAnimating *pAnimating = LUA_BINDING_ARGUMENT( luaL_checkanimating, 1, "entity" );
+    lua_pushboolean( L, SrcboxBoneManip_Get( pAnimating ) != NULL );
+    return 1;
+}
+LUA_BINDING_END( "boolean", "True when manipulated." )
 
 /*
 ** Open CBaseAnimating object

@@ -169,6 +169,14 @@ void CBaseScripted::InitScriptedEntity(void)
     Q_strlower(className);
     SetClassname(className);
 
+#ifndef CLIENT_DLL
+    // Srcbox: a table made by PrepareLuaTable is fresh like the one below ( nothing to merge );
+    // only the metatable fallback ( done for both cases further down ) is needed.
+    if (m_bLuaTablePrepared && lua_isrefvalid(L, m_nTableReference))
+    {
+    }
+    else
+#endif
     if (!lua_isrefvalid(L, m_nTableReference))
     {
         // Srcbox: give every entity its own table (set up below to fall back to the class
@@ -376,6 +384,40 @@ bool CBaseScripted::KeyValue(const char *szKeyName, const char *szValue)
         return true;
 
     return BaseClass::KeyValue(szKeyName, szValue);
+}
+#endif
+
+#ifndef CLIENT_DLL
+void CBaseScripted::PrepareLuaTable(void)
+{
+#ifdef LUA_SDK
+    if (m_bLuaTablePrepared || lua_isrefvalid(L, m_nTableReference))
+        return;
+
+    int iTop = lua_gettop(L);
+
+    lua_newtable(L);
+    m_nTableReference = luaL_ref(L, LUA_REGISTRYINDEX);
+
+    // Fall back to the class table, like InitScriptedEntity does
+    lua_getref(L, m_nTableReference);
+    if (lua_istable(L, -1) && !lua_getmetatable(L, -1))
+    {
+        int iBeforeLoad = lua_gettop(L);
+        LoadScriptedEntity();
+
+        if (lua_gettop(L) == iBeforeLoad + 1 && lua_istable(L, -1))
+        {
+            lua_newtable(L);           // metatable
+            lua_pushvalue(L, -2);      // class table
+            lua_setfield(L, -2, "__index");
+            lua_setmetatable(L, -3);   // instance table
+        }
+    }
+
+    lua_settop(L, iTop);
+    m_bLuaTablePrepared = true;
+#endif
 }
 #endif
 

@@ -16,6 +16,18 @@ hook = require("hooks")
 timer = require("timers")
 net = Networks
 
+-- Srcbox: GMod's net.WriteBit takes a boolean too ( true / non-zero = 1 ); the message writer
+-- only takes numbers ( Ragdoll Mover's Sync errored with 'number expected, got boolean' )
+do
+	local networksMeta = getmetatable(Networks)
+	if (networksMeta and type(networksMeta.__index) == "function" and rawget(Networks, "WriteBit") == nil) then
+		function Networks.WriteBit(value)
+			local bit = (value == true or (type(value) == "number" and value ~= 0)) and 1 or 0
+			return networksMeta.__index(Networks, "WriteBit")(bit)
+		end
+	end
+end
+
 -- weapons = require("scripted_weapons")
 -- scripted_ents = require("scripted_entities") -- Gmods scripted_ents is compatible with our ScriptedEntities
 
@@ -436,6 +448,24 @@ util.PrecacheSound = _R.Entity.PrecacheSound
 -- util.PrecacheModel("models/humans/male_shared.mdl")
 
 util.AddNetworkString = Networks.AddNetworkString
+
+-- Srcbox: GMod's util.IsPointInCone( point, coneOrigin, coneAxis, cosAngle, length ), Source's
+-- mathlib IsPointInCone ( the 4th argument is the cosine of the cone's half angle )
+if (not util.IsPointInCone) then
+	function util.IsPointInCone(point, coneOrigin, coneAxis, cosAngle, length)
+		local delta = point - coneOrigin
+		local dist = delta:Length()
+		if (dist <= 0) then
+			return true
+		end
+		delta = delta / dist
+		local dot = delta:Dot(coneAxis)
+		if (dot < cosAngle) then
+			return false
+		end
+		return dist * dot <= length
+	end
+end
 util.NetworkIDToString = Networks.NetworkIdToString
 util.NetworkStringToID = Networks.NetworkStringToId
 
@@ -668,7 +698,11 @@ do
 	end
 end
 
-util.IsValidProp = util.IsValidPhysicsProp
+-- Srcbox: GMod's IsValidProp is false for ragdoll models ( sandbox's spawn checks IsValidProp
+-- before IsValidRagdoll, so with plain IsValidPhysicsProp spawn-menu ragdolls became prop_physics )
+util.IsValidProp = function(model)
+	return util.IsValidPhysicsProp(model) and not util.IsValidRagdoll(model)
+end
 -- Srcbox: GMod's util.MD5 (hex digest), pure Lua on 5.4 integer bit operations
 if (not util.MD5) then
 	local K = {}
@@ -842,7 +876,10 @@ end
 util.SharedRandom = Randoms.SharedRandomFloat
 
 ents = {
-	Create = Entities.CreateByName,
+	-- GMod's ents.Create doesn't spawn: a scripted entity's Initialize runs at ent:Spawn()
+	Create = function(className)
+		return Entities.CreateByName(className, true)
+	end,
 	-- TODO: Probably not correct, since CreateClientProp creates an ent with physics
 	CreateClientProp = Entities.CreateClientEntity,
 
@@ -2248,6 +2285,68 @@ ENTITY_META.NearestPoint = ENTITY_META.CalculateNearestPoint
 ENTITY_META.OBBCenter = ENTITY_META.GetOBBCenter
 ENTITY_META.OBBMaxs = ENTITY_META.GetOBBMaxs
 ENTITY_META.OBBMins = ENTITY_META.GetOBBMins
+
+-- Srcbox: more GMod Entity space helpers ( Ragdoll Mover's gizmo uses all of these )
+if (not ENTITY_META.WorldToLocal) then
+	function ENTITY_META:WorldToLocal(position)
+		local localPosition = WorldToLocal(position, angle_zero, self:GetPos(), self:GetAngles())
+		return localPosition
+	end
+end
+
+if (not ENTITY_META.LocalToWorldAngles) then
+	function ENTITY_META:LocalToWorldAngles(angles)
+		local _, worldAngles = LocalToWorld(vector_origin, angles, vector_origin, self:GetAngles())
+		return worldAngles
+	end
+end
+
+if (not ENTITY_META.WorldToLocalAngles) then
+	function ENTITY_META:WorldToLocalAngles(angles)
+		local _, localAngles = WorldToLocal(vector_origin, angles, vector_origin, self:GetAngles())
+		return localAngles
+	end
+end
+
+ENTITY_META.GetLocalPos = ENTITY_META.GetLocalPos or ENTITY_META.GetLocalOrigin
+ENTITY_META.SetLocalPos = ENTITY_META.SetLocalPos or ENTITY_META.SetLocalOrigin
+
+-- Srcbox: GMod's Entity:FollowBone( parent, bone ). There's no bone parenting in the engine, so
+-- this parents to the entity ( Ragdoll Mover only uses it to make the parent cache its bones,
+-- then restores the old parent ).
+if (not ENTITY_META.FollowBone) then
+	function ENTITY_META:FollowBone(parent, bone)
+		if (IsValid(parent)) then
+			self:SetParent(parent)
+		else
+			self:SetParent(NULL)
+		end
+	end
+end
+
+-- Srcbox: GMod's Entity:WorldSpaceAABB(): the world-space box around the collision bounds
+-- ( standpose and other properties use it )
+if (not ENTITY_META.WorldSpaceAABB) then
+	function ENTITY_META:WorldSpaceAABB()
+		local mins, maxs = self:OBBMins(), self:OBBMaxs()
+		local worldMins = Vector(math.huge, math.huge, math.huge)
+		local worldMaxs = Vector(-math.huge, -math.huge, -math.huge)
+		for i = 0, 7 do
+			local corner = Vector(
+				i % 2 == 1 and maxs.x or mins.x,
+				math.floor(i / 2) % 2 == 1 and maxs.y or mins.y,
+				math.floor(i / 4) % 2 == 1 and maxs.z or mins.z)
+			local world = self:LocalToWorld(corner)
+			worldMins.x = math.min(worldMins.x, world.x)
+			worldMins.y = math.min(worldMins.y, world.y)
+			worldMins.z = math.min(worldMins.z, world.z)
+			worldMaxs.x = math.max(worldMaxs.x, world.x)
+			worldMaxs.y = math.max(worldMaxs.y, world.y)
+			worldMaxs.z = math.max(worldMaxs.z, world.z)
+		end
+		return worldMins, worldMaxs
+	end
+end
 ENTITY_META.LocalToWorld = ENTITY_META.EntityToWorldSpace
 ENTITY_META.SkinCount = ENTITY_META.GetSkinCount
 ENTITY_META.Alive = ENTITY_META.IsAlive
@@ -2423,11 +2522,13 @@ end
 	TODO: Check if DrawShadow/SetNotSolid on gmod, causes any flags to be set.
 --]]
 function ENTITY_META:SetNotSolid(bBool)
+	-- Srcbox: GMod sets / clears the FSOLID_NOT_SOLID flag ( 4 ). This used to add SOLID_NONE,
+	-- which is 0, so nothing changed: Ragdoll Mover's gizmo stayed solid and trapped the player.
+	local FSOLID_NOT_SOLID_FLAG = 4
 	if (bBool) then
-		self:AddSolidFlags(SOLID_NONE)
+		self:AddSolidFlags(FSOLID_NOT_SOLID_FLAG)
 	else
-		print("ENTITY_META:SetNotSolid - Not sure if SOLID_VPHYSICS is correct for SetNotSolid(false)")
-		self:RemoveSolidFlags(SOLID_VPHYSICS)
+		self:RemoveSolidFlags(FSOLID_NOT_SOLID_FLAG)
 	end
 end
 
@@ -2443,40 +2544,10 @@ function ENTITY_META:EnableForwardArrow()
     self:SetBodygroup(1, 1)
 end
 
--- TODO: Actually implement these bone manipulation functions
--- TODO: We should probably override SetupBones, call the baseclass, and then apply our manipulations?
--- TODO: Or we need to use a function from bone_setup.h. I'm not sure which one.
-function ENTITY_META:GetManipulateBoneAngles()
-	return Angle()
-end
-
-function ENTITY_META:GetManipulateBoneJiggle()
-	return 0
-end
-
-function ENTITY_META:GetManipulateBonePosition()
-	return Vector()
-end
-
-function ENTITY_META:GetManipulateBoneScale()
-	return Vector(1, 1, 1)
-end
-
-function ENTITY_META:ManipulateBoneAngles(boneID, angle, isNetworked)
-end
-
-function ENTITY_META:ManipulateBoneJiggle(boneID, jiggle)
-end
-
-function ENTITY_META:ManipulateBonePosition(boneID, position, isNetworked)
-end
-
-function ENTITY_META:ManipulateBoneScale(boneID, scale, isNetworked)
-end
-
-function ENTITY_META:HasBoneManipulations()
-	return false
-end
+-- Srcbox: bone manipulation ( Manipulate*/GetManipulate*/HasBoneManipulations ) and the bone
+-- hierarchy ( GetBoneName/GetBoneParent/GetChildBones/BoneHasFlag/TranslatePhysBoneToBone/
+-- TranslateBoneToPhysBone ) are engine bindings now ( srcbox_bonemanip.cpp ), so they're not
+-- stubbed here any more ( the empty stubs made Ragdoll Mover and bone_manipulate do nothing ).
 
 if (SERVER) then
 	function ENTITY_META:FrameAdvance()
@@ -2536,6 +2607,17 @@ end
 WEAPON_META.Ammo1 = WEAPON_META.GetPrimaryAmmoCount
 WEAPON_META.Ammo2 = WEAPON_META.GetSecondaryAmmoCount
 WEAPON_META.SendWeaponAnim = WEAPON_META.SendWeaponAnimation
+
+-- Srcbox: GMod's Weapon:IsCarriedByLocalPlayer ( effects/base.lua's tracer start, the tooltracer effect )
+if (not WEAPON_META.IsCarriedByLocalPlayer) then
+	function WEAPON_META:IsCarriedByLocalPlayer()
+		if (not CLIENT) then
+			return false
+		end
+		local owner = self:GetOwner()
+		return IsValid(owner) and owner == LocalPlayer()
+	end
+end
 
 local PLAYER_META = FindMetaTable("Player")
 
@@ -2612,6 +2694,23 @@ PLAYER_META.GetCrouchedWalkSpeed = PLAYER_META.GetCrouchWalkFraction
 PLAYER_META.SetCrouchedWalkSpeed = PLAYER_META.SetCrouchWalkFraction
 PLAYER_META.Ping = PLAYER_META.GetPing
 PLAYER_META.KeyDown = PLAYER_META.IsKeyDown
+
+-- Srcbox: GMod's Player:GetViewEntity() returns the player itself when no view entity is set.
+-- The engine returns NULL on the server, which broke code like
+-- "pl:GetViewEntity():EyePos()" (Ragdoll Mover's gizmo stopped updating on its first error).
+if (SERVER and not PLAYER_META._SrcboxGetViewEntity) then
+	PLAYER_META._SrcboxGetViewEntity = PLAYER_META.GetViewEntity
+
+	function PLAYER_META:GetViewEntity()
+		local viewEntity = self:_SrcboxGetViewEntity()
+
+		if (not IsValid(viewEntity)) then
+			return self
+		end
+
+		return viewEntity
+	end
+end
 PLAYER_META.KeyDownLast = PLAYER_META.WasKeyDown
 PLAYER_META.KeyPressed = PLAYER_META.WasKeyPressed
 PLAYER_META.KeyReleased = PLAYER_META.WasKeyReleased
@@ -2623,6 +2722,21 @@ PLAYER_META.SetDSP = PLAYER_META.SetDsp
 PLAYER_META.ShouldDropWeapon = PLAYER_META.SetDropActiveWeaponOnDeath
 PLAYER_META.Armor = PLAYER_META.GetArmor
 PLAYER_META.ConCommand = PLAYER_META.RunConsoleCommand
+
+-- Srcbox: GMod's Player:RunConsoleCommand( command, ... ) passes its arguments; the engine binding
+-- only sent the command, so sandbox's 'ply:RunConsoleCommand( "gmod_toolmode", mode )' just printed
+-- gmod_toolmode and the tool never changed from rope. ( ConCommand above keeps the one-string form. )
+do
+	local nativeRunConsoleCommand = PLAYER_META.RunConsoleCommand
+
+	function PLAYER_META:RunConsoleCommand(command, ...)
+		local line = tostring(command)
+		for _, argument in ipairs({ ... }) do
+			line = line .. " \"" .. tostring(argument):gsub("\"", "") .. "\""
+		end
+		return nativeRunConsoleCommand(self, line)
+	end
+end
 PLAYER_META.Frags = PLAYER_META.GetFrags
 PLAYER_META.Deaths = PLAYER_META.GetDeaths
 
@@ -2711,7 +2825,26 @@ end
 
 if (SERVER) then
 	function PLAYER_META:SelectWeapon(weaponClass)
-		self:SwitchWeapon(self:GetWeapon(weaponClass))
+		-- GMod does nothing when the player doesn't have it ( gmod_tool's command errored here )
+		local weapon = self:GetWeapon(weaponClass)
+		if (IsValid(weapon)) then
+			self:SwitchWeapon(weapon)
+		end
+	end
+
+	-- Srcbox: GMod's Player:Give returns NULL for a class that doesn't exist; the engine binding
+	-- raises an error, which aborted sandbox's loadout at the first missing weapon ( weapon_ar2 ),
+	-- so the tool gun and physgun ( given last ) never came.
+	do
+		local nativeGive = PLAYER_META.Give
+
+		function PLAYER_META:Give(weaponClass, noAmmo)
+			local ok, result = pcall(nativeGive, self, weaponClass, noAmmo)
+			if (ok) then
+				return result
+			end
+			return NULL
+		end
 	end
 
 	function PLAYER_META:StripAmmo()
@@ -2719,7 +2852,10 @@ if (SERVER) then
 	end
 
 	function PLAYER_META:StripWeapon(weaponClass)
-		self:RemoveWeapon(self:GetWeapon(weaponClass))
+		local weapon = self:GetWeapon(weaponClass)
+		if (IsValid(weapon)) then
+			self:RemoveWeapon(weapon)
+		end
 	end
 
 	function PLAYER_META:StripWeapons()
@@ -4587,6 +4723,85 @@ if (CLIENT) then
 	-- include("includes/vgui_base.lua") -- I don't think this is actually loaded in Garry's Mod since it's missing a bunch of includes
 	-- So let's just include all files inside lua/vgui/
 	includeFolder("lua/vgui")
+
+	-- Srcbox: GMod's RichText is an engine panel we don't have. A plain stand-in ( one colour,
+	-- no clickable links ) so addons using it ( Ragdoll Mover's changelog ) don't error.
+	if (not (vgui.Exists and vgui.Exists("RichText"))) then
+		local RICHTEXT = {}
+
+		function RICHTEXT:Init()
+			self.m_strText = ""
+			self.m_Label = vgui.Create("DLabel")
+			self.m_Label:SetWrap(true)
+			self.m_Label:SetAutoStretchVertical(true)
+			self.m_Label:SetContentAlignment(7)
+			self.m_Label:SetText("")
+			self.m_Label:Dock(TOP)
+			self:AddItem(self.m_Label)
+		end
+
+		function RICHTEXT:SetText(text)
+			self.m_strText = tostring(text or "")
+			self.m_Label:SetText(self.m_strText)
+		end
+
+		function RICHTEXT:GetText()
+			return self.m_strText
+		end
+
+		function RICHTEXT:AppendText(text)
+			self:SetText(self.m_strText .. tostring(text or ""))
+		end
+
+		function RICHTEXT:InsertColorChange(r, g, b, a)
+			if (istable(r)) then
+				self.m_Label:SetTextColor(Color(r.r, r.g, r.b, r.a))
+			else
+				self.m_Label:SetTextColor(Color(r or 255, g or 255, b or 255, a or 255))
+			end
+		end
+
+		function RICHTEXT:SetFontInternal(font)
+			self.m_Label:SetFont(font)
+		end
+
+		function RICHTEXT:GetNumLines()
+			return select(2, self.m_strText:gsub("\n", "\n")) + 1
+		end
+
+		function RICHTEXT:GotoTextStart()
+			if (self.VBar) then self.VBar:SetScroll(0) end
+		end
+
+		function RICHTEXT:GotoTextEnd()
+			if (self.VBar) then self.VBar:SetScroll(math.huge) end
+		end
+
+		function RICHTEXT:InsertClickableTextStart(signal) end
+		function RICHTEXT:InsertClickableTextEnd() end
+		function RICHTEXT:InsertFade(sustain, length) end
+		function RICHTEXT:ResetAllFades(hold, expiredOnly, newSustain) end
+		function RICHTEXT:SetVerticalScrollbarEnabled(enabled) end
+		function RICHTEXT:SetUnderlineFont(font) end
+		function RICHTEXT:SetMaximumCharCount(count) end
+
+		vgui.Register("RichText", RICHTEXT, "DScrollPanel")
+	end
+
+	-- Srcbox: GMod's engine calls the active weapon's SWEP:DrawHUD() every frame after HUDPaint.
+	-- Nothing called it here, so the tool gun drew no help text and no tool HUD ( Ragdoll
+	-- Mover draws its gizmo from TOOL:DrawHUD ).
+	hook.Add("HUDPaint", "GModCompatibility.WeaponDrawHUD", function()
+		local ply = LocalPlayer()
+		if (not IsValid(ply) or not ply:Alive()) then
+			return
+		end
+
+		local weapon = ply:GetActiveWeapon()
+		if (IsValid(weapon) and isfunction(weapon.DrawHUD)) then
+			weapon:DrawHUD()
+		end
+	end)
 
 	include("cl_awesomium.lua")
 

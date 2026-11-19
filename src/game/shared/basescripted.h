@@ -69,6 +69,12 @@ virtual RenderGroup_t GetRenderGroup() OVERRIDE;
 
 	CUtlVector< CUtlString > m_PendingLuaKeyValues; // key, value, key, value, ...
 	bool m_bLuaKeyValuesReady = false;
+
+	// Srcbox: give the entity its Lua table ( falling back to the ENT class table ) right after
+	// it's created, before Spawn, like GMod's ents.Create. Lets the creator call ENT methods
+	// and set fields before Initialize ( gmod_hands:DoSetup, Ragdoll Mover's axis.Owner ).
+	void PrepareLuaTable( void );
+	bool m_bLuaTablePrepared = false;
 #endif
 #endif
 

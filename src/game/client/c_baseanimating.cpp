@@ -62,6 +62,10 @@
 #endif
 
 // memdbgon must be the last include file in a .cpp file!!!
+#ifdef LUA_SDK
+#include "srcbox/srcbox_bonemanip.h"
+#endif
+
 #include "tier0/memdbgon.h"
 
 static ConVar cl_SetupAllBones( "cl_SetupAllBones", "0" );
@@ -3008,6 +3012,11 @@ bool C_BaseAnimating::SetupBones( matrix3x4_t *pBoneToWorldOut, int nMaxBones, i
 
 			StandardBlendingRules( hdr, pos, q, currentTime, bonesMaskNeedRecalc );
 
+#ifdef LUA_SDK
+			// Srcbox: GMod bone manipulation ( Entity:ManipulateBonePosition / Angles )
+			SrcboxBoneManip_ApplyLocal( this, hdr, pos, q, bonesMaskNeedRecalc );
+#endif
+
 			CBoneBitList boneComputed;
 			// don't calculate IK on ragdolls
 			if ( m_pIk && !IsRagdoll() )
@@ -3021,6 +3030,12 @@ bool C_BaseAnimating::SetupBones( matrix3x4_t *pBoneToWorldOut, int nMaxBones, i
 			}
 
 			BuildTransformations( hdr, pos, q, parentTransform, bonesMaskNeedRecalc, boneComputed );
+
+#ifdef LUA_SDK
+			// Srcbox: GMod bone manipulation ( Entity:ManipulateBoneScale ), after the whole
+			// skeleton so a bone's scale isn't passed on to its children
+			SrcboxBoneManip_ApplyScale( this, hdr, m_BoneAccessor.GetBoneArrayForWrite(), bonesMaskNeedRecalc );
+#endif
 			
 			RemoveFlag( EFL_SETTING_UP_BONES );
 			ControlMouth( hdr );

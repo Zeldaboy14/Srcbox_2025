@@ -46,6 +46,8 @@ $Project "Server (Physbox)"
 		$Folder "Srcbox"
 		{
 			$File	"$SRCDIR\game\shared\srcbox\srcbox_gamerules.cpp"
+			$File	"$SRCDIR\game\shared\srcbox\srcbox_bonemanip.cpp"
+			$File	"$SRCDIR\game\shared\srcbox\srcbox_bonemanip.h"
 			$File	"$SRCDIR\game\shared\srcbox\hooks\bsp_compat.cpp"
 			$File	"$SRCDIR\game\shared\srcbox\hooks\bsp_compat.h"
 			$File	"$SRCDIR\game\shared\srcbox\hooks\gma_mount.cpp"

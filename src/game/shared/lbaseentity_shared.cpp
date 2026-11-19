@@ -2871,7 +2871,16 @@ LUA_BINDING_BEGIN( Entity, Spawn, "class", "Spawn entity." )
 {
     lua_CBaseEntity *pEntity = LUA_BINDING_ARGUMENT( luaL_checkentity, 1, "entity" );
 
+#ifndef CLIENT_DLL
+    // Srcbox: spawn like the engine ( and GMod's ent:Spawn ) does. Calling Spawn() directly
+    // skipped DispatchSpawn's setup: animating entities spawned outside the bone-cache
+    // "in spawn" state, so a prop_ragdoll built its physics from an unanimated pose and
+    // didn't come out as a working ragdoll ( spawn menu ragdolls acted like props ), and
+    // gEntList's spawn notification never ran.
+    DispatchSpawn( pEntity );
+#else
     pEntity->Spawn();
+#endif
     return 0;
 }
 LUA_BINDING_END()
@@ -3418,6 +3427,23 @@ LUA_BINDING_BEGIN( Entity, __index, "class", "Metamethod that is called when a n
 {
     lua_CBaseEntity *pEntity = LUA_BINDING_ARGUMENT( lua_toentity, 1, "entity" );
 
+#ifdef LUA_SDK
+    // Srcbox: like GMod, an entity can be indexed with any key: ent[nil] is nil, and numbers
+    // etc. look in the entity's own table ( Ragdoll Mover: axis[GizmoTable[MoveAxis]] )
+    if ( lua_type( L, 2 ) != LUA_TSTRING )
+    {
+        if ( pEntity && !lua_isnil( L, 2 ) )
+        {
+            LUA_GET_REF_TABLE( L, pEntity );
+            lua_pushvalue( L, 2 );
+            lua_gettable( L, -2 );
+            return 1;
+        }
+        lua_pushnil( L );
+        return 1;
+    }
+#endif
+
     LUA_METATABLE_INDEX_CHECK_VALID( L, Entity_IsValid );
     LUA_METATABLE_INDEX_CHECK( L, pEntity );
 
@@ -3491,6 +3517,22 @@ LUA_BINDING_BEGIN( Entity, __newindex, "class", "Metamethod that is called a new
         lua_pushfstring( L, "%s:%d: attempt to index a NULL entity", ar2.short_src, ar1.currentline );
         return lua_error( L );
     }
+
+#ifdef LUA_SDK
+    // Srcbox: non-string keys go in the entity's own table too, like GMod
+    if ( lua_type( L, 2 ) != LUA_TSTRING )
+    {
+        if ( lua_isnil( L, 2 ) )
+            return luaL_error( L, "index is nil" );
+
+        LUA_GET_REF_TABLE( L, pEntity );
+        lua_pushvalue( L, 2 );
+        lua_pushvalue( L, 3 );
+        lua_settable( L, -3 );
+        lua_pop( L, 1 );
+        return 0;
+    }
+#endif
 
     const char *field = LUA_BINDING_ARGUMENT( luaL_checkstring, 2, "field" );
 

@@ -29,6 +29,10 @@
 #include "props.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
+#ifdef LUA_SDK
+#include "srcbox/srcbox_bonemanip.h"
+#endif
+
 #include "tier0/memdbgon.h"
 
 ConVar ai_sequence_debug( "ai_sequence_debug", "0" );
@@ -1988,6 +1992,11 @@ void CBaseAnimating::SetupBones( matrix3x4_t *pBoneToWorld, int boneMask )
 		}
 	}
 	
+#ifdef LUA_SDK
+	// Srcbox: GMod bone manipulation ( Entity:ManipulateBonePosition / Angles )
+	SrcboxBoneManip_ApplyLocal( this, pStudioHdr, pos, q, boneMask );
+#endif
+
 	CBaseAnimating *pParent = dynamic_cast< CBaseAnimating* >( GetMoveParent() );
 	if ( pParent )
 	{
@@ -2024,6 +2033,11 @@ void CBaseAnimating::SetupBones( matrix3x4_t *pBoneToWorld, int boneMask )
 		GetModelScale(), // Scaling
 		pBoneToWorld,
 		boneMask );
+
+#ifdef LUA_SDK
+	// Srcbox: GMod bone manipulation ( Entity:ManipulateBoneScale )
+	SrcboxBoneManip_ApplyScale( this, pStudioHdr, pBoneToWorld, boneMask );
+#endif
 
 	if (ai_setupbones_debug.GetBool())
 	{

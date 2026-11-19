@@ -40,8 +40,20 @@ LUA_BINDING_BEGIN( Entities, CreateByName, "library", "Creates an entity by the 
     CBaseEntity *pEntity = CreateEntityByName( pszClassName );
     LUA_EXPECTED_SCRIPTED_LIBRARY_END( LUA_SCRIPTEDENTITIESLIBNAME );
 
-    if ( dynamic_cast< CBaseScripted * >( pEntity ) != NULL )
-        DispatchSpawn( pEntity );
+    // Srcbox: GMod's ents.Create passes noSpawn, because GMod runs a scripted entity's
+    // Initialize only when ent:Spawn() is called, after the creator has set things up
+    // ( Ragdoll Mover's gizmo reads self.Owner in Initialize ). Spawning here as well
+    // ran Initialize too early, and again on Spawn().
+    bool bNoSpawn = LUA_BINDING_ARGUMENT_WITH_DEFAULT( luaL_optboolean, 2, 0, "noSpawn" ) != 0;
+
+    CBaseScripted *pScripted = dynamic_cast< CBaseScripted * >( pEntity );
+    if ( pScripted )
+    {
+        if ( bNoSpawn )
+            pScripted->PrepareLuaTable();   // ENT methods/fields usable before Spawn, like GMod
+        else
+            DispatchSpawn( pEntity );
+    }
 
     CBaseEntity::PushLuaInstanceSafe( L, pEntity );
     return 1;

@@ -378,7 +378,7 @@ LUA_BINDING_BEGIN( Utilities, IsValidPhysicsProp, "library", "Check if the given
 }
 LUA_BINDING_END( "boolean", "True if the model is a valid physics prop" )
 
-LUA_BINDING_BEGIN( Utilities, IsValidRagdoll, "library", "Check if the given string is a valid ragdoll model. TODO: Unsure if this is implemented correctly (checks if it has more than 1 bones)" )
+LUA_BINDING_BEGIN( Utilities, IsValidRagdoll, "library", "Check if the given string is a valid ragdoll model ( its collision model has more than one solid )." )
 {
     const char *pszModel = LUA_BINDING_ARGUMENT( luaL_checkstring, 1, "model" );
     const MDLHandle_t modelHandle = g_pMDLCache->FindMDL( pszModel );
@@ -397,13 +397,11 @@ LUA_BINDING_BEGIN( Utilities, IsValidRagdoll, "library", "Check if the given str
         return 1;
     }
 
-    if ( pStudioModel->numbones <= 1 )
-    {
-        lua_pushboolean( L, false );
-        return 1;
-    }
-
-    lua_pushboolean( L, true );
+    // Srcbox: a ragdoll is a model whose collision model has several solids ( one per
+    // physics bone ), like GMod checks. Counting bones made every animated prop a
+    // "ragdoll", and props with ragdoll physics count as props too unless this is right.
+    vcollide_t *pCollide = mdlcache->GetVCollide( modelHandle );
+    lua_pushboolean( L, pCollide && pCollide->solidCount > 1 );
     return 1;
 }
 LUA_BINDING_END( "boolean", "True if the model is a valid ragdoll" )
