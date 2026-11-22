@@ -37,6 +37,9 @@
 #include "vcollide_parse.h"
 #include <lColor.h>
 #include <datacache/imdlcache.h>
+#ifdef LUA_SDK
+#include "srcbox/srcbox_ragdollflex.h"
+#endif
 #include <filesystem.h>
 #include <utlbuffer.h>
 #include <saverestore.h>
@@ -3047,6 +3050,117 @@ LUA_BINDING_BEGIN( Entity, PhysicsInit, "class", "Initialize physics object." )
     // TODO: Implement a Lua solid_t object
     lua_pushphysicsobject( L, pEntity->VPhysicsInitNormal( nSolidType, nSolidFlags, bCreateAsleep ) );
     return 1;
+}
+LUA_BINDING_END()
+
+#ifdef LUA_SDK
+// Srcbox: GMod's Entity:SetFlexScale / GetFlexScale. Ragdolls network it ( srcbox_ragdollflex.h ),
+// it scales their posed face; anything else has none ( 1 ).
+LUA_BINDING_BEGIN( Entity, SetFlexScale, "class", "Set the scale applied to the entity's flex weights." )
+{
+    lua_CBaseEntity *pEntity = LUA_BINDING_ARGUMENT( luaL_checkentity, 1, "entity" );
+    float flScale = LUA_BINDING_ARGUMENT( luaL_checknumber, 2, "scale" );
+
+#ifndef CLIENT_DLL
+    SrcboxRagdollFlex_SetScale( pEntity, flScale );
+#else
+    ( void )pEntity;
+    ( void )flScale;
+#endif
+
+    return 0;
+}
+LUA_BINDING_END()
+
+LUA_BINDING_BEGIN( Entity, GetFlexScale, "class", "Get the scale applied to the entity's flex weights." )
+{
+    lua_CBaseEntity *pEntity = LUA_BINDING_ARGUMENT( luaL_checkentity, 1, "entity" );
+
+    float flScale = 1.0f;
+    SrcboxRagdollFlex_GetScale( pEntity, flScale );
+
+    lua_pushnumber( L, flScale );
+    return 1;
+}
+LUA_BINDING_END( "number", "The flex scale." )
+#endif
+
+// Srcbox: GMod's Entity:PhysicsInitSphere( radius, surfaceProp )
+LUA_BINDING_BEGIN( Entity, PhysicsInitSphere, "class", "Initialize physics object as a sphere." )
+{
+    lua_CBaseEntity *pEntity = LUA_BINDING_ARGUMENT( luaL_checkentity, 1, "entity" );
+    float flRadius = LUA_BINDING_ARGUMENT( luaL_checknumber, 2, "radius" );
+    const char *pszSurfaceProperty = LUA_BINDING_ARGUMENT_WITH_DEFAULT( luaL_optstring, 3, "default", "surfaceProperty" );
+
+    if ( flRadius <= 0.0f )
+        return 0;
+
+    solid_t solid;
+    solid.params = g_PhysDefaultObjectParams;
+    Q_strncpy( solid.surfaceprop, pszSurfaceProperty, sizeof( solid.surfaceprop ) );
+
+    // Mass from the surface's density ( kg/m^3, the volume is in cubic inches )
+    float flVolume = ( 4.0f / 3.0f ) * M_PI_F * flRadius * flRadius * flRadius;
+    float flDensity = 2000.0f;
+    int nSurface = physprops->GetSurfaceIndex( pszSurfaceProperty );
+    if ( nSurface >= 0 )
+    {
+        float flThickness, flFriction, flElasticity;
+        physprops->GetPhysicsProperties( nSurface, &flDensity, &flThickness, &flFriction, &flElasticity );
+    }
+    solid.params.volume = flVolume;
+    solid.params.mass = MAX( 1.0f, flDensity * flVolume * 1.6387e-5f );
+
+    pEntity->VPhysicsDestroyObject();
+
+    IPhysicsObject *pPhysicsObject = PhysSphereCreate( pEntity, flRadius, pEntity->GetAbsOrigin(), solid );
+    if ( !pPhysicsObject )
+        return 0;
+
+    pEntity->VPhysicsSetObject( pPhysicsObject );
+    pEntity->SetCollisionBounds( Vector( -flRadius, -flRadius, -flRadius ), Vector( flRadius, flRadius, flRadius ) );
+
+    lua_pushphysicsobject( L, pPhysicsObject );
+    return 1;
+}
+LUA_BINDING_END( "PhysicsObject", "The new physics object." )
+
+// Srcbox: GMod's Entity:GetParentAttachment()
+LUA_BINDING_BEGIN( Entity, GetParentAttachment, "class", "Get the attachment index the entity is parented to." )
+{
+    lua_CBaseEntity *pEntity = LUA_BINDING_ARGUMENT( luaL_checkentity, 1, "entity" );
+    lua_pushinteger( L, pEntity->GetParentAttachment() );
+    return 1;
+}
+LUA_BINDING_END( "integer", "The attachment index, 0 if none." )
+
+// Srcbox: GMod's Entity:GetRenderMode() / GetRenderFX()
+LUA_BINDING_BEGIN( Entity, GetRenderMode, "class", "Get render mode." )
+{
+    lua_CBaseEntity *pEntity = LUA_BINDING_ARGUMENT( luaL_checkentity, 1, "entity" );
+    lua_pushinteger( L, ( int )pEntity->GetRenderMode() );
+    return 1;
+}
+LUA_BINDING_END( "enumeration/RENDER_MODE", "The render mode." )
+
+LUA_BINDING_BEGIN( Entity, GetRenderFX, "class", "Get render effect." )
+{
+    lua_CBaseEntity *pEntity = LUA_BINDING_ARGUMENT( luaL_checkentity, 1, "entity" );
+    lua_pushinteger( L, ( int )pEntity->m_nRenderFX );
+    return 1;
+}
+LUA_BINDING_END( "enumeration/RENDER_FX", "The render effect." )
+
+// Srcbox: GMod's Entity:StopSound; the engine finds the channel a script sound played on
+LUA_BINDING_BEGIN( Entity, StopSound, "class", "Stops a sound the entity is playing." )
+{
+    lua_CBaseEntity *pEntity = LUA_BINDING_ARGUMENT( luaL_checkentity, 1, "entity" );
+    const char *pszSoundName = LUA_BINDING_ARGUMENT( luaL_checkstring, 2, "soundName" );
+
+    if ( pszSoundName && pszSoundName[0] )
+        pEntity->StopSound( pszSoundName );
+
+    return 0;
 }
 LUA_BINDING_END()
 

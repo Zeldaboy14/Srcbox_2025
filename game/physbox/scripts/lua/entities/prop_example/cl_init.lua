@@ -8,6 +8,8 @@
 Include("shared.lua")
 
 function ENT:Draw(flags)
+	-- Draw does the drawing ( as in GMod ), so draw the model
+	self:DrawModel(flags)
 end
 
 function ENT:ClientThink()

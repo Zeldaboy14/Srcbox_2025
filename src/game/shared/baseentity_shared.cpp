@@ -56,6 +56,11 @@ ConVar hl2_episodic( "hl2_episodic", "0", FCVAR_REPLICATED );
 #include "rumble_shared.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
+#include "srcbox/srcbox_gmodhooks.h"
+#ifdef LUA_SDK
+#include "lshareddefs.h"
+#include "mathlib/lvector.h"
+#endif
 #include "tier0/memdbgon.h"
 
 #ifdef GAME_DLL
@@ -349,6 +354,24 @@ bool CBaseEntity::KeyValue( const char *szKeyName, const char *szValue )
 	{
 		*s = '\0';
 	}
+
+#if defined( LUA_SDK ) && defined( GAME_DLL )
+	// Srcbox: GMod's EntityKeyValue( ent, key, value ): a returned string is used as the value
+	char szSrcboxValue[1024];
+	{
+		SRCBOX_HOOK_BEGIN( "EntityKeyValue" )
+			CBaseEntity::PushLuaInstanceSafe( L, this );
+			lua_pushstring( L, szKeyName );
+			lua_pushstring( L, szValue ? szValue : "" );
+		SRCBOX_HOOK_CALL( 3 )
+			if ( SRCBOX_HOOK_RETURNED() && lua_type( L, -1 ) == LUA_TSTRING )
+			{
+				Q_strncpy( szSrcboxValue, lua_tostring( L, -1 ), sizeof( szSrcboxValue ) );
+				szValue = szSrcboxValue;
+			}
+		SRCBOX_HOOK_END()
+	}
+#endif
 
 	if ( FStrEq( szKeyName, "rendercolor" ) || FStrEq( szKeyName, "rendercolor32" ))
 	{
@@ -1619,6 +1642,84 @@ typedef CTraceFilterSimpleList CBulletsTraceFilter;
 
 void CBaseEntity::FireBullets( const FireBulletsInfo_t &info )
 {
+#ifdef LUA_SDK
+	// Srcbox: GMod's EntityFireBullets( ent, data ). false: no bullets; true: fire them as the hook
+	// changed the table ( fired from here, so the hook isn't run twice for them ).
+	static bool s_bSrcboxInFireBulletsHook = false;
+	if ( L && !s_bSrcboxInFireBulletsHook )
+	{
+		bool bBlocked = false;
+		bool bChanged = false;
+		const int nTop = lua_gettop( L );
+
+		lua_newtable( L );
+		const int nData = lua_gettop( L );
+		CBaseEntity::PushLuaInstanceSafe( L, info.m_pAttacker ? info.m_pAttacker : this );
+		lua_setfield( L, nData, "Attacker" );
+		lua_pushnumber( L, info.m_flDamage );
+		lua_setfield( L, nData, "Damage" );
+		lua_pushinteger( L, info.m_iPlayerDamage );
+		lua_setfield( L, nData, "PlayerDamage" );
+		lua_pushnumber( L, info.m_flDamageForceScale );
+		lua_setfield( L, nData, "Force" );
+		lua_pushnumber( L, info.m_flDistance );
+		lua_setfield( L, nData, "Distance" );
+		lua_pushinteger( L, info.m_iShots );
+		lua_setfield( L, nData, "Num" );
+		lua_pushinteger( L, info.m_iTracerFreq );
+		lua_setfield( L, nData, "Tracer" );
+		lua_pushinteger( L, info.m_nFlags );
+		lua_setfield( L, nData, "Flags" );
+		Ammo_t *pAmmo = GetAmmoDef()->GetAmmoOfIndex( info.m_iAmmoType );
+		if ( pAmmo && pAmmo->pName )
+			lua_pushstring( L, pAmmo->pName );
+		else
+			lua_pushinteger( L, info.m_iAmmoType );
+		lua_setfield( L, nData, "AmmoType" );
+		if ( info.m_pszTracerType )
+		{
+			lua_pushstring( L, info.m_pszTracerType );
+			lua_setfield( L, nData, "TracerName" );
+		}
+		if ( info.m_pAdditionalIgnoreEnt )
+		{
+			CBaseEntity::PushLuaInstanceSafe( L, info.m_pAdditionalIgnoreEnt );
+			lua_setfield( L, nData, "IgnoreEntity" );
+		}
+		lua_pushvector( L, info.m_vecDirShooting );
+		lua_setfield( L, nData, "Dir" );
+		lua_pushvector( L, info.m_vecSpread );
+		lua_setfield( L, nData, "Spread" );
+		lua_pushvector( L, info.m_vecSrc );
+		lua_setfield( L, nData, "Src" );
+
+		SRCBOX_HOOK_BEGIN( "EntityFireBullets" )
+			CBaseEntity::PushLuaInstanceSafe( L, this );
+			lua_pushvalue( L, nData );
+		SRCBOX_HOOK_CALL( 2 )
+			bBlocked = SRCBOX_HOOK_RETURNED_FALSE();
+			bChanged = SRCBOX_HOOK_RETURNED_TRUE();
+		SRCBOX_HOOK_END()
+
+		if ( bChanged )
+		{
+			FireBulletsInfo_t changed = lua_tofirebulletsinfo( L, nData, this );
+			changed.m_bPrimaryAttack = info.m_bPrimaryAttack;
+			changed.m_bUseServerRandomSeed = info.m_bUseServerRandomSeed;
+			lua_settop( L, nTop );
+
+			s_bSrcboxInFireBulletsHook = true;
+			FireBullets( changed );
+			s_bSrcboxInFireBulletsHook = false;
+			return;
+		}
+
+		lua_settop( L, nTop );
+		if ( bBlocked )
+			return;
+	}
+#endif
+
 	static int	tracerCount;
 	trace_t		tr;
 	CAmmoDef*	pAmmoDef	= GetAmmoDef();

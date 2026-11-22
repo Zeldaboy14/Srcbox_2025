@@ -20,6 +20,10 @@
 #include "AI_Criteria.h"
 #include "ragdoll_shared.h"
 #include "hierarchy.h"
+#ifdef LUA_SDK
+#include "baseflex.h"
+#include "srcbox/srcbox_ragdollflex.h"
+#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -62,6 +66,11 @@ IMPLEMENT_SERVERCLASS_ST(CRagdollProp, DT_Ragdoll)
 	SendPropEHandle(SENDINFO( m_hUnragdoll ) ),
 	SendPropFloat(SENDINFO(m_flBlendWeight), 8, SPROP_ROUNDDOWN, 0.0f, 1.0f ),
 	SendPropInt(SENDINFO(m_nOverlaySequence), 11),
+#ifdef LUA_SDK
+	SendPropArray3( SENDINFO_ARRAY3(m_flSrcboxFlexWeight), SendPropFloat( SENDINFO_ARRAY(m_flSrcboxFlexWeight), 12, SPROP_ROUNDDOWN, 0.0f, 1.0f ) ),
+	SendPropFloat( SENDINFO(m_flSrcboxFlexScale), 0, SPROP_NOSCALE ),
+	SendPropBool( SENDINFO(m_bSrcboxFlexPosed) ),
+#endif
 END_SEND_TABLE()
 
 #define DEFINE_RAGDOLL_ELEMENT( i ) \
@@ -95,6 +104,11 @@ BEGIN_DATADESC(CRagdollProp)
 
 	DEFINE_FIELD( m_flBlendWeight, FIELD_FLOAT ),
 	DEFINE_FIELD( m_nOverlaySequence, FIELD_INTEGER ),
+#ifdef LUA_SDK
+	DEFINE_ARRAY( m_flSrcboxFlexWeight, FIELD_FLOAT, MAXSTUDIOFLEXCTRL ),
+	DEFINE_FIELD( m_flSrcboxFlexScale, FIELD_FLOAT ),
+	DEFINE_FIELD( m_bSrcboxFlexPosed, FIELD_BOOLEAN ),
+#endif
 	DEFINE_AUTO_ARRAY( m_ragdollMins, FIELD_VECTOR ),
 	DEFINE_AUTO_ARRAY( m_ragdollMaxs, FIELD_VECTOR ),
 
@@ -275,6 +289,12 @@ CRagdollProp::CRagdollProp( void )
 	m_allAsleep = false;
 	m_flFadeScale = 1;
 	m_flDefaultFadeScale = 1;
+#ifdef LUA_SDK
+	for ( int i = 0; i < MAXSTUDIOFLEXCTRL; i++ )
+		m_flSrcboxFlexWeight.Set( i, 0.0f );
+	m_flSrcboxFlexScale = 1.0f;
+	m_bSrcboxFlexPosed = false;
+#endif
 }
 
 CRagdollProp::~CRagdollProp( void )
@@ -1301,6 +1321,9 @@ CBaseEntity *CreateServerRagdoll( CBaseAnimating *pAnimating, int forceBone, con
 	CRagdollProp *pRagdoll = (CRagdollProp *)CBaseEntity::CreateNoSpawn( "prop_ragdoll", pAnimating->GetAbsOrigin(), vec3_angle, NULL );
 	pRagdoll->CopyAnimationDataFrom( pAnimating );
 	pRagdoll->SetOwnerEntity( pAnimating );
+#ifdef LUA_SDK
+	pRagdoll->CopyFlexWeightsFrom( pAnimating );
+#endif
 
 	pRagdoll->InitRagdollAnimation();
 	matrix3x4_t pBoneToWorld[MAXSTUDIOBONES], pBoneToWorldNext[MAXSTUDIOBONES];
@@ -1711,3 +1734,103 @@ void Ragdoll_GetAngleOverrideString( char *pOut, int size, CBaseEntity *pEntity 
 		pRagdoll->GetAngleOverrideFromCurrentState( pOut, size );
 	}
 }
+
+#ifdef LUA_SDK
+//-----------------------------------------------------------------------------
+// Srcbox: face flex weights on ragdolls ( see srcbox/srcbox_ragdollflex.h )
+//-----------------------------------------------------------------------------
+void CRagdollProp::SetFlexWeightNormalized( int index, float flWeight )
+{
+	CStudioHdr *pStudioHdr = GetModelPtr();
+	if ( !pStudioHdr || index < 0 || index >= pStudioHdr->numflexcontrollers() || index >= MAXSTUDIOFLEXCTRL )
+		return;
+
+	m_flSrcboxFlexWeight.Set( index, clamp( flWeight, 0.0f, 1.0f ) );
+	m_bSrcboxFlexPosed = true;
+}
+
+float CRagdollProp::GetFlexWeightNormalized( int index ) const
+{
+	if ( index < 0 || index >= MAXSTUDIOFLEXCTRL )
+		return 0.0f;
+
+	return m_flSrcboxFlexWeight.Get( index );
+}
+
+void CRagdollProp::CopyFlexWeightsFrom( CBaseAnimating *pSource )
+{
+	CBaseFlex *pFlex = dynamic_cast< CBaseFlex * >( pSource );
+	CStudioHdr *pStudioHdr = GetModelPtr();
+	if ( !pFlex || !pStudioHdr )
+		return;
+
+	int nControllers = MIN( pStudioHdr->numflexcontrollers(), MAXSTUDIOFLEXCTRL );
+	bool bPosed = false;
+
+	for ( int i = 0; i < nControllers; i++ )
+	{
+		mstudioflexcontroller_t *pController = pStudioHdr->pFlexcontroller( ( LocalFlexController_t )i );
+		float flValue = pFlex->GetFlexWeight( ( LocalFlexController_t )i );
+
+		if ( flValue != 0.0f )
+			bPosed = true;
+
+		if ( pController->max != pController->min )
+			flValue = ( flValue - pController->min ) / ( pController->max - pController->min );
+
+		m_flSrcboxFlexWeight.Set( i, clamp( flValue, 0.0f, 1.0f ) );
+	}
+
+	m_bSrcboxFlexPosed = bPosed;
+}
+
+bool SrcboxRagdollFlex_GetWeight( CBaseEntity *pEntity, int index, float &flWeight )
+{
+	CRagdollProp *pRagdoll = dynamic_cast< CRagdollProp * >( pEntity );
+	if ( !pRagdoll )
+		return false;
+
+	flWeight = pRagdoll->GetFlexWeightNormalized( index );
+	return true;
+}
+
+bool SrcboxRagdollFlex_SetWeight( CBaseEntity *pEntity, int index, float flWeight )
+{
+	CRagdollProp *pRagdoll = dynamic_cast< CRagdollProp * >( pEntity );
+	if ( !pRagdoll )
+		return false;
+
+	pRagdoll->SetFlexWeightNormalized( index, flWeight );
+	return true;
+}
+
+bool SrcboxRagdollFlex_GetScale( CBaseEntity *pEntity, float &flScale )
+{
+	CRagdollProp *pRagdoll = dynamic_cast< CRagdollProp * >( pEntity );
+	if ( !pRagdoll )
+		return false;
+
+	flScale = pRagdoll->GetFlexScale();
+	return true;
+}
+
+bool SrcboxRagdollFlex_SetScale( CBaseEntity *pEntity, float flScale )
+{
+	CRagdollProp *pRagdoll = dynamic_cast< CRagdollProp * >( pEntity );
+	if ( !pRagdoll )
+		return false;
+
+	pRagdoll->SetFlexScale( flScale );
+	return true;
+}
+
+bool SrcboxRagdollFlex_IsPosed( CBaseEntity *pEntity, bool &bPosed )
+{
+	CRagdollProp *pRagdoll = dynamic_cast< CRagdollProp * >( pEntity );
+	if ( !pRagdoll )
+		return false;
+
+	bPosed = pRagdoll->IsFlexPosed();
+	return true;
+}
+#endif // LUA_SDK

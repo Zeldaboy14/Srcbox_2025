@@ -31,6 +31,7 @@
 
 #include "engine/IEngineSound.h"
 #include "SoundEmitterSystem/isoundemittersystembase.h"
+#include "srcbox/srcbox_gmodhooks.h"
 
 extern ConVar sv_footsteps;
 
@@ -199,6 +200,27 @@ void CHL2MP_Player::PlayStepSound( Vector &vecOrigin, surfacedata_t *psurface, f
 	CSoundParameters params;
 	if ( GetParametersForSound( szStepSound, params, NULL ) == false )
 		return;
+
+#ifdef LUA_SDK
+	// Srcbox: GMod's PlayerFootstep( ply, pos, foot, sound, volume, filter ): returning true plays
+	// nothing ( foot: 0 left, 1 right; no filter object is passed )
+	{
+		bool bSuppressed = false;
+		SRCBOX_HOOK_BEGIN( "PlayerFootstep" )
+			CBasePlayer::PushLuaInstanceSafe( L, this );
+			lua_pushvector( L, vecOrigin );
+			lua_pushinteger( L, m_Local.m_nStepside ? 0 : 1 );
+			lua_pushstring( L, params.soundname );
+			lua_pushnumber( L, fvol );
+			lua_pushnil( L );
+		SRCBOX_HOOK_CALL( 6 )
+			bSuppressed = SRCBOX_HOOK_RETURNED_TRUE();
+		SRCBOX_HOOK_END()
+
+		if ( bSuppressed )
+			return;
+	}
+#endif
 
 	CRecipientFilter filter;
 	filter.AddRecipientsByPAS( vecOrigin );

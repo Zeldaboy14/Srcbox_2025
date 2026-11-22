@@ -40,15 +40,18 @@ LUA_BINDING_END( "integer", "CRC32 of the string." )
 
 LUA_BINDING_BEGIN( Serializers, Base64Encode, "library", "Encode a string to base64" )
 {
-    const char *pszString = LUA_BINDING_ARGUMENT( luaL_checkstring, 1, "string" );
+    // Srcbox: taken whole, so binary data ( pictures, compressed data ) encodes correctly
+    size_t length = 0;
+    const char *pszString = luaL_checklstring( L, 1, &length );
     bool bDisableRfc2045Compliance = LUA_BINDING_ARGUMENT_WITH_DEFAULT( luaL_optboolean, 2, false, "disableRfc2045Compliance" );
 
+    std::string input( pszString, length );
     std::string encodedString;
 
     if ( bDisableRfc2045Compliance )
-        encodedString = base64_encode( pszString, false );
+        encodedString = base64_encode( input, false );
     else
-        encodedString = base64_encode_mime( pszString );
+        encodedString = base64_encode_mime( input );
 
     lua_pushstring( L, encodedString.c_str() );
 
@@ -58,10 +61,12 @@ LUA_BINDING_END( "string", "Base64 encoded string." )
 
 LUA_BINDING_BEGIN( Serializers, Base64Decode, "library", "Decode a base64 encoded string" )
 {
-    const char *pszString = LUA_BINDING_ARGUMENT( luaL_checkstring, 1, "string" );
-    std::string decodedString = base64_decode( pszString );
+    // Srcbox: the result can be binary ( zero bytes ), so it's returned whole
+    size_t length = 0;
+    const char *pszString = luaL_checklstring( L, 1, &length );
+    std::string decodedString = base64_decode( std::string( pszString, length ) );
 
-    lua_pushstring( L, decodedString.c_str() );
+    lua_pushlstring( L, decodedString.data(), decodedString.size() );
 
     return 1;
 }
@@ -132,52 +137,122 @@ LUA_BINDING_END( "string", "JSON encoded string." )
 // LZMA
 //
 
+// Srcbox: these use Garry's Mod's format ( util.Compress / util.Decompress ): the 5 LZMA property
+// bytes, the uncompressed size as an 8-byte little endian integer, then the LZMA stream. That's
+// what GMod's .dupe files and anything else GMod compressed hold, so those open here and what's
+// compressed here opens in GMod. The engine's own format ( an lzma_header_t, "LZMA" first ) is
+// still read. Strings are taken whole ( compressed data has zero bytes in it ), and failing to
+// decompress gives nil, like GMod.
+#define GMOD_LZMA_HEADER_SIZE ( 5 + 8 )
+
 LUA_BINDING_BEGIN( Serializers, LzmaCompress, "library", "Compress a string using LZMA" )
 {
-    const char *inputString = LUA_BINDING_ARGUMENT( luaL_checkstring, 1, "string" );
-    unsigned int outCompressedSize;
-    CUtlBuffer inputBuffer = CUtlBuffer( inputString, Q_strlen( inputString ), CUtlBuffer::READ_ONLY );
+    size_t inputLength = 0;
+    const char *inputString = luaL_checklstring( L, 1, &inputLength );
 
-    unsigned char *compressedString = LZMA_Compress(
-        ( unsigned char * )inputBuffer.Base(),
-        inputBuffer.TellMaxPut(),
-        &outCompressedSize );
+    unsigned int valveSize = 0;
+    unsigned char *valveData = LZMA_Compress( ( unsigned char * )inputString, ( unsigned int )inputLength, &valveSize );
 
-    lua_pushlstring( L, ( char * )compressedString, outCompressedSize );
-    delete[] compressedString;
+    if ( !valveData || valveSize < sizeof( lzma_header_t ) )
+    {
+        if ( valveData )
+            free( valveData );
+
+        lua_pushnil( L );
+        return 1;
+    }
+
+    // Engine format -> GMod format: same properties and stream, a different header
+    const lzma_header_t *pHeader = ( const lzma_header_t * )valveData;
+    const unsigned int streamSize = valveSize - sizeof( lzma_header_t );
+
+    CUtlBuffer output;
+    output.EnsureCapacity( GMOD_LZMA_HEADER_SIZE + streamSize );
+    output.Put( pHeader->properties, 5 );
+
+    unsigned long long actualSize = pHeader->actualSize;
+    for ( int i = 0; i < 8; i++ )
+        output.PutUnsignedChar( ( unsigned char )( actualSize >> ( 8 * i ) ) );
+
+    output.Put( valveData + sizeof( lzma_header_t ), streamSize );
+    free( valveData );
+
+    lua_pushlstring( L, ( const char * )output.Base(), output.TellPut() );
     return 1;
 }
 LUA_BINDING_END( "string", "Compressed string." )
 
 LUA_BINDING_BEGIN( Serializers, LzmaDecompress, "library", "Decompress a string using LZMA" )
 {
-    const char *compressedString = LUA_BINDING_ARGUMENT( luaL_checkstring, 1, "compressedString" );
+    size_t compressedLength = 0;
+    const char *compressedString = luaL_checklstring( L, 1, &compressedLength );
+    const lua_Integer maxSize = luaL_optinteger( L, 2, 0 );
 
-    if ( !LZMA_IsCompressed( ( unsigned char * )compressedString ) )
+    // Anything bigger than this isn't a real decompressed size ( and wouldn't fit the engine's header )
+    const unsigned long long sizeLimit = maxSize > 0 ? ( unsigned long long )maxSize : 0x7FFFFFFFull;
+
+    CUtlBuffer valve;
+    const unsigned char *input = ( const unsigned char * )compressedString;
+
+    if ( compressedLength >= sizeof( lzma_header_t ) && LZMA_IsCompressed( ( unsigned char * )input ) )
     {
-        luaL_argerror( L, 2, "Our LZMA header is missing: Cannot decompress the string if is not compressed through this library. Prepend the length of the uncompressed data to its compressed form as an 8-byte little endian integer." );
-        return 0;
+        // Already the engine's format
+        if ( ( ( const lzma_header_t * )input )->actualSize > sizeLimit )
+        {
+            lua_pushnil( L );
+            return 1;
+        }
+
+        valve.Put( input, ( int )compressedLength );
+    }
+    else if ( compressedLength > GMOD_LZMA_HEADER_SIZE )
+    {
+        unsigned long long actualSize = 0;
+        for ( int i = 0; i < 8; i++ )
+            actualSize |= ( unsigned long long )input[5 + i] << ( 8 * i );
+
+        if ( actualSize > sizeLimit )
+        {
+            lua_pushnil( L );
+            return 1;
+        }
+
+        // GMod format -> engine format, for LZMA_Uncompress
+        lzma_header_t header;
+        header.id = LZMA_ID;
+        header.actualSize = ( unsigned int )actualSize;
+        header.lzmaSize = ( unsigned int )( compressedLength - GMOD_LZMA_HEADER_SIZE );
+        memcpy( header.properties, input, 5 );
+
+        valve.Put( &header, sizeof( header ) );
+        valve.Put( input + GMOD_LZMA_HEADER_SIZE, ( int )( compressedLength - GMOD_LZMA_HEADER_SIZE ) );
+    }
+    else
+    {
+        lua_pushnil( L );
+        return 1;
     }
 
-    unsigned char *outputString;
-    unsigned int outUncompressedSize;
-    bool success = LZMA_Uncompress(
-        ( unsigned char * )compressedString,
-        &outputString,
-        &outUncompressedSize );
-
-    if ( !success )
+    if ( ( ( const lzma_header_t * )valve.Base() )->actualSize == 0 )
     {
-        delete[] outputString;
-        luaL_error( L, "Failed to decompress string." );
+        lua_pushstring( L, "" );
+        return 1;
     }
 
-    // Note:    If you set a breakpoint here and inspect outputString, you may find that additional
-    //          junk data is present at the end of the string. This is because the LZMA decompression
-    //          algorithm does not null-terminate the output string. This is not a bug, since we now
-    //          only push the length of the decompressed string to Lua, and Lua strings are null-terminated.
-    lua_pushlstring( L, ( char * )outputString, outUncompressedSize );
-    delete[] outputString;
+    unsigned char *outputString = NULL;
+    unsigned int outUncompressedSize = 0;
+
+    if ( !LZMA_Uncompress( ( unsigned char * )valve.Base(), &outputString, &outUncompressedSize ) )
+    {
+        if ( outputString )
+            free( outputString );
+
+        lua_pushnil( L );
+        return 1;
+    }
+
+    lua_pushlstring( L, ( const char * )outputString, outUncompressedSize );
+    free( outputString );
     return 1;
 }
 LUA_BINDING_END( "string", "Decompressed string." )

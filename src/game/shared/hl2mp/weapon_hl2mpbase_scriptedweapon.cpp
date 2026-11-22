@@ -198,6 +198,9 @@ CHL2MPScriptedWeapon::~CHL2MPScriptedWeapon( void )
 	// this is the class that initialized the reference.
 #ifdef LUA_SDK
 	lua_unref( L, m_nTableReference );
+	// CBaseEntity's destructor unrefs it again; a double unref corrupts Lua's
+	// free list and later entities end up sharing one ref table.
+	m_nTableReference = LUA_NOREF;
 #endif
 }
 
@@ -632,6 +635,11 @@ void CHL2MPScriptedWeapon::OnDataChanged( DataUpdateType_t updateType )
 
 	if ( updateType == DATA_UPDATE_CREATED )
 	{
+#ifdef LUA_SDK
+		m_flSrcboxLastPredictedThink = -FLT_MAX;
+		SetNextClientThink( CLIENT_THINK_ALWAYS );
+#endif
+
 		if ( m_iScriptedClassname.Get() && !m_pLuaWeaponInfo->bParsedScript )
 		{
 			m_pLuaWeaponInfo->bParsedScript = true;
@@ -645,6 +653,29 @@ void CHL2MPScriptedWeapon::OnDataChanged( DataUpdateType_t updateType )
 		}
 	}
 }
+
+#ifdef LUA_SDK
+//-----------------------------------------------------------------------------
+// Srcbox: GMod calls SWEP:Think clientside every frame for the local player's active weapon,
+// in singleplayer too ( the tool gun's faceposer panel and ghost previews rely on it ). Here it
+// only comes from prediction ( ItemPostFrame ), which doesn't run in singleplayer, so call it
+// whenever prediction hasn't lately. With prediction running this never doubles it.
+//-----------------------------------------------------------------------------
+void CHL2MPScriptedWeapon::ClientThink( void )
+{
+	BaseClass::ClientThink();
+
+	C_BasePlayer *pLocalPlayer = C_BasePlayer::GetLocalPlayer();
+	if ( !pLocalPlayer || GetOwner() != pLocalPlayer || pLocalPlayer->GetActiveWeapon() != this )
+		return;
+
+	if ( gpGlobals->realtime - m_flSrcboxLastPredictedThink < 0.1f )
+		return;
+
+	LUA_CALL_WEAPON_METHOD_BEGIN( "Think" );
+	LUA_CALL_WEAPON_METHOD_END( 0, 0 );
+}
+#endif
 
 const char *CHL2MPScriptedWeapon::GetScriptedClassname( void )
 {
@@ -1018,7 +1049,10 @@ bool CHL2MPScriptedWeapon::Deploy( void )
     LUA_CALL_WEAPON_METHOD_BEGIN( "Deploy" );
     LUA_CALL_WEAPON_METHOD_END( 0, 1 );
 
-    LUA_RETURN_VALUE_IF_TRUE( false );
+    // GMod: SWEP:Deploy's return value never stops the weapon being deployed (most
+    // return true). This used to return false on true, so the weapon was never
+    // drawn and every caller saw a failed deploy.
+    LUA_RETURN_VALUE_IF_TRUE( BaseClass::Deploy() );
 #endif
 
 	return BaseClass::Deploy();
@@ -1048,7 +1082,11 @@ bool CHL2MPScriptedWeapon::Holster( CBaseCombatWeapon *pSwitchingTo )
 	CBaseCombatWeapon::PushLuaInstanceSafe(L, pSwitchingTo);
 	LUA_CALL_WEAPON_METHOD_END( 1, 1 );
 
-	LUA_RETURN_BOOLEAN();
+	// GMod: SWEP:Holster returns whether the weapon may be holstered; true still
+	// has to actually holster it. Returning the Lua value straight away left the
+	// weapon up, so +use pickups (which need the weapon holstered) were dropped
+	// the moment they started.
+	LUA_RETURN_VALUE_IF_FALSE( false );
 #endif
 
 	return BaseClass::Holster( pSwitchingTo );
@@ -1058,9 +1096,33 @@ bool CHL2MPScriptedWeapon::Holster( CBaseCombatWeapon *pSwitchingTo )
 // Purpose: Copied from CBaseCombatWeapon::ItemPostFrame and modified to let Lua
 //          determine more behaviour.
 //====================================================================================
+#ifdef LUA_SDK
+bool CHL2MPScriptedWeapon::LuaIsAutomatic( bool bPrimary )
+{
+    bool bAutomatic = false;
+
+    LUA_GET_REF_TABLE( L, this );
+    lua_getfield( L, -1, bPrimary ? "Primary" : "Secondary" );
+
+    if ( lua_istable( L, -1 ) )
+    {
+        lua_getfield( L, -1, "Automatic" );
+        bAutomatic = lua_toboolean( L, -1 ) != 0;
+        lua_pop( L, 1 );
+    }
+
+    lua_pop( L, 2 );  // Primary/Secondary and the ref table
+    return bAutomatic;
+}
+#endif
+
 void CHL2MPScriptedWeapon::ItemPostFrame( void )
 {
 #if defined ( LUA_SDK )
+#ifdef CLIENT_DLL
+    m_flSrcboxLastPredictedThink = gpGlobals->realtime;
+#endif
+
     // Experiment; TODO: Is this really the best place to call Think? At the end of the frame?
     LUA_CALL_WEAPON_METHOD_BEGIN( "Think" );
     LUA_CALL_WEAPON_METHOD_END( 0, 0 );
@@ -1093,8 +1155,21 @@ void CHL2MPScriptedWeapon::ItemPostFrame( void )
 
 	bool bFired = false;
 
+#ifdef LUA_SDK
+	// Srcbox: like GMod, only attack once the next attack time has passed, and for
+	// non-automatic attacks only when the button was just pressed (the tool gun
+	// otherwise ran its click every frame while the button was held)
+	bool bCanSecondary = ( m_flNextSecondaryAttack <= gpGlobals->curtime ) &&
+		( ( pOwner->m_afButtonPressed & IN_ATTACK2 ) || LuaIsAutomatic( false ) );
+	bool bCanPrimary = ( m_flNextPrimaryAttack <= gpGlobals->curtime ) &&
+		( ( pOwner->m_afButtonPressed & IN_ATTACK ) || LuaIsAutomatic( true ) );
+#else
+	bool bCanSecondary = true;
+	bool bCanPrimary = true;
+#endif
+
 	// Secondary attack has priority
-	if ((pOwner->m_nButtons & IN_ATTACK2))
+	if ((pOwner->m_nButtons & IN_ATTACK2) && bCanSecondary)
 	{
 		// FIXME: This isn't necessarily true if the weapon doesn't have a secondary fire!
 		// For instance, the crossbow doesn't have a 'real' secondary fire, but it still
@@ -1110,7 +1185,7 @@ void CHL2MPScriptedWeapon::ItemPostFrame( void )
 		SecondaryAttack();
 	}
 
-	if (!bFired && (pOwner->m_nButtons & IN_ATTACK))
+	if (!bFired && (pOwner->m_nButtons & IN_ATTACK) && bCanPrimary)
 	{
 		PrimaryAttack();
 

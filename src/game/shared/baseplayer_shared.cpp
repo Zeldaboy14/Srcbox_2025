@@ -9,6 +9,7 @@
 #include "movevars_shared.h"
 #include "util_shared.h"
 #include "datacache/imdlcache.h"
+#include "srcbox/srcbox_gmodhooks.h"
 #if defined ( TF_DLL ) || defined ( TF_CLIENT_DLL )
 #include "tf_gamerules.h"
 #endif
@@ -871,6 +872,24 @@ void CBasePlayer::Weapon_SetLast( CBaseCombatWeapon *pWeapon )
 bool CBasePlayer::Weapon_Switch( CBaseCombatWeapon *pWeapon, int viewmodelindex /*=0*/ ) 
 {
 	CBaseCombatWeapon *pLastWeapon = GetActiveWeapon();
+
+#ifdef LUA_SDK
+	// Srcbox: GMod's PlayerSwitchWeapon( ply, oldWeapon, newWeapon ): returning true stops the switch
+	if ( pWeapon && pWeapon != pLastWeapon )
+	{
+		bool bBlocked = false;
+		SRCBOX_HOOK_BEGIN( "PlayerSwitchWeapon" )
+			CBasePlayer::PushLuaInstanceSafe( L, this );
+			CBaseCombatWeapon::PushLuaInstanceSafe( L, pLastWeapon );
+			CBaseCombatWeapon::PushLuaInstanceSafe( L, pWeapon );
+		SRCBOX_HOOK_CALL( 3 )
+			bBlocked = SRCBOX_HOOK_RETURNED_TRUE();
+		SRCBOX_HOOK_END()
+
+		if ( bBlocked )
+			return false;
+	}
+#endif
 
 	if ( BaseClass::Weapon_Switch( pWeapon, viewmodelindex ))
 	{

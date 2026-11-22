@@ -49,6 +49,7 @@
 #ifdef LUA_SDK
 #include "luamanager.h"
 #include "lbaseplayer_shared.h"
+#include "srcbox/srcbox_gmodhooks.h"
 #endif
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -519,6 +520,35 @@ void Host_Say( edict_t *pEdict, const CCommand &args, bool teamonly )
 		if ( !p )
 			return;
 
+#ifdef LUA_SDK
+		// Srcbox: GMod's PlayerSay( ply, text, teamOnly ): a returned string is said instead ( "" says
+		// nothing )
+		{
+			static char s_szSrcboxSay[256];
+			bool bReplaced = false;
+
+			SRCBOX_HOOK_BEGIN( "PlayerSay" )
+				CBasePlayer::PushLuaInstanceSafe( L, pPlayer );
+				lua_pushstring( L, p );
+				lua_pushboolean( L, teamonly );
+			SRCBOX_HOOK_CALL( 3 )
+				if ( SRCBOX_HOOK_RETURNED() && lua_type( L, -1 ) == LUA_TSTRING )
+				{
+					Q_strncpy( s_szSrcboxSay, lua_tostring( L, -1 ), 128 );
+					bReplaced = true;
+				}
+			SRCBOX_HOOK_END()
+
+			if ( bReplaced )
+			{
+				if ( !s_szSrcboxSay[0] )
+					return;
+
+				p = s_szSrcboxSay;
+			}
+		}
+#endif
+
 		Assert( strlen( pPlayer->GetPlayerName() ) > 0 );
 
 		bSenderDead = ( pPlayer->m_lifeState != LIFE_ALIVE );
@@ -589,6 +619,24 @@ void Host_Say( edict_t *pEdict, const CCommand &args, bool teamonly )
 
 		if ( pPlayer && GetVoiceGameMgr() && GetVoiceGameMgr()->IsPlayerIgnoringPlayer( pPlayer->entindex(), i ) )
 			continue;
+
+#ifdef LUA_SDK
+		// Srcbox: GMod's PlayerCanSeePlayersChat( text, teamOnly, listener, speaker ): false hides it
+		{
+			bool bHidden = false;
+			SRCBOX_HOOK_BEGIN( "PlayerCanSeePlayersChat" )
+				lua_pushstring( L, p );
+				lua_pushboolean( L, teamonly );
+				CBasePlayer::PushLuaInstanceSafe( L, client );
+				CBasePlayer::PushLuaInstanceSafe( L, pPlayer );
+			SRCBOX_HOOK_CALL( 4 )
+				bHidden = SRCBOX_HOOK_RETURNED_FALSE();
+			SRCBOX_HOOK_END()
+
+			if ( bHidden )
+				continue;
+		}
+#endif
 
 		CSingleUserRecipientFilter user( client );
 		user.MakeReliable();
@@ -1452,13 +1500,45 @@ void EnableNoClip( CBasePlayer *pPlayer )
 	pPlayer->AddEFlags( EFL_NOCLIP_ACTIVE );
 }
 
+// Srcbox: noclip works like GMod's. It used to need sv_cheats, which singleplayer games
+// started from the menu turn off. Now it's allowed with cheats on, or when the Lua gamemode's
+// PlayerNoClip( ply, on ) hook says so ( Sandbox: sbox_noclip ), or else, like GMod's base
+// gamemode, in singleplayer ( and turning it off is always allowed ).
+static bool CanPlayerNoClip( CBasePlayer *pPlayer, bool bTurningOn )
+{
+	if ( sv_cheats->GetBool() )
+		return true;
+
+#ifdef LUA_SDK
+	if ( L )
+	{
+		int iTop = lua_gettop( L );
+		LUA_CALL_HOOK_BEGIN( "PlayerNoClip" );
+		CBasePlayer::PushLuaInstanceSafe( L, pPlayer );
+		lua_pushboolean( L, bTurningOn );
+		LUA_CALL_HOOK_END( 2, 1 );
+
+		if ( lua_gettop( L ) > iTop && lua_isboolean( L, -1 ) )
+		{
+			bool bAllowed = lua_toboolean( L, -1 ) != 0;
+			lua_settop( L, iTop );
+			return bAllowed;
+		}
+
+		lua_settop( L, iTop );
+	}
+#endif
+
+	return !bTurningOn || gpGlobals->maxClients == 1;
+}
+
 void CC_Player_NoClip( void )
 {
-	if ( !sv_cheats->GetBool() )
-		return;
-
 	CBasePlayer *pPlayer = ToBasePlayer( UTIL_GetCommandClient() ); 
 	if ( !pPlayer )
+		return;
+
+	if ( !CanPlayerNoClip( pPlayer, pPlayer->GetMoveType() != MOVETYPE_NOCLIP ) )
 		return;
 
 	CPlayerState *pl = pPlayer->PlayerData();
@@ -1506,7 +1586,8 @@ void CC_Player_NoClip( void )
 	}
 }
 
-static ConCommand noclip("noclip", CC_Player_NoClip, "Toggle. Player becomes non-solid and flies.", FCVAR_CHEAT);
+// ( Srcbox: not FCVAR_CHEAT; CanPlayerNoClip decides )
+static ConCommand noclip("noclip", CC_Player_NoClip, "Toggle. Player becomes non-solid and flies.", 0);
 
 
 //------------------------------------------------------------------------------

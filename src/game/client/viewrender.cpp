@@ -82,12 +82,19 @@
 
 #ifdef LUA_SDK
 #include "luamanager.h"
+#include "srcbox/srcbox_gmodhooks.h"
 #endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
 #undef SSAO
+
+#ifdef SFM_SSAO
+// sfm_ssao.cpp
+extern void SFM_SSAO_Render( const CViewSetup &view );
+extern ConVar r_sfm_ssao_translucent_depth;
+#endif
 
 static void testfreezeframe_f( void )
 {
@@ -4105,6 +4112,41 @@ void CRendering3dView::DrawOpaqueRenderables( ERenderDepthMode DepthMode )
 	if( !m_pMainView->ShouldDrawEntities() )
 		return;
 
+#ifdef LUA_SDK
+	// Srcbox: GMod's PreDrawOpaqueRenderables( bDrawingDepth, bDrawingSkybox, isDraw3DSkybox ): returning
+	// true skips the opaque entities ( the matching Post hook still runs, as in GMod )
+	const bool bSrcboxDepth = DepthMode != DEPTH_MODE_NORMAL;
+	const bool bSrcboxSkybox = dynamic_cast< CSkyboxView * >( this ) != NULL;
+	bool bSrcboxSkipOpaque = false;
+
+	SRCBOX_HOOK_BEGIN( "PreDrawOpaqueRenderables" )
+		lua_pushboolean( L, bSrcboxDepth );
+		lua_pushboolean( L, bSrcboxSkybox );
+		lua_pushboolean( L, bSrcboxSkybox );
+	SRCBOX_HOOK_CALL( 3 )
+		bSrcboxSkipOpaque = SRCBOX_HOOK_RETURNED_TRUE();
+	SRCBOX_HOOK_END()
+
+	if ( !bSrcboxSkipOpaque )
+		DrawOpaqueRenderables_Srcbox( DepthMode );
+
+	render->SetBlend( 1 );
+
+	SRCBOX_HOOK_BEGIN( "PostDrawOpaqueRenderables" )
+		lua_pushboolean( L, bSrcboxDepth );
+		lua_pushboolean( L, bSrcboxSkybox );
+		lua_pushboolean( L, bSrcboxSkybox );
+	SRCBOX_HOOK_CALL( 3 )
+	SRCBOX_HOOK_END()
+#else
+	DrawOpaqueRenderables_Srcbox( DepthMode );
+#endif
+}
+
+// The opaque renderables themselves ( split out of DrawOpaqueRenderables so GMod's Pre / Post
+// hooks can go around them )
+void CRendering3dView::DrawOpaqueRenderables_Srcbox( ERenderDepthMode DepthMode )
+{
 	render->SetBlend( 1 );
 
 	//
@@ -4504,6 +4546,16 @@ void CRendering3dView::DrawNoZBufferTranslucentRenderables( void )
 void CRendering3dView::DrawTranslucentRenderables( bool bInSkybox, bool bShadowDepth )
 {
 	const ClientWorldListInfo_t& info = *m_pWorldListInfo;
+
+#ifdef LUA_SDK
+	// Srcbox: GMod's PreDrawTranslucentRenderables( bDrawingDepth, bDrawingSkybox, isDraw3DSkybox )
+	SRCBOX_HOOK_BEGIN( "PreDrawTranslucentRenderables" )
+		lua_pushboolean( L, bShadowDepth );
+		lua_pushboolean( L, bInSkybox );
+		lua_pushboolean( L, bInSkybox );
+	SRCBOX_HOOK_CALL( 3 )
+	SRCBOX_HOOK_END()
+#endif
 
 #ifdef PORTAL //if we're in the portal mod, we need to make a detour so we can render portal views using stencil areas
 	if( ShouldDrawPortals() ) //no recursive stencil views during skybox rendering (although we might be drawing a skybox while already in a recursive stencil view)
@@ -5629,6 +5681,14 @@ void CBaseWorldView::DrawExecute( float waterHeight, view_id_t viewID, float wat
 
 		SSAO_DepthPass();
 
+#ifdef SFM_SSAO
+		// SFM's SSAO over the opaque scene, before translucents. The main 3D view is pushed again.
+		if ( viewID == VIEW_MAIN )
+		{
+			SFM_SSAO_Render( *this );
+		}
+#endif
+
 #ifdef TF_CLIENT_DLL
 		bool bVisionOverride = ( localplayer_visionflags.GetInt() & ( 0x01 ) ); // Pyro-vision Goggles
 
@@ -5689,7 +5749,14 @@ void CBaseWorldView::SSAO_DepthPass()
 	int savedViewID = g_CurrentViewID;
 	g_CurrentViewID = VIEW_SSAO;
 
+#ifdef SFM_SSAO
+	// SFM SSAO wants 32 bit float depth, _rt_ResolvedFullFrameDepth is RGBA8888
+	ITexture *pSSAO = materials->FindTexture( "_rt_SFM_SSAO_Depth", TEXTURE_GROUP_RENDER_TARGET, false );
+	if ( !pSSAO || pSSAO->IsError() )
+		pSSAO = materials->FindTexture( "_rt_ResolvedFullFrameDepth", TEXTURE_GROUP_RENDER_TARGET );
+#else
 	ITexture *pSSAO = materials->FindTexture( "_rt_ResolvedFullFrameDepth", TEXTURE_GROUP_RENDER_TARGET );
+#endif
 
 	CMatRenderContextPtr pRenderContext( materials );
 
@@ -5730,6 +5797,16 @@ void CBaseWorldView::SSAO_DepthPass()
 		VPROF_BUDGET( "DrawOpaqueRenderables", VPROF_BUDGETGROUP_SHADOW_DEPTH_TEXTURING );
 		DrawOpaqueRenderables( DEPTH_MODE_SSA0 );
 	}
+
+#ifdef SFM_SSAO
+	// Translucent world brushes ( windows ) into the depth too, otherwise SFM SSAO computes the
+	// occlusion of whatever is behind the glass and it shows through once the glass is drawn.
+	if ( r_sfm_ssao_translucent_depth.GetBool() )
+	{
+		VPROF_BUDGET( "DrawTranslucentWorldInLeaves", VPROF_BUDGETGROUP_SHADOW_DEPTH_TEXTURING );
+		DrawTranslucentWorldInLeaves( true );
+	}
+#endif
 
 #if 0
 	if ( m_bRenderFlashlightDepthTranslucents || r_flashlightdepth_drawtranslucents.GetBool() )

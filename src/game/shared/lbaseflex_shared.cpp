@@ -6,6 +6,9 @@
 #include "lbaseplayer_shared.h"
 #include "mathlib/lvector.h"
 #include "lvphysics_interface.h"
+#ifdef LUA_SDK
+#include "srcbox/srcbox_ragdollflex.h"
+#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -27,29 +30,14 @@ lua_CBaseFlex *CClientSideEntityManager::CreateClientSideEntity( const char *psz
 {
     lua_CBaseFlex *pClientSideEntity = new lua_CBaseFlex();
 
-    int nModelIndex = modelinfo->GetModelClientSideIndex( pszModelName );
-
-    model_t *pModel = nullptr;
-
-    // First try get the existing model
-    if ( nModelIndex != -1 )
-    {
-        pModel = ( model_t * )modelinfo->GetModel( nModelIndex );
-
-        // After a map change, the pointer to the model may give an invalid studio model
-        // in that case, we need to force the model to be loaded again
-        if ( modelinfo->GetStudiomodel( pModel ) == nullptr )
-        {
-            pModel = nullptr;
-        }
-    }
-
-    if ( pModel == nullptr )
-    {
-        // Force loading of the model into memory immediately
-        pModel = ( model_t * )engine->LoadModel( pszModelName, true );
-        modelinfo->RegisterDynamicModel( pszModelName, true );
-    }
+    // Loaded (or found already loaded) as an ordinary client model. It used to be
+    // registered as a dynamic model too, but nothing ever AddRef'd it: the engine
+    // unloads unreferenced dynamic models a few seconds later (flushing the studiohdr
+    // even though the entity still has it locked), and the entity's CStudioHdr then
+    // pointed at freed memory -> crash in CStudioHdr::SequencesAvailable /
+    // GetVirtualModel from C_BaseAnimating::Simulate. Client models loaded this way
+    // stay until the level ends, which is when these entities are removed anyway.
+    model_t *pModel = ( model_t * )engine->LoadModel( pszModelName, true );
 
     InitClientEntity( pClientSideEntity, pModel, renderGroup );
 
@@ -118,34 +106,99 @@ LUA_BINDING_BEGIN( CBaseFlex, GetFlexIdByName, "class", "Get flex ID by name." )
 }
 LUA_BINDING_END( "integer", "Flex ID." )
 
-LUA_BINDING_BEGIN( CBaseFlex, GetFlexWeight, "class", "Get flex weight." )
+// Srcbox: GMod's flex weights are 0..1 per flex controller ( what CBaseFlex networks ); the
+// faceposer remaps its sliders to that. Ragdolls keep their own ( srcbox_ragdollflex.h ), and any
+// other entity has none, so asking it isn't an error.
+static mstudioflexcontroller_t *Srcbox_FlexController( lua_CBaseFlex *pEntity, LocalFlexController_t index )
 {
-    lua_CBaseFlex *pEntity = LUA_BINDING_ARGUMENT( luaL_checkbaseflex, 1, "entity" );
-    LocalFlexController_t iFlexController = ( LocalFlexController_t )( int )LUA_BINDING_ARGUMENT( luaL_checknumber, 2, "flexId" );
+    if ( !pEntity || index < 0 || index >= pEntity->GetNumFlexControllers() )
+        return NULL;
 
-    lua_pushnumber( L, pEntity->GetFlexWeight( iFlexController ) );
+    CStudioHdr *pStudioHdr = pEntity->GetModelPtr();
+    return pStudioHdr ? pStudioHdr->pFlexcontroller( index ) : NULL;
+}
+
+LUA_BINDING_BEGIN( CBaseFlex, GetFlexWeight, "class", "Get flex weight ( 0..1 )." )
+{
+    int index = ( int )LUA_BINDING_ARGUMENT( luaL_checknumber, 2, "flexId" );
+    lua_CBaseFlex *pFlex = lua_tobaseflex( L, 1 );
+
+    if ( pFlex )
+    {
+        mstudioflexcontroller_t *pController = Srcbox_FlexController( pFlex, ( LocalFlexController_t )index );
+        if ( !pController )
+        {
+            lua_pushnumber( L, 0 );
+            return 1;
+        }
+
+        float flValue = pFlex->GetFlexWeight( ( LocalFlexController_t )index );
+        if ( pController->max != pController->min )
+            flValue = ( flValue - pController->min ) / ( pController->max - pController->min );
+
+        lua_pushnumber( L, flValue );
+        return 1;
+    }
+
+    float flWeight = 0.0f;
+#ifdef LUA_SDK
+    CBaseEntity *pEntity = lua_toentity( L, 1 );
+    if ( pEntity )
+        SrcboxRagdollFlex_GetWeight( pEntity, index, flWeight );
+#endif
+
+    lua_pushnumber( L, flWeight );
     return 1;
 }
-LUA_BINDING_END( "number", "Flex weight." )
+LUA_BINDING_END( "number", "Flex weight, 0..1." )
 
-LUA_BINDING_BEGIN( CBaseFlex, SetFlexWeight, "class", "Set flex weight." )
+LUA_BINDING_BEGIN( CBaseFlex, SetFlexWeight, "class", "Set flex weight ( 0..1 )." )
 {
-    lua_CBaseFlex *pEntity = LUA_BINDING_ARGUMENT( luaL_checkbaseflex, 1, "entity" );
-    LocalFlexController_t iFlexController = ( LocalFlexController_t )( int )LUA_BINDING_ARGUMENT( luaL_checknumber, 2, "flexId" );
+    int index = ( int )LUA_BINDING_ARGUMENT( luaL_checknumber, 2, "flexId" );
     float flWeight = LUA_BINDING_ARGUMENT( luaL_checknumber, 3, "weight" );
+    lua_CBaseFlex *pFlex = lua_tobaseflex( L, 1 );
 
-    pEntity->SetFlexWeight( iFlexController, flWeight );
+    if ( pFlex )
+    {
+        mstudioflexcontroller_t *pController = Srcbox_FlexController( pFlex, ( LocalFlexController_t )index );
+        if ( !pController )
+            return 0;
+
+        // CBaseFlex::SetFlexWeight takes the controller's own range
+        flWeight = clamp( flWeight, 0.0f, 1.0f ) * ( pController->max - pController->min ) + pController->min;
+        pFlex->SetFlexWeight( ( LocalFlexController_t )index, flWeight );
+        return 0;
+    }
+
+#if defined( LUA_SDK ) && !defined( CLIENT_DLL )
+    CBaseEntity *pEntity = lua_toentity( L, 1 );
+    if ( pEntity )
+        SrcboxRagdollFlex_SetWeight( pEntity, index, flWeight );
+#endif
+
     return 0;
 }
 LUA_BINDING_END()
 
 LUA_BINDING_BEGIN( CBaseFlex, HasFlexManipulator, "class", "Check if the entity has flex manipulator." )
 {
-    lua_CBaseFlex *pEntity = LUA_BINDING_ARGUMENT( luaL_checkbaseflex, 1, "entity" );
+    lua_CBaseFlex *pFlex = lua_tobaseflex( L, 1 );
 
-    for ( LocalFlexController_t i = LocalFlexController_t( 0 ); i < pEntity->GetNumFlexControllers(); i++ )
+    if ( !pFlex )
     {
-        if ( pEntity->GetFlexWeight( i ) != 0.0f )
+        bool bPosed = false;
+#ifdef LUA_SDK
+        CBaseEntity *pEntity = lua_toentity( L, 1 );
+        if ( pEntity )
+            SrcboxRagdollFlex_IsPosed( pEntity, bPosed );
+#endif
+        lua_pushboolean( L, bPosed );
+        return 1;
+    }
+
+    for ( LocalFlexController_t i = LocalFlexController_t( 0 ); i < pFlex->GetNumFlexControllers(); i++ )
+    {
+        if ( pFlex->GetFlexWeight( i ) != 0.0f )
         {
             lua_pushboolean( L, true );
             return 1;

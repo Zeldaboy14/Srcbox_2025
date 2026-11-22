@@ -64,6 +64,32 @@ LUA_BINDING_BEGIN(Player, SetArmor, "class", "Sets the armor value for a player.
 }
 LUA_BINDING_END()
 
+LUA_BINDING_BEGIN(Player, IncrementFragCount, "class", "Add to the player's frags (score). GMod 9's _PlayerAddScore.")
+{
+    lua_CBasePlayer* player = LUA_BINDING_ARGUMENT(luaL_checkplayer, 1, "player");
+    int count = LUA_BINDING_ARGUMENT_WITH_DEFAULT(luaL_optinteger, 2, 1, "count");
+    player->IncrementFragCount(count);
+    return 0;
+}
+LUA_BINDING_END()
+
+LUA_BINDING_BEGIN(Player, IncrementDeathCount, "class", "Add to the player's deaths. GMod 9's _PlayerAddDeath.")
+{
+    lua_CBasePlayer* player = LUA_BINDING_ARGUMENT(luaL_checkplayer, 1, "player");
+    int count = LUA_BINDING_ARGUMENT_WITH_DEFAULT(luaL_optinteger, 2, 1, "count");
+    player->IncrementDeathCount(count);
+    return 0;
+}
+LUA_BINDING_END()
+
+LUA_BINDING_BEGIN(Player, ResetScores, "class", "Reset the player's frags and deaths.")
+{
+    lua_CBasePlayer* player = LUA_BINDING_ARGUMENT(luaL_checkplayer, 1, "player");
+    player->ResetScores();
+    return 0;
+}
+LUA_BINDING_END()
+
 LUA_BINDING_BEGIN(Player, SetBodyPitch, "class", "Set the body pitch of the player.")
 {
     lua_CBasePlayer* player = LUA_BINDING_ARGUMENT(luaL_checkplayer, 1, "player");
@@ -860,6 +886,20 @@ LUA_BINDING_BEGIN(Player, SetObserverMode, "class", "Set the observer mode for t
 {
     lua_CBasePlayer* player = LUA_BINDING_ARGUMENT(luaL_checkplayer, 1, "player");
     player->ForceObserverMode(LUA_BINDING_ARGUMENT_ENUM(OBSERVER_MODE, 2, "mode "));
+    return 0;
+}
+LUA_BINDING_END()
+
+// Srcbox: GMod's Player:SetViewEntity( entity ), nil / NULL views from the player again
+LUA_BINDING_BEGIN(Player, SetViewEntity, "class", "Set the entity the player views the world from.")
+{
+    lua_CBasePlayer* player = LUA_BINDING_ARGUMENT(luaL_checkplayer, 1, "player");
+    CBaseEntity* pViewEntity = NULL;
+    if (!lua_isnoneornil(L, 2))
+        pViewEntity = LUA_BINDING_ARGUMENT(luaL_checkentity, 2, "viewEntity");
+    if (pViewEntity == player)
+        pViewEntity = NULL;
+    player->SetViewEntity(pViewEntity);
     return 0;
 }
 LUA_BINDING_END()

@@ -36,6 +36,10 @@ end
 --- @param key string
 --- @param value any
 function ENTITY_META:SetNetworkedVariable(key, value)
+	-- Like GMod, keys are strings: SetNWEntity( 1, ... ) and GetNWEntity( 1 ) both mean "1"
+	-- ( the key goes over the network as a string, so a number key never matched clientside )
+	key = tostring(key)
+
 	if (not self.__networkedVariables) then
 		self.__networkedVariables = {}
 	end
@@ -62,6 +66,8 @@ end
 --- @param defaultValue any
 --- @return any
 function ENTITY_META:GetNetworkedVariable(key, defaultValue)
+	key = tostring(key)
+
 	if (not self.__networkedVariables) then
 		return defaultValue
 	end

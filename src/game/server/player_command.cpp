@@ -14,6 +14,7 @@
 #include "movehelper_server.h"
 #include "iservervehicle.h"
 #include "tier0/vprof.h"
+#include "srcbox/srcbox_gmodmovehooks.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -338,6 +339,11 @@ void CPlayerMove::RunCommand ( CBasePlayer *player, CUserCmd *ucmd, IMoveHelper 
 
 	StartCommand( player, ucmd );
 
+#ifdef LUA_SDK
+	// Srcbox: GMod's StartCommand( ply, cmd )
+	SrcboxCallStartCommand( player, ucmd );
+#endif
+
 	// Set globals appropriately
 	gpGlobals->curtime = playerCurTime;
 	gpGlobals->frametime = playerFrameTime;
@@ -397,6 +403,11 @@ void CPlayerMove::RunCommand ( CBasePlayer *player, CUserCmd *ucmd, IMoveHelper 
 	player->UpdateButtonState( ucmd->buttons );
 	VPROF_SCOPE_END();
 
+#ifdef LUA_SDK
+	// Srcbox: GMod's KeyPress / KeyRelease
+	SrcboxCallKeyHooks( player );
+#endif
+
 	CheckMovingGround( player, TICK_INTERVAL );
 
 	g_pMoveData->m_vecOldAngles = player->pl.v_angle;
@@ -420,8 +431,19 @@ void CPlayerMove::RunCommand ( CBasePlayer *player, CUserCmd *ucmd, IMoveHelper 
 	// Setup input.
 	SetupMove( player, ucmd, moveHelper, g_pMoveData );
 
+#ifdef LUA_SDK
+	// Srcbox: GMod's SetupMove / PlayerTick, then Move ( true = the hook moved the player )
+	SrcboxCallSetupMove( player, g_pMoveData, ucmd );
+	const bool bSrcboxLuaMoved = SrcboxCallMove( player, g_pMoveData );
+#else
+	const bool bSrcboxLuaMoved = false;
+#endif
+
 	// Let the game do the movement.
-	if ( !pVehicle )
+	if ( bSrcboxLuaMoved )
+	{
+	}
+	else if ( !pVehicle )
 	{
 		VPROF( "g_pGameMovement->ProcessMovement()" );
 		Assert( g_pGameMovement );
@@ -433,7 +455,10 @@ void CPlayerMove::RunCommand ( CBasePlayer *player, CUserCmd *ucmd, IMoveHelper 
 		pVehicle->ProcessMovement( player, g_pMoveData );
 	}
 			
-	// Copy output
+	// Copy output ( GMod's FinishMove returning true means it did this itself )
+#ifdef LUA_SDK
+	if ( !SrcboxCallFinishMove( player, g_pMoveData ) )
+#endif
 	FinishMove( player, ucmd, g_pMoveData );
 
 	// If we have to restore the view angle then do so right now

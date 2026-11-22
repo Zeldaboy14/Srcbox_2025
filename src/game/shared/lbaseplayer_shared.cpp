@@ -582,6 +582,23 @@ LUA_BINDING_BEGIN( Player, GetVehicleEntity, "class", "Get the player's vehicle 
 }
 LUA_BINDING_END( "Entity", "The player's vehicle entity." )
 
+// Srcbox: GMod's Player:SetEyeAngles( angles ). Clientside only the local player's view can be set.
+LUA_BINDING_BEGIN( Player, SetEyeAngles, "class", "Set the player's eye angles." )
+{
+    lua_CBasePlayer *player = LUA_BINDING_ARGUMENT( luaL_checkplayer, 1, "player" );
+    QAngle angles = LUA_BINDING_ARGUMENT( luaL_checkangle, 2, "angles" );
+
+#ifdef CLIENT_DLL
+    if ( player == C_BasePlayer::GetLocalPlayer() )
+        engine->SetViewAngles( angles );
+#else
+    player->SnapEyeAngles( angles );
+#endif
+
+    return 0;
+}
+LUA_BINDING_END()
+
 LUA_BINDING_BEGIN( Player, GetViewEntity, "class", "Get the player's view entity." )
 {
     lua_CBasePlayer *player = LUA_BINDING_ARGUMENT( luaL_checkplayer, 1, "player" );

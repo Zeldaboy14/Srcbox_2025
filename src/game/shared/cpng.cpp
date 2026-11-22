@@ -181,9 +181,11 @@ static void PNG_FlushData( png_structp writePointer )
     // TODO: Do we need to do anything here?
 }
 
-bool PNG_WriteToFile( const char *filePath, unsigned char *pImageData, int width, int height )
+// Srcbox: encodes RGBA8888 pixels as a PNG into buffer ( PNG_WriteToFile and render.Capture use this )
+bool PNG_WriteToBuffer( CUtlBuffer &buffer, unsigned char *pImageData, int width, int height, const char *filePath )
 {
-    CUtlBuffer buffer;
+    if ( !filePath )
+        filePath = "(memory)";
 
     png_structp writePointer = png_create_write_struct( PNG_LIBPNG_VER_STRING, NULL, NULL, NULL );
     png_infop infoPointer = png_create_info_struct( writePointer );
@@ -231,6 +233,16 @@ bool PNG_WriteToFile( const char *filePath, unsigned char *pImageData, int width
 
     png_write_end( writePointer, infoPointer );
     png_destroy_write_struct( &writePointer, &infoPointer );
+
+    return true;
+}
+
+bool PNG_WriteToFile( const char *filePath, unsigned char *pImageData, int width, int height )
+{
+    CUtlBuffer buffer;
+
+    if ( !PNG_WriteToBuffer( buffer, pImageData, width, height, filePath ) )
+        return false;
 
     // force create this directory incase it doesn't exist
     char fileDirectoryPath[MAX_PATH];
@@ -397,6 +409,10 @@ CPngMaterialProxy::CPngMaterialProxy()
 {
     m_pTexturePointer = NULL;
     m_iSizeInBytes = 0;
+    m_nWidth = 0;
+    m_nHeight = 0;
+    m_bIsDirty = false;    // Srcbox: was never set, so a PNG that failed to load still got "uploaded"
+    m_bAllowRegenerating = false;
     m_pTextureVar = NULL;
     m_pFullPathVar = NULL;
     m_pTexture = NULL;
@@ -507,17 +523,23 @@ void CPngMaterialProxy::LoadTextureFromDisk()
         return;
     }
 
-    int width, height, colorType, bitDepth, sizeInBytes;
+    int width = 0, height = 0, colorType, bitDepth, sizeInBytes = 0;
+
+    // Srcbox: let go of an earlier image ( it leaked when loaded again )
+    free( m_pTexturePointer );
+    m_pTexturePointer = NULL;
 
     m_pTexturePointer = PNG_ReadFromBuffer( buffer, fileName, width, height, colorType, bitDepth, sizeInBytes );
-    m_nWidth = width;
-    m_nHeight = height;
 
     if ( !m_pTexturePointer )
     {
         // Warning already printed by PNG_ReadFromBuffer
+        m_nWidth = m_nHeight = 0;
         return;
     }
+
+    m_nWidth = width;
+    m_nHeight = height;
 
     m_iSizeInBytes = sizeInBytes;
     m_bIsDirty = true;
@@ -530,7 +552,7 @@ void CPngMaterialProxy::LoadTexture( ITexture *pTexture, IVTFTexture *pVTFTextur
         return;
 
 #ifdef CLIENT_DLL
-    Assert( m_pTexturePointer );
+    // ( m_pTexturePointer may be NULL: a PNG that didn't load is uploaded as transparent below )
 
     // Not supported at the moment:
     Assert( !pTexture->IsMipmapped() );
@@ -540,7 +562,6 @@ void CPngMaterialProxy::LoadTexture( ITexture *pTexture, IVTFTexture *pVTFTextur
     int width, height, depth;
     pVTFTexture->ComputeMipLevelDimensions( 0, &width, &height, &depth );
 
-    Assert( width == m_nWidth && height == m_nHeight );
     Assert( depth == 1 );
 
     // Point the pixel writer to the vtf texture memory
@@ -555,16 +576,24 @@ void CPngMaterialProxy::LoadTexture( ITexture *pTexture, IVTFTexture *pVTFTextur
     int yMax = pSubRect->y + pSubRect->height;
     int x, y;
 
-    // Update the subrect that needs to be updated
+    // Update the subrect that needs to be updated. Srcbox: pixels the image doesn't have ( it
+    // failed to load, or its size isn't the texture's ) are transparent instead of a read past
+    // the image ( a crash: rgba was NULL )
     for ( y = pSubRect->y; y < yMax; ++y )
     {
         pixelWriter.Seek( pSubRect->x, y );
-        unsigned char *rgba = &m_pTexturePointer[( y * m_nWidth + pSubRect->x ) * bytesForFormat];
 
         for ( x = pSubRect->x; x < xMax; ++x )
         {
-            pixelWriter.WritePixel( rgba[0], rgba[1], rgba[2], rgba[3] );
-            rgba += bytesForFormat;
+            if ( m_pTexturePointer && x >= 0 && y >= 0 && x < m_nWidth && y < m_nHeight )
+            {
+                const unsigned char *rgba = &m_pTexturePointer[( y * m_nWidth + x ) * bytesForFormat];
+                pixelWriter.WritePixel( rgba[0], rgba[1], rgba[2], rgba[3] );
+            }
+            else
+            {
+                pixelWriter.WritePixel( 0, 0, 0, 0 );
+            }
         }
     }
 #endif

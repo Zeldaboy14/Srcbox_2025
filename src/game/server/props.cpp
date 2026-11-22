@@ -41,6 +41,7 @@
 #include "physics_collisionevent.h"
 #include "gamestats.h"
 #include "vehicle_base.h"
+#include "srcbox/srcbox_gmodhooks.h"
 
 #ifdef TF_DLL
 #include "nav_mesh/tf_nav_mesh.h"
@@ -208,7 +209,7 @@ void CBaseProp::Spawn( void )
 			// If we don't have data, but we're a prop_physics, fail
 #ifdef LUA_SDK
 			// Force spawning of stuff that seemingly has invalid collision. Gmod does it. why not us?
-			if ( FClassnameIs( this, "prop_physics" ) && !modelinfo->GetVCollide( GetModelIndex() ) )
+			if ( FClassnameIs( this, "prop_physics" ) && !modelinfo->GetVCollide( GetModelIndex() && !FClassnameIs(this, "prop_ragdoll") ) )
 #else
 			if ( FClassnameIs( this, "prop_physics" ) )
 #endif
@@ -1608,6 +1609,15 @@ IPhysicsObject *CBreakableProp::GetRootPhysicsObjectForBreak()
 
 void CBreakableProp::Break( CBaseEntity *pBreaker, const CTakeDamageInfo &info )
 {
+#ifdef LUA_SDK
+	// Srcbox: GMod's PropBreak( attacker, prop )
+	SRCBOX_HOOK_BEGIN( "PropBreak" )
+		CBaseEntity::PushLuaInstanceSafe( L, pBreaker ? pBreaker : info.GetAttacker() );
+		CBaseEntity::PushLuaInstanceSafe( L, this );
+	SRCBOX_HOOK_CALL( 2 )
+	SRCBOX_HOOK_END()
+#endif
+
 	const char *pModelName = STRING( GetModelName() );
 	if ( pModelName && Q_stristr( pModelName, "crate" ) )
 	{

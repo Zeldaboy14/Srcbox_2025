@@ -95,6 +95,9 @@ private:
 
 #ifdef CLIENT_DLL
 	int m_iRenderGroupOverride = -1;
+#ifdef LUA_SDK
+	bool m_bInLuaDraw = false;	// Srcbox: inside ENT:Draw ( see DrawModel )
+#endif
 #endif
 };
 

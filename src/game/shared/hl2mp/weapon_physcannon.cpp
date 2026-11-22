@@ -44,6 +44,7 @@
 #include "vphysics/friction.h"
 #include "weapon_physcannon.h"
 #include "debugoverlay_shared.h"
+#include "srcbox/srcbox_gmodhooks.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -1671,6 +1672,15 @@ bool CWeaponPhysCannon::AttachObject( CBaseEntity *pObject, const Vector &vPosit
 	// NOTE :This must happen after OnPhysGunPickup because that can change the mass
 	m_grabController.AttachEntity( pOwner, pObject, pPhysics, false, vPosition, false );
 	m_hAttachedObject = pObject;
+
+#ifdef LUA_SDK
+	// Srcbox: GMod's GravGunOnPickedUp( ply, entity )
+	SRCBOX_HOOK_BEGIN( "GravGunOnPickedUp" )
+		CBasePlayer::PushLuaInstanceSafe( L, pOwner );
+		CBaseEntity::PushLuaInstanceSafe( L, pObject );
+	SRCBOX_HOOK_CALL( 2 )
+	SRCBOX_HOOK_END()
+#endif
 	m_attachedPositionObjectSpace = m_grabController.m_attachedPositionObjectSpace;
 	m_attachedAnglesPlayerSpace = m_grabController.m_attachedAnglesPlayerSpace;
 
@@ -2035,6 +2045,15 @@ void CWeaponPhysCannon::DetachObject( bool playSound, bool wasLaunched )
 	if ( pObject != NULL )
 	{
 		Pickup_OnPhysGunDrop( pObject, pOwner, wasLaunched ? LAUNCHED_BY_CANNON : DROPPED_BY_CANNON );
+
+#ifdef LUA_SDK
+		// Srcbox: GMod's GravGunOnDropped( ply, entity )
+		SRCBOX_HOOK_BEGIN( "GravGunOnDropped" )
+			CBasePlayer::PushLuaInstanceSafe( L, pOwner );
+			CBaseEntity::PushLuaInstanceSafe( L, pObject );
+		SRCBOX_HOOK_CALL( 2 )
+		SRCBOX_HOOK_END()
+#endif
 	}
 	
 	if ( pObject && m_bResetOwnerEntity == true )

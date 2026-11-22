@@ -59,6 +59,8 @@
 #include "luamanager.h"
 #include "lbasecombatweapon_shared.h"
 #include "lbaseplayer_shared.h"
+#include "lbaseentity_shared.h"
+#include "srcbox/srcbox_gmodhooks.h"
 #endif
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -2941,6 +2943,34 @@ void CHL2_Player::PlayerUse ( void )
 	}
 
 	CBaseEntity *pUseEntity = FindUseEntity();
+
+#ifdef LUA_SDK
+	// Srcbox: GMod's FindUseEntity( ply, defaultEntity ): a returned entity is used instead
+	{
+		SRCBOX_HOOK_BEGIN( "FindUseEntity" )
+			CBasePlayer::PushLuaInstanceSafe( L, this );
+			CBaseEntity::PushLuaInstanceSafe( L, pUseEntity );
+		SRCBOX_HOOK_CALL( 2 )
+			if ( SRCBOX_HOOK_RETURNED() && LUA_IS_ENTITY( L, -1 ) )
+				pUseEntity = lua_toentity( L, -1 );
+		SRCBOX_HOOK_END()
+	}
+
+	// Srcbox: GMod's PlayerUse( ply, entity ): returning false stops the player using it
+	if ( pUseEntity )
+	{
+		bool bRefused = false;
+		SRCBOX_HOOK_BEGIN( "PlayerUse" )
+			CBasePlayer::PushLuaInstanceSafe( L, this );
+			CBaseEntity::PushLuaInstanceSafe( L, pUseEntity );
+		SRCBOX_HOOK_CALL( 2 )
+			bRefused = SRCBOX_HOOK_RETURNED_FALSE();
+		SRCBOX_HOOK_END()
+
+		if ( bRefused )
+			pUseEntity = NULL;
+	}
+#endif
 
 	bool usedSomething = false;
 

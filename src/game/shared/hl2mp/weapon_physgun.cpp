@@ -48,6 +48,11 @@
 
 //#define use_old_physgun_attach 1 // debugging: use the old physgun attach code instead of the new one
 
+#include "srcbox/srcbox_gmodhooks.h"
+#ifdef LUA_SDK
+#include "lvphysics_interface.h"
+#endif
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -1099,7 +1104,22 @@ void CWeaponGravityGun::EffectUpdate( void )
 	Vector end = tr.endpos;
 	float distance = tr.fraction * 4096;
 
+	bool bSrcboxPickupAllowed = true;
+
+#ifdef LUA_SDK
+	// Srcbox: GMod's PhysgunPickup( ply, entity ): returning false stops the physgun grabbing it
 	if ( m_hObject == NULL && tr.DidHitNonWorldEntity() )
+	{
+		SRCBOX_HOOK_BEGIN( "PhysgunPickup" )
+			CBasePlayer::PushLuaInstanceSafe( L, pOwner );
+			CBaseEntity::PushLuaInstanceSafe( L, tr.m_pEnt );
+		SRCBOX_HOOK_CALL( 2 )
+			bSrcboxPickupAllowed = !SRCBOX_HOOK_RETURNED_FALSE();
+		SRCBOX_HOOK_END()
+	}
+#endif
+
+	if ( m_hObject == NULL && tr.DidHitNonWorldEntity() && bSrcboxPickupAllowed )
 	{
 		CBaseEntity *pEntity = tr.m_pEnt;
 		// todo
@@ -1415,6 +1435,15 @@ void CWeaponGravityGun::DetachObject( void )
 {
 	if ( m_hObject )
 	{
+#ifdef LUA_SDK
+		// Srcbox: GMod's PhysgunDrop( ply, entity )
+		SRCBOX_HOOK_BEGIN( "PhysgunDrop" )
+			CBasePlayer::PushLuaInstanceSafe( L, ToBasePlayer( GetOwner() ) );
+			CBaseEntity::PushLuaInstanceSafe( L, m_hObject );
+		SRCBOX_HOOK_CALL( 2 )
+		SRCBOX_HOOK_END()
+#endif
+
 #ifndef CLIENT_DLL
 		CBasePlayer *pOwner = ToBasePlayer( GetOwner() );
 		Pickup_OnPhysGunDrop( m_hObject, pOwner, DROPPED_BY_CANNON );
@@ -1554,6 +1583,24 @@ void CWeaponGravityGun::SecondaryAttack( void )
 	if (gmod_physgun_lock == true) {
 		if (m_hObject) {
 			IPhysicsObject* phys = GetPhysObjFromPhysicsBone( m_hObject, m_physicsBone );
+#ifdef LUA_SDK
+			// Srcbox: GMod's OnPhysgunFreeze( weapon, physObj, entity, ply ): returning false leaves it moving
+			if ( phys )
+			{
+				bool bRefused = false;
+				SRCBOX_HOOK_BEGIN( "OnPhysgunFreeze" )
+					CBaseCombatWeapon::PushLuaInstanceSafe( L, this );
+					lua_pushphysicsobject( L, phys );
+					CBaseEntity::PushLuaInstanceSafe( L, m_hObject );
+					CBasePlayer::PushLuaInstanceSafe( L, ToBasePlayer( GetOwner() ) );
+				SRCBOX_HOOK_CALL( 4 )
+					bRefused = SRCBOX_HOOK_RETURNED_FALSE();
+				SRCBOX_HOOK_END()
+
+				if ( bRefused )
+					phys = NULL;
+			}
+#endif
 			if (phys) {
 				phys->EnableMotion(false);
 

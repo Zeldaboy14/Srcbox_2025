@@ -20,6 +20,7 @@
 #include "mathlib/langle.h"
 #include "c_sun.h"
 #include "steam/steam_api.h"
+#include "cpng.h"
 
 #define LUA_IMESHMETANAME "IMesh"
 #define LUA_LUAEMITTERMETANAME "CLuaEmitter"
@@ -1582,6 +1583,68 @@ LUA_BINDING_BEGIN( RenderExtensions, GetDXLevel, "library", "Gets the DirectX su
     return 1;
 }
 LUA_BINDING_END( "integer", "The DX level." )
+
+//=============================================================================
+// GMod's render.Capture( { x, y, w, h, format, quality } ): part of the current render target
+// as an image file in a string. Always a PNG here ( there's no JPEG encoder in the codebase );
+// browsers and image loaders go by the file's contents, so a PNG saved as .jpg still shows.
+//=============================================================================
+static int CaptureField( lua_State *L, const char *name, int fallback )
+{
+    lua_getfield( L, 1, name );
+    const int value = lua_isnumber( L, -1 ) ? ( int )lua_tonumber( L, -1 ) : fallback;
+    lua_pop( L, 1 );
+    return value;
+}
+
+LUA_BINDING_BEGIN( RenderExtensions, Capture, "library", "Captures part of the current render target as an image file ( PNG ) in a string.", "client" )
+{
+    luaL_checktype( L, 1, LUA_TTABLE );
+
+    CMatRenderContextPtr pRenderContext( materials );
+
+    int targetWide = 0, targetTall = 0;
+    pRenderContext->GetRenderTargetDimensions( targetWide, targetTall );
+
+    int x = clamp( CaptureField( L, "x", 0 ), 0, MAX( targetWide - 1, 0 ) );
+    int y = clamp( CaptureField( L, "y", 0 ), 0, MAX( targetTall - 1, 0 ) );
+    int w = CaptureField( L, "w", targetWide );
+    int h = CaptureField( L, "h", targetTall );
+
+    w = MIN( w, targetWide - x );
+    h = MIN( h, targetTall - y );
+
+    if ( w <= 0 || h <= 0 )
+    {
+        lua_pushnil( L );
+        return 1;
+    }
+
+    unsigned char *pPixels = ( unsigned char * )malloc( w * h * 4 );
+    if ( !pPixels )
+    {
+        lua_pushnil( L );
+        return 1;
+    }
+
+    pRenderContext->ReadPixels( x, y, w, h, pPixels, IMAGE_FORMAT_RGBA8888 );
+
+    // The render target's alpha isn't meaningful here; GMod's captures are opaque
+    for ( int i = 0; i < w * h; i++ )
+        pPixels[i * 4 + 3] = 255;
+
+    CUtlBuffer image;
+    const bool bOk = PNG_WriteToBuffer( image, pPixels, w, h );
+    free( pPixels );
+
+    if ( bOk )
+        lua_pushlstring( L, ( const char * )image.Base(), image.TellPut() );
+    else
+        lua_pushnil( L );
+
+    return 1;
+}
+LUA_BINDING_END( "string", "The image file, or nil." )
 
 LUA_BINDING_BEGIN( RenderExtensions, GetBlend, "library", "Gets the current blend.", "client" )
 {

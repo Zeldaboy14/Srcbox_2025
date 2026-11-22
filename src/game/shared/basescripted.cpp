@@ -287,11 +287,29 @@ RenderGroup_t CBaseScripted::GetRenderGroup()
 int CBaseScripted::DrawModel(int flags)
 {
 #ifdef LUA_SDK
-    LUA_CALL_ENTITY_METHOD_BEGIN("Draw");
-    lua_pushinteger(L, flags);
-    LUA_CALL_ENTITY_METHOD_END(1, 1);
+    // Srcbox: like GMod, a scripted entity's ENT:Draw does the drawing. It calls self:DrawModel()
+    // for the model, which comes back here and draws it ( it used to call Draw again, forever:
+    // gmod_cameraprop's C stack overflow ), or leaves the model out ( the camera hides while you
+    // hold the camera SWEP ). The model used to be drawn after Draw anyway, so it showed twice
+    // or couldn't be hidden.
+    if ( !m_bInLuaDraw )
+    {
+        lua_getref( L, m_nTableReference );
+        lua_getfield( L, -1, "Draw" );
+        lua_remove( L, -2 );
 
-    LUA_RETURN_INTEGER();
+        if ( lua_isfunction( L, -1 ) )
+        {
+            m_bInLuaDraw = true;
+            CBaseEntity::PushLuaInstanceSafe( L, this );
+            lua_pushinteger( L, flags );
+            luasrc_pcall( L, 2, 0 );
+            m_bInLuaDraw = false;
+            return 1;
+        }
+
+        lua_pop( L, 1 );
+    }
 #endif
 
     return BaseClass::DrawModel(flags);
@@ -516,7 +534,25 @@ int CBaseScripted::UpdateTransmitState()
     LUA_CALL_ENTITY_METHOD_BEGIN("UpdateTransmitState");
     LUA_CALL_ENTITY_METHOD_END(0, 1);
 
-    LUA_RETURN_INTEGER();
+    // Srcbox: ENT:UpdateTransmitState returns TRANSMIT_ALWAYS / _NEVER / _PVS ( the engine's
+    // FL_EDICT_ flags ). It has to be set, not only returned, or the edict never gets it.
+    if ( lua_gettop( L ) >= 1 )
+    {
+        if ( lua_isnumber( L, -1 ) )
+        {
+            int nState = ( int )lua_tonumber( L, -1 );
+            lua_pop( L, 1 );
+            return SetTransmitState( nState );
+        }
+
+        lua_pop( L, 1 );
+    }
+
+    // Srcbox: like GMod, a scripted entity hidden with SetNoDraw is still sent to clients.
+    // Plain Source doesn't send EF_NODRAW entities, so hidden helpers never reached the client
+    // ( Hat Painter's proxyent_tf2itempaint: its client side marks the hat with the paint )
+    if ( IsEffectActive( EF_NODRAW ) && GetModelIndex() )
+        return SetTransmitState( FL_EDICT_PVSCHECK );
 #endif
 
     return BaseClass::UpdateTransmitState();

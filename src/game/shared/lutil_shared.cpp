@@ -13,12 +13,24 @@
 #include "decals.h"
 #include "itempents.h"
 
+#include "particle_parse.h"
+#include "ammodef.h"
 #ifdef CLIENT_DLL
+#include "particles_new.h"
+#include "particle_property.h"
+#include "c_baseanimatingoverlay.h"
 #include "cdll_util.h"
 #include "c_recipientfilter.h"
 #include "iefx.h"
+#include "dlight.h"
 #else
 #include "recipientfilter.h"
+#include "BaseAnimatingOverlay.h"
+#include "spritetrail.h"
+#include "gamerules.h"
+#ifdef HL2MP
+#include "hl2mp_gamerules.h"
+#endif
 #endif
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -467,6 +479,619 @@ LUA_BINDING_BEGIN( Utilities, DecalMaterial, "library", "Traces from start to en
 
     LuaDecal_Apply( tr, decalIndex );
     return 0;
+}
+LUA_BINDING_END()
+
+//=============================================================================
+// Srcbox: GMod functions Sandbox and its tools use ( util.BlastDamage, util.SpriteTrail,
+// ParticleEffect, game.CleanUpMap, DynamicLight ); the compat layer puts them under GMod's names.
+//=============================================================================
+
+// GMod colours are Lua tables ( r, g, b, a ); this takes either those or a Color object
+static void SrcboxReadColor( lua_State *L, int index, int &r, int &g, int &b, int &a )
+{
+    r = g = b = a = 255;
+
+    if ( lua_istable( L, index ) )
+    {
+        lua_getfield( L, index, "r" ); r = ( int )luaL_optnumber( L, -1, 255 ); lua_pop( L, 1 );
+        lua_getfield( L, index, "g" ); g = ( int )luaL_optnumber( L, -1, 255 ); lua_pop( L, 1 );
+        lua_getfield( L, index, "b" ); b = ( int )luaL_optnumber( L, -1, 255 ); lua_pop( L, 1 );
+        lua_getfield( L, index, "a" ); a = ( int )luaL_optnumber( L, -1, 255 ); lua_pop( L, 1 );
+    }
+}
+
+// ParticleEffect( name, pos, angles, parent )
+LUA_BINDING_BEGIN( Utilities, ParticleEffect, "library", "Starts a particle system ( from a .pcf ) at a position, optionally attached to an entity ( GMod's ParticleEffect )." )
+{
+    const char *pszName = LUA_BINDING_ARGUMENT( luaL_checkstring, 1, "name" );
+    Vector vecOrigin = LUA_BINDING_ARGUMENT( luaL_checkvector, 2, "position" );
+    QAngle angAngles = LUA_BINDING_ARGUMENT( luaL_checkangle, 3, "angles" );
+    CBaseEntity *pParent = lua_isnoneornil( L, 4 ) ? NULL : lua_toentity( L, 4 );
+
+    DispatchParticleEffect( pszName, vecOrigin, angAngles, pParent );
+    return 0;
+}
+LUA_BINDING_END()
+
+#ifdef GAME_DLL
+// util.BlastDamage( inflictor, attacker, origin, radius, damage )
+LUA_BINDING_BEGIN( Utilities, BlastDamage, "library", "Explosion damage to everything within a radius ( GMod's util.BlastDamage ).", "server" )
+{
+    CBaseEntity *pInflictor = lua_isnoneornil( L, 1 ) ? NULL : lua_toentity( L, 1 );
+    CBaseEntity *pAttacker = lua_isnoneornil( L, 2 ) ? NULL : lua_toentity( L, 2 );
+    Vector vecOrigin = LUA_BINDING_ARGUMENT( luaL_checkvector, 3, "origin" );
+    float flRadius = ( float )LUA_BINDING_ARGUMENT( luaL_checknumber, 4, "radius" );
+    float flDamage = ( float )LUA_BINDING_ARGUMENT( luaL_checknumber, 5, "damage" );
+
+    if ( !pAttacker )
+        pAttacker = pInflictor;
+
+    CTakeDamageInfo info( pInflictor, pAttacker, flDamage, DMG_BLAST );
+    info.SetDamagePosition( vecOrigin );
+
+    if ( g_pGameRules )
+        g_pGameRules->RadiusDamage( info, vecOrigin, flRadius, CLASS_NONE, NULL );
+
+    return 0;
+}
+LUA_BINDING_END()
+
+// util.SpriteTrail( ent, attachment, color, additive, startWidth, endWidth, lifetime, textureRes, texture )
+LUA_BINDING_BEGIN( Utilities, SpriteTrail, "library", "Attaches a sprite trail to an entity and returns it ( GMod's util.SpriteTrail ).", "server" )
+{
+    CBaseEntity *pEntity = LUA_BINDING_ARGUMENT( luaL_checkentity, 1, "entity" );
+    int nAttachment = ( int )luaL_optinteger( L, 2, 0 );
+    int r, g, b, a;
+    SrcboxReadColor( L, 3, r, g, b, a );
+    bool bAdditive = lua_toboolean( L, 4 ) != 0;
+    float flStartWidth = ( float )luaL_optnumber( L, 5, 8 );
+    float flEndWidth = ( float )luaL_optnumber( L, 6, 0 );
+    float flLifeTime = ( float )luaL_optnumber( L, 7, 1 );
+    float flTextureRes = ( float )luaL_optnumber( L, 8, 1.0 / ( ( flStartWidth + flEndWidth ) * 0.5 + 0.001 ) );
+    const char *pszTexture = luaL_optstring( L, 9, "trails/laser.vmt" );
+
+    if ( !pEntity )
+    {
+        lua_pushnil( L );
+        return 1;
+    }
+
+    CSpriteTrail *pTrail = CSpriteTrail::SpriteTrailCreate( pszTexture, pEntity->GetAbsOrigin(), false );
+
+    if ( !pTrail )
+    {
+        lua_pushnil( L );
+        return 1;
+    }
+
+    pTrail->SetTransparency( bAdditive ? kRenderTransAdd : kRenderTransAlpha, r, g, b, a, kRenderFxNone );
+    pTrail->SetAttachment( pEntity, nAttachment );
+    pTrail->SetStartWidth( flStartWidth );
+    pTrail->SetEndWidth( flEndWidth );
+    pTrail->SetLifeTime( flLifeTime );
+    pTrail->SetTextureResolution( flTextureRes );
+
+    CBaseEntity::PushLuaInstanceSafe( L, pTrail );
+    return 1;
+}
+LUA_BINDING_END( "Entity", "The trail." )
+
+// game.CleanUpMap(): removes everything players made and puts the map's own entities back
+LUA_BINDING_BEGIN( Utilities, CleanUpMap, "library", "Resets the map's entities ( GMod's game.CleanUpMap ).", "server" )
+{
+#ifdef HL2MP
+    CHL2MPRules *pRules = dynamic_cast< CHL2MPRules * >( g_pGameRules );
+    if ( pRules )
+        pRules->CleanUpMap();
+#endif
+    return 0;
+}
+LUA_BINDING_END()
+#endif // GAME_DLL
+
+#ifdef CLIENT_DLL
+// DynamicLight( key, elight ): a light Lua fills in field by field ( pos, r, g, b, brightness,
+// size, decay, dietime, style, dir, innerangle, outerangle, nomodel, noworld ). It lasts until
+// its dietime, and has to be renewed each frame, as in GMod.
+struct SrcboxDynamicLight_t
+{
+    int key;
+    bool elight;
+};
+
+#define SRCBOX_DLIGHT_META "SrcboxDynamicLight"
+
+static dlight_t *SrcboxFindDynamicLight( SrcboxDynamicLight_t *pLight )
+{
+    // CL_AllocDlight hands back the light with this key while it lives, cleared; so keep
+    // what's set here in a table instead and push it all on every write ( see __newindex )
+    return pLight->elight ? effects->CL_AllocElight( pLight->key ) : effects->CL_AllocDlight( pLight->key );
+}
+
+static int SrcboxDynamicLight_NewIndex( lua_State *L )
+{
+    SrcboxDynamicLight_t *pLight = ( SrcboxDynamicLight_t * )luaL_checkudata( L, 1, SRCBOX_DLIGHT_META );
+
+    // Remember the value in the userdata's own table
+    lua_getiuservalue( L, 1, 1 );
+    lua_pushvalue( L, 2 );
+    lua_pushvalue( L, 3 );
+    lua_rawset( L, -3 );
+    const int fields = lua_gettop( L );
+
+    dlight_t *dl = SrcboxFindDynamicLight( pLight );
+    if ( !dl )
+        return 0;
+
+    dl->key = pLight->key;
+    dl->die = gpGlobals->curtime + 1.0f;
+    dl->radius = 256.0f;
+    dl->color.r = dl->color.g = dl->color.b = 255;
+    dl->color.exponent = 0;
+
+    lua_pushnil( L );
+    while ( lua_next( L, fields ) != 0 )
+    {
+        if ( lua_type( L, -2 ) == LUA_TSTRING )
+        {
+            char key[32];
+            Q_strncpy( key, lua_tostring( L, -2 ), sizeof( key ) );
+            Q_strlower( key );
+
+            if ( !Q_strcmp( key, "pos" ) )
+                dl->origin = luaL_checkvector( L, -1 );
+            else if ( !Q_strcmp( key, "dir" ) )
+                dl->m_Direction = luaL_checkvector( L, -1 );
+            else if ( !Q_strcmp( key, "r" ) )
+                dl->color.r = ( byte )clamp( ( int )lua_tonumber( L, -1 ), 0, 255 );
+            else if ( !Q_strcmp( key, "g" ) )
+                dl->color.g = ( byte )clamp( ( int )lua_tonumber( L, -1 ), 0, 255 );
+            else if ( !Q_strcmp( key, "b" ) )
+                dl->color.b = ( byte )clamp( ( int )lua_tonumber( L, -1 ), 0, 255 );
+            else if ( !Q_strcmp( key, "brightness" ) )
+                dl->color.exponent = ( signed char )clamp( ( int )lua_tonumber( L, -1 ), -128, 127 );
+            else if ( !Q_strcmp( key, "size" ) )
+                dl->radius = ( float )lua_tonumber( L, -1 );
+            else if ( !Q_strcmp( key, "decay" ) )
+                dl->decay = ( float )lua_tonumber( L, -1 );
+            else if ( !Q_strcmp( key, "dietime" ) )
+                dl->die = ( float )lua_tonumber( L, -1 );
+            else if ( !Q_strcmp( key, "style" ) )
+                dl->style = ( int )lua_tonumber( L, -1 );
+            else if ( !Q_strcmp( key, "minlight" ) )
+                dl->minlight = ( float )lua_tonumber( L, -1 );
+            else if ( !Q_strcmp( key, "innerangle" ) )
+                dl->m_InnerAngle = ( float )lua_tonumber( L, -1 );
+            else if ( !Q_strcmp( key, "outerangle" ) )
+                dl->m_OuterAngle = ( float )lua_tonumber( L, -1 );
+            else if ( !Q_strcmp( key, "nomodel" ) && lua_toboolean( L, -1 ) )
+                dl->flags |= DLIGHT_NO_MODEL_ILLUMINATION;
+            else if ( !Q_strcmp( key, "noworld" ) && lua_toboolean( L, -1 ) )
+                dl->flags |= DLIGHT_NO_WORLD_ILLUMINATION;
+        }
+
+        lua_pop( L, 1 );
+    }
+
+    return 0;
+}
+
+static int SrcboxDynamicLight_Index( lua_State *L )
+{
+    luaL_checkudata( L, 1, SRCBOX_DLIGHT_META );
+    lua_getiuservalue( L, 1, 1 );
+    lua_pushvalue( L, 2 );
+    lua_rawget( L, -2 );
+    return 1;
+}
+
+LUA_BINDING_BEGIN( Utilities, DynamicLight, "library", "A dynamic light Lua sets up field by field ( GMod's DynamicLight ).", "client" )
+{
+    const int key = ( int )LUA_BINDING_ARGUMENT( luaL_checknumber, 1, "key" );
+    const bool bElight = lua_toboolean( L, 2 ) != 0;
+
+    SrcboxDynamicLight_t *pLight = ( SrcboxDynamicLight_t * )lua_newuserdatauv( L, sizeof( SrcboxDynamicLight_t ), 1 );
+    pLight->key = key;
+    pLight->elight = bElight;
+
+    lua_newtable( L );
+    lua_setiuservalue( L, -2, 1 );
+
+    if ( luaL_newmetatable( L, SRCBOX_DLIGHT_META ) )
+    {
+        lua_pushcfunction( L, SrcboxDynamicLight_NewIndex );
+        lua_setfield( L, -2, "__newindex" );
+        lua_pushcfunction( L, SrcboxDynamicLight_Index );
+        lua_setfield( L, -2, "__index" );
+    }
+    lua_setmetatable( L, -2 );
+
+    return 1;
+}
+LUA_BINDING_END( "table", "The light." )
+#endif // CLIENT_DLL
+
+//-----------------------------------------------------------------------------
+// Srcbox: ammo types ( for GMod's game.GetAmmo* ). Ids start at 1; 0 or -1 is none.
+//-----------------------------------------------------------------------------
+LUA_BINDING_BEGIN( Utilities, GetAmmoTypeCount, "library", "How many ammo types there are ( ids 1 to this )." )
+{
+    lua_pushinteger( L, GetAmmoDef()->m_nAmmoIndex - 1 );
+    return 1;
+}
+LUA_BINDING_END( "number", "The ammo type count." )
+
+LUA_BINDING_BEGIN( Utilities, GetAmmoTypeIndex, "library", "The id of the ammo type with this name, or -1." )
+{
+    const char *pszName = LUA_BINDING_ARGUMENT( luaL_checkstring, 1, "name" );
+    lua_pushinteger( L, GetAmmoDef()->Index( pszName ) );
+    return 1;
+}
+LUA_BINDING_END( "number", "The ammo id." )
+
+// Every number GMod's game.GetAmmo* and game.GetAmmoData ask for, in one table ( nil for an unknown id )
+LUA_BINDING_BEGIN( Utilities, GetAmmoTypeInfo, "library", "Name, damage type, damages, max carry, force, tracer and flags of an ammo type." )
+{
+    const int nIndex = ( int )LUA_BINDING_ARGUMENT( luaL_checknumber, 1, "id" );
+    CAmmoDef *pDef = GetAmmoDef();
+    Ammo_t *pAmmo = pDef->GetAmmoOfIndex( nIndex );
+
+    if ( !pAmmo || nIndex < 1 )
+    {
+        lua_pushnil( L );
+        return 1;
+    }
+
+    lua_newtable( L );
+    lua_pushstring( L, pAmmo->pName ? pAmmo->pName : "" );
+    lua_setfield( L, -2, "name" );
+    lua_pushinteger( L, pDef->DamageType( nIndex ) );
+    lua_setfield( L, -2, "dmgtype" );
+    lua_pushinteger( L, pDef->PlrDamage( nIndex ) );
+    lua_setfield( L, -2, "plydmg" );
+    lua_pushinteger( L, pDef->NPCDamage( nIndex ) );
+    lua_setfield( L, -2, "npcdmg" );
+    lua_pushinteger( L, pDef->MaxCarry( nIndex ) );
+    lua_setfield( L, -2, "maxcarry" );
+    lua_pushnumber( L, pDef->DamageForce( nIndex ) );
+    lua_setfield( L, -2, "force" );
+    lua_pushinteger( L, pDef->TracerType( nIndex ) );
+    lua_setfield( L, -2, "tracer" );
+    lua_pushinteger( L, pDef->Flags( nIndex ) );
+    lua_setfield( L, -2, "flags" );
+    lua_pushinteger( L, pAmmo->nMinSplashSize );
+    lua_setfield( L, -2, "minsplash" );
+    lua_pushinteger( L, pAmmo->nMaxSplashSize );
+    lua_setfield( L, -2, "maxsplash" );
+    return 1;
+}
+LUA_BINDING_END( "table", "The ammo type's info." )
+
+//-----------------------------------------------------------------------------
+// Srcbox: particles attached to entities ( GMod's ParticleEffectAttach and the
+// Entity:StopParticles family ). The server sends them; the client runs them.
+//-----------------------------------------------------------------------------
+LUA_BINDING_BEGIN( Utilities, ParticleEffectAttach, "library", "Starts a particle system on an entity ( GMod's ParticleEffectAttach )." )
+{
+    const char *pszName = LUA_BINDING_ARGUMENT( luaL_checkstring, 1, "name" );
+    int nAttachType = ( int )LUA_BINDING_ARGUMENT( luaL_checknumber, 2, "attachType" );
+    CBaseEntity *pEntity = LUA_BINDING_ARGUMENT( luaL_checkentity, 3, "entity" );
+    int nAttachment = ( int )luaL_optinteger( L, 4, -1 );
+
+    // GMod counts attachments from 1, and 0 means none
+    DispatchParticleEffect( pszName, ( ParticleAttachment_t )nAttachType, pEntity, nAttachment > 0 ? nAttachment : -1 );
+    return 0;
+}
+LUA_BINDING_END()
+
+LUA_BINDING_BEGIN( Utilities, StopEntityParticles, "library", "Stops the particle systems on an entity. 0: all ( stop emitting ), 1: all, at once, 2: by name, 3: by name and attachment." )
+{
+    CBaseEntity *pEntity = LUA_BINDING_ARGUMENT( luaL_checkentity, 1, "entity" );
+    int nMode = ( int )luaL_optinteger( L, 2, 0 );
+    const char *pszName = luaL_optstring( L, 3, NULL );
+    int nAttachment = ( int )luaL_optinteger( L, 4, -1 );
+    bool bInstantly = lua_toboolean( L, 5 ) != 0;
+
+#ifdef CLIENT_DLL
+    CParticleProperty *pProp = pEntity->ParticleProp();
+    if ( !pProp )
+        return 0;
+
+    if ( nMode == 1 )
+        pProp->StopEmissionAndDestroyImmediately();
+    else if ( nMode == 2 && pszName )
+        pProp->StopParticlesNamed( pszName, bInstantly );
+    else if ( nMode == 3 && pszName )
+        pProp->StopParticlesWithNameAndAttachment( pszName, nAttachment, bInstantly );
+    else
+        pProp->StopEmission();
+#else
+    // The server can only tell the clients to stop everything on it
+    StopParticleEffects( pEntity );
+#endif
+    return 0;
+}
+LUA_BINDING_END()
+
+#ifdef CLIENT_DLL
+//-----------------------------------------------------------------------------
+// Srcbox: CNewParticleEffect for Lua ( GMod's CreateParticleSystem and friends ).
+// Lua holds a number; the effect is kept alive here until Lua lets go of it
+// ( ParticleEffectRelease, from the Lua object's __gc ).
+//-----------------------------------------------------------------------------
+static CUtlMap< int, CSmartPtr< CNewParticleEffect > > s_LuaParticleEffects( DefLessFunc( int ) );
+static int s_nNextLuaParticleEffect = 1;
+
+static void SrcboxPushParticleEffect( lua_State *L, CNewParticleEffect *pEffect )
+{
+    if ( !pEffect )
+    {
+        lua_pushnil( L );
+        return;
+    }
+
+    const int nId = s_nNextLuaParticleEffect++;
+    s_LuaParticleEffects.Insert( nId, CSmartPtr< CNewParticleEffect >( pEffect ) );
+    lua_pushinteger( L, nId );
+}
+
+static CNewParticleEffect *SrcboxGetParticleEffect( lua_State *L, int nArg )
+{
+    const int nId = ( int )luaL_checkinteger( L, nArg );
+    const unsigned short i = s_LuaParticleEffects.Find( nId );
+    if ( i == s_LuaParticleEffects.InvalidIndex() )
+        return NULL;
+    return s_LuaParticleEffects[i].GetObject();
+}
+
+LUA_BINDING_BEGIN( Utilities, ParticleEffectCreate, "library", "Creates a particle system, on an entity or on its own. Returns its id.", "client" )
+{
+    CBaseEntity *pEntity = lua_isnoneornil( L, 1 ) ? NULL : lua_toentity( L, 1 );
+    const char *pszName = LUA_BINDING_ARGUMENT( luaL_checkstring, 2, "name" );
+    int nAttachType = ( int )luaL_optinteger( L, 3, PATTACH_ABSORIGIN_FOLLOW );
+    int nAttachment = ( int )luaL_optinteger( L, 4, 0 );
+    Vector vecOffset = lua_isnoneornil( L, 5 ) ? vec3_origin : luaL_checkvector( L, 5 );
+
+    CNewParticleEffect *pEffect = NULL;
+    if ( pEntity && pEntity->ParticleProp() )
+    {
+        pEffect = pEntity->ParticleProp()->Create( pszName, ( ParticleAttachment_t )nAttachType, nAttachment > 0 ? nAttachment : INVALID_PARTICLE_ATTACHMENT, vecOffset );
+    }
+    else
+    {
+        CSmartPtr< CNewParticleEffect > pNew = CNewParticleEffect::Create( NULL, pszName );
+        pEffect = pNew.GetObject();
+        if ( pEffect )
+            pEffect->SetControlPoint( 0, vecOffset );
+    }
+
+    SrcboxPushParticleEffect( L, pEffect );
+    return 1;
+}
+LUA_BINDING_END( "number", "The effect's id, or nil." )
+
+LUA_BINDING_BEGIN( Utilities, ParticleEffectRelease, "library", "Lets go of a particle system Lua no longer holds.", "client" )
+{
+    const int nId = ( int )luaL_checkinteger( L, 1 );
+    s_LuaParticleEffects.Remove( nId );
+    return 0;
+}
+LUA_BINDING_END()
+
+LUA_BINDING_BEGIN( Utilities, ParticleEffectCall, "library", "Runs one CNewParticleEffect method ( by GMod's name ) on a particle system id.", "client" )
+{
+    CNewParticleEffect *pEffect = SrcboxGetParticleEffect( L, 1 );
+    const char *pszMethod = LUA_BINDING_ARGUMENT( luaL_checkstring, 2, "method" );
+
+    if ( !V_stricmp( pszMethod, "IsValid" ) )
+    {
+        lua_pushboolean( L, pEffect != NULL );
+        return 1;
+    }
+
+    if ( !pEffect )
+        return 0;
+
+    if ( !V_stricmp( pszMethod, "StopEmission" ) )
+        pEffect->StopEmission( lua_toboolean( L, 3 ) != 0, lua_toboolean( L, 4 ) != 0, lua_toboolean( L, 5 ) != 0 );
+    else if ( !V_stricmp( pszMethod, "StopEmissionAndDestroyImmediately" ) )
+        pEffect->StopEmission( false, true, false );
+    else if ( !V_stricmp( pszMethod, "StartEmission" ) )
+        pEffect->StartEmission( lua_toboolean( L, 3 ) != 0 );
+    else if ( !V_stricmp( pszMethod, "Restart" ) )
+        pEffect->Restart();
+    else if ( !V_stricmp( pszMethod, "SetControlPoint" ) )
+        pEffect->SetControlPoint( ( int )luaL_checkinteger( L, 3 ), luaL_checkvector( L, 4 ) );
+    else if ( !V_stricmp( pszMethod, "SetControlPointEntity" ) )
+        pEffect->SetControlPointEntity( ( int )luaL_checkinteger( L, 3 ), lua_isnoneornil( L, 4 ) ? NULL : lua_toentity( L, 4 ) );
+    else if ( !V_stricmp( pszMethod, "SetControlPointParent" ) )
+        pEffect->SetControlPointParent( ( int )luaL_checkinteger( L, 3 ), ( int )luaL_checkinteger( L, 4 ) );
+    else if ( !V_stricmp( pszMethod, "SetControlPointOrientation" ) )
+        pEffect->SetControlPointOrientation( ( int )luaL_checkinteger( L, 3 ), luaL_checkvector( L, 4 ), luaL_checkvector( L, 5 ), luaL_checkvector( L, 6 ) );
+    else if ( !V_stricmp( pszMethod, "SetControlPointForwardVector" ) )
+        pEffect->SetControlPointForwardVector( ( int )luaL_checkinteger( L, 3 ), luaL_checkvector( L, 4 ) );
+    else if ( !V_stricmp( pszMethod, "SetControlPointRightVector" ) )
+        pEffect->SetControlPointRightVector( ( int )luaL_checkinteger( L, 3 ), luaL_checkvector( L, 4 ) );
+    else if ( !V_stricmp( pszMethod, "SetControlPointUpVector" ) )
+        pEffect->SetControlPointUpVector( ( int )luaL_checkinteger( L, 3 ), luaL_checkvector( L, 4 ) );
+    else if ( !V_stricmp( pszMethod, "SetSortOrigin" ) )
+        pEffect->SetSortOrigin( luaL_checkvector( L, 3 ) );
+    else if ( !V_stricmp( pszMethod, "SetShouldDraw" ) )
+        pEffect->SetDrawn( lua_toboolean( L, 3 ) != 0 );
+    else if ( !V_stricmp( pszMethod, "SetIsViewModelEffect" ) )
+        pEffect->SetIsViewModelEffect( lua_toboolean( L, 3 ) != 0 );
+    else if ( !V_stricmp( pszMethod, "IsViewModelEffect" ) )
+    {
+        lua_pushboolean( L, pEffect->GetIsViewModelEffect() );
+        return 1;
+    }
+    else if ( !V_stricmp( pszMethod, "GetEffectName" ) )
+    {
+        lua_pushstring( L, pEffect->GetEffectName() );
+        return 1;
+    }
+    else if ( !V_stricmp( pszMethod, "GetOwner" ) )
+    {
+        CBaseEntity::PushLuaInstanceSafe( L, pEffect->GetOwner() );
+        return 1;
+    }
+    else if ( !V_stricmp( pszMethod, "GetAutoUpdateBBox" ) )
+    {
+        lua_pushboolean( L, pEffect->GetAutoUpdateBBox() );
+        return 1;
+    }
+    else if ( !V_stricmp( pszMethod, "GetHighestControlPoint" ) )
+    {
+        lua_pushinteger( L, pEffect->GetHighestControlPoint() );
+        return 1;
+    }
+    else if ( !V_stricmp( pszMethod, "IsFinished" ) )
+    {
+        lua_pushboolean( L, pEffect->IsFinished() );
+        return 1;
+    }
+    else if ( !V_stricmp( pszMethod, "GetRenderBounds" ) )
+    {
+        Vector mins, maxs;
+        pEffect->GetRenderBounds( mins, maxs );
+        lua_pushvector( L, mins );
+        lua_pushvector( L, maxs );
+        return 2;
+    }
+
+    return 0;
+}
+LUA_BINDING_END()
+#endif // CLIENT_DLL
+
+//-----------------------------------------------------------------------------
+// Srcbox: animation layers and gestures ( GMod's Entity:AddGesture, Get/SetLayer* ... ).
+// Adding and removing gestures is the server's; the client reads and sets what it
+// was sent ( GMod's client-side layer setters only last until the next update ).
+//-----------------------------------------------------------------------------
+LUA_BINDING_BEGIN( Utilities, EntityLayerCall, "library", "Runs one GMod layer / gesture method ( by its name ) on an entity." )
+{
+    CBaseEntity *pEntity = LUA_BINDING_ARGUMENT( luaL_checkentity, 1, "entity" );
+    const char *pszMethod = LUA_BINDING_ARGUMENT( luaL_checkstring, 2, "method" );
+
+#ifdef CLIENT_DLL
+    C_BaseAnimatingOverlay *pOverlay = dynamic_cast< C_BaseAnimatingOverlay * >( pEntity );
+#else
+    CBaseAnimatingOverlay *pOverlay = dynamic_cast< CBaseAnimatingOverlay * >( pEntity );
+#endif
+    if ( !pOverlay )
+        return 0;
+
+    const int nLayer = ( int )luaL_optinteger( L, 3, 0 );
+
+    if ( !V_stricmp( pszMethod, "IsValidLayer" ) )
+    {
+        lua_pushboolean( L, nLayer >= 0 && nLayer < pOverlay->GetNumAnimOverlays() );
+        return 1;
+    }
+
+#ifdef CLIENT_DLL
+    if ( nLayer < 0 || nLayer >= pOverlay->GetNumAnimOverlays() )
+        return 0;
+
+    C_AnimationLayer *pLayer = pOverlay->GetAnimOverlay( nLayer );
+    if ( !pLayer )
+        return 0;
+
+    if ( !V_stricmp( pszMethod, "GetLayerCycle" ) )
+        lua_pushnumber( L, pLayer->m_flCycle );
+    else if ( !V_stricmp( pszMethod, "GetLayerWeight" ) )
+        lua_pushnumber( L, pLayer->m_flWeight );
+    else if ( !V_stricmp( pszMethod, "GetLayerPlaybackRate" ) )
+        lua_pushnumber( L, pLayer->m_flPlaybackRate );
+    else if ( !V_stricmp( pszMethod, "GetLayerSequence" ) )
+        lua_pushinteger( L, pLayer->m_nSequence );
+    else if ( !V_stricmp( pszMethod, "GetLayerDuration" ) )
+    {
+        const float flRate = pLayer->m_flPlaybackRate;
+        const float flLength = pOverlay->SequenceDuration( pLayer->m_nSequence );
+        lua_pushnumber( L, flRate != 0.0f ? flLength / flRate : flLength );
+    }
+    else
+    {
+        if ( !V_stricmp( pszMethod, "SetLayerCycle" ) )
+            pLayer->m_flCycle = ( float )luaL_checknumber( L, 4 );
+        else if ( !V_stricmp( pszMethod, "SetLayerWeight" ) )
+            pLayer->m_flWeight = ( float )luaL_checknumber( L, 4 );
+        else if ( !V_stricmp( pszMethod, "SetLayerPlaybackRate" ) )
+            pLayer->m_flPlaybackRate = ( float )luaL_checknumber( L, 4 );
+        else if ( !V_stricmp( pszMethod, "SetLayerSequence" ) )
+            pLayer->m_nSequence = ( int )luaL_checkinteger( L, 4 );
+        return 0;
+    }
+    return 1;
+#else
+    const Activity act = ( Activity )nLayer;	// the gesture methods take an activity where the layer ones take a layer
+
+    if ( !V_stricmp( pszMethod, "AddGesture" ) )
+        lua_pushinteger( L, pOverlay->AddGesture( act, lua_isnoneornil( L, 4 ) ? true : lua_toboolean( L, 4 ) != 0 ) );
+    else if ( !V_stricmp( pszMethod, "AddGestureSequence" ) )
+        lua_pushinteger( L, pOverlay->AddGestureSequence( nLayer, lua_isnoneornil( L, 4 ) ? true : lua_toboolean( L, 4 ) != 0 ) );
+    else if ( !V_stricmp( pszMethod, "AddLayeredSequence" ) )
+        lua_pushinteger( L, pOverlay->AddLayeredSequence( nLayer, ( int )luaL_optinteger( L, 4, 0 ) ) );
+    else if ( !V_stricmp( pszMethod, "IsPlayingGesture" ) )
+        lua_pushboolean( L, pOverlay->IsPlayingGesture( act ) );
+    else if ( !V_stricmp( pszMethod, "FindGestureLayer" ) )
+        lua_pushinteger( L, pOverlay->FindGestureLayer( act ) );
+    else if ( !V_stricmp( pszMethod, "GetLayerCycle" ) )
+        lua_pushnumber( L, pOverlay->IsValidLayer( nLayer ) ? pOverlay->GetLayerCycle( nLayer ) : 0.0f );
+    else if ( !V_stricmp( pszMethod, "GetLayerWeight" ) )
+        lua_pushnumber( L, pOverlay->IsValidLayer( nLayer ) ? pOverlay->GetLayerWeight( nLayer ) : 0.0f );
+    else if ( !V_stricmp( pszMethod, "GetLayerDuration" ) )
+        lua_pushnumber( L, pOverlay->IsValidLayer( nLayer ) ? pOverlay->GetLayerDuration( nLayer ) : 0.0f );
+    else if ( !V_stricmp( pszMethod, "GetLayerSequence" ) )
+        lua_pushinteger( L, pOverlay->IsValidLayer( nLayer ) ? pOverlay->GetLayerSequence( nLayer ) : -1 );
+    else if ( !V_stricmp( pszMethod, "GetLayerPlaybackRate" ) )
+    {
+        CAnimationLayer *pLayer = pOverlay->IsValidLayer( nLayer ) ? pOverlay->GetAnimOverlay( nLayer ) : NULL;
+        lua_pushnumber( L, pLayer ? pLayer->m_flPlaybackRate : 0.0f );
+    }
+    else
+    {
+        if ( !V_stricmp( pszMethod, "RestartGesture" ) )
+            pOverlay->RestartGesture( act, lua_isnoneornil( L, 4 ) ? true : lua_toboolean( L, 4 ) != 0, lua_isnoneornil( L, 5 ) ? true : lua_toboolean( L, 5 ) != 0 );
+        else if ( !V_stricmp( pszMethod, "RemoveGesture" ) )
+            pOverlay->RemoveGesture( act );
+        else if ( !V_stricmp( pszMethod, "RemoveAllGestures" ) )
+            pOverlay->RemoveAllGestures();
+        else if ( !pOverlay->IsValidLayer( nLayer ) )
+            return 0;
+        else if ( !V_stricmp( pszMethod, "RemoveLayer" ) )
+            pOverlay->RemoveLayer( nLayer, ( float )luaL_optnumber( L, 4, 0.2 ), ( float )luaL_optnumber( L, 5, 0.0 ) );
+        else if ( !V_stricmp( pszMethod, "SetLayerCycle" ) )
+            pOverlay->SetLayerCycle( nLayer, ( float )luaL_checknumber( L, 4 ) );
+        else if ( !V_stricmp( pszMethod, "SetLayerWeight" ) )
+            pOverlay->SetLayerWeight( nLayer, ( float )luaL_checknumber( L, 4 ) );
+        else if ( !V_stricmp( pszMethod, "SetLayerDuration" ) )
+            pOverlay->SetLayerDuration( nLayer, ( float )luaL_checknumber( L, 4 ) );
+        else if ( !V_stricmp( pszMethod, "SetLayerPlaybackRate" ) )
+            pOverlay->SetLayerPlaybackRate( nLayer, ( float )luaL_checknumber( L, 4 ) );
+        else if ( !V_stricmp( pszMethod, "SetLayerPriority" ) )
+            pOverlay->SetLayerPriority( nLayer, ( int )luaL_checkinteger( L, 4 ) );
+        else if ( !V_stricmp( pszMethod, "SetLayerBlendIn" ) )
+            pOverlay->SetLayerBlendIn( nLayer, ( float )luaL_checknumber( L, 4 ) );
+        else if ( !V_stricmp( pszMethod, "SetLayerBlendOut" ) )
+            pOverlay->SetLayerBlendOut( nLayer, ( float )luaL_checknumber( L, 4 ) );
+        else if ( !V_stricmp( pszMethod, "SetLayerAutokill" ) )
+            pOverlay->SetLayerAutokill( nLayer, lua_toboolean( L, 4 ) != 0 );
+        else if ( !V_stricmp( pszMethod, "SetLayerLooping" ) )
+            pOverlay->SetLayerLooping( nLayer, lua_toboolean( L, 4 ) != 0 );
+        else if ( !V_stricmp( pszMethod, "SetLayerSequence" ) )
+        {
+            CAnimationLayer *pLayer = pOverlay->GetAnimOverlay( nLayer );
+            if ( pLayer )
+                pLayer->m_nSequence = ( int )luaL_checkinteger( L, 4 );
+        }
+        return 0;
+    }
+    return 1;
+#endif
 }
 LUA_BINDING_END()
 

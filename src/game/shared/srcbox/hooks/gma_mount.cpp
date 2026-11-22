@@ -18,6 +18,11 @@
 // Nothing is extracted. Legacy .bin items are decompressed once into
 // <mod>/cache/gma_legacy.
 //
+// Addons published through Steam's older upload system (no content manifest;
+// most of a long-time player's subscriptions) never reach workshop/content/4000:
+// Garry's Mod downloads those itself, into garrysmod/cache/workshop/<id>.gma.
+// The subscribed ones there are mounted too (see ScanGModCache).
+//
 // It runs when Garry's Mod is mounted (a GAME search path ending in
 // "garrysmod"): its addons folder and the workshop folder of the same Steam
 // library are scanned. -gmapath <folder> points at a workshop content/4000
@@ -657,6 +662,8 @@ static bool DecompressLegacy( const std::wstring &strBin, const std::wstring &st
 //   -gmaonly id,id,...   only mount these (workshop ids or .gma file names)
 //   -gmaskip id,id,...   never mount these
 //   cfg/gma_skip.txt     ids/file names to never mount, one per line (// comments)
+//   -gmaservercache      also mount addons in Garry's Mod's download cache that
+//                        aren't subscribed (ones downloaded from servers joined)
 //-----------------------------------------------------------------------------
 static std::unordered_set< std::wstring >	s_SkipIds;
 static std::unordered_set< std::wstring >	s_OnlyIds;
@@ -759,7 +766,8 @@ static void ReportMounted( int nNumber, const std::wstring &strId, const std::st
 		Msg( "GMA #%d  %s  %s\n", nNumber, Narrow( strId ).c_str(), strTitle.c_str() );
 }
 
-static void ScanWorkshop( const std::wstring &strContent, const std::wstring &strLegacyCache, int &nAddons, int &nFiles )
+static void ScanWorkshop( const std::wstring &strContent, const std::wstring &strLegacyCache, int &nAddons, int &nFiles,
+	std::unordered_set< std::wstring > &seenIds, std::unordered_set< std::wstring > &mountedIds )
 {
 	ForEachInFolder( strContent, L"*", [&]( const WIN32_FIND_DATAW &item )
 	{
@@ -767,6 +775,8 @@ static void ScanWorkshop( const std::wstring &strContent, const std::wstring &st
 			return;
 		if ( item.cFileName[0] == L'.' )
 			return;
+
+		seenIds.insert( LowerId( item.cFileName ) );
 
 		int nNumber = 0;
 		if ( !ShouldMountAddon( item.cFileName, nNumber ) )
@@ -805,7 +815,103 @@ static void ScanWorkshop( const std::wstring &strContent, const std::wstring &st
 		if ( MountArchive( strGMA, nFiles, &strTitle ) )
 		{
 			nAddons++;
+			mountedIds.insert( LowerId( item.cFileName ) );
 			ReportMounted( nNumber, item.cFileName, strTitle );
+		}
+	} );
+}
+
+// The workshop ids Steam lists as installed for Garry's Mod: the item keys of
+// "WorkshopItemsInstalled" in steamapps/workshop/appworkshop_4000.acf
+static bool ReadSubscribedIds( const std::wstring &strAcf, std::unordered_set< std::wstring > &ids )
+{
+	HANDLE hFile = CreateFileW( strAcf.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+		NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL );
+	if ( hFile == INVALID_HANDLE_VALUE )
+		return false;
+
+	LARGE_INTEGER size;
+	std::string text;
+	bool bRead = GetFileSizeEx( hFile, &size ) && size.QuadPart > 0 && size.QuadPart < 64 * 1024 * 1024;
+	if ( bRead )
+	{
+		text.resize( (size_t)size.QuadPart );
+		bRead = ReadAt( hFile, 0, &text[0], text.size() );
+	}
+	CloseHandle( hFile );
+	if ( !bRead )
+		return false;
+
+	const size_t nBlock = text.find( "\"WorkshopItemsInstalled\"" );
+	const size_t nOpen = ( nBlock == std::string::npos ) ? std::string::npos : text.find( '{', nBlock );
+	if ( nOpen == std::string::npos )
+		return false;
+
+	// The keys one level in are the ids; each one's details are a level deeper
+	int nDepth = 0;
+	for ( size_t i = nOpen; i < text.size(); i++ )
+	{
+		const char c = text[i];
+		if ( c == '{' )
+			nDepth++;
+		else if ( c == '}' )
+		{
+			if ( --nDepth == 0 )
+				break;
+		}
+		else if ( c == '"' )
+		{
+			const size_t nEnd = text.find( '"', i + 1 );
+			if ( nEnd == std::string::npos )
+				break;
+			if ( nDepth == 1 && nEnd > i + 1 && text.find_first_not_of( "0123456789", i + 1 ) == nEnd )
+				ids.insert( Widen( text.substr( i + 1, nEnd - i - 1 ).c_str() ) );
+			i = nEnd;
+		}
+	}
+	return true;
+}
+
+// Garry's Mod downloads addons published through Steam's older upload system
+// itself, into garrysmod/cache/workshop/<id>.gma: Steam never puts those in
+// workshop/content/4000. The cache also keeps addons downloaded from servers the
+// player joined, so only subscribed ones are mounted (pSubscribed NULL: all).
+// One already mounted from content/4000 is left alone; one that failed there
+// (a broken download) is mounted from here instead.
+static void ScanGModCache( const std::wstring &strCache, const std::unordered_set< std::wstring > *pSubscribed,
+	const std::unordered_set< std::wstring > &seenIds, std::unordered_set< std::wstring > &mountedIds,
+	int &nAddons, int &nFiles, int &nFromCache, int &nNotSubscribed )
+{
+	ForEachInFolder( strCache, L"*.gma", [&]( const WIN32_FIND_DATAW &fd )
+	{
+		const std::wstring id = LowerId( fd.cFileName );
+		if ( mountedIds.count( id ) )
+			return;
+		if ( pSubscribed && !pSubscribed->count( id ) )
+		{
+			nNotSubscribed++;
+			return;
+		}
+
+		// Counted already if content/4000 had a folder for it: only the id filters apply again
+		int nNumber = 0;
+		if ( seenIds.count( id ) )
+		{
+			if ( s_SkipIds.count( id ) || ( !s_OnlyIds.empty() && !s_OnlyIds.count( id ) ) )
+				return;
+		}
+		else if ( !ShouldMountAddon( fd.cFileName, nNumber ) )
+		{
+			return;
+		}
+
+		std::string strTitle;
+		if ( MountArchive( strCache + L"\\" + fd.cFileName, nFiles, &strTitle ) )
+		{
+			nAddons++;
+			nFromCache++;
+			mountedIds.insert( id );
+			ReportMounted( nNumber, fd.cFileName, strTitle );
 		}
 	} );
 }
@@ -1042,12 +1148,27 @@ void GMAMount_Init()
 			strWorkshop = strGMod.substr( 0, nSteamApps ) + L"\\steamapps\\workshop\\content\\4000";
 	}
 
-	if ( strGMod.empty() && strWorkshop.empty() )
-		return;	// Garry's Mod isn't mounted
-
 	const std::vector< std::string > modPaths = SplitSearchPath( "MOD" );
 	if ( modPaths.empty() )
 		return;
+
+	// Srcbox: .gma files dropped into the mod's own addons folder (<mod>/addons/*.gma, or
+	// <mod>/addons/<folder>/*.gma like a workshop item) are mounted too, with or without Garry's Mod
+	const std::wstring strModAddons = Widen( modPaths[0].c_str() ) + L"\\addons";
+	bool bModHasGMAs = false;
+	ForEachInFolder( strModAddons, L"*.gma", [&]( const WIN32_FIND_DATAW & ) { bModHasGMAs = true; } );
+	if ( !bModHasGMAs )
+	{
+		ForEachInFolder( strModAddons, L"*", [&]( const WIN32_FIND_DATAW &item )
+		{
+			if ( bModHasGMAs || !( item.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY ) || item.cFileName[0] == L'.' )
+				return;
+			ForEachInFolder( strModAddons + L"\\" + item.cFileName, L"*.gma", [&]( const WIN32_FIND_DATAW & ) { bModHasGMAs = true; } );
+		} );
+	}
+
+	if ( strGMod.empty() && strWorkshop.empty() && !bModHasGMAs )
+		return;	// Garry's Mod isn't mounted and the mod has no .gma addons
 
 	std::wstring strRoot;
 	if ( !NormalizePath( ( Widen( modPaths[0].c_str() ) + L"\\cache\\gma_mount" ).c_str(), strRoot ) || strRoot.size() >= MAX_PATH )
@@ -1078,12 +1199,71 @@ void GMAMount_Init()
 			}
 		} );
 	}
+	std::unordered_set< std::wstring > seenIds, mountedIds;
 	if ( !strWorkshop.empty() )
-		ScanWorkshop( strWorkshop, strLegacyCache, nAddons, nFiles );
+		ScanWorkshop( strWorkshop, strLegacyCache, nAddons, nFiles, seenIds, mountedIds );
+
+	// Garry's Mod's own download cache ( see ScanGModCache )
+	int nFromCache = 0, nNotSubscribed = 0;
+	if ( !strGMod.empty() )
+	{
+		const bool bAllCached = CommandLine()->FindParm( "-gmaservercache" ) != 0;
+
+		// <library>\steamapps\workshop\content\4000 -> <library>\steamapps\workshop\appworkshop_4000.acf
+		std::unordered_set< std::wstring > subscribed;
+		bool bHaveList = false;
+		std::wstring lower = strWorkshop;
+		for ( size_t i = 0; i < lower.size(); i++ )
+			lower[i] = IsSep( lower[i] ) ? L'\\' : (wchar_t)towlower( lower[i] );
+		const size_t nContent = lower.rfind( L"\\content\\4000" );
+		if ( nContent != std::wstring::npos )
+			bHaveList = ReadSubscribedIds( strWorkshop.substr( 0, nContent ) + L"\\appworkshop_4000.acf", subscribed );
+
+		if ( bHaveList || bAllCached )
+			ScanGModCache( strGMod + L"\\cache\\workshop", bAllCached ? NULL : &subscribed, seenIds, mountedIds,
+				nAddons, nFiles, nFromCache, nNotSubscribed );
+		else
+			Msg( "GMA: couldn't read Steam's list of subscribed addons, so Garry's Mod's download cache isn't mounted (-gmaservercache mounts all of it)\n" );
+	}
+
+	// The mod's own addons last, so they replace files from Garry's Mod's addons (later wins)
+	if ( bModHasGMAs )
+	{
+		auto mountModGMA = [&]( const std::wstring &strPath, const wchar_t *pszId )
+		{
+			int nNumber = 0;
+			if ( !ShouldMountAddon( pszId, nNumber ) )
+				return;
+
+			std::string strTitle;
+			if ( MountArchive( strPath, nFiles, &strTitle ) )
+			{
+				nAddons++;
+				ReportMounted( nNumber, pszId, strTitle );
+			}
+		};
+
+		ForEachInFolder( strModAddons, L"*.gma", [&]( const WIN32_FIND_DATAW &fd )
+		{
+			mountModGMA( strModAddons + L"\\" + fd.cFileName, fd.cFileName );
+		} );
+
+		ForEachInFolder( strModAddons, L"*", [&]( const WIN32_FIND_DATAW &item )
+		{
+			if ( !( item.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY ) || item.cFileName[0] == L'.' )
+				return;
+
+			const std::wstring strFolder = strModAddons + L"\\" + item.cFileName;
+			ForEachInFolder( strFolder, L"*.gma", [&]( const WIN32_FIND_DATAW &fd )
+			{
+				mountModGMA( strFolder + L"\\" + fd.cFileName, fd.cFileName );
+			} );
+		} );
+	}
 
 	if ( !nAddons )
 	{
-		DevMsg( "GMA: Garry's Mod is mounted, but no addons were found\n" );
+		DevMsg( "GMA: no Garry's Mod addons were found\n" );
 		GMAMount_Shutdown();
 		return;
 	}
@@ -1091,7 +1271,9 @@ void GMAMount_Init()
 	s_Dirs[std::wstring( s_szRoot )];	// the root lists as a folder even if empty
 	s_bActive = true;
 	filesystem->AddSearchPath( Narrow( strRoot ).c_str(), "GAME", PATH_ADD_TO_TAIL );
-	Msg( "GMA: mounted %d of %d Garry's Mod addons (%d files)\n", nAddons, s_nCandidate, nFiles );
+	Msg( "GMA: mounted %d of %d Garry's Mod addons (%d files; %d from Garry's Mod's download cache)\n", nAddons, s_nCandidate, nFiles, nFromCache );
+	if ( nNotSubscribed )
+		Msg( "GMA: %d addons in Garry's Mod's download cache aren't subscribed (downloaded from servers), not mounted (-gmaservercache mounts them)\n", nNotSubscribed );
 }
 
 void GMAMount_Shutdown()

@@ -878,7 +878,29 @@ util.SharedRandom = Randoms.SharedRandomFloat
 ents = {
 	-- GMod's ents.Create doesn't spawn: a scripted entity's Initialize runs at ent:Spawn()
 	Create = function(className)
-		return Entities.CreateByName(className, true)
+		local entity = Entities.CreateByName(className, true)
+
+		-- Srcbox: but GMod has run SetupDataTables by now, so NetworkVar accessors
+		-- ( lamp:SetLightFOV, light:SetBrightness, ... ) work before Spawn. The engine only
+		-- runs it at Spawn ( PreEntityInitialize below, which then skips it )
+		if (IsValid(entity) and entity.SetupDataTables and not entity.SrcboxDataTablesSetUp) then
+			entity.SrcboxDataTablesSetUp = true
+
+			if (entity.InstallDataTable) then
+				entity:InstallDataTable()
+			end
+
+			entity:SetupDataTables()
+		end
+
+		-- Srcbox: this engine's env_projectedtexture ( Mapbase's ) reads "Start On" / "Always
+		-- Update" from its spawnflags at Spawn, so one made from Lua started off. GMod's are on and
+		-- follow their parent ( the lamp tool never sets spawnflags ). A later keyvalue still wins.
+		if (IsValid(entity) and className == "env_projectedtexture") then
+			entity:SetKeyValue("spawnflags", "3")
+		end
+
+		return entity
 	end,
 	-- TODO: Probably not correct, since CreateClientProp creates an ent with physics
 	CreateClientProp = Entities.CreateClientEntity,
@@ -1267,8 +1289,14 @@ engine.GetGames = function()
 	local games = Engines.GetMountableGames()
 	local result = {}
 
-	for i, game in ipairs(games) do
-		result[i] = {
+	for _, game in ipairs(games) do
+		-- Like GMod: Garry's Mod itself isn't in the list ( Sandbox adds its own entry for it,
+		-- so it showed twice under Browse > Games )
+		if (game.directoryName == "garrysmod") then
+			continue
+		end
+
+		result[#result + 1] = {
 			depot = game.appId,
 			title = game.name,
 			folder = game.directoryName,
@@ -4193,6 +4221,13 @@ hook.Add("PostEntitiesLoaded", "GModCompatibility.CallOnLoaded", function()
 end)
 
 hook.Add("PreEntityInitialize", "GModCompatibility.CallSetupDataTables", function(entity)
+	-- Already done by ents.Create ( running it again would make the NetworkVars over )
+	if (entity.SrcboxDataTablesSetUp) then
+		return
+	end
+
+	entity.SrcboxDataTablesSetUp = true
+
 	if (entity.InstallDataTable) then
 		entity:InstallDataTable()
 	end
@@ -4662,6 +4697,24 @@ include("includes/init.lua")
 
 include = originalInclude
 
+-- Srcbox: GMod hooks Physbox calls under its own names, and what GMod's versions of them use
+include("sh_gmodhooks.lua")
+
+-- Srcbox: srcbox_glua_audit / srcbox_glua_audit_cl list what GMod's Lua calls that isn't here
+include("sh_glua_audit.lua")
+
+-- Srcbox: GMod functions the audit found missing ( util.SteamIDTo64, render.Model, DynamicLight, ... )
+include("sh_gmod_missing.lua")
+include("sh_gmod_methods.lua")
+include("sh_gmod_wiki_fill.lua")
+
+-- GMod's ServerLog( text ): a line in the server's log ( here, the console )
+if (SERVER and not ServerLog) then
+	function ServerLog(text)
+		Msg(tostring(text))
+	end
+end
+
 -- GMod's matproxy module loads lua/matproxy/*.lua (sky_paint.lua, addons' proxies) when it's required
 if (CLIENT and matproxy and matproxy.Add) then
 	includeFolder("lua/matproxy")
@@ -4804,6 +4857,7 @@ if (CLIENT) then
 	end)
 
 	include("cl_awesomium.lua")
+	include("cl_dupes.lua") -- Srcbox: engine.WriteDupe / OpenDupe, render.Capture, the Dupes tab
 
 	include("skins/default.lua")
 
@@ -5626,7 +5680,10 @@ do
 
 		if (originalCreateClientConVar) then
 			function CreateClientConVar(name, default, shouldSave, userInfo, ...)
-				local conVar = originalCreateClientConVar(name, default, shouldSave, userInfo, ...)
+				-- Srcbox: not made engine userinfo. The engine only takes userinfo that existed when
+				-- the client connected, so it refused every change ( "userinfo ignored" in the
+				-- console ); the mirror below is what the server reads anyway
+				local conVar = originalCreateClientConVar(name, default, shouldSave, false, ...)
 
 				if (userInfo and isstring(name)) then
 					userInfoConVars[name] = conVar or true
@@ -6365,10 +6422,9 @@ do
 		-- base_entity (edit_fog/edit_sky have theirs cleared by differentBase), so prefer what
 		-- DEFINE_BASECLASS declared
 		-- (but keep base_entity where differentBase deliberately remaps to it)
-		local className = rawget(entityTable, "ClassName")
-		local remapped = isstring(className) and differentBase[className] == "base_entity"
-
-		if (not isstring(baseName) or baseName == "prop_scripted" or (baseName == "base_entity" and not remapped)) then
+		-- Srcbox: differentBase's "base_entity" only picks the C++ side; the Lua fields still come
+		-- from the declared base ( gmod_lamp etc. need base_gmodentity's SetPlayer / GetPlayer )
+		if (not isstring(baseName) or baseName == "prop_scripted" or baseName == "base_entity") then
 			local declaredBase = GModCompatibilityDeclaredBase and GModCompatibilityDeclaredBase[entityTable]
 			if (isstring(declaredBase)) then
 				baseName = declaredBase
@@ -6405,8 +6461,39 @@ do
 	local baseCache = setmetatable({}, { __mode = "k" })
 	local lookingUp = {}
 
+	-- self.BaseClass: the declared base. A hook method no Lua base has ( base_gmodentity has no
+	-- server Think, base_anim's are C++ ) is an empty function, like calling an empty base in GMod.
+	local baseClassCache = setmetatable({}, { __mode = "k" })
+	local function noop() end
+
+	local function baseClassOf(entityTable)
+		local proxy = baseClassCache[entityTable]
+
+		if (not proxy) then
+			proxy = setmetatable({}, {
+				__index = function(_, key)
+					local baseTable = getBaseTable(entityTable)
+					local value = baseTable and baseTable[key]
+
+					if (value == nil and isstring(key) and key:match("^%u")) then
+						value = noop
+					end
+
+					return value
+				end
+			})
+			baseClassCache[entityTable] = proxy
+		end
+
+		return proxy
+	end
+
 	local inheritMeta = {
 		__index = function(entityTable, key)
+			if (key == "BaseClass" and not lookingUp[entityTable] and getBaseName(entityTable)) then
+				return baseClassOf(entityTable)
+			end
+
 			if (NOT_INHERITED[key] or lookingUp[entityTable]) then
 				return nil
 			end

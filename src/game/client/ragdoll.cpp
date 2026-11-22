@@ -16,6 +16,10 @@
 #include "view.h"
 #include "physics_saverestore.h"
 #include "vphysics/constraints.h"
+#ifdef LUA_SDK
+#include "c_baseflex.h"
+#include "srcbox/srcbox_ragdollflex.h"
+#endif
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -405,6 +409,13 @@ public:
 	int			m_elementCount;
 	int			m_boneIndex[RAGDOLL_MAX_ELEMENTS];
 
+#ifdef LUA_SDK
+	// Srcbox: face flex weights from the server ( 0..1 per flex controller ), see srcbox_ragdollflex.h
+	float		m_flSrcboxFlexWeight[MAXSTUDIOFLEXCTRL];
+	float		m_flSrcboxFlexScale;
+	bool		m_bSrcboxFlexPosed;
+#endif
+
 private:
 	C_ServerRagdoll( const C_ServerRagdoll &src );
 
@@ -424,6 +435,11 @@ IMPLEMENT_CLIENTCLASS_DT(C_ServerRagdoll, DT_Ragdoll, CRagdollProp)
 	RecvPropEHandle(RECVINFO(m_hUnragdoll)),
 	RecvPropFloat(RECVINFO(m_flBlendWeight)),
 	RecvPropInt(RECVINFO(m_nOverlaySequence)),
+#ifdef LUA_SDK
+	RecvPropArray3( RECVINFO_ARRAY(m_flSrcboxFlexWeight), RecvPropFloat( RECVINFO(m_flSrcboxFlexWeight[0]) ) ),
+	RecvPropFloat( RECVINFO(m_flSrcboxFlexScale) ),
+	RecvPropBool( RECVINFO(m_bSrcboxFlexPosed) ),
+#endif
 END_RECV_TABLE()
 
 
@@ -441,6 +457,11 @@ C_ServerRagdoll::C_ServerRagdoll( void ) :
 	m_flBlendWeightCurrent = 0.0f;
 	m_nOverlaySequence = -1;
 	m_flFadeScale = 1;
+#ifdef LUA_SDK
+	memset( m_flSrcboxFlexWeight, 0, sizeof( m_flSrcboxFlexWeight ) );
+	m_flSrcboxFlexScale = 1.0f;
+	m_bSrcboxFlexPosed = false;
+#endif
 }
 
 void C_ServerRagdoll::PostDataUpdate( DataUpdateType_t updateType )
@@ -517,8 +538,38 @@ void C_ServerRagdoll::SetupWeights( const matrix3x4_t *pBoneToWorld, int nFlexWe
 	int nFlexDescCount = hdr->numflexdesc();
 	if ( nFlexDescCount )
 	{
-		Assert( !pFlexDelayedWeights );
 		memset( pFlexWeights, 0, nFlexWeightCount * sizeof(float) );
+
+#ifdef LUA_SDK
+		// Srcbox: a posed face ( faceposer, or the NPC this ragdoll came from ). The controller
+		// values go through the model's flex rules like C_BaseFlex does; unposed ragdolls stay blank.
+		int nControllers = MIN( hdr->numflexcontrollers(), MAXSTUDIOFLEXCTRL );
+		if ( m_bSrcboxFlexPosed && nControllers > 0 )
+		{
+			C_BaseFlex::LinkToGlobalFlexControllers( hdr );
+
+			static float s_flControllers[MAXSTUDIOFLEXDESC];
+			memset( s_flControllers, 0, sizeof( s_flControllers ) );
+
+			for ( int i = 0; i < nControllers; i++ )
+			{
+				mstudioflexcontroller_t *pController = hdr->pFlexcontroller( ( LocalFlexController_t )i );
+				int nGlobal = pController->localToGlobal;
+				if ( nGlobal < 0 || nGlobal >= MAXSTUDIOFLEXDESC )
+					continue;
+
+				float flValue = m_flSrcboxFlexWeight[i] * ( pController->max - pController->min ) + pController->min;
+				s_flControllers[nGlobal] = flValue * m_flSrcboxFlexScale;
+			}
+
+			hdr->RunFlexRules( s_flControllers, pFlexWeights );
+		}
+#endif
+
+		if ( pFlexDelayedWeights )
+		{
+			memcpy( pFlexDelayedWeights, pFlexWeights, nFlexWeightCount * sizeof(float) );
+		}
 	}
 
 	if ( m_iEyeAttachment > 0 )
@@ -866,3 +917,37 @@ bool WasRagdollCreatedOnCurrentTick( C_BaseEntity *pRagdoll )
 	return gRagdolls.IsInList( pRagdoll );
 }
 
+#ifdef LUA_SDK
+//-----------------------------------------------------------------------------
+// Srcbox: face flex weights on ragdolls ( see srcbox/srcbox_ragdollflex.h )
+//-----------------------------------------------------------------------------
+bool SrcboxRagdollFlex_GetWeight( C_BaseEntity *pEntity, int index, float &flWeight )
+{
+	C_ServerRagdoll *pRagdoll = dynamic_cast< C_ServerRagdoll * >( pEntity );
+	if ( !pRagdoll )
+		return false;
+
+	flWeight = ( index >= 0 && index < MAXSTUDIOFLEXCTRL ) ? pRagdoll->m_flSrcboxFlexWeight[index] : 0.0f;
+	return true;
+}
+
+bool SrcboxRagdollFlex_GetScale( C_BaseEntity *pEntity, float &flScale )
+{
+	C_ServerRagdoll *pRagdoll = dynamic_cast< C_ServerRagdoll * >( pEntity );
+	if ( !pRagdoll )
+		return false;
+
+	flScale = pRagdoll->m_flSrcboxFlexScale;
+	return true;
+}
+
+bool SrcboxRagdollFlex_IsPosed( C_BaseEntity *pEntity, bool &bPosed )
+{
+	C_ServerRagdoll *pRagdoll = dynamic_cast< C_ServerRagdoll * >( pEntity );
+	if ( !pRagdoll )
+		return false;
+
+	bPosed = pRagdoll->m_bSrcboxFlexPosed;
+	return true;
+}
+#endif // LUA_SDK

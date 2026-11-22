@@ -85,6 +85,10 @@ public:
 
 	// Default calls through to m_hOwner, but plasma weapons can override and shoot projectiles here.
 	virtual void	ItemPostFrame( void );
+#ifdef LUA_SDK
+	// Srcbox: reads SWEP.Primary.Automatic / SWEP.Secondary.Automatic (they can change at runtime)
+	bool			LuaIsAutomatic( bool bPrimary );
+#endif
 	virtual void	ItemBusyFrame( void );
 	virtual void	FireBullets( const FireBulletsInfo_t &info );
 	virtual bool	Reload();
@@ -95,6 +99,11 @@ public:
 #ifdef CLIENT_DLL
 	virtual void	OnDataChanged( DataUpdateType_t updateType );
 	virtual const char *GetScriptedClassname( void );
+#ifdef LUA_SDK
+	// Srcbox: SWEP:Think clientside when prediction isn't calling it ( singleplayer )
+	virtual void	ClientThink( void );
+	float			m_flSrcboxLastPredictedThink;
+#endif
 #endif
 
 	virtual const Vector &GetBulletSpread( void );

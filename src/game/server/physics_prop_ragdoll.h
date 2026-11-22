@@ -57,6 +57,17 @@ public:
 	virtual void ModifyOrAppendCriteria( AI_CriteriaSet& set );
 	void SetSourceClassName( const char *pClassname );
 
+#ifdef LUA_SDK
+	// Srcbox: face flex weights, 0..1 per flex controller like CBaseFlex's ( GMod's faceposer )
+	void	SetFlexWeightNormalized( int index, float flWeight );
+	float	GetFlexWeightNormalized( int index ) const;
+	void	SetFlexScale( float flScale ) { m_flSrcboxFlexScale = flScale; }
+	float	GetFlexScale() const { return m_flSrcboxFlexScale; }
+	bool	IsFlexPosed() const { return m_bSrcboxFlexPosed; }
+	// An NPC's ragdoll keeps the face it had
+	void	CopyFlexWeightsFrom( CBaseAnimating *pSource );
+#endif
+
 	// Physics attacker
 	virtual CBasePlayer *HasPhysicsAttacker( float dt );
 
@@ -144,6 +155,12 @@ private:
 	CNetworkVar( float, m_flBlendWeight );
 	CNetworkVar( int, m_nOverlaySequence );
 	float	m_flDefaultFadeScale;
+
+#ifdef LUA_SDK
+	CNetworkArray( float, m_flSrcboxFlexWeight, MAXSTUDIOFLEXCTRL );
+	CNetworkVar( float, m_flSrcboxFlexScale );
+	CNetworkVar( bool, m_bSrcboxFlexPosed );
+#endif
 	
 	Vector				m_ragdollMins[RAGDOLL_MAX_ELEMENTS];
 	Vector				m_ragdollMaxs[RAGDOLL_MAX_ELEMENTS];

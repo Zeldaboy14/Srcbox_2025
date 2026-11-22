@@ -26,6 +26,7 @@
 #include "multiplay_gamerules.h"
 #include "voice_status.h"
 #include "steam/isteamutils.h"
+#include "srcbox/srcbox_gmodhooks.h"
 
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -771,6 +772,26 @@ void CBaseHudChat::MsgFunc_SayText( bf_read &msg )
 	msg.ReadString( szString, sizeof(szString) );
 	bool bWantsToChat = msg.ReadByte();
 
+#ifdef LUA_SDK
+	// Srcbox: GMod's ChatText( playerIndex, playerName, text, type ): returning true hides it
+	{
+		C_BasePlayer *pSender = client > 0 ? UTIL_PlayerByIndex( client ) : NULL;
+		bool bHidden = false;
+
+		SRCBOX_HOOK_BEGIN( "ChatText" )
+			lua_pushinteger( L, client );
+			lua_pushstring( L, pSender ? pSender->GetPlayerName() : "Console" );
+			lua_pushstring( L, bWantsToChat ? szString : hudtextmessage->LookupString( szString ) );
+			lua_pushstring( L, bWantsToChat ? "chat" : "servermsg" );
+		SRCBOX_HOOK_CALL( 4 )
+			bHidden = SRCBOX_HOOK_RETURNED_TRUE();
+		SRCBOX_HOOK_END()
+
+		if ( bHidden )
+			return;
+	}
+#endif
+
 	if ( bWantsToChat )
 	{
 		UTIL_GetFilteredChatText( client, szString, sizeof( szString ) );
@@ -848,6 +869,37 @@ void CBaseHudChat::MsgFunc_SayText2( bf_read &msg )
 			// This user has been ignored at the Steam level
 			return;
 		}
+
+#ifdef LUA_SDK
+		// Srcbox: GMod's OnPlayerChat( ply, text, teamChat, isDead ): returning true means Lua showed
+		// it ( GMod's Base gamemode prints it with chat.AddText and returns true )
+		{
+			char chatText[256];
+			g_pVGuiLocalize->ConvertUnicodeToANSI( szBuf[2], chatText, sizeof( chatText ) );
+
+			const bool bTeam = Q_stristr( untranslated_msg_text, "team" ) != NULL;
+			const bool bDead = Q_stristr( untranslated_msg_text, "dead" ) != NULL || ( client > 0 && !g_PR->IsAlive( client ) );
+			bool bHandled = false;
+
+			SRCBOX_HOOK_BEGIN( "OnPlayerChat" )
+				CBasePlayer::PushLuaInstanceSafe( L, client > 0 ? UTIL_PlayerByIndex( client ) : NULL );
+				lua_pushstring( L, chatText );
+				lua_pushboolean( L, bTeam );
+				lua_pushboolean( L, bDead );
+			SRCBOX_HOOK_CALL( 4 )
+				bHandled = SRCBOX_HOOK_RETURNED_TRUE();
+			SRCBOX_HOOK_END()
+
+			if ( bHandled )
+			{
+				Msg( "%s\n", RemoveColorMarkup( ansiString ) );
+
+				CLocalPlayerFilter filter;
+				C_BaseEntity::EmitSound( filter, SOUND_FROM_LOCAL_PLAYER, "HudChat.Message" );
+				return;
+			}
+		}
+#endif
 
 		// print raw chat text
 		ChatPrintf( client, iFilter, "%s", ansiString );
@@ -1176,6 +1228,21 @@ void CBaseHudChat::Printf( int iFilter, const char *fmt, ... )
 //-----------------------------------------------------------------------------
 void CBaseHudChat::StartMessageMode( int iMessageModeType )
 {
+#ifdef LUA_SDK
+	// Srcbox: GMod's StartChat( isTeamChat ): returning true means Lua shows its own chat box
+	{
+		bool bHandled = false;
+		SRCBOX_HOOK_BEGIN( "StartChat" )
+			lua_pushboolean( L, iMessageModeType == MM_SAY_TEAM );
+		SRCBOX_HOOK_CALL( 1 )
+			bHandled = SRCBOX_HOOK_RETURNED_TRUE();
+		SRCBOX_HOOK_END()
+
+		if ( bHandled )
+			return;
+	}
+#endif
+
 #ifndef _XBOX
 	m_nMessageMode = iMessageModeType;
 
@@ -1243,6 +1310,13 @@ void CBaseHudChat::StartMessageMode( int iMessageModeType )
 //-----------------------------------------------------------------------------
 void CBaseHudChat::StopMessageMode( void )
 {
+#ifdef LUA_SDK
+	// Srcbox: GMod's FinishChat()
+	SRCBOX_HOOK_BEGIN( "FinishChat" )
+	SRCBOX_HOOK_CALL( 0 )
+	SRCBOX_HOOK_END()
+#endif
+
 #ifndef _XBOX
 
 	engine->ClientCmd_Unrestricted( "gameui_allowescapetoshow\n" );

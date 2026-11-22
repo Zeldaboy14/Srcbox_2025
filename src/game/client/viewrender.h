@@ -226,6 +226,7 @@ protected:
 
 	// Draws all opaque/translucent renderables in leaves that were rendered
 	void			DrawOpaqueRenderables( ERenderDepthMode DepthMode );
+	void			DrawOpaqueRenderables_Srcbox( ERenderDepthMode DepthMode );	// Srcbox: the drawing itself, between GMod's Pre/PostDrawOpaqueRenderables
 	void			DrawTranslucentRenderables( bool bInSkybox, bool bShadowDepth );
 
 	// Renders all translucent entities in the render list

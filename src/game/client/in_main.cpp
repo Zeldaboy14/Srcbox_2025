@@ -47,6 +47,11 @@ extern ConVar cam_idealyaw;
 // Need this for steam controller
 #include "clientsteamcontext.h"
 
+#ifdef LUA_SDK
+#include "srcbox/srcbox_gmodhooks.h"
+#include "lusercmd.h"
+#endif
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -533,6 +538,25 @@ void IN_Impulse( const CCommand &args )
 void IN_ScoreDown( const CCommand &args )
 {
 	KeyDown( &in_score, args[1] );
+
+#ifdef LUA_SDK
+	// Srcbox: GMod's ScoreboardShow(): returning true ( or a GMod gamemode ) means Lua shows its own scoreboard
+	{
+		bool bHandled = false;
+		SRCBOX_HOOK_BEGIN( "ScoreboardShow" )
+		SRCBOX_HOOK_CALL( 0 )
+			bHandled = SRCBOX_HOOK_RETURNED_TRUE();
+		SRCBOX_HOOK_END()
+
+		// A GMod gamemode draws its own scoreboard ( GMod has no engine one )
+		if ( SrcboxGamemodeHasFunction( "ScoreboardShow" ) )
+			bHandled = true;
+
+		if ( bHandled )
+			return;
+	}
+#endif
+
 	if ( gViewPortInterface )
 	{
 		gViewPortInterface->ShowPanel( PANEL_SCOREBOARD, true );
@@ -542,6 +566,28 @@ void IN_ScoreDown( const CCommand &args )
 void IN_ScoreUp( const CCommand &args )
 {
 	KeyUp( &in_score, args[1] );
+
+#ifdef LUA_SDK
+	// Srcbox: GMod's ScoreboardHide(): returning true ( or a GMod gamemode ) means Lua hid its own scoreboard
+	{
+		bool bHandled = false;
+		SRCBOX_HOOK_BEGIN( "ScoreboardHide" )
+		SRCBOX_HOOK_CALL( 0 )
+			bHandled = SRCBOX_HOOK_RETURNED_TRUE();
+		SRCBOX_HOOK_END()
+
+		// A GMod gamemode draws its own scoreboard ( GMod has no engine one )
+		if ( SrcboxGamemodeHasFunction( "ScoreboardHide" ) )
+			bHandled = true;
+
+		if ( bHandled )
+		{
+			GetClientVoiceMgr()->StopSquelchMode();
+			return;
+		}
+	}
+#endif
+
 	if ( gViewPortInterface )
 	{
 		gViewPortInterface->ShowPanel( PANEL_SCOREBOARD, false );
@@ -1266,6 +1312,22 @@ void CInput::CreateMove ( int sequence_number, float input_sample_frametime, boo
 			}
 		}
 	}
+
+#ifdef LUA_SDK
+	// Srcbox: GMod's CreateMove( cmd ): Lua can change the command ( buttons, movement, view angles )
+	// before it's sent
+	{
+		const QAngle anglesBefore = cmd->viewangles;
+
+		SRCBOX_HOOK_BEGIN( "CreateMove" )
+			lua_pushusercmd( L, cmd );
+		SRCBOX_HOOK_CALL( 1 )
+		SRCBOX_HOOK_END()
+
+		if ( cmd->viewangles != anglesBefore )
+			engine->SetViewAngles( cmd->viewangles );
+	}
+#endif
 
 	m_flLastForwardMove = cmd->forwardmove;
 

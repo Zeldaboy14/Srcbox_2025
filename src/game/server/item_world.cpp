@@ -25,6 +25,8 @@
 #include "tf_obj_teleporter.h"
 #endif
 
+#include "srcbox/srcbox_gmodhooks.h"
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -455,6 +457,22 @@ void CItem::ItemTouch( CBaseEntity *pOther )
 		// no? Ignore the touch.
 		return;
 	}
+
+#ifdef LUA_SDK
+	// Srcbox: GMod's PlayerCanPickupItem( ply, item ): returning false leaves it
+	{
+		bool bRefused = false;
+		SRCBOX_HOOK_BEGIN( "PlayerCanPickupItem" )
+			CBasePlayer::PushLuaInstanceSafe( L, pPlayer );
+			CBaseEntity::PushLuaInstanceSafe( L, this );
+		SRCBOX_HOOK_CALL( 2 )
+			bRefused = SRCBOX_HOOK_RETURNED_FALSE();
+		SRCBOX_HOOK_END()
+
+		if ( bRefused )
+			return;
+	}
+#endif
 
 	if ( MyTouch( pPlayer ) )
 	{

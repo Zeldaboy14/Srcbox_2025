@@ -12,6 +12,7 @@
 #include "luamanager.h"
 #include "fmtstr.h"
 #include "tier3/tier3.h"
+#include "tier0/icommandline.h"
 
 #undef SRCBOX
 #define EXPERIMENT 1
@@ -172,6 +173,19 @@ void RemoveRootSearchPaths( const char *gamePath, lua_State *L )
     luasrc_remove_from_package_path( L, luaGamemodesPath );
 }
 
+#ifdef LUA_SDK
+//-----------------------------------------------------------------------------
+// Srcbox: like GMod, each mounted game's paths also go under a path ID of its own
+// folder name ( "hl2", "tf", ... ), so file.Find( "models/*", "tf" ) lists only that
+// game. The spawnmenu's Games browser ( and Extended Spawnmenu ) rely on it; without
+// it every game's tree showed nothing. -nogamepathids turns it off.
+//-----------------------------------------------------------------------------
+static bool UseGamePathIDs()
+{
+    return !CommandLine()->FindParm( "-nogamepathids" );
+}
+#endif
+
 void AddSearchPathByAppId( int nAppId )
 {
     ISteamApps *pSteamApps = steamapicontext->SteamApps();
@@ -204,6 +218,10 @@ void AddSearchPathByAppId( int nAppId )
         Q_snprintf( fullPath, sizeof( fullPath ), "%s/%s", appInstallPath, g_GamePaths[i].directoryName );
 
         SetupRootSearchPaths( fullPath, L );
+#ifdef LUA_SDK
+        if ( UseGamePathIDs() )
+            filesystem->AddSearchPath( fullPath, g_GamePaths[i].directoryName, PATH_ADD_TO_TAIL );
+#endif
 
         // GAME - Add the VPKs as search paths
         auto &vpkPaths = g_GamePaths[i].vpks;
@@ -212,6 +230,10 @@ void AddSearchPathByAppId( int nAppId )
         {
             Q_snprintf( fullPath, sizeof( fullPath ), "%s/%s", appInstallPath, vpkPaths[j] );
             SetupRootSearchPaths( fullPath, L );
+#ifdef LUA_SDK
+            if ( UseGamePathIDs() )
+                filesystem->AddSearchPath( fullPath, g_GamePaths[i].directoryName, PATH_ADD_TO_TAIL );
+#endif
         }
 
         g_GamePaths[i].isMounted = true;
@@ -247,6 +269,9 @@ void RemoveSearchPathByAppId( int nAppId )
 
         Q_snprintf( fullPath, sizeof( fullPath ), "%s/%s", appInstallPath, g_GamePaths[i].directoryName );
         RemoveRootSearchPaths( fullPath, L );
+#ifdef LUA_SDK
+        filesystem->RemoveSearchPath( fullPath, g_GamePaths[i].directoryName );
+#endif
 
         auto &vpkPaths = g_GamePaths[i].vpks;
 
@@ -254,6 +279,9 @@ void RemoveSearchPathByAppId( int nAppId )
         {
             Q_snprintf( fullPath, sizeof( fullPath ), "%s/%s", appInstallPath, vpkPaths[j] );
             RemoveRootSearchPaths( fullPath, L );
+#ifdef LUA_SDK
+            filesystem->RemoveSearchPath( fullPath, g_GamePaths[i].directoryName );
+#endif
         }
 
         g_GamePaths[i].isMounted = false;
@@ -319,6 +347,8 @@ void InitializeGameContentMounting()
     REGISTER_GAME_WITH_VPK( pSteamApps, "Left 4 Dead 2", "l4d2", 550, "left4dead2/pak01_dir.vpk", "left4dead2_dlc1/pak01_dir.vpk", "left4dead2_dlc2/pak01_dir.vpk", "left4dead2_dlc3/pak01_dir.vpk", "update/pak01_dir.vpk", "left4dead2",  "left4dead2_dlc1", "left4dead2_dlc2", "left4dead2_dlc3", "update");
     REGISTER_GAME(pSteamApps, "The Stanley Parable", "thestanleyparable", 221910);
     REGISTER_GAME_WITH_VPK(pSteamApps, "Black Mesa", "bms", 362890, "bms/bms_models_dir.vpk", "bms/bms_materials_dir.vpk", "bms/bms_maps_dir.vpk", "bms/bms_sound_vo_english_dir.vpk", "bms/bms_sounds_misc_dir.vpk", "bms/bms_textures_dir.vpk", "bms");
+    REGISTER_GAME_WITH_VPK(pSteamApps, "Fortress Connected", "fc_tfsdk", 3561600, "fc_tfsdk/vpks/fc_tfsdk_misc_dir.vpk", "fc_tfsdk/vpks/fc_tfsdk_sound_dir.vpk", "fc_tfsdk/vpks/fc_tfsdk_textures_dir.vpk" , "fc_tfsdk");
+    REGISTER_GAME_WITH_VPK(pSteamApps, "Nightmare House: Source", "NH", 2954780, "NG/nh_vpks/pak01_dir.vpk", "NH");
 
     KeyValues *pMainFile, *pFileSystemInfo;
 
@@ -550,8 +580,13 @@ bool UnmountGameContentByAppId( int nAppId )
         if ( !pFileSystemInfo )
             continue;
 
+        // Srcbox: a game that isn't listed ( mounted some other way ) has no key to remove
         KeyValues *pSubKey = pFileSystemInfo->FindKey( pGameToUnmount->directoryName );
-        pFileSystemInfo->RemoveSubKey( pSubKey );
+        if ( pSubKey )
+        {
+            pFileSystemInfo->RemoveSubKey( pSubKey );
+            pSubKey->deleteThis();
+        }
 
         pMainFile->SaveToFile( filesystem, UTIL_VarArgs( paths[i], gamePath ), CONTENT_SEARCH_PATH );
         bFound = true;

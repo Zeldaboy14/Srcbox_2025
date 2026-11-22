@@ -26,6 +26,7 @@
 #endif
 
 #include "tier0/vprof.h"
+#include "srcbox/srcbox_gmodmovehooks.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -923,6 +924,11 @@ void CPrediction::RunCommand( C_BasePlayer *player, CUserCmd *ucmd, IMoveHelper 
 #endif
 	StartCommand( player, ucmd );
 
+#ifdef LUA_SDK
+	// Srcbox: GMod's StartCommand( ply, cmd ), predicted
+	SrcboxCallStartCommand( player, ucmd );
+#endif
+
 	// Set globals appropriately
 	gpGlobals->curtime		= player->m_nTickBase * TICK_INTERVAL;
 	gpGlobals->frametime	= m_bEnginePaused ? 0 : TICK_INTERVAL;
@@ -958,6 +964,11 @@ void CPrediction::RunCommand( C_BasePlayer *player, CUserCmd *ucmd, IMoveHelper 
 	// Get button states
 	player->UpdateButtonState( ucmd->buttons );
 
+#ifdef LUA_SDK
+	// Srcbox: GMod's KeyPress / KeyRelease ( predicted, like GMod: IsFirstTimePredicted tells repeats apart )
+	SrcboxCallKeyHooks( player );
+#endif
+
 // TODO
 	CheckMovingGround( player, gpGlobals->frametime );
 
@@ -982,8 +993,19 @@ void CPrediction::RunCommand( C_BasePlayer *player, CUserCmd *ucmd, IMoveHelper 
 		SetupMove( player, ucmd, moveHelper, g_pMoveData );
 	}
 
+#ifdef LUA_SDK
+	// Srcbox: GMod's SetupMove / PlayerTick, then Move ( true = the hook moved the player )
+	SrcboxCallSetupMove( player, g_pMoveData, ucmd );
+	const bool bSrcboxLuaMoved = SrcboxCallMove( player, g_pMoveData );
+#else
+	const bool bSrcboxLuaMoved = false;
+#endif
+
 	// RUN MOVEMENT
-	if ( !pVehicle )
+	if ( bSrcboxLuaMoved )
+	{
+	}
+	else if ( !pVehicle )
 	{
 		Assert( g_pGameMovement );
 		g_pGameMovement->ProcessMovement( player, g_pMoveData );
@@ -993,6 +1015,9 @@ void CPrediction::RunCommand( C_BasePlayer *player, CUserCmd *ucmd, IMoveHelper 
 		pVehicle->ProcessMovement( player, g_pMoveData );
 	}
 
+#ifdef LUA_SDK
+	if ( !SrcboxCallFinishMove( player, g_pMoveData ) )
+#endif
 	FinishMove( player, ucmd, g_pMoveData );
 
 	VPROF_SCOPE_BEGIN( "moveHelper->ProcessImpacts(cl)" );

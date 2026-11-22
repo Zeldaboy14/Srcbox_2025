@@ -363,10 +363,10 @@ LUA_BINDING_BEGIN( Renders, PushModelMatrix, "library", "Push a model matrix.", 
     pRenderContext->MatrixMode( MATERIAL_MODEL );
     pRenderContext->PushMatrix();
 
-    // TODO: Is this the correct implementation, the same as how GMod does it?
+    // Srcbox: multiplying keeps what's already on the stack ( GMod's cam.PushModelMatrix( matrix, true ) )
     if ( shouldMultiply )
     {
-        pRenderContext->LoadMatrix( matrix );
+        pRenderContext->MultMatrix( matrix );
     }
     else
     {

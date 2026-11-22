@@ -19,6 +19,7 @@
 // lua hooks
 #ifdef LUA_SDK
 #include "luamanager.h"
+#include "srcbox/srcbox_gmodhooks.h"
 #endif
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -52,6 +53,24 @@ void CScriptedHudViewport::SetParent( vgui::VPANEL parent )
 
 void CScriptedHudViewport::Paint()
 {
+#ifdef LUA_SDK
+    // Srcbox: GMod's PreDrawHUD and HUDPaintBackground come before HUDPaint ( which the compat
+    // layer runs from HudDraw ), PostDrawHUD after it
+    SRCBOX_HOOK_BEGIN( "PreDrawHUD" )
+    SRCBOX_HOOK_CALL( 0 )
+    SRCBOX_HOOK_END()
+
+    SRCBOX_HOOK_BEGIN( "HUDPaintBackground" )
+    SRCBOX_HOOK_CALL( 0 )
+    SRCBOX_HOOK_END()
+#endif
+
     LUA_CALL_HOOK_BEGIN( "HudDraw" );
     LUA_CALL_HOOK_END( 0, 0 );
+
+#ifdef LUA_SDK
+    SRCBOX_HOOK_BEGIN( "PostDrawHUD" )
+    SRCBOX_HOOK_CALL( 0 )
+    SRCBOX_HOOK_END()
+#endif
 }

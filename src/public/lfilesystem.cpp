@@ -333,7 +333,12 @@ LUA_BINDING_BEGIN( Files, Open, "library", "Open a file." )
     // Experiment; TODO: Is it risky to allow reading from any search path?
     if ( readMode[0] == 'w' || readMode[0] == 'a' )
     {
-        if ( !V_stristr( pathId, "data" ) )
+        // Srcbox: also the mod's dupes/ folder, where GMod's engine.WriteDupe puts saved dupes
+        // ( and where the spawnmenu's Dupes tab looks ). Nothing above it, and no ".." to climb out.
+        const bool bDupesFolder = !V_stricmp( pathId, "MOD" ) && !V_strnicmp( filePath, "dupes/", 6 ) &&
+                                  !V_strstr( filePath, ".." ) && !V_strchr( filePath, ':' ) && !V_strchr( filePath, '\\' );
+
+        if ( !bDupesFolder && !V_stristr( pathId, "data" ) )
         {
             char message[256];
             V_snprintf( message, sizeof( message ), "Invalid pathId for writing (DATA expected, got %s)", pathId );

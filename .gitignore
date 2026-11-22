@@ -576,3 +576,11 @@ src/lib/public/mathlib.lib
 src/lib/public/raytrace.lib
 src/lib/public/tier1.lib
 src/lib/public/vgui_controls.lib
+game/physbox/cloudbox/seen_full_message.txt
+game/physbox/data_scp263/en_questions.json
+game/physbox/data_scp263/fr_questions.json
+game/physbox/data_scp263/zh-cn_questions.json
+game/physbox/data_scp_207/scp_207.json
+game/physbox/data_scramble/scramble_config.json
+game/physbox/data_scramble_mw/scramble_mw.json
+game/physbox/portal_colors.json

@@ -64,6 +64,8 @@
 #include "hintsystem.h"
 #include "env_debughistory.h"
 #include "fogcontroller.h"
+#include "fogvolume.h"
+#include "postprocesscontroller.h"
 #include "gameinterface.h"
 #include "hl2orange.spa.h"
 #include "dt_utlvector_send.h"
@@ -110,6 +112,11 @@ ConVar sv_chat_bucket_size_tier2( "sv_chat_bucket_size_tier2", "30", FCVAR_NONE,
 ConVar sv_chat_seconds_per_msg_tier2( "sv_chat_seconds_per_msg_tier2", "10", FCVAR_NONE, "The number of seconds to accrue an additional long term chat msg." );
 
 static ConVar sv_maxusrcmdprocessticks( "sv_maxusrcmdprocessticks", "24", FCVAR_NOTIFY, "Maximum number of client-issued usrcmd ticks that can be replayed in packet loss conditions, 0 to allow no restrictions" );
+
+#include "srcbox/srcbox_gmodhooks.h"
+#ifdef LUA_SDK
+#include "ltakedamageinfo.h"
+#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -469,6 +476,9 @@ BEGIN_DATADESC( CBasePlayer )
 	DEFINE_INPUTFUNC( FIELD_INTEGER, "SetHealth", InputSetHealth ),
 	DEFINE_INPUTFUNC( FIELD_BOOLEAN, "SetHUDVisibility", InputSetHUDVisibility ),
 	DEFINE_INPUTFUNC( FIELD_STRING, "SetFogController", InputSetFogController ),
+	// Srcbox (from Mapbase): the input function existed but was never registered, so map triggers
+	// firing "!activator,SetPostProcessController" did nothing
+	DEFINE_INPUTFUNC( FIELD_INPUT, "SetPostProcessController", InputSetPostProcessController ),
 	DEFINE_INPUTFUNC( FIELD_STRING, "HandleMapEvent", InputHandleMapEvent ),
 
 	DEFINE_FIELD( m_nNumCrouches, FIELD_INTEGER ),
@@ -1006,7 +1016,35 @@ void CBasePlayer::TraceAttack( const CTakeDamageInfo &inputInfo, const Vector &v
 
 		SetLastHitGroup( ptr->hitgroup );
 
-		
+#ifdef LUA_SDK
+		// Srcbox: GMod's ScalePlayerDamage( ply, hitgroup, dmginfo ). Returning true blocks the damage.
+		// A GMod gamemode does its own hitgroup scaling there ( Base: head x2, limbs x0.25 ), so the
+		// engine's sk_player_* scaling below is skipped when the gamemode has the function.
+		const bool bGamemodeScales = SrcboxGamemodeHasFunction( "ScalePlayerDamage" );
+		if ( L )
+		{
+			bool bBlocked = false;
+			const int top = lua_gettop( L );
+			lua_pushdamageinfo( L, info );
+			const int infoIndex = lua_gettop( L );
+
+			SRCBOX_HOOK_BEGIN( "ScalePlayerDamage" )
+				CBasePlayer::PushLuaInstanceSafe( L, this );
+				lua_pushinteger( L, ptr->hitgroup );
+				lua_pushvalue( L, infoIndex );
+			SRCBOX_HOOK_CALL( 3 )
+				bBlocked = SRCBOX_HOOK_RETURNED_TRUE();
+			SRCBOX_HOOK_END()
+
+			info = lua_todamageinfo( L, infoIndex );
+			lua_settop( L, top );
+
+			if ( bBlocked )
+				return;
+		}
+
+		if ( !bGamemodeScales )
+#endif
 		switch ( ptr->hitgroup )
 		{
 		case HITGROUP_GENERIC:
@@ -1702,6 +1740,17 @@ int CBasePlayer::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 		ApplyAbsVelocityImpulse( force );
 	}
 
+#ifdef LUA_SDK
+	// Srcbox: GMod's PlayerHurt( victim, attacker, healthRemaining, damageTaken )
+	SRCBOX_HOOK_BEGIN( "PlayerHurt" )
+		CBasePlayer::PushLuaInstanceSafe( L, this );
+		CBaseEntity::PushLuaInstanceSafe( L, attacker );
+		lua_pushinteger( L, MAX( 0, m_iHealth.Get() ) );
+		lua_pushnumber( L, info.GetDamage() );
+	SRCBOX_HOOK_CALL( 4 )
+	SRCBOX_HOOK_END()
+#endif
+
 	// fire global game event
 
 	IGameEvent * event = gameeventmanager->CreateEvent( "player_hurt" );
@@ -2159,7 +2208,7 @@ void CBasePlayer::PlayerDeathThink(void)
 {
 	float flForward;
 
-#ifdef USE_OLD_HAND_VIEWMODEL
+#ifdef OLD_HAND_VIEWMODELS
 	GetViewModel(1)->SetModel(""); // FIX: Removes hand model when the player is dead
 #endif
 
@@ -2749,7 +2798,16 @@ bool CBasePlayer::IsValidObserverTarget(CBaseEntity * target)
 	// MOD AUTHORS: Add checks on target here or in derived method
 
 	if ( !target->IsPlayer() )	// only track players
+	{
+#ifdef LUA_SDK
+		// Lua gamemodes may spectate any entity they set explicitly (GMod 9's melonracer
+		// chase-cams the player's melon). FindNextObserverTarget only walks players, so
+		// regular spectating never picks a non-player.
+		return !target->IsMarkedForDeletion() && !target->IsEffectActive( EF_NODRAW );
+#else
 		return false;
+#endif
+	}
 
 	CBasePlayer * player = ToBasePlayer( target );
 
@@ -4724,6 +4782,14 @@ void CBasePlayer::ForceOrigin( const Vector &vecOrigin )
 //-----------------------------------------------------------------------------
 void CBasePlayer::PostThink()
 {
+#ifdef LUA_SDK
+	// Srcbox: GMod's PlayerPostThink( ply )
+	SRCBOX_HOOK_BEGIN( "PlayerPostThink" )
+		CBasePlayer::PushLuaInstanceSafe( L, this );
+	SRCBOX_HOOK_CALL( 1 )
+	SRCBOX_HOOK_END()
+#endif
+
 	// Attempt to apply pending client settings
 	if ( m_bPendingClientSettings )
 	{
@@ -4731,6 +4797,9 @@ void CBasePlayer::PostThink()
 	}
 
 	m_vecSmoothedVelocity = m_vecSmoothedVelocity * SMOOTHING_FACTOR + GetAbsVelocity() * ( 1 - SMOOTHING_FACTOR );
+
+	// Srcbox (from Mapbase / Alien Swarm): fog_volume brushes switch fog and post-process controllers
+	UpdateFXVolume();
 
 	if ( !g_fGameOver && !m_iPlayerLocked )
 	{
@@ -5232,7 +5301,7 @@ void CBasePlayer::Spawn( void )
 	enginesound->SetPlayerDSP( user, 0, false );
 
 	CreateViewModel();
-#if 0
+#if OLD_HAND_VIEWMODELS
 	CreateHandModel(); // hand viewmodel
 #endif
 
@@ -5549,6 +5618,23 @@ void CBasePlayer::CommitSuicide( bool bExplode /*= false*/, bool bForce /*= fals
 	if ( m_fNextSuicideTime > gpGlobals->curtime && !bForce )
 		return;
 
+#ifdef LUA_SDK
+	// Srcbox: GMod's CanPlayerSuicide( ply ): returning false stops it ( unless forced )
+	if ( !bForce )
+	{
+		bool bRefused = false;
+		SRCBOX_HOOK_BEGIN( "CanPlayerSuicide" )
+			CBasePlayer::PushLuaInstanceSafe( L, this );
+		SRCBOX_HOOK_CALL( 1 )
+			bRefused = SRCBOX_HOOK_RETURNED_FALSE();
+		SRCBOX_HOOK_END()
+
+		if ( bRefused )
+			return;
+	}
+#endif
+
+
 	// don't let them suicide for 5 seconds after suiciding
 	m_fNextSuicideTime = gpGlobals->curtime + 5;
 
@@ -5574,6 +5660,23 @@ void CBasePlayer::CommitSuicide( const Vector &vecForce, bool bExplode /*= false
 	// Prevent suicides for a time.
 	if ( m_fNextSuicideTime > gpGlobals->curtime && !bForce )
 		return;
+
+#ifdef LUA_SDK
+	// Srcbox: GMod's CanPlayerSuicide( ply ): returning false stops it ( unless forced )
+	if ( !bForce )
+	{
+		bool bRefused = false;
+		SRCBOX_HOOK_BEGIN( "CanPlayerSuicide" )
+			CBasePlayer::PushLuaInstanceSafe( L, this );
+		SRCBOX_HOOK_CALL( 1 )
+			bRefused = SRCBOX_HOOK_RETURNED_FALSE();
+		SRCBOX_HOOK_END()
+
+		if ( bRefused )
+			return;
+	}
+#endif
+
 
 	m_fNextSuicideTime = gpGlobals->curtime + 5;  
 
@@ -5881,6 +5984,16 @@ bool CBasePlayer::GetInVehicle( IServerVehicle *pVehicle, int nRole )
 		}
 	}
 
+#ifdef LUA_SDK
+	// Srcbox: GMod's PlayerEnteredVehicle( ply, vehicle, role )
+	SRCBOX_HOOK_BEGIN( "PlayerEnteredVehicle" )
+		CBasePlayer::PushLuaInstanceSafe( L, this );
+		CBaseEntity::PushLuaInstanceSafe( L, pVehicle->GetVehicleEnt() );
+		lua_pushinteger( L, nRole );
+	SRCBOX_HOOK_CALL( 3 )
+	SRCBOX_HOOK_END()
+#endif
+
 	return true;
 }
 
@@ -5895,6 +6008,26 @@ void CBasePlayer::LeaveVehicle( const Vector &vecExitPoint, const QAngle &vecExi
 
 	IServerVehicle *pVehicle = GetVehicle();
 	Assert( pVehicle );
+
+#ifdef LUA_SDK
+	// Srcbox: GMod's CanExitVehicle( vehicle, ply ): returning false keeps the player in. Not asked
+	// when the player has died ( they have to come out then )
+	if ( IsAlive() && pVehicle )
+	{
+		bool bRefused = false;
+		SRCBOX_HOOK_BEGIN( "CanExitVehicle" )
+			CBaseEntity::PushLuaInstanceSafe( L, pVehicle->GetVehicleEnt() );
+			CBasePlayer::PushLuaInstanceSafe( L, this );
+		SRCBOX_HOOK_CALL( 2 )
+			bRefused = SRCBOX_HOOK_RETURNED_FALSE();
+		SRCBOX_HOOK_END()
+
+		if ( bRefused )
+			return;
+	}
+
+	CBaseEntity *pSrcboxLeftVehicle = pVehicle ? pVehicle->GetVehicleEnt() : NULL;
+#endif
 
 	int nRole = pVehicle->GetPassengerRole( this );
 	Assert( nRole >= 0 );
@@ -5964,6 +6097,15 @@ void CBasePlayer::LeaveVehicle( const Vector &vecExitPoint, const QAngle &vecExi
 			gameeventmanager->FireEvent( event );
 		}
 	}
+
+#ifdef LUA_SDK
+	// Srcbox: GMod's PlayerLeaveVehicle( ply, vehicle )
+	SRCBOX_HOOK_BEGIN( "PlayerLeaveVehicle" )
+		CBasePlayer::PushLuaInstanceSafe( L, this );
+		CBaseEntity::PushLuaInstanceSafe( L, pSrcboxLeftVehicle );
+	SRCBOX_HOOK_CALL( 2 )
+	SRCBOX_HOOK_END()
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -6307,6 +6449,21 @@ void CBasePlayer::ImpulseCommands( )
 	switch (iImpulse)
 	{
 	case 100:
+#ifdef LUA_SDK
+		// Srcbox: GMod's PlayerSwitchFlashlight( ply, enabled ): returning false keeps it as it is
+		{
+			bool bRefused = false;
+			SRCBOX_HOOK_BEGIN( "PlayerSwitchFlashlight" )
+				CBasePlayer::PushLuaInstanceSafe( L, this );
+				lua_pushboolean( L, !FlashlightIsOn() );
+			SRCBOX_HOOK_CALL( 2 )
+				bRefused = SRCBOX_HOOK_RETURNED_FALSE();
+			SRCBOX_HOOK_END()
+
+			if ( bRefused )
+				break;
+		}
+#endif
         // temporary flashlight for level designers
         if ( FlashlightIsOn() )
 		{
@@ -6343,6 +6500,21 @@ void CBasePlayer::ImpulseCommands( )
 			// too early!
 			break;
 		}
+
+#ifdef LUA_SDK
+		// Srcbox: GMod's PlayerSpray( ply ): returning true stops the spray
+		{
+			bool bBlocked = false;
+			SRCBOX_HOOK_BEGIN( "PlayerSpray" )
+				CBasePlayer::PushLuaInstanceSafe( L, this );
+			SRCBOX_HOOK_CALL( 1 )
+				bBlocked = SRCBOX_HOOK_RETURNED_TRUE();
+			SRCBOX_HOOK_END()
+
+			if ( bBlocked )
+				break;
+		}
+#endif
 
 		{
 			Vector forward;
@@ -7716,6 +7888,18 @@ void CBasePlayer::Weapon_Drop( CBaseCombatWeapon *pWeapon, const Vector *pvecTar
 
 	BaseClass::Weapon_Drop( pWeapon, pvecTarget, pVelocity );
 
+#ifdef LUA_SDK
+	// Srcbox: GMod's PlayerDroppedWeapon( ply, weapon )
+	if ( pWeapon )
+	{
+		SRCBOX_HOOK_BEGIN( "PlayerDroppedWeapon" )
+			CBasePlayer::PushLuaInstanceSafe( L, this );
+			CBaseCombatWeapon::PushLuaInstanceSafe( L, pWeapon );
+		SRCBOX_HOOK_CALL( 2 )
+		SRCBOX_HOOK_END()
+	}
+#endif
+
 	if ( bWasActiveWeapon )
 	{
 		if (!SwitchToNextBestWeapon( NULL ))
@@ -7763,6 +7947,15 @@ void CBasePlayer::Weapon_Equip( CBaseCombatWeapon *pWeapon)
 #endif
 {
 	BaseClass::Weapon_Equip( pWeapon );
+
+#ifdef LUA_SDK
+	// Srcbox: GMod's WeaponEquip( weapon, owner )
+	SRCBOX_HOOK_BEGIN( "WeaponEquip" )
+		CBaseCombatWeapon::PushLuaInstanceSafe( L, pWeapon );
+		CBasePlayer::PushLuaInstanceSafe( L, this );
+	SRCBOX_HOOK_CALL( 2 )
+	SRCBOX_HOOK_END()
+#endif
 
 	bool bShouldSwitch = g_pGameRules->FShouldSwitchWeapon( this, pWeapon );
 
@@ -9240,6 +9433,59 @@ void CBasePlayer::InputSetPostProcessController(inputdata_t& inputdata)
 	if (pController)
 	{
 		m_hPostProcessCtrl.Set(pController);
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Srcbox (from Mapbase / Alien Swarm SDK): pick the fog and post-process controllers
+// of the fog_volume the player's view is in. Color correction volumes aren't supported
+// (Srcbox has no color correction system on the player).
+//-----------------------------------------------------------------------------
+void CBasePlayer::UpdateFXVolume( void )
+{
+	if ( TheFogVolumes.Count() == 0 )
+		return;
+
+	CFogController *pFogController = NULL;
+	CPostProcessController *pPostProcessController = NULL;
+
+	Vector eyePos;
+	CBaseEntity *pViewEntity = GetViewEntity();
+	if ( pViewEntity )
+	{
+		eyePos = pViewEntity->GetAbsOrigin();
+	}
+	else
+	{
+		eyePos = EyePosition();
+	}
+
+	CFogVolume *pFogVolume = CFogVolume::FindFogVolumeForPosition( eyePos );
+	if ( pFogVolume )
+	{
+		pFogController = pFogVolume->GetFogController();
+		pPostProcessController = pFogVolume->GetPostProcessController();
+	}
+
+	// Outside any volume (or a volume without one of them) falls back to the master controllers
+	if ( !pFogController )
+	{
+		pFogController = FogSystem()->GetMasterFogController();
+	}
+
+	if ( !pPostProcessController )
+	{
+		pPostProcessController = PostProcessSystem()->GetMasterPostProcessController();
+	}
+
+	if ( pFogController && m_Local.m_PlayerFog.m_hCtrl.Get() != pFogController )
+	{
+		m_Local.m_PlayerFog.m_hCtrl.Set( pFogController );
+	}
+
+	if ( pPostProcessController && m_hPostProcessCtrl.Get() != pPostProcessController )
+	{
+		m_hPostProcessCtrl.Set( pPostProcessController );
 	}
 }
 

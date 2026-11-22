@@ -903,6 +903,19 @@ LUA_BINDING_BEGIN( PhysicsObject, GetName, "class", "Gets name" )
 }
 LUA_BINDING_END( "string", "The name." )
 
+#ifdef LUA_SDK
+// Srcbox: GMod's PhysObj:GetEntity(), the entity the physics object belongs to ( its game data ).
+// GMod's duplicator calls it on frozen props / ragdoll bones when pasting.
+LUA_BINDING_BEGIN( PhysicsObject, GetEntity, "class", "Gets the entity the physics object belongs to" )
+{
+    lua_IPhysicsObject *physicsObject = LUA_BINDING_ARGUMENT( luaL_checkphysicsobject, 1, "physicsObject" );
+    CBaseEntity *pEntity = static_cast< CBaseEntity * >( physicsObject->GetGameData() );
+    CBaseEntity::PushLuaInstanceSafe( L, pEntity );
+    return 1;
+}
+LUA_BINDING_END( "Entity", "The entity, or NULL." )
+#endif
+
 LUA_BINDING_BEGIN( PhysicsObject, GetPosition, "class", "Gets the world position and angles" )
 {
     lua_IPhysicsObject *physicsObject = LUA_BINDING_ARGUMENT( luaL_checkphysicsobject, 1, "physicsObject" );

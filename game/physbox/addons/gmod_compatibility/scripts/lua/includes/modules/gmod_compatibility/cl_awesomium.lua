@@ -10,16 +10,22 @@ function PANEL:NewObjectCallback(objectName, callbackName)
 	self:AddJavascriptObjectCallback(objectName, callbackName)
 end
 
--- TODO: Adds javascript function 'language.Update' to an HTML panel as a method to call Lua's language.GetPhrase function.
-function JS_Language(htmlPanel)
+-- Srcbox: GMod's own JS_Language / JS_Utility / JS_Workshop ( includes/util/javascript_util.lua, loaded
+-- by includes/init.lua before this file ) add the Lua functions the spawnmenu's Saves and Dupes pages
+-- call. Only fill in empty ones when GMod's file wasn't loaded, instead of replacing them.
+if (not JS_Language) then
+	function JS_Language(htmlPanel)
+	end
 end
 
--- TODO: Adds javascript function 'util.MotionSensorAvailable' to an HTML panel as a method to call Lua's motionsensor.IsAvailable function.
-function JS_Utility(htmlPanel)
+if (not JS_Utility) then
+	function JS_Utility(htmlPanel)
+	end
 end
 
--- TODO: Adds workshop related javascript functions to an HTML panel, used by the "Dupes" and "Saves" tabs in the spawnmenu.
-function JS_Workshop(htmlPanel)
+if (not JS_Workshop) then
+	function JS_Workshop(htmlPanel)
+	end
 end
 
 derma.DefineControl("Awesomium", "A wrapper around the HTML to simulate awesomium", PANEL, "HTML")

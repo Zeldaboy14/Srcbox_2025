@@ -27,6 +27,7 @@
 #include "ltakedamageinfo.h"
 #include "mathlib/lvector.h"
 #include "hl2mp_playeranimstate.h"
+#include "srcbox/srcbox_gmodhooks.h"
 #endif
 
 //#if defined( ARGG )
@@ -430,7 +431,31 @@ int C_HL2MP_Player::DrawModel( int flags )
 
     Color(r, g, b, 255);*/
 
+#ifdef LUA_SDK
+    // Srcbox: GMod's PrePlayerDraw( ply, flags ): returning true hides the player; PostPlayerDraw after
+    bool bSrcboxHidden = false;
+    SRCBOX_HOOK_BEGIN( "PrePlayerDraw" )
+        CBasePlayer::PushLuaInstanceSafe( L, this );
+        lua_pushinteger( L, flags );
+    SRCBOX_HOOK_CALL( 2 )
+        bSrcboxHidden = SRCBOX_HOOK_RETURNED_TRUE();
+    SRCBOX_HOOK_END()
+
+    if ( bSrcboxHidden )
+        return 0;
+
+    const int drawn = BaseClass::DrawModel( flags );
+
+    SRCBOX_HOOK_BEGIN( "PostPlayerDraw" )
+        CBasePlayer::PushLuaInstanceSafe( L, this );
+        lua_pushinteger( L, flags );
+    SRCBOX_HOOK_CALL( 2 )
+    SRCBOX_HOOK_END()
+
+    return drawn;
+#else
     return BaseClass::DrawModel( flags );
+#endif
 }
 
 //-----------------------------------------------------------------------------

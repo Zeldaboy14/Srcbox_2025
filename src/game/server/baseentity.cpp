@@ -63,6 +63,10 @@
 #include "tier1/utlstring.h"
 #include "utlhashtable.h"
 #include "vscript_server.h"
+#include "srcbox/srcbox_gmodhooks.h"
+#ifdef LUA_SDK
+#include "ltakedamageinfo.h"
+#endif
 
 #if defined( TF_DLL )
 #include "tf_gamerules.h"
@@ -334,6 +338,13 @@ IMPLEMENT_SERVERCLASS_ST_NOBASE( CBaseEntity, DT_BaseEntity )
 
 #ifdef TF_DLL
 	SendPropArray3( SENDINFO_ARRAY3(m_nModelIndexOverrides), SendPropInt( SENDINFO_ARRAY(m_nModelIndexOverrides), SP_MODEL_INDEX_BITS, 0 ) ),
+#endif
+
+#ifdef LUA_SDK
+	// Lua network variables (Entity:SetNetworkDataValue, GMod's SetDT*/NetworkVar). The client
+	// receives this table, but it had dropped out of the send table, so no NetworkVar ever reached
+	// the client (every edit_* property read 0 there). Upstream Experiment sends it here too.
+	SendPropDataTable( "BaseEntityLuaVariables", 0, &REFERENCE_SEND_TABLE( DT_BaseEntityLuaVariables ) ),
 #endif
 
 END_SEND_TABLE()
@@ -1714,8 +1725,15 @@ void CBaseEntity::SetPhysAngularVelocity( const Vector &angularImpulse )
 //-----------------------------------------------------------------------------
 // Purpose: Scale damage done and call OnTakeDamage
 //-----------------------------------------------------------------------------
-int CBaseEntity::TakeDamage( const CTakeDamageInfo &inputInfo )
+int CBaseEntity::TakeDamage( const CTakeDamageInfo &originalInputInfo )
 {
+#ifdef LUA_SDK
+	// Srcbox: a copy GMod's EntityTakeDamage hook can change ( see below )
+	CTakeDamageInfo inputInfo = originalInputInfo;
+#else
+	const CTakeDamageInfo &inputInfo = originalInputInfo;
+#endif
+
 	if ( !g_pGameRules )
 		return 0;
 
@@ -1756,6 +1774,35 @@ int CBaseEntity::TakeDamage( const CTakeDamageInfo &inputInfo )
 	{
 		return 0;
 	}
+
+#ifdef LUA_SDK
+	// Srcbox: GMod's EntityTakeDamage( target, dmginfo ). Returning true blocks the damage; changes
+	// made to dmginfo ( ScaleDamage, SetDamage, SetAttacker, ... ) are what gets applied.
+	{
+		bool bBlocked = false;
+		lua_State *pState = L;
+
+		if ( pState )
+		{
+			const int top = lua_gettop( pState );
+			lua_pushdamageinfo( pState, inputInfo );
+			const int infoIndex = lua_gettop( pState );
+
+			SRCBOX_HOOK_BEGIN( "EntityTakeDamage" )
+				CBaseEntity::PushLuaInstanceSafe( L, this );
+				lua_pushvalue( L, infoIndex );
+			SRCBOX_HOOK_CALL( 2 )
+				bBlocked = SRCBOX_HOOK_RETURNED_TRUE();
+			SRCBOX_HOOK_END()
+
+			inputInfo = lua_todamageinfo( pState, infoIndex );
+			lua_settop( pState, top );
+		}
+
+		if ( bBlocked )
+			return 0;
+	}
+#endif
 
 	if ( PhysIsInCallback() )
 	{
