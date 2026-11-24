@@ -79,6 +79,7 @@ jobs:
         shell: cmd
         run: |
           create_physbox.bat
+          BUILD_SHADERS_SLN.bat
 
 
       - name: Build Full Solution (Windows)
