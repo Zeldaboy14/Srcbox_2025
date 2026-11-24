@@ -78,7 +78,6 @@ jobs:
         working-directory: src
         shell: cmd
         run: |
-          create_physbox.bat
           BUILD_SHADERS_SLN.bat
 
 
