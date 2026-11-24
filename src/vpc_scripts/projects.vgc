@@ -108,6 +108,11 @@ $Project "launcher_main"
 	"launcher_main\launcher_main_physbox.vpc" [$PHYSBOX]
 }
 
+$Project "lzma"
+{
+    "utils\lzma\lzma.vpc" [$WINDOWS]
+}
+
 $Project "mathlib"
 {
 	"mathlib\mathlib.vpc"

@@ -1007,6 +1007,7 @@ public:
 	CNetworkHandle(CPostProcessController, m_hPostProcessCtrl);	// active postprocessing controller
 	void InitPostProcessController(void);
 	void InputSetPostProcessController(inputdata_t& inputdata);
+	void UpdateFXVolume( void );	// Srcbox (from Mapbase / Alien Swarm): fog_volume support
 
 	// Used by env_soundscape_triggerable to manage when the player is touching multiple
 	// soundscape triggers simultaneously.

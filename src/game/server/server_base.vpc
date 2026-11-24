@@ -560,6 +560,8 @@ $Project
 		$File	"pointteleport.cpp"
 		$File	"postprocesscontroller.cpp"
 		$File	"postprocesscontroller.h"
+		$File	"fogvolume.cpp"
+		$File	"fogvolume.h"
 		$File	"$SRCDIR\public\mathlib\polyhedron.h"
 		$File	"$SRCDIR\game\shared\positionwatcher.h"
 		$File	"$SRCDIR\game\shared\precache_register.cpp"

@@ -584,3 +584,4 @@ game/physbox/data_scp_207/scp_207.json
 game/physbox/data_scramble/scramble_config.json
 game/physbox/data_scramble_mw/scramble_mw.json
 game/physbox/portal_colors.json
+src/lib/common/win32/2015/release/lzma.lib
