@@ -1,11 +1,11 @@
 name: Build and Push Binaries
 
+permissions:
+    contents: write
+
 on:
   push:
   workflow_dispatch:
-  
- permissions:
-  contents: write
 
 jobs:
   build:
